@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "dray",
+  "productName": "Dray",
   "version": "1.0.0",
   "identifier": "rust.dray.app",
   "build": {
