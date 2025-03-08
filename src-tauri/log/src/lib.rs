@@ -12,23 +12,21 @@ log = { path = "./log" }
 
 use log::{debug, error, info, init_logger, trace, warn};
 
-fn main() {
-  init_logger(
-	  Some(logger::LogLevel::Trace),
-	  Some("logs/main.log"),
-	  Some(1 * 1024 * 1024),
-  );
+init_logger(
+	Some(log::LogLevel::Trace),
+	Some("logs/main.log"),
+	Some(1 * 1024 * 1024),
+);
 
-  println!("{}", log::get_logger());
+println!("{}", log::get_logger());
 
-  // 测试性能的循环
-  for i in 0..3 {
-	  trace!("这是一个日志，{}", i);
-	  debug!("这是一个日志，{}", i);
-	  info!("这是一个日志，{}", i);
-	  warn!("这是一个日志，{}", i);
-	  error!("这是一个日志，{}", i);
-  }
+// 测试性能的循环
+for i in 0..3 {
+	error!("这是一个日志，{}", i);
+	warn!("这是一个日志，{}", i);
+	info!("这是一个日志，{}", i);
+	debug!("这是一个日志，{}", i);
+	trace!("这是一个日志，{}", i);
 }
 */
 

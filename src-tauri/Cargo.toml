@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "2.0.6", features = [] }
 
 [dependencies]
-loger = { path = "./loger" }
+log = { path = "./log" }
 tokio = { version = "1.44", features = ["full"] }
 actix-files = "0.6.6"
 actix-web = "4.9"
