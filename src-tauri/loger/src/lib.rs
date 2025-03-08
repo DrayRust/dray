@@ -15,11 +15,24 @@ pub enum LogLevel {
     Trace,
 }
 
+impl std::fmt::Display for Logger {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Logger {{
+    config: {:?},
+    file_writer: {:?}
+}}",
+            self.config, self.file_writer
+        )
+    }
+}
+
 // 日志配置
 #[derive(Debug)]
 pub struct LogConfig {
     pub log_filepath: Option<PathBuf>,
-    pub max_log_size: u64,
+    pub log_max_size: u64,
     pub log_level: LogLevel,
 }
 
@@ -27,7 +40,7 @@ impl LogConfig {
     pub fn new() -> Self {
         LogConfig {
             log_filepath: None,
-            max_log_size: 5 * 1024 * 1024,
+            log_max_size: 5 * 1024 * 1024,
             log_level: LogLevel::Trace,
         }
     }
@@ -43,8 +56,8 @@ impl LogConfig {
         Ok(())
     }
 
-    pub fn set_max_log_size(&mut self, size: u64) {
-        self.max_log_size = size;
+    pub fn set_log_max_size(&mut self, size: u64) {
+        self.log_max_size = size;
     }
 
     pub fn set_log_level(&mut self, level: LogLevel) {
@@ -98,7 +111,7 @@ impl Logger {
 
             // 判断文件大小是否超过最大值
             let metadata = fs::metadata(log_filepath)?;
-            if metadata.len() > config.max_log_size {
+            if metadata.len() > config.log_max_size {
                 // 重命名文件
                 let extension = log_filepath
                     .extension()
@@ -143,9 +156,9 @@ impl Logger {
     }
 
     // 设置日志文件最大大小
-    pub fn set_max_log_size(&self, size: u64) {
+    pub fn set_log_max_size(&self, size: u64) {
         let mut config = self.config.lock().unwrap();
-        config.set_max_log_size(size);
+        config.set_log_max_size(size);
     }
 }
 
@@ -154,7 +167,7 @@ static GLOBAL_LOGGER: OnceLock<Logger> = OnceLock::new();
 static LOGGER_INIT: Once = Once::new();
 
 // 初始化全局日志记录器
-pub fn init_logger(log_level: Option<LogLevel>, filepath: Option<&str>, max_log_size: Option<u64>) {
+pub fn init_logger(log_level: Option<LogLevel>, filepath: Option<&str>, log_max_size: Option<u64>) {
     LOGGER_INIT.call_once(|| {
         let logger = Logger::new();
 
@@ -168,8 +181,8 @@ pub fn init_logger(log_level: Option<LogLevel>, filepath: Option<&str>, max_log_
             }
         }
 
-        if let Some(size) = max_log_size {
-            logger.set_max_log_size(size);
+        if let Some(size) = log_max_size {
+            logger.set_log_max_size(size);
         }
 
         GLOBAL_LOGGER
@@ -198,7 +211,7 @@ pub fn level_str(level: LogLevel) -> &'static str {
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Error, &format!($($arg)*)) {
+        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Error, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -207,7 +220,7 @@ macro_rules! error {
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Warn, &format!($($arg)*)) {
+        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Warn, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -216,7 +229,7 @@ macro_rules! warn {
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Info, &format!($($arg)*)) {
+        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Info, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -225,7 +238,7 @@ macro_rules! info {
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Debug, &format!($($arg)*)) {
+        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Debug, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -234,7 +247,7 @@ macro_rules! debug {
 #[macro_export]
 macro_rules! trace {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Trace, &format!($($arg)*)) {
+        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Trace, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
