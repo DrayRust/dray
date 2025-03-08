@@ -17,14 +17,14 @@ pub enum LogLevel {
 
 // 日志配置
 #[derive(Debug)]
-struct LogConfig {
-    log_filepath: Option<PathBuf>,
-    max_log_size: u64,
-    log_level: LogLevel,
+pub struct LogConfig {
+    pub log_filepath: Option<PathBuf>,
+    pub max_log_size: u64,
+    pub log_level: LogLevel,
 }
 
 impl LogConfig {
-    fn new() -> Self {
+    pub fn new() -> Self {
         LogConfig {
             log_filepath: None,
             max_log_size: 5 * 1024 * 1024,
@@ -32,7 +32,7 @@ impl LogConfig {
         }
     }
 
-    fn set_log_filepath(&mut self, filepath: &str) -> io::Result<()> {
+    pub fn set_log_filepath(&mut self, filepath: &str) -> io::Result<()> {
         let log_filepath = PathBuf::from(filepath);
         if let Some(parent_dir) = log_filepath.parent() {
             if !parent_dir.exists() {
@@ -43,24 +43,24 @@ impl LogConfig {
         Ok(())
     }
 
-    fn set_max_log_size(&mut self, size: u64) {
+    pub fn set_max_log_size(&mut self, size: u64) {
         self.max_log_size = size;
     }
 
-    fn set_log_level(&mut self, level: LogLevel) {
+    pub fn set_log_level(&mut self, level: LogLevel) {
         self.log_level = level;
     }
 }
 
 // 日志器
 #[derive(Debug)]
-struct Logger {
+pub struct Logger {
     config: Arc<Mutex<LogConfig>>,
     file_writer: Mutex<Option<BufWriter<File>>>,
 }
 
 impl Logger {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let config = Arc::new(Mutex::new(LogConfig::new()));
         Logger {
             config,
@@ -198,7 +198,7 @@ pub fn level_str(level: LogLevel) -> &'static str {
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Error, &format!($($arg)*)) {
+        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Error, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -207,7 +207,7 @@ macro_rules! error {
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Warn, &format!($($arg)*)) {
+        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Warn, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -216,7 +216,7 @@ macro_rules! warn {
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Info, &format!($($arg)*)) {
+        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Info, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -225,7 +225,7 @@ macro_rules! info {
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Debug, &format!($($arg)*)) {
+        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Debug, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -234,7 +234,7 @@ macro_rules! debug {
 #[macro_export]
 macro_rules! trace {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Trace, &format!($($arg)*)) {
+        if let Err(e) = $crate::loger::get_logger().log($crate::loger::LogLevel::Trace, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
