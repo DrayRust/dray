@@ -69,7 +69,7 @@ impl Logger {
     }
 
     // 日志函数
-    fn log(&self, level: LogLevel, message: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn log(&self, level: LogLevel, message: &str) -> Result<(), Box<dyn std::error::Error>> {
         let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
         let log_message = format!("[{}] [{}] {}", timestamp, level_str(level), message);
 
@@ -123,7 +123,7 @@ impl Logger {
     }
 
     // 设置日志文件路径
-    fn set_log_filepath(&self, filepath: &str) -> io::Result<()> {
+    pub fn set_log_filepath(&self, filepath: &str) -> io::Result<()> {
         let mut config = self.config.lock().unwrap();
         config.set_log_filepath(filepath)?;
         let log_filepath = config.log_filepath.clone().unwrap();
@@ -137,13 +137,13 @@ impl Logger {
     }
 
     // 设置日志级别
-    fn set_log_level(&self, level: LogLevel) {
+    pub fn set_log_level(&self, level: LogLevel) {
         let mut config = self.config.lock().unwrap();
         config.set_log_level(level);
     }
 
     // 设置日志文件最大大小
-    fn set_max_log_size(&self, size: u64) {
+    pub fn set_max_log_size(&self, size: u64) {
         let mut config = self.config.lock().unwrap();
         config.set_max_log_size(size);
     }
@@ -179,12 +179,12 @@ pub fn init_logger(log_level: Option<LogLevel>, filepath: Option<&str>, max_log_
 }
 
 // 获取全局日志记录器
-fn get_logger() -> &'static Logger {
+pub fn get_logger() -> &'static Logger {
     GLOBAL_LOGGER.get().expect("Logger not initialized")
 }
 
 // 日志级别字符串
-fn level_str(level: LogLevel) -> &'static str {
+pub fn level_str(level: LogLevel) -> &'static str {
     match level {
         LogLevel::Error => "error",
         LogLevel::Warn => "warn",
