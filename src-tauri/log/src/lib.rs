@@ -1,24 +1,22 @@
 //! 这是一个日志记录模块，提供了日志记录功能。
-//! 支持不同级别的日志（如 Error, Warn, Info, Debug, Trace），
+//! 支持不同级别的日志（如 None, Error, Warn, Info, Debug, Trace），
 //! 可以将日志输出到控制台和文件，并支持日志文件的自动轮转。
-//!
-//! 日志记录器的配置可以通过 `LogConfig` 结构体进行设置，包括日志文件路径、日志文件大小、日志级别等。
-//! 日志记录器的实例可以通过 `Logger` 结构体进行创建和使用。
 
 /**
 用例：
 [dependencies]
 log = { path = "./log" }
 
-use log::{debug, error, info, init_logger, trace, warn};
+use log::{debug, error, info, trace, warn};
 
-init_logger(
-    Some(log::LogLevel::Trace),
-    Some("logs/main.log"),
-    Some(1 * 1024 * 1024),
-);
+log::set_log_level("info");
+log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
+	eprintln!("设置日志文件路径失败: {}", e);
+});
+log::set_log_max_size(2 * 1024 * 1024);
 
-println!("{}", log::get_logger());
+println!("{:?}", log::get_log_config());
+println!("{:?}", log::get_log_writer());
 
 // 测试性能的循环
 for i in 0..3 {
@@ -38,6 +36,7 @@ use std::sync::{Mutex, MutexGuard};
 // 日志级别
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
+    None,
     Error,
     Warn,
     Info,
@@ -84,13 +83,14 @@ fn set_log_writer(filepath: &PathBuf) -> io::Result<()> {
 }
 
 // 获取 BufWriter
-fn get_log_writer() -> MutexGuard<'static, Option<BufWriter<File>>> {
+pub fn get_log_writer() -> MutexGuard<'static, Option<BufWriter<File>>> {
     LOG_WRITER.lock().unwrap()
 }
 
 // 日志级别字符串
 pub fn level_str(level: LogLevel) -> &'static str {
     match level {
+        LogLevel::None => "none",
         LogLevel::Error => "error",
         LogLevel::Warn => "warn",
         LogLevel::Info => "info",
@@ -102,7 +102,7 @@ pub fn level_str(level: LogLevel) -> &'static str {
 pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
     let config = get_log_config();
     // 如果当前日志级别低于设置的级别，则不记录
-    if level > config.log_level {
+    if level > config.log_level || config.log_level == LogLevel::None {
         // println!("{:?} 大于 {:?}", level, config.log_level);
         return Ok(());
     }
@@ -112,6 +112,7 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
 
     // 输出到控制台
     match level {
+        LogLevel::None => (),
         LogLevel::Error => println!("\x1b[31m{}\x1b[0m", log_message.trim_end()),
         LogLevel::Warn => println!("\x1b[33m{}\x1b[0m", log_message.trim_end()),
         LogLevel::Info => println!("\x1b[32m{}\x1b[0m", log_message.trim_end()),
@@ -144,9 +145,16 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
 }
 
 // 设置日志级别
-pub fn set_log_level(level: LogLevel) {
+pub fn set_log_level(level_str: &str) {
     let mut config = get_log_config();
-    config.log_level = level;
+    config.log_level = match level_str.to_lowercase().as_str() {
+        "error" => LogLevel::Error,
+        "warn" => LogLevel::Warn,
+        "info" => LogLevel::Info,
+        "debug" => LogLevel::Debug,
+        "trace" => LogLevel::Trace,
+        _ => LogLevel::None, // 匹配不上的情况设置为 None
+    };
 }
 
 // 设置日志文件路径
@@ -165,10 +173,10 @@ pub fn set_log_filepath(filepath: &str) -> io::Result<()> {
     Ok(())
 }
 
-// 设置日志文件最大大小（单位：M）
+// 设置日志文件最大大小（单位：字节）
 pub fn set_log_max_size(size: u64) {
     let mut config = get_log_config();
-    config.log_max_size = size * 1024 * 1024; // 转换为字节
+    config.log_max_size = size
 }
 
 // 定义日志宏
