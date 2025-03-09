@@ -13,237 +13,169 @@ log = { path = "./log" }
 use log::{debug, error, info, init_logger, trace, warn};
 
 init_logger(
-	Some(log::LogLevel::Trace),
-	Some("logs/main.log"),
-	Some(1 * 1024 * 1024),
+    Some(log::LogLevel::Trace),
+    Some("logs/main.log"),
+    Some(1 * 1024 * 1024),
 );
 
 println!("{}", log::get_logger());
 
 // 测试性能的循环
 for i in 0..3 {
-	error!("这是一个日志，{}", i);
-	warn!("这是一个日志，{}", i);
-	info!("这是一个日志，{}", i);
-	debug!("这是一个日志，{}", i);
-	trace!("这是一个日志，{}", i);
+    error!("这是一个日志，{}", i);
+    warn!("这是一个日志，{}", i);
+    info!("这是一个日志，{}", i);
+    debug!("这是一个日志，{}", i);
+    trace!("这是一个日志，{}", i);
 }
 */
-
 use chrono::Local;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Write};
 use std::path::PathBuf;
-use std::sync::OnceLock;
-use std::sync::{Arc, Mutex, Once};
+use std::sync::{Mutex, MutexGuard};
 
 // 日志级别
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
-	Error,
-	Warn,
-	Info,
-	Debug,
-	Trace,
-}
-
-impl std::fmt::Display for Logger {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(
-			f,
-			"Logger {{
-    config: {:?},
-    file_writer: {:?}
-}}",
-			self.config, self.file_writer
-		)
-	}
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
 }
 
 // 日志配置
 #[derive(Debug)]
 pub struct LogConfig {
-	pub log_filepath: Option<PathBuf>,
-	pub log_max_size: u64,
-	pub log_level: LogLevel,
+    pub log_level: LogLevel,
+    pub log_filepath: Option<PathBuf>,
+    pub log_max_size: u64,
 }
 
-impl LogConfig {
-	pub fn new() -> Self {
-		LogConfig {
-			log_filepath: None,
-			log_max_size: 5 * 1024 * 1024,
-			log_level: LogLevel::Trace,
-		}
-	}
+static LOG_CONFIG: Mutex<LogConfig> = Mutex::new(LogConfig {
+    log_level: LogLevel::Trace,
+    log_filepath: None,
+    log_max_size: 5 * 1024 * 1024, // 设置默认值为 5MB
+});
+static LOG_WRITER: Mutex<Option<BufWriter<File>>> = Mutex::new(None);
 
-	pub fn set_log_filepath(&mut self, filepath: &str) -> io::Result<()> {
-		let log_filepath = PathBuf::from(filepath);
-		if let Some(parent_dir) = log_filepath.parent() {
-			if !parent_dir.exists() {
-				fs::create_dir_all(parent_dir)?;
-			}
-		}
-		self.log_filepath = Some(log_filepath);
-		Ok(())
-	}
-
-	pub fn set_log_max_size(&mut self, size: u64) {
-		self.log_max_size = size;
-	}
-
-	pub fn set_log_level(&mut self, level: LogLevel) {
-		self.log_level = level;
-	}
+// 获取全局配置
+pub fn get_log_config() -> MutexGuard<'static, LogConfig> {
+    LOG_CONFIG.lock().unwrap()
 }
 
-// 日志器
-#[derive(Debug)]
-pub struct Logger {
-	config: Arc<Mutex<LogConfig>>,
-	file_writer: Mutex<Option<BufWriter<File>>>,
+// 初始化 BufWriter
+fn init_log_writer(filepath: &PathBuf) -> io::Result<()> {
+    let mut writer = LOG_WRITER.lock().unwrap();
+    if writer.is_none() {
+        let file = File::options().append(true).create(true).open(filepath)?;
+        *writer = Some(BufWriter::new(file));
+    }
+    Ok(())
 }
 
-impl Logger {
-	pub fn new() -> Self {
-		let config = Arc::new(Mutex::new(LogConfig::new()));
-		Logger {
-			config,
-			file_writer: Mutex::new(None),
-		}
-	}
-
-	// 日志函数
-	pub fn log(&self, level: LogLevel, message: &str) -> Result<(), Box<dyn std::error::Error>> {
-		let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-		let log_message = format!("[{}] [{}] {}", timestamp, level_str(level), message);
-
-		// 输出到控制台
-		match level {
-			LogLevel::Error => eprintln!("\x1b[31m{}\x1b[0m", log_message.trim_end()),
-			LogLevel::Warn => eprintln!("\x1b[33m{}\x1b[0m", log_message.trim_end()),
-			LogLevel::Info => eprintln!("\x1b[32m{}\x1b[0m", log_message.trim_end()),
-			LogLevel::Debug => eprintln!("\x1b[34m{}\x1b[0m", log_message.trim_end()),
-			LogLevel::Trace => eprintln!("\x1b[35m{}\x1b[0m", log_message.trim_end()),
-		}
-
-		let config = self.config.lock().unwrap();
-		// 如果当前日志级别低于设置的级别，则不记录
-		if level < config.log_level {
-			return Ok(());
-		}
-
-		if let Some(log_filepath) = &config.log_filepath {
-			// 同步写入日志文件
-			let mut file_writer = self.file_writer.lock().unwrap();
-			if let Some(writer) = file_writer.as_mut() {
-				writeln!(writer, "{}", log_message)?;
-				writer.flush()?;
-			}
-
-			// 判断文件大小是否超过最大值
-			let metadata = fs::metadata(log_filepath)?;
-			if metadata.len() > config.log_max_size {
-				// 重命名文件
-				let extension = log_filepath
-					.extension()
-					.and_then(|ext| ext.to_str())
-					.unwrap_or("");
-				let timestamp = Local::now().format("%Y%m%d%H%M%S");
-				let bak_filepath =
-					log_filepath.with_extension(format!("{}.{}", timestamp, extension));
-				fs::rename(log_filepath, bak_filepath)?;
-
-				// 打开新的文件
-				*file_writer = Some(BufWriter::new(
-					File::options()
-						.append(true)
-						.create(true)
-						.open(log_filepath)?,
-				));
-			}
-		}
-
-		Ok(())
-	}
-
-	// 设置日志文件路径
-	pub fn set_log_filepath(&self, filepath: &str) -> io::Result<()> {
-		let mut config = self.config.lock().unwrap();
-		config.set_log_filepath(filepath)?;
-		let log_filepath = config.log_filepath.clone().unwrap();
-		*self.file_writer.lock().unwrap() = Some(BufWriter::new(
-			File::options()
-				.append(true)
-				.create(true)
-				.open(log_filepath)?,
-		));
-		Ok(())
-	}
-
-	// 设置日志级别
-	pub fn set_log_level(&self, level: LogLevel) {
-		let mut config = self.config.lock().unwrap();
-		config.set_log_level(level);
-	}
-
-	// 设置日志文件最大大小
-	pub fn set_log_max_size(&self, size: u64) {
-		let mut config = self.config.lock().unwrap();
-		config.set_log_max_size(size);
-	}
+// 设置 BufWriter
+fn set_log_writer(filepath: &PathBuf) -> io::Result<()> {
+    let mut writer = LOG_WRITER.lock().unwrap();
+    let file = File::options().append(true).create(true).open(filepath)?;
+    *writer = Some(BufWriter::new(file));
+    Ok(())
 }
 
-// 全局日志记录器
-static GLOBAL_LOGGER: OnceLock<Logger> = OnceLock::new();
-static LOGGER_INIT: Once = Once::new();
-
-// 初始化全局日志记录器
-pub fn init_logger(log_level: Option<LogLevel>, filepath: Option<&str>, log_max_size: Option<u64>) {
-	LOGGER_INIT.call_once(|| {
-		let logger = Logger::new();
-
-		if let Some(level) = log_level {
-			logger.set_log_level(level);
-		}
-
-		if let Some(fp) = filepath {
-			if let Err(e) = logger.set_log_filepath(fp) {
-				eprintln!("无法设置日志文件路径: {}", e);
-			}
-		}
-
-		if let Some(size) = log_max_size {
-			logger.set_log_max_size(size);
-		}
-
-		GLOBAL_LOGGER
-			.set(logger)
-			.expect("Logger already initialized");
-	});
-}
-
-// 获取全局日志记录器
-pub fn get_logger() -> &'static Logger {
-	GLOBAL_LOGGER.get().expect("Logger not initialized")
+// 获取 BufWriter
+fn get_log_writer() -> MutexGuard<'static, Option<BufWriter<File>>> {
+    LOG_WRITER.lock().unwrap()
 }
 
 // 日志级别字符串
 pub fn level_str(level: LogLevel) -> &'static str {
-	match level {
-		LogLevel::Error => "error",
-		LogLevel::Warn => "warn",
-		LogLevel::Info => "info",
-		LogLevel::Debug => "debug",
-		LogLevel::Trace => "trace",
-	}
+    match level {
+        LogLevel::Error => "error",
+        LogLevel::Warn => "warn",
+        LogLevel::Info => "info",
+        LogLevel::Debug => "debug",
+        LogLevel::Trace => "trace",
+    }
+}
+
+pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
+    let config = get_log_config();
+    // 如果当前日志级别低于设置的级别，则不记录
+    if level > config.log_level {
+        // println!("{:?} 大于 {:?}", level, config.log_level);
+        return Ok(());
+    }
+
+    let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    let log_message = format!("[{}] [{}] {}\n", timestamp, level_str(level), message);
+
+    // 输出到控制台
+    match level {
+        LogLevel::Error => println!("\x1b[31m{}\x1b[0m", log_message.trim_end()),
+        LogLevel::Warn => println!("\x1b[33m{}\x1b[0m", log_message.trim_end()),
+        LogLevel::Info => println!("\x1b[32m{}\x1b[0m", log_message.trim_end()),
+        LogLevel::Debug => println!("\x1b[34m{}\x1b[0m", log_message.trim_end()),
+        LogLevel::Trace => println!("\x1b[35m{}\x1b[0m", log_message.trim_end()),
+    }
+
+    if let Some(log_filepath) = &config.log_filepath {
+        init_log_writer(log_filepath)?; // 初始化 BufWriter
+        if let Some(writer) = get_log_writer().as_mut() {
+            writer.write_all(log_message.as_bytes())?; // 写入日志，性能比 writeln! 高
+            writer.flush()?;
+        }
+
+        // 判断文件大小是否超过最大值
+        let metadata = fs::metadata(log_filepath)?;
+        if metadata.len() > config.log_max_size {
+            let extension = log_filepath
+                .extension()
+                .and_then(|ext| ext.to_str())
+                .unwrap_or("");
+            let timestamp = Local::now().format("%Y%m%d%H%M%S");
+            let bak_filepath = log_filepath.with_extension(format!("{}.{}", timestamp, extension));
+            fs::rename(log_filepath, bak_filepath)?; // 重命名文件，备份旧文件
+            set_log_writer(log_filepath)?; // 打开新的文件
+        }
+    }
+
+    Ok(())
+}
+
+// 设置日志级别
+pub fn set_log_level(level: LogLevel) {
+    let mut config = get_log_config();
+    config.log_level = level;
+}
+
+// 设置日志文件路径
+pub fn set_log_filepath(filepath: &str) -> io::Result<()> {
+    let mut config = get_log_config();
+    config.log_filepath = Some(PathBuf::from(filepath));
+    if let Some(log_filepath) = config.log_filepath.as_ref() {
+        // 如果有值，创建父目录
+        if let Some(parent_dir) = log_filepath.parent() {
+            if !parent_dir.exists() {
+                fs::create_dir_all(parent_dir)?;
+            }
+        }
+    }
+    set_log_writer(&PathBuf::from(filepath))?;
+    Ok(())
+}
+
+// 设置日志文件最大大小（单位：M）
+pub fn set_log_max_size(size: u64) {
+    let mut config = get_log_config();
+    config.log_max_size = size * 1024 * 1024; // 转换为字节
 }
 
 // 定义日志宏
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Error, &format!($($arg)*)) {
+        if let Err(e) = $crate::log($crate::LogLevel::Error, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -252,7 +184,7 @@ macro_rules! error {
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Warn, &format!($($arg)*)) {
+        if let Err(e) = $crate::log($crate::LogLevel::Warn, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -261,7 +193,7 @@ macro_rules! warn {
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Info, &format!($($arg)*)) {
+        if let Err(e) = $crate::log($crate::LogLevel::Info, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -270,7 +202,7 @@ macro_rules! info {
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Debug, &format!($($arg)*)) {
+        if let Err(e) = $crate::log($crate::LogLevel::Debug, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
@@ -279,7 +211,7 @@ macro_rules! debug {
 #[macro_export]
 macro_rules! trace {
     ($($arg:tt)*) => {
-        if let Err(e) = $crate::get_logger().log($crate::LogLevel::Trace, &format!($($arg)*)) {
+        if let Err(e) = $crate::log($crate::LogLevel::Trace, &format!($($arg)*)) {
             eprintln!("日志记录失败: {}", e);
         }
     };
