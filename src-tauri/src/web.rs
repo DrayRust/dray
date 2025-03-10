@@ -9,14 +9,16 @@ pub fn start(ip: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
     let rt = Runtime::new()?;
     rt.block_on(async {
         let server = HttpServer::new(|| {
-            App::new().route("/", web::get().to(|| async { "This is Dray Web Server!" }))
+            App::new()
+                .service(Files::new("/dray", "~/.dray/web_server"))
+                .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
         })
         .bind(format!("{}:{}", ip, port))?
         .run();
 
-        tokio::spawn(async move { server.await });
+        let start_handle = tokio::spawn(async move { server.await });
 
-		// 标记运行
+        // 标记运行
         let mut is_run = IS_RUN.lock()?;
         *is_run = true;
 
@@ -28,6 +30,8 @@ pub fn start(ip: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
+        start_handle.await?;
+
         Ok(())
     })
 }
@@ -35,4 +39,5 @@ pub fn start(ip: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
 pub fn stop() -> Result<(), Box<dyn std::error::Error>> {
     let mut is_run = IS_RUN.lock()?;
     *is_run = false;
+    Ok(())
 }
