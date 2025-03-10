@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::sync::LazyLock;
+use std::sync::Mutex;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -27,21 +28,32 @@ impl Default for Config {
     }
 }
 
-static CONFIG: LazyLock<Config> = LazyLock::new(|| {
-    if let Ok(config) = load_config_from_file("config.json") {
-        config // 尝试从配置文件加载
-    } else {
-        Config::default() // 如果文件不存在或解析失败，使用默认值
-    }
+static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| {
+	Mutex::new(
+		load_config_from_file("config.json").unwrap_or_else(|_| Config::default())
+	)
 });
 
-// 新增函数，返回 CONFIG 的引用
-pub fn get_config() -> &'static Config {
-    &CONFIG
+pub fn get_config() -> Config {
+    CONFIG.lock().unwrap().clone()
 }
 
-fn load_config_from_file(file_path: &str) -> Result<Config, Box<dyn std::error::Error>> {
+pub fn load_config_from_file(file_path: &str) -> Result<Config, Box<dyn std::error::Error>> {
     let file_content = fs::read_to_string(file_path)?;
     let config: Config = serde_json::from_str(&file_content)?;
     Ok(config)
+}
+
+pub fn save_config_to_file(
+    config: &Config,
+    file_path: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // 更新全局配置
+    *CONFIG.lock().unwrap() = config.clone();
+
+    // 保存配置到文件
+    let config_json = serde_json::to_string_pretty(config)?;
+    fs::write(file_path, config_json)?;
+
+    Ok(())
 }
