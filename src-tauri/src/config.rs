@@ -3,6 +3,32 @@ use std::fs;
 use std::sync::LazyLock;
 use std::sync::Mutex;
 
+/**
+    使用方法：
+    mod config;
+
+    let mut config = config::get_config();
+    println!("{:?}", config);
+
+    // 修改配置
+    config.log_level = "Error".to_string();
+    config.log_max_size = 10;
+
+    // 保存修改后的配置
+    if let Err(e) = config::save_config_to_file(&config, "config.json") {
+        eprintln!("Failed to save config: {}", e);
+    } else {
+        println!("Config saved successfully");
+    }
+
+    // 打印修改后的配置
+    println!("Updated Config: {:?}", config);
+
+    // 读取，对比是否修改成功
+    let config = config::get_config();
+    println!("{:?}", config);
+*/
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub web_server_host: String,
@@ -29,9 +55,7 @@ impl Default for Config {
 }
 
 static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| {
-	Mutex::new(
-		load_config_from_file("config.json").unwrap_or_else(|_| Config::default())
-	)
+    Mutex::new(load_config_from_file("config.json").unwrap_or_else(|_| Config::default()))
 });
 
 pub fn get_config() -> Config {
