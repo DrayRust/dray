@@ -1,3 +1,4 @@
+use actix_files::Files;
 use actix_web::{web, App, HttpServer};
 use std::sync::Mutex;
 use tokio::runtime::Runtime;
