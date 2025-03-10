@@ -4,9 +4,11 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 
 /**
-    使用方法：
-    mod config;
+使用释例：
 
+mod config;
+
+fn main() {
     let mut config = config::get_config();
     println!("{:?}", config);
 
@@ -27,6 +29,7 @@ use std::sync::Mutex;
     // 读取，对比是否修改成功
     let config = config::get_config();
     println!("{:?}", config);
+}
 */
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
