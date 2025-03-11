@@ -4,6 +4,17 @@ use once_cell::sync::Lazy;
 use serde::Serialize;
 use serde_json;
 
+/**
+测试：
+fn main() {
+	println!("Executable Path: {:?}", get_executable_path());
+	println!("Current Dir: {:?}", get_current_dir());
+	println!("Home Dir: {:?}", get_home_dir());
+	println!("Data Dir: {:?}", get_data_dir());
+	println!("Paths JSON: {}", get_paths_json());
+}
+*/
+
 #[derive(Serialize)]
 struct Paths {
 	audio_dir: Option<std::path::PathBuf>,
