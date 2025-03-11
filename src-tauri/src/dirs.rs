@@ -38,26 +38,26 @@ static CURRENT_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| env::current
 static HOME_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::home_dir());
 static DATA_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::data_dir());
 
-/// 获取当前可执行文件的路径。
-/// 返回一个`Option<std::path::PathBuf>`，如果获取成功则包含路径，否则为`None`。
+/// Get the path of the current executable.
+/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_executable_path() -> Option<std::path::PathBuf> {
 	EXECUTABLE_PATH.clone()
 }
 
-/// 获取当前工作目录的路径。
-/// 返回一个`Option<std::path::PathBuf>`，如果获取成功则包含路径，否则为`None`。
+/// Get the path of the current working directory.
+/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_current_dir() -> Option<std::path::PathBuf> {
 	CURRENT_DIR.clone()
 }
 
-/// 获取用户主目录的路径。
-/// 返回一个`Option<std::path::PathBuf>`，如果获取成功则包含路径，否则为`None`。
+/// Get the path of the user's home directory.
+/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_home_dir() -> Option<std::path::PathBuf> {
 	HOME_DIR.clone()
 }
 
-/// 获取应用程序数据目录的路径。
-/// 返回一个`Option<std::path::PathBuf>`，如果获取成功则包含路径，否则为`None`。
+/// Get the path of the application data directory.
+/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_data_dir() -> Option<std::path::PathBuf> {
 	DATA_DIR.clone()
 }
