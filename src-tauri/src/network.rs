@@ -36,7 +36,7 @@ pub fn disable_all_proxies() -> bool {
 }
 
 pub fn set_pac() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setautoproxyurl", "Wi-Fi", "127.0.0.1", "http://127.0.0.1:18687/dray/proxy.pac"]) {
+	if let Err(e) = command::start("networksetup", &["-setautoproxyurl", "Wi-Fi", "http://127.0.0.1:18687/dray/proxy.pac"]) {
 		error!("Failed to set PAC file: {}", e);
 		false
 	} else {

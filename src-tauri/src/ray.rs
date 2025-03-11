@@ -7,9 +7,9 @@ pub fn start() -> bool {
 		error!("Failed to get user home directory");
 		std::path::PathBuf::from(".")
 	});
-	let ray_bin_path = home_dir.join("dray").join("ray-bin");
-	let ray_path: String = ray_bin_path.join("ray").to_str().unwrap_or("./ray-bin/ray").to_string();
-	let ray_config_path: String = ray_bin_path.join("config.json").to_str().unwrap_or("./ray-bin/config.json").to_string();
+	let ray_dir = home_dir.join("dray").join("ray-bin");
+	let ray_path: String = ray_dir.join("ray").to_str().unwrap_or("./ray-bin/ray").to_string();
+	let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap_or("./ray-bin/config.json").to_string();
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
 

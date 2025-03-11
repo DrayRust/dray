@@ -21,13 +21,13 @@ pub fn start() {
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
 		error!("Failed to get user home directory");
-		std::path::PathBuf::from(".")
+		std::path::PathBuf::from("./dray/web_server")
 	});
-	let web_server_path = home_dir.join("dray").join("web_server");
+	let web_server_path: String = home_dir.join("dray").join("web_server").to_str().unwrap_or("").to_string();
 
 	let server = HttpServer::new(move || {
 		App::new()
-			.service(Files::new("/dray", web_server_path.to_str().unwrap_or("./dray/web_server")))
+			.service(Files::new("/dray", &*web_server_path).show_files_listing())
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
 		.bind("127.0.0.1:18687")
