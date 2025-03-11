@@ -27,7 +27,23 @@ static CURRENT_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| env::current
 static HOME_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::home_dir());
 static DATA_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::data_dir());
 
-pub fn get_dirs_json() -> String {
+pub fn get_executable_path() -> Option<std::path::PathBuf> {
+	EXECUTABLE_PATH.clone()
+}
+
+pub fn get_current_dir() -> Option<std::path::PathBuf> {
+	CURRENT_DIR.clone()
+}
+
+pub fn get_home_dir() -> Option<std::path::PathBuf> {
+	HOME_DIR.clone()
+}
+
+pub fn get_data_dir() -> Option<std::path::PathBuf> {
+	DATA_DIR.clone()
+}
+
+pub fn get_paths_json() -> String {
 	let dirs = Paths {
 		audio_dir: dirs::audio_dir(),
 		cache_dir: dirs::cache_dir(),
