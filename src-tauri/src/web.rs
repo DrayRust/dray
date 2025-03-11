@@ -13,9 +13,7 @@ pub fn start() {
 	}
 
 	tauri::async_runtime::spawn(async {
-		run_server().await.unwrap_or_else(|e| {
-			error!("Failed to run server: {}", e);
-		});
+		run_server().await.unwrap();
 	});
 }
 
