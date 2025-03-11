@@ -20,7 +20,7 @@ pub fn start() {
 
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
-		error!("无法获取用户主目录");
+		error!("Failed to get user home directory");
 		std::path::PathBuf::from(".")
 	});
 	let web_server_path = home_dir.join("dray").join("web_server");
