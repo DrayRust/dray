@@ -11,7 +11,37 @@ use crate::command;
 // networksetup -setsocksfirewallproxystate Wi-Fi off
 // networksetup -setautoproxystate Wi-Fi off
 
-pub fn setup_http() -> bool {
+pub fn enable_all_proxies() -> bool {
+	let http_success = set_http();
+	let https_success = set_https();
+	let socks_success = set_socks();
+	let pac_success = set_pac();
+
+	if http_success && https_success && socks_success && pac_success {
+		info!("All proxies enabled successfully");
+		true
+	} else {
+		error!("Failed to enable all proxies");
+		false
+	}
+}
+
+pub fn disable_all_proxies() -> bool {
+	let http_success = disable_http_proxy();
+	let https_success = disable_https_proxy();
+	let socks_success = disable_socks_proxy();
+	let auto_success = disable_auto_proxy();
+
+	if http_success && https_success && socks_success && auto_success {
+		info!("All proxies disabled successfully");
+		true
+	} else {
+		error!("Failed to disable all proxies");
+		false
+	}
+}
+
+pub fn set_http() -> bool {
 	if let Err(e) = command::start("networksetup", &["-setwebproxy", "Wi-Fi", "127.0.0.1", "8689"]) {
 		error!("Failed to start HTTP proxy: {}", e);
 		false
@@ -21,7 +51,7 @@ pub fn setup_http() -> bool {
 	}
 }
 
-pub fn setup_https() -> bool {
+pub fn set_https() -> bool {
 	if let Err(e) = command::start("networksetup", &["-setsecurewebproxy", "Wi-Fi", "127.0.0.1", "8689"]) {
 		error!("Failed to start HTTPS proxy: {}", e);
 		false
@@ -31,7 +61,7 @@ pub fn setup_https() -> bool {
 	}
 }
 
-pub fn setup_socks() -> bool {
+pub fn set_socks() -> bool {
 	if let Err(e) = command::start("networksetup", &["-setsocksfirewallproxy", "Wi-Fi", "127.0.0.1", "8687"]) {
 		error!("Failed to start SOCKS proxy: {}", e);
 		false
@@ -41,7 +71,7 @@ pub fn setup_socks() -> bool {
 	}
 }
 
-pub fn setup_pac() -> bool {
+pub fn set_pac() -> bool {
 	if let Err(e) = command::start("networksetup", &["-setsecurewebproxy", "Wi-Fi", "127.0.0.1", "http://127.0.0.1:18687/dray/proxy.pac"]) {
 		error!("Failed to set PAC file: {}", e);
 		false
