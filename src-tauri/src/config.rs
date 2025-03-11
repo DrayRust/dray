@@ -9,26 +9,26 @@ use std::sync::Mutex;
 mod config;
 
 fn main() {
-    let mut config = config::get_config();
-    println!("{:?}", config);
+	let mut config = config::get_config();
+	println!("{:?}", config);
 
-    // 修改配置
-    config.log_level = "Error".to_string();
-    config.log_max_size = 10;
+	// 修改配置
+	config.log_level = "Error".to_string();
+	config.log_max_size = 10;
 
-    // 保存修改后的配置
-    if let Err(e) = config::save_config_to_file(&config, "config.json") {
-        eprintln!("Failed to save config: {}", e);
-    } else {
-        println!("Config saved successfully");
-    }
+	// 保存修改后的配置
+	if let Err(e) = config::save_config_to_file(&config, "config.json") {
+		eprintln!("Failed to save config: {}", e);
+	} else {
+		println!("Config saved successfully");
+	}
 
-    // 打印修改后的配置
-    println!("Updated Config: {:?}", config);
+	// 打印修改后的配置
+	println!("Updated Config: {:?}", config);
 
-    // 读取，对比是否修改成功
-    let config = config::get_config();
-    println!("{:?}", config);
+	// 读取，对比是否修改成功
+	let config = config::get_config();
+	println!("{:?}", config);
 }
 */
 
@@ -37,7 +37,6 @@ pub struct Config {
 	pub web_server_host: String,
 	pub web_server_port: u32,
 	pub log_level: String,
-	pub log_filepath: String,
 	pub log_max_size: u32,
 	pub ray_path: String,
 	pub ray_config_path: String,
@@ -49,7 +48,6 @@ impl Default for Config {
 			web_server_host: "127.0.0.1".to_string(),
 			web_server_port: 18687,
 			log_level: "Trace".to_string(),
-			log_filepath: "./logs/dray.log".to_string(),
 			log_max_size: 2, // 单位为 MB
 			ray_path: "./v2ray-core/v2ray".to_string(),
 			ray_config_path: "./v2ray-core/config.json".to_string(),
