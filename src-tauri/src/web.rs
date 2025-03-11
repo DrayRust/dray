@@ -13,7 +13,9 @@ pub fn start() {
 	}
 
 	tauri::async_runtime::spawn(async {
-		run_server().await.unwrap();
+		run_server().await.unwrap_or_else(|e| {
+			error!("Failed to run server: {}", e);
+		});
 	});
 }
 
@@ -32,7 +34,10 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	info!("Server running on http://127.0.0.1:18687");
 
 	*SERVER_HANDLE.lock().unwrap() = Some(server.handle());
-	server.await?;
+	server.await.map_err(|e| {
+		error!("Server encountered an error: {}", e);
+		e
+	})?;
 	Ok(())
 }
 
