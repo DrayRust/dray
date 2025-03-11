@@ -41,15 +41,21 @@ fn stop_ray() -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
-	log::init_log();
-	info!("Dray 启动");
+    log::init_log();
+    info!("Dray 启动");
 
-	tauri::Builder::default()
-		.plugin(tauri_plugin_opener::init())
-		.plugin(tauri_plugin_fs::init())
-		.invoke_handler(tauri::generate_handler![
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
+        .setup(|_app| {
+            ray::start(); // 启动 ray server
+            web::start(); // 启动 web server
+            network::enable_all_proxies(); // set proxy
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
             dray, start_web, stop_web, start_ray, stop_ray
         ])
-		.run(tauri::generate_context!())
-		.expect("error while running dray application");
+        .run(tauri::generate_context!())
+        .expect("error while running dray application");
 }
