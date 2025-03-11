@@ -1,6 +1,8 @@
 mod command;
 mod log;
 mod web;
+mod ray;
+mod network;
 use logger::{error, info};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -27,21 +29,13 @@ fn stop_web() -> String {
 
 #[tauri::command]
 fn start_ray() -> String {
-	if let Err(e) = command::start("./ray-bin/ray", &["-c", "./ray-bin/config.json"]) {
-		error!("启动 Ray Server 失败: {}", e);
-	} else {
-		info!("启动 Ray Server 成功");
-	}
+	ray::start();
 	"start_ray send ok!".to_string()
 }
 
 #[tauri::command]
 fn stop_ray() -> String {
-	if let Err(e) = command::stop() {
-		error!("停止 Ray Server 失败: {}", e);
-	} else {
-		info!("停止 Ray Server 成功");
-	}
+	ray::stop();
 	"stop_ray send ok!".to_string()
 }
 

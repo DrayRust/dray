@@ -1,4 +1,4 @@
-use log::{error, info};
+use logger::{error, info};
 use crate::command;
 
 // networksetup -setwebproxy Wi-Fi 127.0.0.1 8888
