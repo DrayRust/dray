@@ -1,10 +1,10 @@
 mod command;
-mod log;
-mod web;
-mod ray;
-mod network;
 mod dirs;
-use logger::{info};
+mod log;
+mod network;
+mod ray;
+mod web;
+use logger::info;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
@@ -67,7 +67,13 @@ pub fn main() {
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![
-            dray, start_web, stop_web, start_ray, stop_ray, disable_all_proxies
+            dray,
+            get_paths_json,
+            start_web,
+            stop_web,
+            start_ray,
+            stop_ray,
+            disable_all_proxies
         ])
 		.run(tauri::generate_context!())
 		.expect("error while running dray application");
