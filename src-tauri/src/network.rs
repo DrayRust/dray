@@ -12,33 +12,25 @@ use crate::command;
 // networksetup -setautoproxystate Wi-Fi off
 
 pub fn enable_all_proxies() -> bool {
-	let http_success = set_http();
-	let https_success = set_https();
-	let socks_success = set_socks();
-	let pac_success = set_pac();
-
-	if http_success && https_success && socks_success && pac_success {
-		info!("All proxies enabled successfully");
-		true
-	} else {
-		error!("Failed to enable all proxies");
-		false
-	}
+    let results = [set_http(), set_https(), set_socks(), set_pac()];
+    if results.iter().all(|&x| x) {
+        info!("All proxies enabled successfully");
+        true
+    } else {
+        error!("Failed to enable all proxies");
+        false
+    }
 }
 
 pub fn disable_all_proxies() -> bool {
-	let http_success = disable_http_proxy();
-	let https_success = disable_https_proxy();
-	let socks_success = disable_socks_proxy();
-	let auto_success = disable_auto_proxy();
-
-	if http_success && https_success && socks_success && auto_success {
-		info!("All proxies disabled successfully");
-		true
-	} else {
-		error!("Failed to disable all proxies");
-		false
-	}
+    let results = [disable_http_proxy(), disable_https_proxy(), disable_socks_proxy(), disable_auto_proxy()];
+    if results.iter().all(|&x| x) {
+        info!("All proxies disabled successfully");
+        true
+    } else {
+        error!("Failed to disable all proxies");
+        false
+    }
 }
 
 pub fn set_http() -> bool {
