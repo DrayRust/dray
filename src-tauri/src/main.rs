@@ -2,6 +2,8 @@ mod command;
 mod web;
 use log::{error, info};
 
+// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+
 fn init_log() {
     log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
         eprintln!("设置日志文件路径失败: {}", e);
