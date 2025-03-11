@@ -27,7 +27,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
 	let server = HttpServer::new(move || {
 		App::new()
-			.service(Files::new("/dray", web_server_path.to_str()))
+			.service(Files::new("/dray", web_server_path.to_str().unwrap_or("./dray/web_server")))
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
 		.bind("127.0.0.1:18687")
