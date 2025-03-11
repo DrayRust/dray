@@ -12,7 +12,7 @@ use crate::command;
 // networksetup -setautoproxystate Wi-Fi off
 
 pub fn enable_all_proxies() -> bool {
-    let results = [set_http(), set_https(), set_socks(), set_pac()];
+    let results = [set_https(), set_http(), set_socks(), set_pac()];
     if results.iter().all(|&x| x) {
         info!("All proxies enabled successfully");
         true

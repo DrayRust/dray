@@ -3,7 +3,8 @@ mod log;
 mod web;
 mod ray;
 mod network;
-use logger::{error, info};
+mod dirs;
+use logger::{info};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
@@ -11,6 +12,12 @@ use logger::{error, info};
 fn dray(name: &str) -> String {
 	info!("dray 触发");
 	format!("Hello, {}! Do you know Dray is great?", name)
+}
+
+#[tauri::command]
+fn get_paths_json() -> String {
+	info!("get_paths_json 触发");
+	dirs::get_paths_json()
 }
 
 #[tauri::command]

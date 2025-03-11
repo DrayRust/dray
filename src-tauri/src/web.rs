@@ -3,6 +3,7 @@ use actix_web::{dev, web, App, HttpServer};
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 use logger::{error, info};
+use crate::dirs;
 
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
@@ -18,9 +19,15 @@ pub fn start() {
 }
 
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
-	let server = HttpServer::new(|| {
+	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
+		error!("无法获取用户主目录");
+		std::path::PathBuf::from(".")
+	});
+	let web_server_path = home_dir.join("dray").join("web_server");
+
+	let server = HttpServer::new(move || {
 		App::new()
-			.service(Files::new("/dray", "~/.dray/web_server"))
+			.service(Files::new("/dray", web_server_path.to_str()))
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
 		.bind("127.0.0.1:18687")
