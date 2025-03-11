@@ -10,26 +10,26 @@ use logger::{info};
 
 #[tauri::command]
 fn dray(name: &str) -> String {
-	info!("dray 触发");
+	info!("dray triggered");
 	format!("Hello, {}! Do you know Dray is great?", name)
 }
 
 #[tauri::command]
 fn get_paths_json() -> String {
-	info!("get_paths_json 触发");
+	info!("get_paths_json triggered");
 	dirs::get_paths_json()
 }
 
 #[tauri::command]
 fn start_web() -> String {
-	info!("请求 Web Server 启动");
+	info!("Request to start Web Server");
 	web::start();
 	"web_start send ok!".to_string()
 }
 
 #[tauri::command]
 fn stop_web() -> String {
-	info!("请求 Web Server 关闭");
+	info!("Request to stop Web Server");
 	web::stop();
 	"stop_web send ok!".to_string()
 }
@@ -55,15 +55,15 @@ fn disable_all_proxies() -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
 	log::init_log();
-	info!("Dray 启动");
+	info!("Dray started");
 
 	tauri::Builder::default()
 		.plugin(tauri_plugin_opener::init())
 		.plugin(tauri_plugin_fs::init())
 		.setup(|_app| {
-			ray::start(); // 启动 ray server
-			web::start(); // 启动 web server
-			network::enable_all_proxies(); // set proxy
+			ray::start(); // Start ray server
+			web::start(); // Start web server
+			network::enable_all_proxies(); // Set proxy
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![
