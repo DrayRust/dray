@@ -3,9 +3,9 @@ use crate::command;
 
 /**
 networksetup -setautoproxyurl Wi-Fi http://127.0.0.1:18687/dray/proxy.pac
-networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 8687
-networksetup -setwebproxy Wi-Fi 127.0.0.1 8689
-networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 8689
+networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 1086
+networksetup -setwebproxy Wi-Fi 127.0.0.1 1089
+networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 1089
 
 networksetup -setautoproxystate Wi-Fi off
 networksetup -setsocksfirewallproxystate Wi-Fi off
@@ -46,11 +46,31 @@ pub fn set_pac() -> bool {
 }
 
 pub fn set_socks() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsocksfirewallproxy", "Wi-Fi", "127.0.0.1", "8687"]) {
+	if let Err(e) = command::start("networksetup", &["-setsocksfirewallproxy", "Wi-Fi", "127.0.0.1", "1086"]) {
 		error!("Failed to start SOCKS proxy: {}", e);
 		false
 	} else {
 		info!("SOCKS proxy started successfully");
+		true
+	}
+}
+
+pub fn set_http() -> bool {
+	if let Err(e) = command::start("networksetup", &["-setwebproxy", "Wi-Fi", "127.0.0.1", "1089"]) {
+		error!("Failed to start HTTP proxy: {}", e);
+		false
+	} else {
+		info!("HTTP proxy started successfully");
+		true
+	}
+}
+
+pub fn set_https() -> bool {
+	if let Err(e) = command::start("networksetup", &["-setsecurewebproxy", "Wi-Fi", "127.0.0.1", "1089"]) {
+		error!("Failed to start HTTPS proxy: {}", e);
+		false
+	} else {
+		info!("HTTPS proxy started successfully");
 		true
 	}
 }
@@ -71,26 +91,6 @@ pub fn disable_auto_proxy() -> bool {
 		false
 	} else {
 		info!("Auto proxy disabled successfully");
-		true
-	}
-}
-
-pub fn set_http() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setwebproxy", "Wi-Fi", "127.0.0.1", "8689"]) {
-		error!("Failed to start HTTP proxy: {}", e);
-		false
-	} else {
-		info!("HTTP proxy started successfully");
-		true
-	}
-}
-
-pub fn set_https() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsecurewebproxy", "Wi-Fi", "127.0.0.1", "8689"]) {
-		error!("Failed to start HTTPS proxy: {}", e);
-		false
-	} else {
-		info!("HTTPS proxy started successfully");
 		true
 	}
 }
