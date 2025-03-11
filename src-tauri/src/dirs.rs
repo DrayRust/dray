@@ -84,3 +84,38 @@ pub fn get_paths_json() -> String {
 		"{}".to_string()
 	})
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_get_executable_path() {
+		let path = get_executable_path();
+		assert!(path.is_some(), "Executable path should be available");
+	}
+
+	#[test]
+	fn test_get_current_dir() {
+		let path = get_current_dir();
+		assert!(path.is_some(), "Current directory should be available");
+	}
+
+	#[test]
+	fn test_get_home_dir() {
+		let path = get_home_dir();
+		assert!(path.is_some(), "Home directory should be available");
+	}
+
+	#[test]
+	fn test_get_data_dir() {
+		let path = get_data_dir();
+		assert!(path.is_some(), "Data directory should be available");
+	}
+
+	#[test]
+	fn test_get_paths_json() {
+		let json = get_paths_json();
+		assert!(!json.is_empty(), "Paths JSON should not be empty");
+	}
+}
