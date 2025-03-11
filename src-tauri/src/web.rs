@@ -1,44 +1,42 @@
 use actix_files::Files;
-use actix_web::{web, App, HttpServer};
+use actix_web::{dev, web, App, HttpServer};
+use once_cell::sync::Lazy;
 use std::sync::Mutex;
-use tokio::runtime::Runtime;
-use tokio::time::{sleep, Duration};
 
-static IS_RUN: Mutex<bool> = Mutex::new(false);
+static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
-pub fn start(ip: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
-    let rt = Runtime::new()?;
-    rt.block_on(async {
-        let server = HttpServer::new(|| {
-            App::new()
-                .service(Files::new("/dray", "~/.dray/web_server"))
-                .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
-        })
-        .bind(format!("{}:{}", ip, port))?
-        .run();
+pub fn start() {
+    if SERVER_HANDLE.lock().unwrap().is_some() {
+        println!("Server is already running.");
+        return;
+    }
 
-        let start_handle = tokio::spawn(async move { server.await });
-
-        // 标记运行
-        let mut is_run = IS_RUN.lock()?;
-        *is_run = true;
-
-        loop {
-            sleep(Duration::from_secs(2)).await;
-            let is_run = *IS_RUN.lock()?;
-            if !is_run {
-                break;
-            }
-        }
-
-        start_handle.await?;
-
-        Ok(())
-    })
+    tauri::async_runtime::spawn(async {
+        run_server().await.unwrap();
+    });
 }
 
-pub fn stop() -> Result<(), Box<dyn std::error::Error>> {
-    let mut is_run = IS_RUN.lock()?;
-    *is_run = false;
+async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
+    let server = HttpServer::new(|| {
+        App::new()
+            .service(Files::new("/dray", "~/.dray/web_server"))
+            .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
+    })
+    .bind("127.0.0.1:18687")?
+    .run();
+    println!("Server running on http://127.0.0.1:18687");
+
+    *SERVER_HANDLE.lock().unwrap() = Some(server.handle());
+    server.await?;
     Ok(())
+}
+
+pub fn stop() {
+    tauri::async_runtime::spawn(async {
+        let handle = SERVER_HANDLE.lock().unwrap().take();
+        if let Some(handle) = handle {
+            handle.stop(false).await;
+        }
+        *SERVER_HANDLE.lock().unwrap() = None;
+    });
 }
