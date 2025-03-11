@@ -134,7 +134,7 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
                 .extension()
                 .and_then(|ext| ext.to_str())
                 .unwrap_or("");
-            let timestamp = Local::now().format("%Y%m%d%H%M%S");
+            let timestamp = Local::now().format("%Y%m%d%H%M%S%.3f");
             let bak_filepath = log_filepath.with_extension(format!("{}.{}", timestamp, extension));
             fs::rename(log_filepath, bak_filepath)?; // 重命名文件，备份旧文件
             set_log_writer(log_filepath)?; // 打开新的文件
