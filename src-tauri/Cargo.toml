@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "2.0.6", features = [] }
 
 [dependencies]
-log = { path = "./log" }
+logger = { path = "./logger" }
 
 tokio = { version = "1.44.0", features = ["full"] }
 

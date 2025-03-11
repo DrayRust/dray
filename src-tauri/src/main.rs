@@ -1,14 +1,9 @@
 mod command;
+mod log;
 mod web;
-use log::{error, info};
+use logger::{error, info};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-
-fn init_log() {
-	log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
-		eprintln!("设置日志文件路径失败: {}", e);
-	});
-}
 
 #[tauri::command]
 fn dray(name: &str) -> String {
@@ -33,9 +28,9 @@ fn stop_web() -> String {
 #[tauri::command]
 fn start_ray() -> String {
 	if let Err(e) = command::start("./ray-bin/ray", &["-c", "./ray-bin/config.json"]) {
-		error!("Ray Server 启动失败: {}", e);
+		error!("启动 Ray Server 失败: {}", e);
 	} else {
-		info!("Ray Server 启动成功");
+		info!("启动 Ray Server 成功");
 	}
 	"start_ray send ok!".to_string()
 }
@@ -43,16 +38,16 @@ fn start_ray() -> String {
 #[tauri::command]
 fn stop_ray() -> String {
 	if let Err(e) = command::stop() {
-		error!("Ray Server 停止失败: {}", e);
+		error!("停止 Ray Server 失败: {}", e);
 	} else {
-		info!("Ray Server 停止成功");
+		info!("停止 Ray Server 成功");
 	}
 	"stop_ray send ok!".to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
-	init_log();
+	log::init_log();
 	info!("Dray 启动");
 
 	tauri::Builder::default()
