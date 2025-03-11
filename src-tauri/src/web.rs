@@ -2,12 +2,13 @@ use actix_files::Files;
 use actix_web::{dev, web, App, HttpServer};
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
+use logger::{error, info};
 
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
 pub fn start() {
 	if SERVER_HANDLE.lock().unwrap().is_some() {
-		println!("Server is already running.");
+		info!("Server is already running.");
 		return;
 	}
 
@@ -22,9 +23,13 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 			.service(Files::new("/dray", "~/.dray/web_server"))
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
-		.bind("127.0.0.1:18687")?
+		.bind("127.0.0.1:18687")
+		.map_err(|e| {
+			error!("Failed to bind to 127.0.0.1:18687: {}", e);
+			e
+		})?
 		.run();
-	println!("Server running on http://127.0.0.1:18687");
+	info!("Server running on http://127.0.0.1:18687");
 
 	*SERVER_HANDLE.lock().unwrap() = Some(server.handle());
 	server.await?;
