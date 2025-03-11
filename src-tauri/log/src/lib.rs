@@ -9,22 +9,24 @@ log = { path = "./log" }
 
 use log::{debug, error, info, trace, warn};
 
-log::set_log_level("info");
-log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
-	eprintln!("设置日志文件路径失败: {}", e);
-});
-log::set_log_max_size(2 * 1024 * 1024);
+fn main() {
+	log::set_log_level("info");
+	log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
+		eprintln!("设置日志文件路径失败: {}", e);
+	});
+	log::set_log_max_size(2 * 1024 * 1024);
 
-println!("{:?}", log::get_log_config());
-println!("{:?}", log::get_log_writer());
+	println!("{:?}", log::get_log_config());
+	println!("{:?}", log::get_log_writer());
 
-// 测试性能的循环
-for i in 0..3 {
-    error!("这是一个日志，{}", i);
-    warn!("这是一个日志，{}", i);
-    info!("这是一个日志，{}", i);
-    debug!("这是一个日志，{}", i);
-    trace!("这是一个日志，{}", i);
+	// 测试性能的循环
+	for i in 0..3 {
+		error!("这是一个日志，{}", i);
+		warn!("这是一个日志，{}", i);
+		info!("这是一个日志，{}", i);
+		debug!("这是一个日志，{}", i);
+		trace!("这是一个日志，{}", i);
+	}
 }
 */
 use chrono::Local;
