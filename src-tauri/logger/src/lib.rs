@@ -5,19 +5,19 @@
 /**
 用例：
 [dependencies]
-log = { path = "./log" }
+logger = { path = "./logger" }
 
-use log::{debug, error, info, trace, warn};
+use logger::{debug, error, info, trace, warn};
 
 fn main() {
-	log::set_log_level("info");
-	log::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
+	logger::set_log_level("info");
+	logger::set_log_filepath("logs/main.log").unwrap_or_else(|e| {
 		eprintln!("设置日志文件路径失败: {}", e);
 	});
-	log::set_log_max_size(2 * 1024 * 1024);
+	logger::set_log_max_size(2 * 1024 * 1024);
 
-	println!("{:?}", log::get_log_config());
-	println!("{:?}", log::get_log_writer());
+	println!("{:?}", logger::get_log_config());
+	println!("{:?}", logger::get_log_writer());
 
 	// 测试性能的循环
 	for i in 0..3 {
