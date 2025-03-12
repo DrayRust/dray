@@ -54,7 +54,7 @@ pub fn get_data_dir() -> Option<std::path::PathBuf> {
 	DATA_DIR.clone()
 }
 
-pub fn get_dray_log_dir() -> Option<std::path::PathBuf> {
+pub fn get_dray_logs_dir() -> Option<std::path::PathBuf> {
 	let home_dir = get_home_dir()?;
 	Some(home_dir.join("dray").join("logs"))
 }

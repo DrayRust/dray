@@ -12,25 +12,21 @@ use env_logger::Builder;
 use actix_web::middleware::Logger;
 use chrono;
 
+static LOGGER_INITIALIZED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
+// 日志初始化
 fn init_logger() {
-	static LOGGER_INITIALIZED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 	let mut initialized = LOGGER_INITIALIZED.lock().unwrap();
 	if *initialized {
 		return;
 	}
 
-	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
-		error!("Failed to get user home directory");
-		std::path::PathBuf::from(".")
-	});
-
 	let log_file = OpenOptions::new()
 		.write(true)
 		.create(true)
 		.append(true)
-		.open(home_dir.join("dray").join("logs").join("web_server.log").to_str().unwrap()).unwrap();
+		.open(dirs::get_dray_logs_dir().unwrap().join("web_server.log").to_str().unwrap()).unwrap();
 
 	Builder::from_default_env()
 		.target(env_logger::Target::Pipe(Box::new(log_file)))
@@ -56,7 +52,7 @@ pub fn start() {
 		return;
 	}
 
-	init_logger(); // 调用日志初始化函数
+	init_logger();
 
 	tauri::async_runtime::spawn(async {
 		run_server().await.unwrap();
@@ -64,17 +60,10 @@ pub fn start() {
 }
 
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
-	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
-		error!("Failed to get user home directory");
-		std::path::PathBuf::from(".")
-	});
-
-	let web_server_path: String = home_dir.join("dray").join("web_server").to_str().unwrap_or("./web_server").to_string();
-
 	let server = HttpServer::new(move || {
 		App::new()
 			.wrap(Logger::new("%D %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\""))
-			.service(Files::new("/dray", &*web_server_path).show_files_listing())
+			.service(Files::new("/dray", dirs::get_dray_web_server_dir().unwrap().to_str().unwrap()).show_files_listing())
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
 		.bind("127.0.0.1:18687")
