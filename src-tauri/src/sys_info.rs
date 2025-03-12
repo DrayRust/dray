@@ -7,7 +7,7 @@ struct SystemInfo {
 	os: String,
 	kernel_version: String,
 	hostname: String,
-	cpu_count: usize,
+	cpu_count: String,
 	memory_total: u64,
 	memory_used: u64,
 	swap_total: u64,
@@ -26,32 +26,32 @@ struct DiskInfo {
 #[derive(Serialize)]
 struct ComponentInfo {
 	label: String,
-	temperature: f32,
+	temperature: String,
 }
 
 pub fn sys_info_json() -> serde_json::Value {
 	let mut sys = System::new_all();
 	sys.refresh_all();
 
-	let disks = sys_info::Disks::new_with_refreshed_list();
+	let disks = Disks::new_with_refreshed_list();
 	let disk_info = disks.iter().map(|disk| DiskInfo {
 		name: disk.name().to_string_lossy().to_string(),
 		total_space: disk.total_space(),
 		available_space: disk.available_space(),
 	}).collect::<Vec<_>>();
 
-	let components = sys_info::Components::new_with_refreshed_list();
+	let components = Components::new_with_refreshed_list();
 	let component_info = components.iter().map(|component| ComponentInfo {
 		label: component.label().to_string(),
-		temperature: component.temperature(),
+		temperature: format!("{:?}", component.temperature()),
 	}).collect::<Vec<_>>();
 
 	let sys_info = SystemInfo {
 		os: std::env::consts::OS.to_string(),
-		kernel_version: sys_info::linux_os_release().unwrap_or_default(),
-		hostname: sys_info::hostname().unwrap_or_default(),
-		cpu_count: sys_info::cpu_num().unwrap_or(0),
-		memory_total: sys.mem_info().unwrap_or_default().total,
+		kernel_version: format!("{:?}", System::kernel_version()),
+		hostname: format!("{:?}", System::host_name()),
+		cpu_count: format!("{}", sys.cpus().len()),
+		memory_total: sys.total_memory(),
 		memory_used: sys.used_memory(),
 		swap_total: sys.total_swap(),
 		swap_used: sys.used_swap(),
