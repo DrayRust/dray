@@ -48,7 +48,7 @@ fn init_logger() {
 
 pub fn start() {
 	if SERVER_HANDLE.lock().unwrap().is_some() {
-		info!("Server is already running.");
+		info!("Web Server is already running.");
 		return;
 	}
 
