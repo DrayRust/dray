@@ -38,28 +38,35 @@ static CURRENT_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| env::current
 static HOME_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::home_dir());
 static DATA_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::data_dir());
 
-/// Get the path of the current executable.
-/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_executable_path() -> Option<std::path::PathBuf> {
 	EXECUTABLE_PATH.clone()
 }
 
-/// Get the path of the current working directory.
-/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_current_dir() -> Option<std::path::PathBuf> {
 	CURRENT_DIR.clone()
 }
 
-/// Get the path of the user's home directory.
-/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_home_dir() -> Option<std::path::PathBuf> {
 	HOME_DIR.clone()
 }
 
-/// Get the path of the application data directory.
-/// Returns an `Option<std::path::PathBuf>`, containing the path if successful, otherwise `None`.
 pub fn get_data_dir() -> Option<std::path::PathBuf> {
 	DATA_DIR.clone()
+}
+
+pub fn get_dray_log_dir() -> Option<std::path::PathBuf> {
+	let home_dir = get_home_dir()?;
+	Some(home_dir.join("dray").join("logs"))
+}
+
+pub fn get_dray_web_server_dir() -> Option<std::path::PathBuf> {
+	let home_dir = get_home_dir()?;
+	Some(home_dir.join("dray").join("web_server"))
+}
+
+pub fn get_dray_ray_dir() -> Option<std::path::PathBuf> {
+	let home_dir = get_home_dir()?;
+	Some(home_dir.join("dray").join("ray"))
 }
 
 pub fn get_paths_json() -> String {
