@@ -29,7 +29,7 @@ struct ComponentInfo {
 	temperature: String,
 }
 
-pub fn sys_info_json() -> serde_json::Value {
+pub fn sys_info_json() -> String {
 	let mut sys = System::new_all();
 	sys.refresh_all();
 
@@ -59,7 +59,7 @@ pub fn sys_info_json() -> serde_json::Value {
 		components: component_info,
 	};
 
-	json!({
+	serde_json::to_string(&json!({
         "os": sys_info.os,
         "kernel_version": sys_info.kernel_version,
         "hostname": sys_info.hostname,
@@ -70,5 +70,5 @@ pub fn sys_info_json() -> serde_json::Value {
         "swap_used": sys_info.swap_used,
         "disks": sys_info.disks,
         "components": sys_info.components,
-    })
+    })).unwrap()
 }

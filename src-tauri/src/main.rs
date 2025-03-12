@@ -3,6 +3,7 @@ mod log;
 mod network;
 mod ray;
 mod web;
+mod sys_info;
 use logger::info;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -22,7 +23,7 @@ fn get_paths_json() -> String {
 #[tauri::command]
 fn sys_info_json() -> String {
 	info!("sys_info_json triggered");
-	dirs::sys_info_json()
+	sys_info::sys_info_json()
 }
 
 #[tauri::command]
