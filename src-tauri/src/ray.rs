@@ -34,6 +34,7 @@ pub fn stop() -> bool {
 			return false;
 		}
 		info!("Ray Server stopped successfully");
+		*CHILD_PROCESS.lock().unwrap() = None;
 		true
 	} else {
 		error!("Ray Server is not running, no need to stop");
@@ -69,5 +70,6 @@ pub fn force_kill_ray() -> bool {
 			}
 		}
 	}
+	*CHILD_PROCESS.lock().unwrap() = None;
 	killed
 }
