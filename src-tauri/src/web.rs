@@ -5,6 +5,13 @@ use std::sync::Mutex;
 use logger::{error, info};
 use crate::dirs;
 
+use std::fs::OpenOptions;
+use std::io::Write;
+use log::LevelFilter;
+use env_logger::Builder;
+use actix_web::middleware::Logger;
+use chrono;
+
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
 pub fn start() {
@@ -21,12 +28,35 @@ pub fn start() {
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
 		error!("Failed to get user home directory");
-		std::path::PathBuf::from("./dray/web_server")
+		std::path::PathBuf::from(".")
 	});
-	let web_server_path: String = home_dir.join("dray").join("web_server").to_str().unwrap_or("").to_string();
+
+	let log_file = OpenOptions::new()
+		.write(true)
+		.create(true)
+		.append(true)
+		.open(home_dir.join("dray").join("logs").join("web_server.log").to_str().unwrap_or("./web_server.log"))?;
+
+	Builder::from_default_env()
+		.target(env_logger::Target::Pipe(Box::new(log_file)))
+		.filter_level(LevelFilter::Debug) // 设置日志级别参数: Off Error Warn Info Debug Trace
+		.format(|buf, record| {
+			buf.write_fmt(format_args!(
+				"[{}] [{}] {}: {}\n",
+				chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+				record.level(),
+				record.target(),
+				record.args()
+			))
+		})
+		.format_timestamp(None)
+		.init();
+
+	let web_server_path: String = home_dir.join("dray").join("web_server").to_str().unwrap_or("./web_server").to_string();
 
 	let server = HttpServer::new(move || {
 		App::new()
+			.wrap(Logger::new("%D %b %a \"%r\" %s \"%{Referer}i\" \"%{User-Agent}i\""))
 			.service(Files::new("/dray", &*web_server_path).show_files_listing())
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
