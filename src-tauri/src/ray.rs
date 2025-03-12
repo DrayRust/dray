@@ -49,8 +49,7 @@ pub fn stop() -> bool {
 }
 
 pub fn force_restart_ray() -> bool {
-	let mut child = CHILD_PROCESS.lock().unwrap();
-	if child.is_some() {
+	if CHILD_PROCESS.lock().unwrap().is_some() {
 		*CHILD_PROCESS.lock().unwrap() = None;
 	}
 	force_kill_ray();
