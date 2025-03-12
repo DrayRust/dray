@@ -9,7 +9,7 @@ static CHILD_PROCESS: Lazy<Mutex<Option<Child>>> = Lazy::new(|| Mutex::new(None)
 pub fn start() -> bool {
 	// 检查是否已有进程在运行
 	if CHILD_PROCESS.lock().unwrap().is_some() {
-		error!("Command is already running");
+		error!("Ray Server is already running");
 		return false;
 	}
 
@@ -51,7 +51,7 @@ pub fn stop() -> bool {
 pub fn force_restart_ray() -> bool {
 	let mut child = CHILD_PROCESS.lock().unwrap();
 	if child.is_some() {
-		*child = None;
+		*CHILD_PROCESS.lock().unwrap() = None;
 	}
 	force_kill_ray();
 	if !start() {

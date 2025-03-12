@@ -20,6 +20,12 @@ fn get_paths_json() -> String {
 }
 
 #[tauri::command]
+fn sys_info_json() -> String {
+	info!("sys_info_json triggered");
+	dirs::sys_info_json()
+}
+
+#[tauri::command]
 fn start_web() -> String {
 	info!("Request to start Web Server");
 	web::start();
@@ -100,6 +106,7 @@ pub fn main() {
 		.invoke_handler(tauri::generate_handler![
 			dray,
 			get_paths_json,
+			sys_info_json,
 			start_web,
 			stop_web,
 			start_ray,
