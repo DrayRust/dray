@@ -2,7 +2,7 @@ use logger::{error, info};
 use crate::command;
 
 /**
-networksetup -setautoproxyurl Wi-Fi http://127.0.0.1:18687/dray/proxy.pac
+networksetup -setautoproxyurl Wi-Fi http://127.0.0.1:18687/dray/proxy.js
 networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 1086
 networksetup -setwebproxy Wi-Fi 127.0.0.1 1089
 networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 1089
@@ -49,27 +49,47 @@ pub fn parse_and_execute_commands(command_str: &str) -> bool {
 	all_success
 }
 
-pub fn set_auto_proxy_url(url: &str) -> bool {
-	let command_str = format!("networksetup -setautoproxyurl Wi-Fi {}", url);
+pub fn set_auto_proxy_url() -> bool {
+	let url = "http://127.0.0.1:18687/dray/proxy.js";
+	let commands = vec![
+		format!("networksetup -setautoproxyurl Wi-Fi {}", url),
+		"networksetup -setautoproxystate Wi-Fi on".parse().unwrap(),
+	];
+	let command_str = commands.join("\n");
 	parse_and_execute_commands(&command_str)
 }
 
-pub fn set_socks_firewall_proxy(port: &str) -> bool {
-	let command_str = format!("networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 {}", port);
+pub fn set_socks_firewall_proxy() -> bool {
+	let port = 1086;
+	let commands = vec![
+		format!("networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 {}", port),
+		"networksetup -setsocksfirewallproxystate Wi-Fi on".parse().unwrap(),
+	];
+	let command_str = commands.join("\n");
 	parse_and_execute_commands(&command_str)
 }
 
-pub fn set_web_proxy(port: &str) -> bool {
-	let command_str = format!("networksetup -setwebproxy Wi-Fi 127.0.0.1 {}", port);
+pub fn set_web_proxy() -> bool {
+	let port = 1089;
+	let commands = vec![
+		format!("networksetup -setwebproxy Wi-Fi 127.0.0.1 {}", port),
+		"networksetup -setwebproxystate Wi-Fi on".parse().unwrap(),
+	];
+	let command_str = commands.join("\n");
 	parse_and_execute_commands(&command_str)
 }
 
-pub fn set_secure_web_proxy(port: &str) -> bool {
-	let command_str = format!("networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 {}", port);
+pub fn set_secure_web_proxy() -> bool {
+	let port = 1089;
+	let commands = vec![
+		format!("networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 {}", port),
+		"networksetup -setsecurewebproxystate Wi-Fi on".parse().unwrap(),
+	];
+	let command_str = commands.join("\n");
 	parse_and_execute_commands(&command_str)
 }
 
-pub fn enable_proxy() -> bool {
+/*pub fn enable_proxy() -> bool {
 	let commands = vec![
 		"networksetup -setautoproxystate Wi-Fi on",
 		"networksetup -setsocksfirewallproxystate Wi-Fi on",
@@ -78,9 +98,9 @@ pub fn enable_proxy() -> bool {
 	];
 	let command_str = commands.join("\n");
 	parse_and_execute_commands(&command_str)
-}
+}*/
 
-pub fn disable_proxy() -> bool {
+pub fn disable_all_proxies() -> bool {
 	let commands = vec![
 		"networksetup -setautoproxystate Wi-Fi off",
 		"networksetup -setsocksfirewallproxystate Wi-Fi off",

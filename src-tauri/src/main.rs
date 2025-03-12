@@ -47,6 +47,30 @@ fn stop_ray() -> String {
 }
 
 #[tauri::command]
+fn set_auto_proxy_url() -> String {
+	network::set_auto_proxy_url();
+	"set_auto_proxy_url send ok!".to_string()
+}
+
+#[tauri::command]
+fn set_socks_firewall_proxy() -> String {
+	network::set_socks_firewall_proxy();
+	"set_socks_firewall_proxy send ok!".to_string()
+}
+
+#[tauri::command]
+fn set_web_proxy() -> String {
+	network::set_web_proxy();
+	"set_web_proxy send ok!".to_string()
+}
+
+#[tauri::command]
+fn set_secure_web_proxy() -> String {
+	network::set_secure_web_proxy();
+	"set_secure_web_proxy send ok!".to_string()
+}
+
+#[tauri::command]
 fn disable_all_proxies() -> String {
 	network::disable_all_proxies();
 	"disable_all_proxies send ok!".to_string()
@@ -63,7 +87,7 @@ pub fn main() {
 		.setup(|_app| {
 			ray::start(); // Start ray server
 			web::start(); // Start web server
-			network::enable_all_proxies(); // Set proxy
+			network::set_auto_proxy_url(); // Set proxy
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![
@@ -73,6 +97,10 @@ pub fn main() {
             stop_web,
             start_ray,
             stop_ray,
+			set_auto_proxy_url,
+			set_socks_firewall_proxy,
+			set_web_proxy,
+			set_secure_web_proxy,
             disable_all_proxies
         ])
 		.run(tauri::generate_context!())
