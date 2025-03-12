@@ -39,7 +39,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
 	Builder::from_default_env()
 		.target(env_logger::Target::Pipe(Box::new(log_file)))
-		.filter_level(LevelFilter::Debug) // 设置日志级别参数: Off Error Warn Info Debug Trace
+		.filter_level(LevelFilter::Info) // 设置日志级别参数: Off Error Warn Info Debug Trace
 		.format(|buf, record| {
 			buf.write_fmt(format_args!(
 				"[{}] [{}] {}: {}\n",
@@ -56,7 +56,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
 	let server = HttpServer::new(move || {
 		App::new()
-			.wrap(Logger::new("%D %b %a \"%r\" %s \"%{Referer}i\" \"%{User-Agent}i\""))
+			.wrap(Logger::new("%D %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\""))
 			.service(Files::new("/dray", &*web_server_path).show_files_listing())
 			.route("/", web::get().to(|| async { "This is Dray Web Server!" }))
 	})
