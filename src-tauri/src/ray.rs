@@ -53,6 +53,7 @@ pub fn force_restart_ray() -> bool {
 	if child.is_some() {
 		*child = None;
 	}
+	force_kill_ray();
 	start()
 }
 
