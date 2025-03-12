@@ -46,33 +46,33 @@ fn stop_ray() -> String {
 }
 
 #[tauri::command]
-fn set_auto_proxy_url() -> String {
-	network::set_auto_proxy_url();
-	"set_auto_proxy_url send ok!".to_string()
+fn enable_auto_proxy() -> String {
+	network::enable_auto_proxy();
+	"enable_auto_proxy send ok!".to_string()
 }
 
 #[tauri::command]
-fn set_socks_proxy() -> String {
-	network::set_socks_proxy();
-	"set_socks_proxy send ok!".to_string()
+fn enable_socks_proxy() -> String {
+	network::enable_socks_proxy();
+	"enable_socks_proxy send ok!".to_string()
 }
 
 #[tauri::command]
-fn set_web_proxy() -> String {
-	network::set_web_proxy();
-	"set_web_proxy send ok!".to_string()
+fn enable_web_proxy() -> String {
+	network::enable_web_proxy();
+	"enable_web_proxy send ok!".to_string()
 }
 
 #[tauri::command]
-fn set_secure_web_proxy() -> String {
-	network::set_secure_web_proxy();
-	"set_secure_web_proxy send ok!".to_string()
+fn enable_secure_web_proxy() -> String {
+	network::enable_secure_web_proxy();
+	"enable_secure_web_proxy send ok!".to_string()
 }
 
 #[tauri::command]
-fn disable_all_proxies() -> String {
-	network::disable_all_proxies();
-	"disable_all_proxies send ok!".to_string()
+fn disable_proxies() -> String {
+	network::disable_proxies();
+	"disable_proxies send ok!".to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -86,7 +86,7 @@ pub fn main() {
 		.setup(|_app| {
 			ray::start(); // Start ray server
 			web::start(); // Start web server
-			network::set_auto_proxy_url(); // Set proxy
+			network::enable_auto_proxy(); // Set proxy
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![
@@ -96,11 +96,11 @@ pub fn main() {
             stop_web,
             start_ray,
             stop_ray,
-			set_auto_proxy_url,
-			set_socks_proxy,
-			set_web_proxy,
-			set_secure_web_proxy,
-            disable_all_proxies
+			enable_auto_proxy,
+			enable_socks_proxy,
+			enable_web_proxy,
+			enable_secure_web_proxy,
+            disable_proxies
         ])
 		.run(tauri::generate_context!())
 		.expect("error while running dray application");
