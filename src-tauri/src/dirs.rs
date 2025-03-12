@@ -66,7 +66,7 @@ pub fn get_dray_web_server_dir() -> Option<std::path::PathBuf> {
 
 pub fn get_dray_ray_dir() -> Option<std::path::PathBuf> {
 	let home_dir = get_home_dir()?;
-	Some(home_dir.join("dray").join("ray"))
+	Some(home_dir.join("dray").join("ray-core"))
 }
 
 pub fn get_paths_json() -> String {
