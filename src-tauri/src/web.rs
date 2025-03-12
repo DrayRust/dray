@@ -14,18 +14,13 @@ use chrono;
 
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 
-pub fn start() {
-	if SERVER_HANDLE.lock().unwrap().is_some() {
-		info!("Server is already running.");
+fn init_logger() {
+	static LOGGER_INITIALIZED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
+	let mut initialized = LOGGER_INITIALIZED.lock().unwrap();
+	if *initialized {
 		return;
 	}
 
-	tauri::async_runtime::spawn(async {
-		run_server().await.unwrap();
-	});
-}
-
-async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
 		error!("Failed to get user home directory");
 		std::path::PathBuf::from(".")
@@ -35,7 +30,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 		.write(true)
 		.create(true)
 		.append(true)
-		.open(home_dir.join("dray").join("logs").join("web_server.log").to_str().unwrap_or("./web_server.log"))?;
+		.open(home_dir.join("dray").join("logs").join("web_server.log").to_str().unwrap()).unwrap();
 
 	Builder::from_default_env()
 		.target(env_logger::Target::Pipe(Box::new(log_file)))
@@ -51,6 +46,28 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 		})
 		.format_timestamp(None)
 		.init();
+
+	*initialized = true;
+}
+
+pub fn start() {
+	if SERVER_HANDLE.lock().unwrap().is_some() {
+		info!("Server is already running.");
+		return;
+	}
+
+	init_logger(); // 调用日志初始化函数
+
+	tauri::async_runtime::spawn(async {
+		run_server().await.unwrap();
+	});
+}
+
+async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
+	let home_dir = dirs::get_home_dir().unwrap_or_else(|| {
+		error!("Failed to get user home directory");
+		std::path::PathBuf::from(".")
+	});
 
 	let web_server_path: String = home_dir.join("dray").join("web_server").to_str().unwrap_or("./web_server").to_string();
 
