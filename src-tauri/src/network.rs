@@ -1,5 +1,5 @@
+use std::process::{Command};
 use logger::{error, info};
-use crate::command;
 
 /**
 networksetup -setautoproxyurl Wi-Fi http://127.0.0.1:18687/dray/proxy.js
@@ -17,6 +17,21 @@ networksetup -setsocksfirewallproxystate Wi-Fi off
 networksetup -setwebproxystate Wi-Fi off
 networksetup -setsecurewebproxystate Wi-Fi off
 */
+
+pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
+	let status = Command::new(command)
+		.args(args)
+		// .stdin(Stdio::null())
+		// .stdout(Stdio::null())
+		// .stderr(Stdio::null())
+		.status()?;
+
+	if !status.success() {
+		return Err(format!("Command exited with status: {}", status).into());
+	}
+
+	Ok(())
+}
 
 pub fn parse_and_execute_commands(command_str: &str) -> bool {
 	let commands: Vec<&str> = command_str.trim().lines().collect();
@@ -38,7 +53,7 @@ pub fn parse_and_execute_commands(command_str: &str) -> bool {
 		let command_name = args[0];
 		let command_args = &args[1..];
 
-		if let Err(e) = command::start(command_name, command_args) {
+		if let Err(e) = command(command_name, command_args) {
 			error!("Failed to execute command '{}': {}", cmd, e);
 			all_success = false;
 		} else {
