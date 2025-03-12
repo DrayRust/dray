@@ -35,6 +35,7 @@ fn stop_web() -> String {
 
 #[tauri::command]
 fn start_ray() -> String {
+	info!("start_ray triggered");
 	ray::start();
 	"start_ray send ok!".to_string()
 }

@@ -4,6 +4,19 @@ use std::sync::Mutex;
 use crate::dirs;
 
 pub fn start() -> bool {
+	let mut child_process = CHILD_PROCESS
+		.lock()
+		.map_err(|_| {
+			error!("Failed to lock CHILD_PROCESS");
+			return false;
+		})
+		.unwrap();
+
+	if child_process.is_some() {
+		error!("Command is already running");
+		return false;
+	}
+
 	let ray_dir = dirs::get_dray_ray_dir().unwrap();
 	let ray_path: String = ray_dir.join("xray").to_str().unwrap().to_string();
 	let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap().to_string();
@@ -35,10 +48,6 @@ fn start_command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error:
 	let mut child_process = CHILD_PROCESS
 		.lock()
 		.map_err(|_| "Failed to lock CHILD_PROCESS")?;
-
-	if child_process.is_some() {
-		return Err("Command is already running".into());
-	}
 
 	let child = Command::new(command)
 		.args(args)
