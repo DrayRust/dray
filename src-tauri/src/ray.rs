@@ -7,29 +7,19 @@ use crate::dirs;
 static CHILD_PROCESS: Lazy<Mutex<Option<Child>>> = Lazy::new(|| Mutex::new(None));
 
 pub fn start() -> bool {
-	// 检查是否已有进程在运行
 	if CHILD_PROCESS.lock().unwrap().is_some() {
 		error!("Ray Server is already running");
 		return false;
 	}
 
-	// 获取路径
 	let ray_dir = dirs::get_dray_ray_dir().unwrap();
 	let ray_path: String = ray_dir.join("xray").to_str().unwrap().to_string();
 	let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap().to_string();
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
 
-	// 启动命令
 	let mut child_process = CHILD_PROCESS.lock().unwrap();
-	let child = Command::new(&ray_path)
-		.args(&["-c", &ray_config_path])
-		.spawn()
-		.map_err(|e| {
-			error!("Failed to start command: {}", e);
-		}).unwrap();
-
-	// 保存子进程句柄
+	let child = Command::new(&ray_path).args(&["-c", &ray_config_path]).spawn().unwrap();
 	*child_process = Some(child);
 	info!("Ray Server started successfully");
 	true
@@ -38,7 +28,7 @@ pub fn start() -> bool {
 pub fn stop() -> bool {
 	if let Some(mut child) = CHILD_PROCESS.lock().unwrap().take() {
 		child.kill().unwrap();
-		child.wait().unwrap();
+		// child.wait().unwrap();
 		*CHILD_PROCESS.lock().unwrap() = None;
 		info!("Ray Server stopped successfully");
 		true
@@ -61,25 +51,20 @@ pub fn force_restart_ray() -> bool {
 	true
 }
 
-fn force_kill_ray() -> bool {
+pub fn force_kill_ray() -> bool {
 	let mut sys = sysinfo::System::new_all();
 	sys.refresh_all();
 
-	let mut killed = false;
+	let mut killed = true;
 	for (pid, process) in sys.processes() {
 		if process.name() == "xray" {
 			if process.kill() {
+				info!("Killed xray process with PID: {}", pid);
+			} else {
 				error!("Failed to kill xray process with PID: {}", pid);
-				return false;
+				killed = false;
 			}
-			info!("Killed xray process with PID: {}", pid);
-			killed = true;
-			break;
 		}
-	}
-	if !killed {
-		error!("No xray process found to kill");
-		return false;
 	}
 	true
 }

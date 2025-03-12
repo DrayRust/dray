@@ -49,6 +49,7 @@ fn start_ray() -> String {
 
 #[tauri::command]
 fn stop_ray() -> String {
+	info!("stop_ray triggered");
 	ray::stop();
 	"stop_ray send ok!".to_string()
 }
@@ -58,6 +59,13 @@ fn force_restart_ray() -> String {
 	info!("force_restart_ray triggered");
 	ray::force_restart_ray();
 	"force_restart_ray send ok!".to_string()
+}
+
+#[tauri::command]
+fn force_kill_ray() -> String {
+	info!("force_kill_ray triggered");
+	ray::force_kill_ray();
+	"force_kill_ray send ok!".to_string()
 }
 
 #[tauri::command]
@@ -113,6 +121,7 @@ pub fn main() {
 			start_ray,
 			stop_ray,
 			force_restart_ray,
+			force_kill_ray,
 			enable_auto_proxy,
 			enable_socks_proxy,
 			enable_web_proxy,
