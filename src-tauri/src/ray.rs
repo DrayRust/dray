@@ -1,5 +1,6 @@
 use logger::{error, info, debug};
-use crate::command;
+use std::process::{Child, Command};
+use std::sync::Mutex;
 use crate::dirs;
 
 pub fn start() -> bool {
@@ -9,7 +10,7 @@ pub fn start() -> bool {
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
 
-	if let Err(e) = command::start(&*ray_path, &["-c", &*ray_config_path]) {
+	if let Err(e) = start_command(&*ray_path, &["-c", &*ray_config_path]) {
 		error!("Failed to start Ray Server: {}", e);
 		false
 	} else {
@@ -19,11 +20,46 @@ pub fn start() -> bool {
 }
 
 pub fn stop() -> bool {
-	if let Err(e) = command::stop() {
+	if let Err(e) = stop_command() {
 		error!("Failed to stop Ray Server: {}", e);
 		false
 	} else {
 		info!("Ray Server stopped successfully");
 		true
 	}
+}
+
+static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
+
+fn start_command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
+	let mut child_process = CHILD_PROCESS
+		.lock()
+		.map_err(|_| "Failed to lock CHILD_PROCESS")?;
+
+	if child_process.is_some() {
+		return Err("Command is already running".into());
+	}
+
+	let child = Command::new(command)
+		.args(args)
+		.spawn()
+		.map_err(|e| format!("Failed to start command: {}", e))?;
+
+	*child_process = Some(child);
+
+	Ok(())
+}
+
+fn stop_command() -> Result<(), Box<dyn std::error::Error>> {
+	if let Some(mut child) = CHILD_PROCESS
+		.lock()
+		.map_err(|_| "Failed to lock CHILD_PROCESS")?
+		.take()
+	{
+		child.kill()?;
+		child.wait()?;
+	} else {
+		return Err("No child process found".into());
+	}
+	Ok(())
 }

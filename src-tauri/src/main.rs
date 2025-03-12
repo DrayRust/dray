@@ -1,4 +1,3 @@
-mod command;
 mod dirs;
 mod log;
 mod network;
