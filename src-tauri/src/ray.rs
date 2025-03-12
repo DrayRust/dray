@@ -27,8 +27,7 @@ pub fn start() -> bool {
 		.spawn()
 		.map_err(|e| {
 			error!("Failed to start command: {}", e);
-			e
-		})?;
+		}).unwrap();
 
 	// 保存子进程句柄
 	*child_process = Some(child);
@@ -42,10 +41,9 @@ pub fn stop() -> bool {
 		child.wait().unwrap();
 		*CHILD_PROCESS.lock().unwrap() = None;
 		info!("Ray Server stopped successfully");
-		true;
+		true
 	} else {
 		error!("Ray Server is not running, no need to stop");
-		false;
+		false
 	}
 }
-
