@@ -54,7 +54,12 @@ pub fn force_restart_ray() -> bool {
 		*child = None;
 	}
 	force_kill_ray();
-	start()
+	if !start() {
+		error!("Failed to start Ray Server");
+		return false;
+	}
+	info!("Ray Server force restarted successfully");
+	true
 }
 
 fn force_kill_ray() -> bool {
