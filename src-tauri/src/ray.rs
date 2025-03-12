@@ -24,9 +24,12 @@ pub fn start() -> bool {
 }
 
 pub fn stop() -> bool {
-	if let Some(mut child) = CHILD_PROCESS.lock().unwrap().take() {
+	// debug!("Ray Server stop and take");
+	let child_opt = CHILD_PROCESS.lock().unwrap().take();
+	if let Some(mut child) = child_opt {
 		if let Err(e) = child.kill() {
 			error!("Failed to kill Ray Server: {}", e);
+			*CHILD_PROCESS.lock().unwrap() = Some(child);
 			return false;
 		}
 		if let Err(e) = child.wait() {
@@ -34,7 +37,6 @@ pub fn stop() -> bool {
 			return false;
 		}
 		info!("Ray Server stopped successfully");
-		*CHILD_PROCESS.lock().unwrap() = None;
 		true
 	} else {
 		error!("Ray Server is not running, no need to stop");
