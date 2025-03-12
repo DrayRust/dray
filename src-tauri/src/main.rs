@@ -49,7 +49,7 @@ fn stop_ray() -> String {
 #[tauri::command]
 fn force_restart_ray() -> String {
 	info!("force_restart_ray triggered");
-	ray::start();
+	ray::force_restart_ray();
 	"force_restart_ray send ok!".to_string()
 }
 
