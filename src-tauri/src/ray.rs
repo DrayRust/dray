@@ -1,10 +1,9 @@
 use std::process::{Child, Command};
 use std::sync::Mutex;
 use logger::{error, info, debug};
-use once_cell::sync::Lazy;
 use crate::dirs;
 
-static CHILD_PROCESS: Lazy<Mutex<Option<Child>>> = Lazy::new(|| Mutex::new(None));
+static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 pub fn start() -> bool {
 	if CHILD_PROCESS.lock().unwrap().is_some() {
@@ -18,18 +17,22 @@ pub fn start() -> bool {
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
 
-	let mut child_process = CHILD_PROCESS.lock().unwrap();
 	let child = Command::new(&ray_path).args(&["-c", &ray_config_path]).spawn().unwrap();
-	*child_process = Some(child);
+	*CHILD_PROCESS.lock().unwrap() = Some(child);
 	info!("Ray Server started successfully");
 	true
 }
 
 pub fn stop() -> bool {
 	if let Some(mut child) = CHILD_PROCESS.lock().unwrap().take() {
-		child.kill().unwrap();
-		// child.wait().unwrap();
-		*CHILD_PROCESS.lock().unwrap() = None;
+		if let Err(e) = child.kill() {
+			error!("Failed to kill Ray Server: {}", e);
+			return false;
+		}
+		if let Err(e) = child.wait() {
+			error!("Failed to wait for Ray Server to terminate: {}", e);
+			return false;
+		}
 		info!("Ray Server stopped successfully");
 		true
 	} else {
@@ -66,5 +69,5 @@ pub fn force_kill_ray() -> bool {
 			}
 		}
 	}
-	true
+	killed
 }
