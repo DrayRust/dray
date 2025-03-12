@@ -47,3 +47,34 @@ pub fn stop() -> bool {
 		false
 	}
 }
+
+pub fn force_restart_ray() -> bool {
+	let mut child = CHILD_PROCESS.lock().unwrap();
+	if child.is_some() {
+		*child = None;
+	}
+	start()
+}
+
+fn force_kill_ray() -> bool {
+	let mut sys = sysinfo::System::new_all();
+	sys.refresh_all();
+
+	let mut killed = false;
+	for (pid, process) in sys.processes() {
+		if process.name() == "xray" {
+			if process.kill() {
+				error!("Failed to kill xray process with PID: {}", pid);
+				return false;
+			}
+			info!("Killed xray process with PID: {}", pid);
+			killed = true;
+			break;
+		}
+	}
+	if !killed {
+		error!("No xray process found to kill");
+		return false;
+	}
+	true
+}

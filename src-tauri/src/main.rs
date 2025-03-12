@@ -47,6 +47,13 @@ fn stop_ray() -> String {
 }
 
 #[tauri::command]
+fn force_restart_ray() -> String {
+	info!("force_restart_ray triggered");
+	ray::start();
+	"force_restart_ray send ok!".to_string()
+}
+
+#[tauri::command]
 fn enable_auto_proxy() -> String {
 	network::enable_auto_proxy();
 	"enable_auto_proxy send ok!".to_string()
@@ -91,18 +98,19 @@ pub fn main() {
 			Ok(())
 		})
 		.invoke_handler(tauri::generate_handler![
-            dray,
-            get_paths_json,
-            start_web,
-            stop_web,
-            start_ray,
-            stop_ray,
+			dray,
+			get_paths_json,
+			start_web,
+			stop_web,
+			start_ray,
+			stop_ray,
+			force_restart_ray,
 			enable_auto_proxy,
 			enable_socks_proxy,
 			enable_web_proxy,
 			enable_secure_web_proxy,
-            disable_proxies
-        ])
+			disable_proxies
+		])
 		.run(tauri::generate_context!())
 		.expect("error while running dray application");
 }
