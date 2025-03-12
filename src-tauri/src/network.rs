@@ -19,14 +19,17 @@ networksetup -setsecurewebproxystate Wi-Fi off
 */
 
 pub fn parse_and_execute_commands(command_str: &str) -> bool {
-	let commands: Vec<&str> = command_str.split_whitespace().collect().lines().collect();
+	let commands: Vec<&str> = command_str.trim().lines().collect();
 	let mut all_success = true;
 
 	for cmd in commands {
-		let args: Vec<&str> = cmd.split_whitespace().collect();
-		if args.is_empty() {
+		let cmd = cmd.trim();
+		if cmd.is_empty() {
 			continue;
-		} else if args.len() < 2 {
+		}
+
+		let args: Vec<&str> = cmd.split_whitespace().collect();
+		if args.len() < 2 {
 			error!("Invalid command format: {}", cmd);
 			all_success = false;
 			continue;
