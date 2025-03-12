@@ -12,13 +12,13 @@ use env_logger::Builder;
 use actix_web::middleware::Logger;
 use chrono;
 
-static LOGGER_INITIALIZED: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
+static LOGGER_ONCE: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 
 // 日志初始化
 fn init_logger() {
-	let mut initialized = LOGGER_INITIALIZED.lock().unwrap();
-	if *initialized {
+	let mut init_once = LOGGER_ONCE.lock().unwrap();
+	if *init_once {
 		return;
 	}
 
@@ -43,7 +43,7 @@ fn init_logger() {
 		.format_timestamp(None)
 		.init();
 
-	*initialized = true;
+	*init_once = true;
 }
 
 pub fn start() {
