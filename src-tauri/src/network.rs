@@ -7,110 +7,41 @@ networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 1086
 networksetup -setwebproxy Wi-Fi 127.0.0.1 1089
 networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 1089
 
+networksetup -setautoproxystate Wi-Fi on
+networksetup -setsocksfirewallproxystate Wi-Fi on
+networksetup -setwebproxystate Wi-Fi on
+networksetup -setsecurewebproxystate Wi-Fi on
+
 networksetup -setautoproxystate Wi-Fi off
 networksetup -setsocksfirewallproxystate Wi-Fi off
 networksetup -setwebproxystate Wi-Fi off
 networksetup -setsecurewebproxystate Wi-Fi off
 */
 
-pub fn enable_all_proxies() -> bool {
-	let results = [set_https(), set_http(), set_socks(), set_pac()];
-	if results.iter().all(|&x| x) {
-		info!("All proxies enabled successfully");
-		true
-	} else {
-		error!("Failed to enable all proxies");
-		false
-	}
-}
+pub fn parse_and_execute_commands(command_str: &str) -> bool {
+	let commands: Vec<&str> = command_str.split_whitespace().collect().lines().collect();
+	let mut all_success = true;
 
-pub fn disable_all_proxies() -> bool {
-	let results = [disable_http_proxy(), disable_https_proxy(), disable_socks_proxy(), disable_auto_proxy()];
-	if results.iter().all(|&x| x) {
-		info!("All proxies disabled successfully");
-		true
-	} else {
-		error!("Failed to disable all proxies");
-		false
-	}
-}
+	for cmd in commands {
+		let args: Vec<&str> = cmd.split_whitespace().collect();
+		if args.is_empty() {
+			continue;
+		} else if args.len() < 2 {
+			error!("Invalid command format: {}", cmd);
+			all_success = false;
+			continue;
+		}
 
-pub fn set_pac() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setautoproxyurl", "Wi-Fi", "http://127.0.0.1:18687/dray/proxy.pac"]) {
-		error!("Failed to set PAC file: {}", e);
-		false
-	} else {
-		info!("PAC file set successfully");
-		true
-	}
-}
+		let command_name = args[0];
+		let command_args = &args[1..];
 
-pub fn set_socks() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsocksfirewallproxy", "Wi-Fi", "127.0.0.1", "1086"]) {
-		error!("Failed to start SOCKS proxy: {}", e);
-		false
-	} else {
-		info!("SOCKS proxy started successfully");
-		true
+		if let Err(e) = command::start(command_name, command_args) {
+			error!("Failed to execute command '{}': {}", cmd, e);
+			all_success = false;
+		} else {
+			info!("Command '{}' executed successfully", cmd);
+		}
 	}
-}
 
-pub fn set_http() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setwebproxy", "Wi-Fi", "127.0.0.1", "1089"]) {
-		error!("Failed to start HTTP proxy: {}", e);
-		false
-	} else {
-		info!("HTTP proxy started successfully");
-		true
-	}
-}
-
-pub fn set_https() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsecurewebproxy", "Wi-Fi", "127.0.0.1", "1089"]) {
-		error!("Failed to start HTTPS proxy: {}", e);
-		false
-	} else {
-		info!("HTTPS proxy started successfully");
-		true
-	}
-}
-
-pub fn disable_socks_proxy() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsocksfirewallproxystate", "Wi-Fi", "off"]) {
-		error!("Failed to disable SOCKS proxy: {}", e);
-		false
-	} else {
-		info!("SOCKS proxy disabled successfully");
-		true
-	}
-}
-
-pub fn disable_auto_proxy() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setautoproxystate", "Wi-Fi", "off"]) {
-		error!("Failed to disable auto proxy: {}", e);
-		false
-	} else {
-		info!("Auto proxy disabled successfully");
-		true
-	}
-}
-
-pub fn disable_http_proxy() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setwebproxystate", "Wi-Fi", "off"]) {
-		error!("Failed to disable HTTP proxy: {}", e);
-		false
-	} else {
-		info!("HTTP proxy disabled successfully");
-		true
-	}
-}
-
-pub fn disable_https_proxy() -> bool {
-	if let Err(e) = command::start("networksetup", &["-setsecurewebproxystate", "Wi-Fi", "off"]) {
-		error!("Failed to disable HTTPS proxy: {}", e);
-		false
-	} else {
-		info!("HTTPS proxy disabled successfully");
-		true
-	}
+	all_success
 }
