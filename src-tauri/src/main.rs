@@ -53,9 +53,9 @@ fn set_auto_proxy_url() -> String {
 }
 
 #[tauri::command]
-fn set_socks_firewall_proxy() -> String {
-	network::set_socks_firewall_proxy();
-	"set_socks_firewall_proxy send ok!".to_string()
+fn set_socks_proxy() -> String {
+	network::set_socks_proxy();
+	"set_socks_proxy send ok!".to_string()
 }
 
 #[tauri::command]
@@ -98,7 +98,7 @@ pub fn main() {
             start_ray,
             stop_ray,
 			set_auto_proxy_url,
-			set_socks_firewall_proxy,
+			set_socks_proxy,
 			set_web_proxy,
 			set_secure_web_proxy,
             disable_all_proxies

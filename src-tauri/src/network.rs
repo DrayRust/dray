@@ -59,7 +59,7 @@ pub fn set_auto_proxy_url() -> bool {
 	parse_and_execute_commands(&command_str)
 }
 
-pub fn set_socks_firewall_proxy() -> bool {
+pub fn set_socks_proxy() -> bool {
 	let port = 1086;
 	let commands = vec![
 		format!("networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 {}", port),
