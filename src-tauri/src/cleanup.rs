@@ -2,7 +2,7 @@ use tauri::{plugin::Plugin, AppHandle, RunEvent, Runtime};
 use crate::network;
 use crate::ray;
 
-struct CleanupPlugin;
+pub struct CleanupPlugin;
 
 impl<R: Runtime> Plugin<R> for CleanupPlugin {
 	fn name(&self) -> &'static str {
