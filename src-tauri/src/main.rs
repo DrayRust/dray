@@ -4,6 +4,7 @@ mod network;
 mod ray;
 mod web;
 mod sys_info;
+mod cleanup;
 use logger::info;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -104,6 +105,7 @@ pub fn main() {
 	info!("Dray started");
 
 	tauri::Builder::default()
+		.plugin(cleanup::CleanupPlugin)
 		.plugin(tauri_plugin_opener::init())
 		.plugin(tauri_plugin_fs::init())
 		.setup(|_app| {
