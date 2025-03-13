@@ -26,7 +26,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
 	if let Err(e) = Command::new(&ray_path).args(&["-c", &ray_config_path]).output() {
-		error!("Ray Server Command run error: {}", e);
+		error!("Ray Server run error: {}", e);
 	} else {
 		info!("Ray Server has stopped running");
 	}
