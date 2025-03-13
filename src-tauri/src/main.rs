@@ -1,135 +1,139 @@
+mod cleanup;
 mod dirs;
 mod log;
 mod network;
 mod ray;
-mod web;
 mod sys_info;
-mod cleanup;
+mod web;
 use logger::info;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 #[tauri::command]
 fn dray(name: &str) -> String {
-	info!("dray triggered");
-	format!("Hello, {}! Do you know Dray is great?", name)
+    info!("dray triggered");
+    format!("Hello, {}! Do you know Dray is great?", name)
 }
 
 #[tauri::command]
 fn get_paths_json() -> String {
-	info!("get_paths_json triggered");
-	dirs::get_paths_json()
+    info!("get_paths_json triggered");
+    dirs::get_paths_json()
 }
 
 #[tauri::command]
 fn sys_info_json() -> String {
-	info!("sys_info_json triggered");
-	sys_info::sys_info_json()
+    info!("sys_info_json triggered");
+    sys_info::sys_info_json()
 }
 
 #[tauri::command]
 fn start_web() -> String {
-	info!("Request to start Web Server");
-	web::start();
-	"web_start send ok!".to_string()
+    info!("Request to start Web Server");
+    web::start();
+    "web_start send ok!".to_string()
 }
 
 #[tauri::command]
 fn stop_web() -> String {
-	info!("Request to stop Web Server");
-	web::stop();
-	"stop_web send ok!".to_string()
+    info!("Request to stop Web Server");
+    web::stop();
+    "stop_web send ok!".to_string()
 }
 
 #[tauri::command]
 fn start_ray() -> String {
-	info!("start_ray triggered");
-	ray::start();
-	"start_ray send ok!".to_string()
+    info!("start_ray triggered");
+    ray::start();
+    "start_ray send ok!".to_string()
 }
 
 #[tauri::command]
 fn stop_ray() -> String {
-	info!("stop_ray triggered");
-	ray::stop();
-	"stop_ray send ok!".to_string()
+    info!("stop_ray triggered");
+    ray::stop();
+    "stop_ray send ok!".to_string()
 }
 
 #[tauri::command]
 fn force_restart_ray() -> String {
-	info!("force_restart_ray triggered");
-	ray::force_restart_ray();
-	"force_restart_ray send ok!".to_string()
+    info!("force_restart_ray triggered");
+    ray::force_restart_ray();
+    "force_restart_ray send ok!".to_string()
 }
 
 #[tauri::command]
 fn force_kill_ray() -> String {
-	info!("force_kill_ray triggered");
-	ray::force_kill_ray();
-	"force_kill_ray send ok!".to_string()
+    info!("force_kill_ray triggered");
+    ray::force_kill_ray();
+    "force_kill_ray send ok!".to_string()
 }
 
 #[tauri::command]
 fn enable_auto_proxy() -> String {
-	network::enable_auto_proxy();
-	"enable_auto_proxy send ok!".to_string()
+    network::enable_auto_proxy();
+    "enable_auto_proxy send ok!".to_string()
 }
 
 #[tauri::command]
 fn enable_socks_proxy() -> String {
-	network::enable_socks_proxy();
-	"enable_socks_proxy send ok!".to_string()
+    network::enable_socks_proxy();
+    "enable_socks_proxy send ok!".to_string()
 }
 
 #[tauri::command]
 fn enable_web_proxy() -> String {
-	network::enable_web_proxy();
-	"enable_web_proxy send ok!".to_string()
+    network::enable_web_proxy();
+    "enable_web_proxy send ok!".to_string()
 }
 
 #[tauri::command]
 fn enable_secure_web_proxy() -> String {
-	network::enable_secure_web_proxy();
-	"enable_secure_web_proxy send ok!".to_string()
+    network::enable_secure_web_proxy();
+    "enable_secure_web_proxy send ok!".to_string()
 }
 
 #[tauri::command]
 fn disable_proxies() -> String {
-	network::disable_proxies();
-	"disable_proxies send ok!".to_string()
+    network::disable_proxies();
+    "disable_proxies send ok!".to_string()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
-	log::init_log();
-	info!("Dray started");
+    log::init_log();
+    info!("Dray started");
 
-	tauri::Builder::default()
-		.plugin(cleanup::CleanupPlugin)
-		.plugin(tauri_plugin_opener::init())
-		.plugin(tauri_plugin_fs::init())
-		.setup(|_app| {
-			ray::start(); // Start ray server
-			web::start(); // Start web server
-			network::enable_auto_proxy(); // Set proxy
-			Ok(())
-		})
-		.invoke_handler(tauri::generate_handler![
-			dray,
-			get_paths_json,
-			sys_info_json,
-			start_web,
-			stop_web,
-			start_ray,
-			stop_ray,
-			force_restart_ray,
-			force_kill_ray,
-			enable_auto_proxy,
-			enable_socks_proxy,
-			enable_web_proxy,
-			enable_secure_web_proxy,
-			disable_proxies
-		])
-		.run(tauri::generate_context!())
-		.expect("error while running dray application");
+    tauri::Builder::default()
+        .plugin(cleanup::CleanupPlugin)
+		.plugin(tauri_plugin_autostart::init(
+			tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+			Option::None, // 或者提供具体的参数，例如 Option::Some(vec!["arg1", "arg2"])
+		))
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
+        .setup(|_app| {
+            ray::start(); // Start ray server
+            web::start(); // Start web server
+            network::enable_auto_proxy(); // Set proxy
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            dray,
+            get_paths_json,
+            sys_info_json,
+            start_web,
+            stop_web,
+            start_ray,
+            stop_ray,
+            force_restart_ray,
+            force_kill_ray,
+            enable_auto_proxy,
+            enable_socks_proxy,
+            enable_web_proxy,
+            enable_secure_web_proxy,
+            disable_proxies
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running dray application");
 }

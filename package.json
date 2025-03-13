@@ -1,32 +1,33 @@
 {
-  "name": "dray",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-	"dev": "vite",
-	"build": "vue-tsc --noEmit && vite build",
-	"preview": "vite preview",
-	"tauri": "tauri",
-	"start": "yarn tauri dev"
-  },
-  "dependencies": {
-	"@tauri-apps/api": "^2",
-	"@tauri-apps/plugin-opener": "^2"
-  },
-  "devDependencies": {
-	"@tauri-apps/cli": "^2",
-	"@vitejs/plugin-vue": "^5.2.1",
-	"element-plus": "^2.9.6",
-	"esbuild": "^0.25.0",
-	"pinia": "^3.0.1",
-	"typescript": "^5.8.2",
-	"unplugin-auto-import": "^19.1.1",
-	"unplugin-element-plus": "^0.9.1",
-	"unplugin-vue-components": "^28.4.1",
-	"vite": "^6.2.1",
-	"vue": "^3.5.13",
-	"vue-router": "^4.5.0",
-	"vue-tsc": "^2.2.8"
-  }
+	"name": "dray",
+	"private": true,
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vue-tsc --noEmit && vite build",
+		"preview": "vite preview",
+		"tauri": "tauri",
+		"start": "yarn tauri dev"
+	},
+	"dependencies": {
+		"@tauri-apps/api": "^2",
+		"@tauri-apps/plugin-autostart": "~2",
+		"@tauri-apps/plugin-opener": "^2"
+	},
+	"devDependencies": {
+		"@tauri-apps/cli": "^2",
+		"@vitejs/plugin-vue": "^5.2.1",
+		"element-plus": "^2.9.6",
+		"esbuild": "^0.25.0",
+		"pinia": "^3.0.1",
+		"typescript": "^5.8.2",
+		"unplugin-auto-import": "^19.1.1",
+		"unplugin-element-plus": "^0.9.1",
+		"unplugin-vue-components": "^28.4.1",
+		"vite": "^6.2.1",
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.0",
+		"vue-tsc": "^2.2.8"
+	}
 }
