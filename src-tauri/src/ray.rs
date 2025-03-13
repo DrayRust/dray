@@ -1,42 +1,40 @@
-use std::process::Command;
+use std::process::{Child, Command};
 use std::sync::Mutex;
 use logger::{error, info, debug};
-use once_cell::sync::Lazy;
 use crate::dirs;
 
-static SERVER_HANDLE: Lazy<Mutex<Option<tauri::async_runtime::JoinHandle<()>>>> = Lazy::new(|| Mutex::new(None));
+static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 pub fn start() -> bool {
-	if SERVER_HANDLE.lock().unwrap().is_some() {
+	if CHILD_PROCESS.lock().unwrap().is_some() {
 		error!("Ray Server is already running");
 		return false;
 	}
 
-	*SERVER_HANDLE.lock().unwrap() = Some(tauri::async_runtime::spawn(async {
-		run_server().await.unwrap();
-	}));
-	info!("Ray Server started successfully");
-	true
-}
-
-async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 	let ray_dir = dirs::get_dray_ray_dir().unwrap();
 	let ray_path: String = ray_dir.join("xray").to_str().unwrap().to_string();
 	let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap().to_string();
 	debug!("ray_path: {}", ray_path);
 	debug!("ray_config_path: {}", ray_config_path);
-	if let Err(e) = Command::new(&ray_path).args(&["-c", &ray_config_path]).output() {
-		error!("Ray Server run error: {}", e);
-	} else {
-		info!("Ray Server has stopped running");
-	}
-	Ok(())
+
+	let child = Command::new(&ray_path).args(&["-c", &ray_config_path]).spawn().unwrap();
+	*CHILD_PROCESS.lock().unwrap() = Some(child);
+	info!("Ray Server started successfully");
+	true
 }
 
 pub fn stop() -> bool {
-	let mut server_handle = SERVER_HANDLE.lock().unwrap();
-	if let Some(handle) = server_handle.take() {
-		handle.abort();
+	let child_opt = CHILD_PROCESS.lock().unwrap().take();
+	if let Some(mut child) = child_opt {
+		if let Err(e) = child.kill() {
+			error!("Failed to kill Ray Server: {}", e);
+			*CHILD_PROCESS.lock().unwrap() = Some(child);
+			return false;
+		}
+		if let Err(e) = child.wait() {
+			error!("Failed to wait for Ray Server to terminate: {}", e);
+			return false;
+		}
 		info!("Ray Server stopped successfully");
 		true
 	} else {
@@ -46,8 +44,8 @@ pub fn stop() -> bool {
 }
 
 pub fn force_restart_ray() -> bool {
-	if SERVER_HANDLE.lock().unwrap().is_some() {
-		*SERVER_HANDLE.lock().unwrap() = None;
+	if CHILD_PROCESS.lock().unwrap().is_some() {
+		*CHILD_PROCESS.lock().unwrap() = None;
 	}
 	force_kill_ray();
 	if !start() {
@@ -73,6 +71,6 @@ pub fn force_kill_ray() -> bool {
 			}
 		}
 	}
-	*SERVER_HANDLE.lock().unwrap() = None;
+	*CHILD_PROCESS.lock().unwrap() = None;
 	killed
 }
