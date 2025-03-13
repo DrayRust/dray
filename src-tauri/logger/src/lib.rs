@@ -188,7 +188,7 @@ pub fn set_log_max_size(size: u64) {
 macro_rules! error {
     ($($arg:tt)*) => {
         if let Err(e) = $crate::log($crate::LogLevel::Error, &format!($($arg)*)) {
-            eprintln!("日志记录失败: {}", e);
+            eprintln!("Failed to log: {}", e);
         }
     };
 }
@@ -197,7 +197,7 @@ macro_rules! error {
 macro_rules! warn {
     ($($arg:tt)*) => {
         if let Err(e) = $crate::log($crate::LogLevel::Warn, &format!($($arg)*)) {
-            eprintln!("日志记录失败: {}", e);
+            eprintln!("Failed to log: {}", e);
         }
     };
 }
@@ -206,7 +206,7 @@ macro_rules! warn {
 macro_rules! info {
     ($($arg:tt)*) => {
         if let Err(e) = $crate::log($crate::LogLevel::Info, &format!($($arg)*)) {
-            eprintln!("日志记录失败: {}", e);
+            eprintln!("Failed to log: {}", e);
         }
     };
 }
@@ -215,7 +215,7 @@ macro_rules! info {
 macro_rules! debug {
     ($($arg:tt)*) => {
         if let Err(e) = $crate::log($crate::LogLevel::Debug, &format!($($arg)*)) {
-            eprintln!("日志记录失败: {}", e);
+            eprintln!("Failed to log: {}", e);
         }
     };
 }
@@ -224,7 +224,7 @@ macro_rules! debug {
 macro_rules! trace {
     ($($arg:tt)*) => {
         if let Err(e) = $crate::log($crate::LogLevel::Trace, &format!($($arg)*)) {
-            eprintln!("日志记录失败: {}", e);
+            eprintln!("Failed to log: {}", e);
         }
     };
 }
