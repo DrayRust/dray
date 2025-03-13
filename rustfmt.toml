@@ -17,6 +17,6 @@
 # wrap_comments = true
 
 max_width = 180
-#hard_tabs = true
+hard_tabs = false
 tab_spaces = 4
 tab_width = 4

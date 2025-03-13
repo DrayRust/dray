@@ -6,8 +6,51 @@ mod ray;
 mod sys_info;
 mod web;
 use logger::info;
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::Manager;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+
+fn setup_main_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
+    let main_window = app.get_webview_window("main").unwrap();
+
+    // #[cfg(target_os = "windows")]
+    main_window.set_skip_taskbar(true)?;
+
+    #[cfg(target_os = "macos")]
+    app.set_activation_policy(tauri::ActivationPolicy::Accessory)?;
+
+    main_window.clone().on_window_event(move |event| {
+        if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            api.prevent_close();
+            main_window.hide().unwrap();
+        }
+    });
+
+    Ok(())
+}
+
+fn setup_tray<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
+    TrayIconBuilder::new()
+        .icon(app.default_window_icon().unwrap().clone())
+        .on_tray_icon_event(|tray, event| match event {
+            TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } => {
+                if let Some(window) = tray.app_handle().get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+            _ => {
+                // println!("unhandled event {event:?}");
+            }
+        })
+        .build(app)?;
+    Ok(())
+}
 
 #[tauri::command]
 fn dray(name: &str) -> String {
@@ -106,13 +149,16 @@ pub fn main() {
 
     tauri::Builder::default()
         .plugin(cleanup::CleanupPlugin)
-		.plugin(tauri_plugin_autostart::init(
-			tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-			Option::None, // 或者提供具体的参数，例如 Option::Some(vec!["arg1", "arg2"])
-		))
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Option::None, // 或者提供具体的参数，例如 Option::Some(vec!["arg1", "arg2"])
+        ))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
-        .setup(|_app| {
+        .setup(|app| {
+            setup_main_window(&app.handle())?;
+            setup_tray(app)?;
+
             ray::start(); // Start ray server
             web::start(); // Start web server
             network::enable_auto_proxy(); // Set proxy
