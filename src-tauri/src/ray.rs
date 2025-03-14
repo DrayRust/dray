@@ -25,7 +25,7 @@ pub fn start() -> bool {
     {
         Ok(child) => child,
         Err(e) => {
-            error!("Failed to start Ray Server: {}", e);
+            error!("Failed to start Ray Server: {:?}", e);
             return false;
         }
     };
