@@ -150,13 +150,20 @@ fn disable_proxies() -> String {
     "disable_proxies send ok!".to_string()
 }
 
+#[tauri::command]
+fn quit() -> String {
+    cleanup::exit_cleanly();
+    info!("Dray quit");
+    std::process::exit(0);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
     log::init_log();
     info!("Dray started");
 
     tauri::Builder::default()
-        .plugin(cleanup::CleanupPlugin)
+        .plugin(cleanup::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Option::None, // 或者提供具体的参数，例如 Option::Some(vec!["arg1", "arg2"])
@@ -165,8 +172,8 @@ pub fn main() {
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             setup_main_window(&app.handle())?;
-			setup_menu(app)?;
-			setup_tray(app)?;
+            setup_menu(app)?;
+            setup_tray(app)?;
 
             ray::start(); // Start ray server
             web::start(); // Start web server
@@ -187,7 +194,8 @@ pub fn main() {
             enable_socks_proxy,
             enable_web_proxy,
             enable_secure_web_proxy,
-            disable_proxies
+            disable_proxies,
+            quit
         ])
         .run(tauri::generate_context!())
         .expect("error while running dray application");

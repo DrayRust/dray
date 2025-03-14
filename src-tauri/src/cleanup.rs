@@ -12,10 +12,18 @@ impl<R: Runtime> Plugin<R> for CleanupPlugin {
     fn on_event(&mut self, _app: &AppHandle<R>, event: &RunEvent) {
         match event {
             RunEvent::Exit => {
-                network::disable_proxies();
-                ray::force_kill_ray();
+                exit_cleanly();
             }
             _ => {}
         }
     }
+}
+
+pub fn init() -> CleanupPlugin {
+    CleanupPlugin {}
+}
+
+pub fn exit_cleanly() {
+    network::disable_proxies();
+    ray::force_kill_ray();
 }
