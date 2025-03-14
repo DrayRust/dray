@@ -17,9 +17,21 @@ pub fn start() -> bool {
     debug!("ray_path: {}", ray_path);
     debug!("ray_config_path: {}", ray_config_path);
 
-    let child = Command::new(&ray_path).args(&["-c", &ray_config_path]).spawn().unwrap();
+    let child = match Command::new(&ray_path)
+        .args(&["-c", &ray_config_path])
+        // .stdout(std::process::Stdio::piped()) // 捕获标准输出
+        // .stderr(std::process::Stdio::piped()) // 捕获标准错误
+        .spawn()
+    {
+        Ok(child) => child,
+        Err(e) => {
+            error!("Failed to start Ray Server: {}", e);
+            return false;
+        }
+    };
+
+    info!("Ray Server started with PID: {}", child.id());
     *CHILD_PROCESS.lock().unwrap() = Some(child);
-    info!("Ray Server started successfully");
     true
 }
 
