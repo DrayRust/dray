@@ -165,8 +165,8 @@ pub fn main() {
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             setup_main_window(&app.handle())?;
-            setup_tray(app)?;
-            setup_menu(app)?;
+			setup_menu(app)?;
+			setup_tray(app)?;
 
             ray::start(); // Start ray server
             web::start(); // Start web server
