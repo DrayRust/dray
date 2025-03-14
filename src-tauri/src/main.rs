@@ -31,6 +31,7 @@ fn setup_main_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> tauri::Res
 }
 
 fn setup_tray<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
+    // See: https://v2.tauri.app/learn/system-tray/#listen-to-tray-events
     TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
         .on_tray_icon_event(|tray, event| match event {
@@ -49,6 +50,13 @@ fn setup_tray<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
             }
         })
         .build(app)?;
+    Ok(())
+}
+
+fn setup_menu<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
+    // See: https://v2.tauri.app/learn/window-menu/
+    let menu = tauri::menu::MenuBuilder::new(app).build()?;
+    app.set_menu(menu)?;
     Ok(())
 }
 
@@ -158,6 +166,7 @@ pub fn main() {
         .setup(|app| {
             setup_main_window(&app.handle())?;
             setup_tray(app)?;
+            setup_menu(app)?;
 
             ray::start(); // Start ray server
             web::start(); // Start web server
