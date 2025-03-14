@@ -74,11 +74,11 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         e
     })?
     .run();
-    info!("Server running on http://127.0.0.1:18687");
+    info!("Web Server running on http://127.0.0.1:18687");
 
     *SERVER_HANDLE.lock().unwrap() = Some(server.handle());
     server.await.map_err(|e| {
-        error!("Server encountered an error: {}", e);
+        error!("Web Server encountered an error: {}", e);
         e
     })?;
     Ok(())
