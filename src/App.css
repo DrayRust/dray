@@ -3,25 +3,11 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    font-weight: 400;
-
-    color-scheme: light dark;
-
-    --color-bg: #242424;
-    --color-text: #fff;
 }
 
 body, p, ul, li, h1, h2, h3, h4, h5, h6 {
     margin: 0;
     padding: 0;
-}
-
-body {
-    background-color: var(--color-bg);
-    color: var(--color-text);
 }
 
 .panel-left {
@@ -39,11 +25,4 @@ body {
     width: calc(100% - 160px);
     height: calc(100vh - 20px);
     overflow-y: auto;
-}
-
-@media (prefers-color-scheme: light) {
-    :root {
-        --color-bg: #fff;
-        --color-text: #333;
-    }
 }
