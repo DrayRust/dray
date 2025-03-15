@@ -166,7 +166,7 @@ pub fn main() {
         .plugin(cleanup::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Option::None, // 或者提供具体的参数，例如 Option::Some(vec!["arg1", "arg2"])
+            Option::Some(vec!["-s", "quiet"])
         ))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
