@@ -1,28 +1,30 @@
 import { useState, useMemo } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { ThemeProvider, createTheme, FormControlLabel, Switch } from '@mui/material'
+import { styled } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import BottomNavigation from '@mui/material/BottomNavigation'
-import BottomNavigationAction from '@mui/material/BottomNavigationAction'
-import Paper from '@mui/material/Paper'
 
+import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 
-import { styled } from '@mui/material/styles'
 import HomeIcon from '@mui/icons-material/Home'
 import StorageIcon from '@mui/icons-material/Storage'
 import InboxIcon from '@mui/icons-material/Inbox'
+import RuleIcon from '@mui/icons-material/Rule'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import SettingsIcon from '@mui/icons-material/Settings'
 
-import RestoreIcon from '@mui/icons-material/Restore'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
+import Home from "./page/Home.tsx"
+import Server from "./page/Server.tsx"
+import Subscription from "./page/Subscription.tsx"
+import Rule from "./page/Rule.tsx"
+import Log from "./page/Log.tsx"
+import Setting from "./page/Setting.tsx"
 
-import { invoke } from "@tauri-apps/api/core"
 import './App.css'
 
 function isMacOS() {
@@ -52,17 +54,6 @@ function isMacOSByKeydown() {
 }
 
 function App() {
-    const [drayMsg, setDrayMsg] = useState("")
-    const [name, setName] = useState("")
-    const [value, setValue] = useState(0)
-
-    async function dray() {
-        // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-        setName("Hello World!")
-        setDrayMsg(await invoke("dray", {name}))
-    }
-
-    // 从 localStorage 中读取主题模式
     const [mode, setMode] = useState<'light' | 'dark'>(() => {
         const savedMode = localStorage.getItem('themeMode') as 'light' | 'dark'
         return savedMode || 'light'
@@ -130,66 +121,68 @@ function App() {
     }))
 
     return (
-        <ThemeProvider theme={theme}>
-            <div className="panel-left">
-                <Paper elevation={3} sx={{width: '100%', height: '100%', borderRadius: 0}}>
-                    <List>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <CustomListItemIcon><HomeIcon/></CustomListItemIcon>
-                                <ListItemText primary="首页"/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <CustomListItemIcon><StorageIcon/></CustomListItemIcon>
-                                <ListItemText primary="服务器"/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <CustomListItemIcon><InboxIcon/></CustomListItemIcon>
-                                <ListItemText primary="订阅"/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <CustomListItemIcon><AssignmentIcon/></CustomListItemIcon>
-                                <ListItemText primary="日志"/>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <CustomListItemIcon><SettingsIcon/></CustomListItemIcon>
-                                <ListItemText primary="设置"/>
-                            </ListItemButton>
-                        </ListItem>
-                    </List>
-                </Paper>
-            </div>
-            <div className="panel-right">
+        <Router>
+            <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <BottomNavigation
-                    showLabels
-                    value={value}
-                    onChange={(_event, newValue) => {
-                        setValue(newValue)
-                    }}
-                >
-                    <BottomNavigationAction label="Recents" icon={<RestoreIcon/>}/>
-                    <BottomNavigationAction label="Favorites" icon={<FavoriteIcon/>}/>
-                    <BottomNavigationAction label="Nearby" icon={<LocationOnIcon/>}/>
-                </BottomNavigation>
                 <FormControlLabel
                     control={<MaterialUISwitch checked={mode === 'dark'} onChange={toggleColorMode}/>}
-                    style={{position: 'fixed', right: 16, top: 16, zIndex: 9999}}
+                    style={{position: 'fixed', right: 0, top: 15, zIndex: 9999}}
                     label=""
                 />
-                <div className="card">
-                    <button onClick={() => dray()}>{drayMsg}</button>
+                <div className="panel-left">
+                    <Paper elevation={3} sx={{width: '100%', height: '100%', borderRadius: 0}}>
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/">
+                                    <CustomListItemIcon><HomeIcon/></CustomListItemIcon>
+                                    <ListItemText primary="首页"/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/server">
+                                    <CustomListItemIcon><StorageIcon/></CustomListItemIcon>
+                                    <ListItemText primary="服务器"/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/subscription">
+                                    <CustomListItemIcon><InboxIcon/></CustomListItemIcon>
+                                    <ListItemText primary="订阅"/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/rule">
+                                    <CustomListItemIcon><RuleIcon/></CustomListItemIcon>
+                                    <ListItemText primary="规则"/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/log">
+                                    <CustomListItemIcon><AssignmentIcon/></CustomListItemIcon>
+                                    <ListItemText primary="日志"/>
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/setting">
+                                    <CustomListItemIcon><SettingsIcon/></CustomListItemIcon>
+                                    <ListItemText primary="设置"/>
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </Paper>
                 </div>
-            </div>
-        </ThemeProvider>
+                <div className="panel-right">
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/server" element={<Server/>}/>
+                        <Route path="/subscription" element={<Subscription/>}/>
+                        <Route path="/rule" element={<Rule/>}/>
+                        <Route path="/log" element={<Log/>}/>
+                        <Route path="/setting" element={<Setting/>}/>
+                    </Routes>
+                </div>
+            </ThemeProvider>
+        </Router>
     )
 }
 
