@@ -65,8 +65,6 @@ function App() {
         localStorage.setItem('themeMode', newMode)
     }
 
-    const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
-
     const theme = useMemo(() => createTheme({palette: {mode}}), [mode])
     const MaterialUISwitch = styled(Switch)(({theme}) => ({
         width: 62,
@@ -120,6 +118,20 @@ function App() {
         },
     }))
 
+    const navItems = [
+        {path: '/', icon: <HomeIcon/>, text: '首页', value: 'home'},
+        {path: '/server', icon: <StorageIcon/>, text: '服务器', value: 'server'},
+        {path: '/subscription', icon: <InboxIcon/>, text: '订阅', value: 'subscription'},
+        {path: '/rule', icon: <RuleIcon/>, text: '规则', value: 'rule'},
+        {path: '/log', icon: <AssignmentIcon/>, text: '日志', value: 'log'},
+        {path: '/setting', icon: <SettingsIcon/>, text: '设置', value: 'setting'}
+    ]
+    const [navVal, setNavVal] = useState('home')
+    const handleNavClick = (v: string) => {
+        setNavVal(v)
+    }
+    const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
+
     return (
         <Router>
             <ThemeProvider theme={theme}>
@@ -132,42 +144,19 @@ function App() {
                 <div className="panel-left">
                     <Paper elevation={3} sx={{width: '100%', height: '100%', borderRadius: 0}}>
                         <List>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/">
-                                    <CustomListItemIcon><HomeIcon/></CustomListItemIcon>
-                                    <ListItemText primary="首页"/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/server">
-                                    <CustomListItemIcon><StorageIcon/></CustomListItemIcon>
-                                    <ListItemText primary="服务器"/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/subscription">
-                                    <CustomListItemIcon><InboxIcon/></CustomListItemIcon>
-                                    <ListItemText primary="订阅"/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/rule">
-                                    <CustomListItemIcon><RuleIcon/></CustomListItemIcon>
-                                    <ListItemText primary="规则"/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/log">
-                                    <CustomListItemIcon><AssignmentIcon/></CustomListItemIcon>
-                                    <ListItemText primary="日志"/>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/setting">
-                                    <CustomListItemIcon><SettingsIcon/></CustomListItemIcon>
-                                    <ListItemText primary="设置"/>
-                                </ListItemButton>
-                            </ListItem>
+                            {navItems.map((item) => (
+                                <ListItem disablePadding key={item.value}>
+                                    <ListItemButton
+                                        component={Link}
+                                        to={item.path}
+                                        selected={navVal === item.value}
+                                        onClick={() => handleNavClick(item.value)}
+                                    >
+                                        <CustomListItemIcon>{item.icon}</CustomListItemIcon>
+                                        <ListItemText primary={item.text}/>
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
                         </List>
                     </Paper>
                 </div>
