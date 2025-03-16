@@ -172,7 +172,7 @@ function App() {
                 <div className="panel-right">
                     <Routes>
                         {navItems.map((item) => (
-                            <Route key={item.value} path={item.path} element={pageComponents[item.value as keyof typeof pageComponents]}/>
+                            <Route key={item.path} path={item.path} element={pageComponents[item.value as keyof typeof pageComponents]}/>
                         ))}
                     </Routes>
                 </div>
