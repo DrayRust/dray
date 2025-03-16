@@ -152,14 +152,14 @@ function App() {
         <Router>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <Box sx={{position: 'fixed', left: 15, bottom: 15, width: 130, zIndex: 9999}}>
-                    <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
-                        <Tooltip title="退出程序">
+                <Box sx={{position: 'fixed', left: 15, bottom: 15, width: 100, zIndex: 1}}>
+                    <Stack spacing={2} sx={{justifyContent: "center", alignItems: "center"}}>
+                        <FormControlLabel control={<MaterialUISwitch checked={mode === 'dark'} onChange={toggleColorMode}/>} label=""/>
+                        <Tooltip title="退出程序" sx={{position: 'relative', zIndex: 99}}>
                             <Fab color="error" size="medium" aria-label="logout" onClick={() => invoke('quit')}>
                                 <LogoutIcon/>
                             </Fab>
                         </Tooltip>
-                        <FormControlLabel control={<MaterialUISwitch checked={mode === 'dark'} onChange={toggleColorMode}/>} label=""/>
                     </Stack>
                 </Box>
                 <div className="panel-left">
