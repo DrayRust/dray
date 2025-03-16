@@ -18,6 +18,12 @@ import RuleIcon from '@mui/icons-material/Rule'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import SettingsIcon from '@mui/icons-material/Settings'
 
+import Tooltip from '@mui/material/Tooltip'
+import Stack from '@mui/material/Stack'
+import Box from '@mui/material/Box'
+import Fab from '@mui/material/Fab'
+import LogoutIcon from '@mui/icons-material/Logout'
+
 import Home from "./page/Home.tsx"
 import Server from "./page/Server.tsx"
 import Subscription from "./page/Subscription.tsx"
@@ -25,6 +31,7 @@ import Rule from "./page/Rule.tsx"
 import Log from "./page/Log.tsx"
 import Setting from "./page/Setting.tsx"
 
+import { invoke } from "@tauri-apps/api/core"
 import './App.css'
 
 function isMacOS() {
@@ -145,11 +152,16 @@ function App() {
         <Router>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <FormControlLabel
-                    control={<MaterialUISwitch checked={mode === 'dark'} onChange={toggleColorMode}/>}
-                    style={{position: 'fixed', right: 0, top: 15, zIndex: 9999}}
-                    label=""
-                />
+                <Box sx={{position: 'fixed', left: 15, bottom: 15, width: 130, zIndex: 9999}}>
+                    <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
+                        <Tooltip title="退出程序">
+                            <Fab color="error" size="medium" aria-label="logout" onClick={() => invoke('quit')}>
+                                <LogoutIcon/>
+                            </Fab>
+                        </Tooltip>
+                        <FormControlLabel control={<MaterialUISwitch checked={mode === 'dark'} onChange={toggleColorMode}/>} label=""/>
+                    </Stack>
+                </Box>
                 <div className="panel-left">
                     <Paper elevation={3} sx={{width: '100%', height: '100%', borderRadius: 0}}>
                         <List>

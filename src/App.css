@@ -5,6 +5,22 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+::-webkit-scrollbar {
+    width: 1px;
+}
+
+::-webkit-scrollbar-track {
+    opacity: 0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 body, p, ul, li, h1, h2, h3, h4, h5, h6 {
     margin: 0;
     padding: 0;
@@ -20,9 +36,10 @@ body, p, ul, li, h1, h2, h3, h4, h5, h6 {
 
 .panel-right {
     position: fixed;
-    top: 10px;
-    right: 10px;
-    width: calc(100% - 160px);
-    height: calc(100vh - 20px);
+    top: 0;
+    right: 0;
+    width: calc(100% - 130px);
+    height: calc(100vh);
+    padding: 8px 10px;
     overflow-y: auto;
 }
