@@ -132,6 +132,15 @@ function App() {
     }
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
+    const pageComponents = {
+        home: <Home/>,
+        server: <Server/>,
+        subscription: <Subscription/>,
+        rule: <Rule/>,
+        log: <Log/>,
+        setting: <Setting/>
+    }
+
     return (
         <Router>
             <ThemeProvider theme={theme}>
@@ -162,12 +171,9 @@ function App() {
                 </div>
                 <div className="panel-right">
                     <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/server" element={<Server/>}/>
-                        <Route path="/subscription" element={<Subscription/>}/>
-                        <Route path="/rule" element={<Rule/>}/>
-                        <Route path="/log" element={<Log/>}/>
-                        <Route path="/setting" element={<Setting/>}/>
+                        {navItems.map((item) => (
+                            <Route key={item.value} path={item.path} element={pageComponents[item.value as keyof typeof pageComponents]}/>
+                        ))}
                     </Routes>
                 </div>
             </ThemeProvider>
