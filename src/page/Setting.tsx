@@ -56,6 +56,16 @@ const Setting: React.FC = () => {
         return value >= 0 && value <= 65535
     }
 
+    const invokeSend = (fn: string, value: string | number | boolean) => {
+        (async () => {
+            try {
+                await invoke(fn, {value})
+            } catch (err) {
+                console.log('Failed to invokeSend:', err)
+            }
+        })()
+    }
+
     // 从配置文件中读取配置信息
     const [config, setConfig] = useState<AppConfig>({
         "web_server_enable": true,
@@ -91,24 +101,15 @@ const Setting: React.FC = () => {
     const handleWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
-        try {
-            await invoke('set_web_server_enable', {value})
-        } catch (err) {
-            console.log('Failed to set web server enable:', err)
-        }
+        invokeSend('set_web_server_enable', value)
     }
 
     const handleWebIp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
+        const ok = validateIp(value)
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
-        setWebIpError(!validateIp(value))
-        if (validateIp(value)) {
-            try {
-                await invoke('set_web_server_host', {value})
-            } catch (err) {
-                console.log('Failed to set web server host:', err)
-            }
-        }
+        setWebIpError(!ok)
+        ok && invokeSend('set_web_server_host', value)
     }
 
     const handleWebPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,13 +117,7 @@ const Setting: React.FC = () => {
         const ok = validatePort(value)
         setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
         setWebPortError(!ok)
-        if (ok) {
-            try {
-                await invoke('set_web_server_port', {value: value})
-            } catch (err) {
-                console.log('Failed to set web server port:', err)
-            }
-        }
+        ok && invokeSend('set_web_server_port', value)
     }
 
     return (
@@ -262,7 +257,7 @@ const Setting: React.FC = () => {
             ) : activeTab === 2 && (
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{cursor: 'default'}}>
+                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
                                 <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
