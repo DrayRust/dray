@@ -76,9 +76,6 @@ impl Default for Config {
 }
 
 static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| Mutex::new(Config::default()));
-pub fn get_config() -> Config {
-    CONFIG.lock().unwrap().clone()
-}
 
 pub fn init() {
     // 首先确保配置目录存在
@@ -114,6 +111,18 @@ pub fn init() {
             error!("Failed to create default config file: {}", e);
         }
     }
+}
+
+pub fn get_config() -> Config {
+    CONFIG.lock().unwrap().clone()
+}
+
+pub fn get_config_json() -> String {
+    let config = get_config();
+    serde_json::to_string_pretty(&config).unwrap_or_else(|e| {
+        error!("Failed to serialize config to JSON: {}", e);
+        "{}".to_string()
+    })
 }
 
 pub fn load_config_from_file(file_path: &str) -> Result<Config, Box<dyn std::error::Error>> {
