@@ -66,17 +66,17 @@ function isMacOSByKeydown() {
 
 const App: React.FC = () => {
     const navItems = [
-        {path: '/', text: '首页', value: 'home', element: <Home/>, icon: <HomeIcon/>},
-        {path: '/server', text: '服务器', value: 'server', element: <Server/>, icon: <StorageIcon/>},
-        {path: '/subscription', text: '订阅', value: 'subscription', element: <Subscription/>, icon: <InboxIcon/>},
-        {path: '/rule', text: '规则', value: 'rule', element: <Rule/>, icon: <RuleIcon/>},
-        {path: '/log', text: '日志', value: 'log', element: <Log/>, icon: <AssignmentIcon/>},
-        {path: '/setting', text: '设置', value: 'setting', element: <Setting/>, icon: <SettingsIcon/>}
+        {path: '/', text: '首页', icon: <HomeIcon/>},
+        {path: '/server', text: '服务器', icon: <StorageIcon/>},
+        {path: '/subscription', text: '订阅', icon: <InboxIcon/>},
+        {path: '/rule', text: '规则', icon: <RuleIcon/>},
+        {path: '/log', text: '日志', icon: <AssignmentIcon/>},
+        {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
-    const [navVal, setNavVal] = useState('home')
-    const handleNavClick = (v: string) => {
-        setNavVal(v)
+    const [navVal, setNavVal] = useState(0)
+    const handleNavClick = (index: number) => {
+        setNavVal(index)
     }
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
@@ -97,13 +97,13 @@ const App: React.FC = () => {
                 <div className="panel-left">
                     <Paper elevation={5} sx={{width: '100%', height: '100%', borderRadius: 0}}>
                         <List>
-                            {navItems.map((item) => (
-                                <ListItem disablePadding key={item.value}>
+                            {navItems.map((item, index) => (
+                                <ListItem disablePadding key={index}>
                                     <ListItemButton
                                         component={Link}
                                         to={item.path}
-                                        selected={navVal === item.value}
-                                        onClick={() => handleNavClick(item.value)}
+                                        selected={navVal === index}
+                                        onClick={() => handleNavClick(index)}
                                     >
                                         <CustomListItemIcon>{item.icon}</CustomListItemIcon>
                                         <ListItemText primary={item.text}/>
@@ -115,9 +115,12 @@ const App: React.FC = () => {
                 </div>
                 <div className="panel-right">
                     <Routes>
-                        {navItems.map((item) => (
-                            <Route key={item.path} path={item.path} element={item.element}/>
-                        ))}
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/server" element={<Server/>}/>
+                        <Route path="/subscription" element={<Subscription/>}/>
+                        <Route path="/rule" element={<Rule/>}/>
+                        <Route path="/log" element={<Log/>}/>
+                        <Route path="/setting" element={<Setting/>}/>
                     </Routes>
                 </div>
             </Router>
