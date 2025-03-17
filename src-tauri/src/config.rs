@@ -145,74 +145,85 @@ pub fn save_config_to_file(config: &Config, file_path: &str) -> Result<(), Box<d
     Ok(())
 }
 
+pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+    // 更新全局配置
+    *CONFIG.lock().unwrap() = config.clone();
+
+    // 保存配置到文件
+    let config_json = serde_json::to_string_pretty(config)?;
+    fs::write(CONFIG_PATH.lock().unwrap().to_str().unwrap(), config_json)?;
+
+    Ok(())
+}
+
 pub fn set_web_server_enable(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.web_server_enable = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_web_server_host(value: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.web_server_host = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_web_server_port(value: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.web_server_port = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_log_level(value: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_log_level = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_host(value: String) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_host = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_socks_port(value: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_socks_port = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_http_port(value: u32) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_http_port = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_start_socks(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_start_socks = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_ray_start_http(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.ray_start_http = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_auto_setup_pac(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.auto_setup_pac = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_auto_setup_socks(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.auto_setup_socks = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
 
 pub fn set_auto_setup_http(value: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = get_config();
     config.auto_setup_http = value;
-    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
+    save_config(&config)
 }
