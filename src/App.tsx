@@ -66,12 +66,12 @@ function isMacOSByKeydown() {
 
 const App: React.FC = () => {
     const navItems = [
-        {path: '/', icon: <HomeIcon/>, text: '首页', value: 'home'},
-        {path: '/server', icon: <StorageIcon/>, text: '服务器', value: 'server'},
-        {path: '/subscription', icon: <InboxIcon/>, text: '订阅', value: 'subscription'},
-        {path: '/rule', icon: <RuleIcon/>, text: '规则', value: 'rule'},
-        {path: '/log', icon: <AssignmentIcon/>, text: '日志', value: 'log'},
-        {path: '/setting', icon: <SettingsIcon/>, text: '设置', value: 'setting'}
+        {path: '/', text: '首页', value: 'home', element: <Home/>, icon: <HomeIcon/>},
+        {path: '/server', text: '服务器', value: 'server', element: <Server/>, icon: <StorageIcon/>},
+        {path: '/subscription', text: '订阅', value: 'subscription', element: <Subscription/>, icon: <InboxIcon/>},
+        {path: '/rule', text: '规则', value: 'rule', element: <Rule/>, icon: <RuleIcon/>},
+        {path: '/log', text: '日志', value: 'log', element: <Log/>, icon: <AssignmentIcon/>},
+        {path: '/setting', text: '设置', value: 'setting', element: <Setting/>, icon: <SettingsIcon/>}
     ]
 
     const [navVal, setNavVal] = useState('home')
@@ -80,15 +80,6 @@ const App: React.FC = () => {
     }
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
-
-    const pageComponents = {
-        home: <Home/>,
-        server: <Server/>,
-        subscription: <Subscription/>,
-        rule: <Rule/>,
-        log: <Log/>,
-        setting: <Setting/>
-    }
 
     return (
         <ThemeProvider>
@@ -104,7 +95,7 @@ const App: React.FC = () => {
                     </Stack>
                 </Box>
                 <div className="panel-left">
-                    <Paper elevation={3} sx={{width: '100%', height: '100%', borderRadius: 0}}>
+                    <Paper elevation={5} sx={{width: '100%', height: '100%', borderRadius: 0}}>
                         <List>
                             {navItems.map((item) => (
                                 <ListItem disablePadding key={item.value}>
@@ -125,7 +116,7 @@ const App: React.FC = () => {
                 <div className="panel-right">
                     <Routes>
                         {navItems.map((item) => (
-                            <Route key={item.path} path={item.path} element={pageComponents[item.value as keyof typeof pageComponents]}/>
+                            <Route key={item.path} path={item.path} element={item.element}/>
                         ))}
                     </Routes>
                 </div>
