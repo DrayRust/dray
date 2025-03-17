@@ -6,35 +6,6 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 use std::sync::Mutex;
 
-/**
-使用释例：
-
-mod config;
-
-fn main() {
-    let mut config = config::get_config();
-    println!("{:?}", config);
-
-    // 修改配置
-    config.log_level = "Error".to_string();
-    config.log_max_size = 10;
-
-    // 保存修改后的配置
-    if let Err(e) = config::save_config_to_file(&config, "config.json") {
-        eprintln!("Failed to save config: {}", e);
-    } else {
-        println!("Config saved successfully");
-    }
-
-    // 打印修改后的配置
-    println!("Updated Config: {:?}", config);
-
-    // 读取，对比是否修改成功
-    let config = config::get_config();
-    println!("{:?}", config);
-}
-*/
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     pub web_server_enable: bool,
