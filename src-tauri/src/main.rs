@@ -1,11 +1,11 @@
 mod cleanup;
+mod config;
 mod dirs;
 mod log;
 mod network;
 mod ray;
 mod sys_info;
 mod web;
-mod config;
 
 use logger::info;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -161,14 +161,15 @@ fn quit() -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
-    log::init_log();
+    log::init();
+    config::init();
     info!("Dray started");
 
     tauri::Builder::default()
         .plugin(cleanup::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Option::Some(vec!["-s", "quiet"])
+            Option::Some(vec!["-s", "quiet"]),
         ))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
