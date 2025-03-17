@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 import {
     Paper,
+    Tabs,
+    Tab,
     List,
     ListItem,
     ListItemButton,
@@ -9,7 +11,6 @@ import {
     Switch,
     Button,
     ButtonGroup,
-    Divider
 } from '@mui/material'
 
 import { useTheme } from '../context/ThemeProvider'
@@ -21,6 +22,12 @@ const Setting: React.FC = () => {
         toggleMode(newMode as 'light' | 'dark' | 'system')
     }
 
+    const [activeTab, setActiveTab] = useState(0)
+
+    const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
+        setActiveTab(newValue)
+    }
+
     const invoke = (action: string) => {
         console.log(`Invoking action: ${action}`)
     }
@@ -29,20 +36,17 @@ const Setting: React.FC = () => {
         console.log('Enabling auto start')
     }
 
-    const [activeTab, setActiveTab] = useState<'basic' | 'proxy' | 'web'>('basic')
 
     return (
-        <Paper elevation={3} sx={{borderRadius: 3, overflow: 'visible'}}>
-            <Typography variant="h6" sx={{padding: '10px 15px'}}>设置</Typography>
-            <Divider/>
-            <Stack sx={{alignItems: "center", marginTop: 2}}>
-                <ButtonGroup variant="contained">
-                    <Button onClick={() => setActiveTab('basic')} variant={activeTab === 'basic' ? 'contained' : 'outlined'}>基本设置</Button>
-                    <Button onClick={() => setActiveTab('proxy')} variant={activeTab === 'proxy' ? 'contained' : 'outlined'}>代理设置</Button>
-                    <Button onClick={() => setActiveTab('web')} variant={activeTab === 'web' ? 'contained' : 'outlined'}>Web 设置</Button>
-                </ButtonGroup>
-            </Stack>
-            {activeTab === 'basic' ? (
+        <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
+            <Paper elevation={1} sx={{alignItems: "center", borderRadius: '8px 8px 0 0'}}>
+                <Tabs value={activeTab} onChange={handleTabChange} aria-label="设置导航">
+                    <Tab label="基本设置"/>
+                    <Tab label="代理设置"/>
+                    <Tab label="Web 设置"/>
+                </Tabs>
+            </Paper>
+            {activeTab === 0 ? (
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton sx={{p: 0, cursor: 'default'}}>
@@ -65,7 +69,7 @@ const Setting: React.FC = () => {
                         </ListItemButton>
                     </ListItem>
                 </List>
-            ) : activeTab === 'proxy' ? (
+            ) : activeTab === 1 ? (
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton sx={{p: 0, cursor: 'default'}}>
@@ -167,7 +171,7 @@ const Setting: React.FC = () => {
                         </ListItemButton>
                     </ListItem>
                 </List>
-            ) : activeTab === 'web' && (
+            ) : activeTab === 2 && (
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton sx={{p: 0, cursor: 'default'}}>
