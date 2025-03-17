@@ -1,3 +1,5 @@
+use crate::dirs;
+use logger::{error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::sync::LazyLock;
@@ -73,10 +75,45 @@ impl Default for Config {
     }
 }
 
-static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| Mutex::new(load_config_from_file("config.json").unwrap_or_else(|_| Config::default())));
-
+static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| Mutex::new(Config::default()));
 pub fn get_config() -> Config {
     CONFIG.lock().unwrap().clone()
+}
+
+pub fn init() {
+    // 首先确保配置目录存在
+    let conf_dir = match dirs::get_dray_conf_dir() {
+        Ok(dir) => {
+            if !dir.exists() {
+                if let Err(e) = fs::create_dir_all(&dir) {
+                    error!("Failed to create config directory: {}", e);
+                    return;
+                }
+            }
+            dir
+        }
+    };
+
+    // 配置文件路径
+    let config_path = conf_dir.join("config.json");
+
+    // 如果配置文件存在，则加载
+    if config_path.exists() {
+        match load_config_from_file(config_path.to_str().unwrap()) {
+            Ok(config) => {
+                *CONFIG.lock().unwrap() = config;
+                info!("Config loaded successfully");
+            }
+            Err(e) => {
+                error!("Failed to load config file: {}", e);
+            }
+        }
+    } else {
+        // 如果配置文件不存在，则创建默认配置并保存
+        if let Err(e) = save_config_to_file(&get_config(), config_path.to_str().unwrap()) {
+            error!("Failed to create default config file: {}", e);
+        }
+    }
 }
 
 pub fn load_config_from_file(file_path: &str) -> Result<Config, Box<dyn std::error::Error>> {
