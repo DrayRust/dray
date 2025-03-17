@@ -5,6 +5,8 @@ mod network;
 mod ray;
 mod sys_info;
 mod web;
+mod config;
+
 use logger::info;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::Manager;
