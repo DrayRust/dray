@@ -14,6 +14,7 @@ import {
     TextField,
 } from '@mui/material'
 
+import { invoke } from "@tauri-apps/api/core"
 import { useTheme } from '../context/ThemeProvider'
 
 import {
@@ -21,6 +22,15 @@ import {
     isEnabled as autoStartIsEnabled,
     disable as autoStartDisable,
 } from '@tauri-apps/plugin-autostart'
+
+// 从配置文件中读取配置信息
+let config = {} as AppConfig
+
+async function load_config() {
+    config = await invoke('get_config_json')
+}
+
+load_config().catch(console.error)
 
 const Setting: React.FC = () => {
     // 从上下文中获取当前主题模式和切换模式的函数
@@ -47,10 +57,17 @@ const Setting: React.FC = () => {
     }
 
     // 用于记录当前 Web 服务的设置
+    const [webServerEnable, setWebServerEnable] = useState(config.web_server_enable || false)
     const [ip, setIp] = useState('127.0.0.1')
     const [port, setPort] = useState('18687')
     const [ipError, setIpError] = useState(false)
     const [portError, setPortError] = useState(false)
+
+    const changeWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        let value = event.target.checked
+        setWebServerEnable(value)
+        invoke("set_web_server_enable", {value})
+    }
 
     const validateIp = (value: string) => {
         const ipPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
@@ -72,10 +89,6 @@ const Setting: React.FC = () => {
         const value = event.target.value
         setPort(value)
         setPortError(!validatePort(value))
-    }
-
-    const invoke = (action: string) => {
-        console.log(`Invoking action: ${action}`)
     }
 
     return (
@@ -218,7 +231,7 @@ const Setting: React.FC = () => {
                         <ListItemButton sx={{cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
-                                <Switch checked={false} onChange={() => invoke('start_web')}/>
+                                <Switch checked={webServerEnable} onChange={changeWebServerEnable}/>
                             </Stack>
                         </ListItemButton>
                     </ListItem>
