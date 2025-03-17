@@ -32,7 +32,7 @@ impl Default for Config {
             web_server_host: "127.0.0.1".to_string(),
             web_server_port: 18687,
 
-            ray_log_level: "Error".to_string(),
+            ray_log_level: "warning".to_string(),
             ray_host: "127.0.0.1".to_string(),
             ray_socks_port: 1086,
             ray_http_port: 1089,
@@ -51,18 +51,21 @@ static CONFIG: LazyLock<Mutex<Config>> = LazyLock::new(|| Mutex::new(Config::def
 static CONFIG_PATH: LazyLock<Mutex<PathBuf>> = LazyLock::new(|| Mutex::new(PathBuf::new()));
 
 pub fn init() {
-    // 首先确保配置目录存在
     let conf_dir = match dirs::get_dray_conf_dir() {
-        Ok(dir) => {
-            if !dir.exists() {
-                if let Err(e) = fs::create_dir_all(&dir) {
-                    error!("Failed to create config directory: {}", e);
-                    return;
-                }
-            }
-            dir
+        Some(dir) => dir,
+        None => {
+            error!("Failed to get config directory");
+            return;
         }
     };
+
+    // 首先确保配置目录存在
+    if !conf_dir.exists() {
+        if let Err(e) = fs::create_dir_all(&conf_dir) {
+            error!("Failed to create config directory: {}", e);
+            return;
+        }
+    }
 
     // 配置文件路径
     let config_path = conf_dir.join("config.json");
