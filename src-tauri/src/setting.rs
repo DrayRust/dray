@@ -1,7 +1,16 @@
 use crate::config;
+use crate::web;
 
 pub fn set_web_server_enable(value: bool) -> bool {
-    config::set_web_server_enable(value)
+    let success = config::set_web_server_enable(value);
+    if success {
+        if value {
+            web::start();
+        } else {
+            web::stop();
+        }
+    }
+    success
 }
 
 pub fn set_web_server_host(value: String) -> bool {
