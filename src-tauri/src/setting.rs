@@ -14,11 +14,11 @@ pub fn set_web_server_enable(value: bool) -> bool {
 }
 
 pub fn set_web_server_host(value: String) -> bool {
-    config::set_web_server_host(value)
+    config::set_web_server_host(value) && { web::restart(); true }
 }
 
 pub fn set_web_server_port(value: u32) -> bool {
-    config::set_web_server_port(value)
+    config::set_web_server_port(value) && { web::restart(); true }
 }
 
 pub fn set_ray_log_level(value: String) -> bool {

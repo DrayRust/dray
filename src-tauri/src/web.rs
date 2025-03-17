@@ -96,3 +96,8 @@ pub fn stop() {
         *SERVER_HANDLE.lock().unwrap() = None;
     });
 }
+
+pub fn restart() {
+    stop();
+    start();
+}
