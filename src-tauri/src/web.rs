@@ -1,3 +1,4 @@
+use crate::config;
 use crate::dirs;
 use actix_files::Files;
 use actix_web::{dev, web, App, HttpServer};
@@ -62,19 +63,21 @@ pub fn start() {
 }
 
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
+    let config = config::get_config();
+    let server_address = format!("{}:{}", config.web_server_host, config.web_server_port);
     let server = HttpServer::new(move || {
         App::new()
             .wrap(Logger::new("%D %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\""))
             .service(Files::new("/dray", dirs::get_dray_web_server_dir().unwrap().to_str().unwrap()).show_files_listing())
             .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
     })
-    .bind("127.0.0.1:18687")
+    .bind(&server_address)
     .map_err(|e| {
-        error!("Failed to bind to 127.0.0.1:18687: {}", e);
+        error!("Failed to bind to {}: {}", server_address, e);
         e
     })?
     .run();
-    info!("Web Server running on http://127.0.0.1:18687");
+    info!("Web Server running on http://{}", server_address);
 
     *SERVER_HANDLE.lock().unwrap() = Some(server.handle());
     server.await.map_err(|e| {
