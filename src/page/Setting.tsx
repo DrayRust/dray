@@ -1,22 +1,25 @@
 import { useState } from 'react'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Paper from '@mui/material/Paper'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
-import { Switch, Select, MenuItem, Button, ButtonGroup } from '@mui/material'
-import { FormControl, InputLabel, SelectChangeEvent } from '@mui/material'
+import {
+    AppBar,
+    Toolbar,
+    Paper,
+    List,
+    ListItem,
+    ListItemButton,
+    Stack,
+    Typography,
+    Switch,
+    Button,
+    ButtonGroup,
+} from '@mui/material'
 
 import { useTheme } from '../context/ThemeProvider'
 
 const Setting: React.FC = () => {
     const {mode, toggleMode} = useTheme()
 
-    const handleThemeChange = (event: SelectChangeEvent) => {
-        toggleMode(event.target.value as 'light' | 'dark' | 'system')
+    const changeTheme = (newMode: string) => {
+        toggleMode(newMode as 'light' | 'dark' | 'system')
     }
 
     const invoke = (action: string) => {
@@ -49,20 +52,18 @@ const Setting: React.FC = () => {
             </Stack>
             {activeTab === 'basic' ? (
                 <List>
-                    <FormControl fullWidth>
-                        <InputLabel id="theme-select-label">Theme</InputLabel>
-                        <Select
-                            labelId="theme-select-label"
-                            id="theme-select"
-                            value={mode}
-                            label="Theme"
-                            onChange={handleThemeChange}
-                        >
-                            <MenuItem value="light">Light</MenuItem>
-                            <MenuItem value="dark">Dark</MenuItem>
-                            <MenuItem value="system">System</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <ListItem disablePadding>
+                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
+                                <Typography variant="body1" sx={{paddingLeft: 1}}>外观</Typography>
+                                <ButtonGroup variant="contained">
+                                    <Button onClick={() => changeTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
+                                    <Button onClick={() => changeTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
+                                    <Button onClick={() => changeTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
+                                </ButtonGroup>
+                            </Stack>
+                        </ListItemButton>
+                    </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton sx={{p: 0, cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
