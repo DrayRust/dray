@@ -11,6 +11,7 @@ import {
     Switch,
     Button,
     ButtonGroup,
+    TextField,
 } from '@mui/material'
 
 import { useTheme } from '../context/ThemeProvider'
@@ -43,6 +44,34 @@ const Setting: React.FC = () => {
         let checked = event.target.checked
         setAutoStart(checked)
         checked ? await autoStartEnable() : await autoStartDisable()
+    }
+
+    // 用于记录当前 Web 服务的设置
+    const [ip, setIp] = useState('127.0.0.1')
+    const [port, setPort] = useState('18687')
+    const [ipError, setIpError] = useState(false)
+    const [portError, setPortError] = useState(false)
+
+    const validateIp = (value: string) => {
+        const ipPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+        return ipPattern.test(value)
+    }
+
+    const validatePort = (value: string) => {
+        const portNumber = parseInt(value, 10)
+        return !isNaN(portNumber) && portNumber >= 0 && portNumber <= 65535
+    }
+
+    const handleIpChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        setIp(value)
+        setIpError(!validateIp(value))
+    }
+
+    const handlePortChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        setPort(value)
+        setPortError(!validatePort(value))
     }
 
     const invoke = (action: string) => {
@@ -186,20 +215,31 @@ const Setting: React.FC = () => {
             ) : activeTab === 2 && (
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
+                        <ListItemButton sx={{cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启动 Web</Typography>
+                                <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
                                 <Switch checked={false} onChange={() => invoke('start_web')}/>
                             </Stack>
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>停止 Web</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('stop_web')}
+                        <ListItemButton sx={{cursor: 'default'}}>
+                            <Stack direction="row" spacing={2} sx={{width: '100%', p: 1}}>
+                                <TextField
+                                    label="IP 地址"
+                                    value={ip}
+                                    onChange={handleIpChange}
+                                    error={ipError}
+                                    helperText={ipError ? "请输入有效的IP地址" : ""}
+                                    sx={{flex: 'auto'}}
+                                />
+                                <TextField
+                                    label="端口"
+                                    value={port}
+                                    onChange={handlePortChange}
+                                    error={portError}
+                                    helperText={portError ? "请输入有效的端口号 (0-65535)" : ""}
+                                    sx={{width: '220px'}}
                                 />
                             </Stack>
                         </ListItemButton>
