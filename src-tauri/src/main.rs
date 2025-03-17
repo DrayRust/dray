@@ -4,6 +4,7 @@ mod dirs;
 mod log;
 mod network;
 mod ray;
+mod setting;
 mod sys_info;
 mod web;
 
