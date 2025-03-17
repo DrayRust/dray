@@ -12,6 +12,7 @@ pub struct Config {
     pub web_server_host: String,
     pub web_server_port: u32,
 
+    pub ray_enable: bool,
     pub ray_log_level: String,
     pub ray_host: String,
     pub ray_socks_port: u32,
@@ -32,6 +33,7 @@ impl Default for Config {
             web_server_host: "127.0.0.1".to_string(),
             web_server_port: 18687,
 
+            ray_enable: true,
             ray_log_level: "warning".to_string(),
             ray_host: "127.0.0.1".to_string(),
             ray_socks_port: 1086,
@@ -158,6 +160,17 @@ pub fn set_web_server_port(value: u32) -> bool {
     save_config(&config)
         .map_err(|e| {
             error!("Failed to set web server port: {}", e);
+            e
+        })
+        .is_ok()
+}
+
+pub fn set_ray_enable(value: bool) -> bool {
+    let mut config = get_config();
+    config.ray_enable = value;
+    save_config(&config)
+        .map_err(|e| {
+            error!("Failed to set ray enable: {}", e);
             e
         })
         .is_ok()

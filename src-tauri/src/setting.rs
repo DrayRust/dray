@@ -21,6 +21,10 @@ pub fn set_web_server_port(value: u32) -> bool {
     config::set_web_server_port(value) && { web::restart(); true }
 }
 
+pub fn set_ray_enable(value: bool) -> bool {
+    config::set_ray_enable(value)
+}
+
 pub fn set_ray_log_level(value: String) -> bool {
     config::set_ray_log_level(value)
 }

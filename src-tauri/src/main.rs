@@ -182,6 +182,11 @@ fn set_web_server_port(value: u32) -> bool {
 }
 
 #[tauri::command]
+fn set_ray_enable(value: bool) -> bool {
+    setting::set_ray_enable(value)
+}
+
+#[tauri::command]
 fn set_ray_log_level(value: String) -> bool {
     setting::set_ray_log_level(value)
 }
@@ -269,6 +274,7 @@ pub fn main() {
             set_web_server_enable,
             set_web_server_host,
             set_web_server_port,
+            set_ray_enable,
             set_ray_log_level,
             set_ray_host,
             set_ray_socks_port,
