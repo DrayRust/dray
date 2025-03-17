@@ -160,6 +160,66 @@ fn quit() -> String {
     std::process::exit(0);
 }
 
+#[tauri::command]
+fn set_web_server_enable(value: bool) -> bool {
+    setting::set_web_server_enable(value)
+}
+
+#[tauri::command]
+fn set_web_server_host(value: String) -> bool {
+    setting::set_web_server_host(value)
+}
+
+#[tauri::command]
+fn set_web_server_port(value: u32) -> bool {
+    setting::set_web_server_port(value)
+}
+
+#[tauri::command]
+fn set_ray_log_level(value: String) -> bool {
+    setting::set_ray_log_level(value)
+}
+
+#[tauri::command]
+fn set_ray_host(value: String) -> bool {
+    setting::set_ray_host(value)
+}
+
+#[tauri::command]
+fn set_ray_socks_port(value: u32) -> bool {
+    setting::set_ray_socks_port(value)
+}
+
+#[tauri::command]
+fn set_ray_http_port(value: u32) -> bool {
+    setting::set_ray_http_port(value)
+}
+
+#[tauri::command]
+fn set_ray_start_socks(value: bool) -> bool {
+    setting::set_ray_start_socks(value)
+}
+
+#[tauri::command]
+fn set_ray_start_http(value: bool) -> bool {
+    setting::set_ray_start_http(value)
+}
+
+#[tauri::command]
+fn set_auto_setup_pac(value: bool) -> bool {
+    setting::set_auto_setup_pac(value)
+}
+
+#[tauri::command]
+fn set_auto_setup_socks(value: bool) -> bool {
+    setting::set_auto_setup_socks(value)
+}
+
+#[tauri::command]
+fn set_auto_setup_http(value: bool) -> bool {
+    setting::set_auto_setup_http(value)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
     log::init();
@@ -199,6 +259,18 @@ pub fn main() {
             enable_web_proxy,
             enable_secure_web_proxy,
             disable_proxies,
+            set_web_server_enable,
+            set_web_server_host,
+            set_web_server_port,
+            set_ray_log_level,
+            set_ray_host,
+            set_ray_socks_port,
+            set_ray_http_port,
+            set_ray_start_socks,
+            set_ray_start_http,
+            set_auto_setup_pac,
+            set_auto_setup_socks,
+            set_auto_setup_http,
             quit
         ])
         .run(tauri::generate_context!())
