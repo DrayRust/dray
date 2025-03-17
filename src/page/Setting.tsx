@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import {
-    AppBar,
-    Toolbar,
     Paper,
     List,
     ListItem,
@@ -11,6 +9,7 @@ import {
     Switch,
     Button,
     ButtonGroup,
+    Divider
 } from '@mui/material'
 
 import { useTheme } from '../context/ThemeProvider'
@@ -34,15 +33,8 @@ const Setting: React.FC = () => {
 
     return (
         <Paper elevation={3} sx={{borderRadius: 3, overflow: 'visible'}}>
-            <AppBar position="static" sx={{
-                borderTopLeftRadius: 12,
-                borderTopRightRadius: 12,
-                backgroundColor: (theme) => theme.palette.mode === 'dark' ? theme.palette.background.default : '#7F7F7F',
-            }}>
-                <Toolbar>
-                    <Typography variant="h6">设置</Typography>
-                </Toolbar>
-            </AppBar>
+            <Typography variant="h6" sx={{padding: '10px 15px'}}>设置</Typography>
+            <Divider/>
             <Stack sx={{alignItems: "center", marginTop: 2}}>
                 <ButtonGroup variant="contained">
                     <Button onClick={() => setActiveTab('basic')} variant={activeTab === 'basic' ? 'contained' : 'outlined'}>基本设置</Button>
