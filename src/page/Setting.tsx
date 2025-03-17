@@ -107,17 +107,21 @@ const Setting: React.FC = () => {
     const handleWebIp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
-        setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
         setWebIpError(!ok)
-        ok && invokeSend('set_web_server_host', value)
+        setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
+        if (ok && config.web_server_host !== value) {
+            invokeSend('set_web_server_host', value)
+        }
     }
 
     const handleWebPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 18687
         const ok = validatePort(value)
-        setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
         setWebPortError(!ok)
-        ok && invokeSend('set_web_server_port', value)
+        setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
+        if (ok && config.web_server_port !== value) {
+            invokeSend('set_web_server_port', value)
+        }
     }
 
     return (
