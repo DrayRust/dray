@@ -92,6 +92,7 @@ pub fn stop() {
         let handle = SERVER_HANDLE.lock().unwrap().take();
         if let Some(handle) = handle {
             handle.stop(false).await;
+            info!("Web server stopped");
         }
         *SERVER_HANDLE.lock().unwrap() = None;
     });
