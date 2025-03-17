@@ -1,27 +1,30 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import { styled } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
 
-import Paper from '@mui/material/Paper'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
+import {
+    styled,
+    CssBaseline,
+    Paper,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Tooltip,
+    Stack,
+    Box,
+    Fab
+} from '@mui/material'
 
-import HomeIcon from '@mui/icons-material/Home'
-import StorageIcon from '@mui/icons-material/Storage'
-import InboxIcon from '@mui/icons-material/Inbox'
-import RuleIcon from '@mui/icons-material/Rule'
-import AssignmentIcon from '@mui/icons-material/Assignment'
-import SettingsIcon from '@mui/icons-material/Settings'
-
-import Tooltip from '@mui/material/Tooltip'
-import Stack from '@mui/material/Stack'
-import Box from '@mui/material/Box'
-import Fab from '@mui/material/Fab'
-import LogoutIcon from '@mui/icons-material/Logout'
+import {
+    Home as HomeIcon,
+    Storage as StorageIcon,
+    Inbox as InboxIcon,
+    Rule as RuleIcon,
+    Assignment as AssignmentIcon,
+    Settings as SettingsIcon,
+    Logout as LogoutIcon
+} from '@mui/icons-material'
 
 import { ThemeProvider } from './context/ThemeProvider.tsx'
 
@@ -70,10 +73,12 @@ const App: React.FC = () => {
         {path: '/log', icon: <AssignmentIcon/>, text: '日志', value: 'log'},
         {path: '/setting', icon: <SettingsIcon/>, text: '设置', value: 'setting'}
     ]
+
     const [navVal, setNavVal] = useState('home')
     const handleNavClick = (v: string) => {
         setNavVal(v)
     }
+
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
     const pageComponents = {
@@ -89,9 +94,9 @@ const App: React.FC = () => {
         <ThemeProvider>
             <Router>
                 <CssBaseline/>
-                <Box sx={{position: 'fixed', left: 15, bottom: 15, width: 100, zIndex: 1}}>
-                    <Stack spacing={2} sx={{justifyContent: "center", alignItems: "center"}}>
-                        <Tooltip title="退出程序" sx={{position: 'relative', zIndex: 99}}>
+                <Box sx={{position: 'fixed', left: 0, bottom: 15, width: 130, zIndex: 1}}>
+                    <Stack spacing={0} sx={{justifyContent: "center", alignItems: "center"}}>
+                        <Tooltip title="退出程序">
                             <Fab color="error" size="medium" aria-label="logout" onClick={() => invoke('quit')}>
                                 <LogoutIcon/>
                             </Fab>
