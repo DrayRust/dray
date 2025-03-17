@@ -26,13 +26,13 @@ import {
 const Setting: React.FC = () => {
     // 从上下文中获取当前主题模式和切换模式的函数
     const {mode, toggleMode} = useTheme()
-    const changeTheme = (newMode: string) => {
+    const handleTheme = (newMode: string) => {
         toggleMode(newMode as 'light' | 'dark' | 'system')
     }
 
     // 用于记录当前激活的选项卡索引，初始值为0（即第一个选项卡）
     const [activeTab, setActiveTab] = useState(0)
-    const changeTab = (_event: SyntheticEvent, newValue: number) => {
+    const handleTab = (_event: SyntheticEvent, newValue: number) => {
         setActiveTab(newValue)
     }
 
@@ -41,10 +41,19 @@ const Setting: React.FC = () => {
     (async () => {
         setAutoStart(await autoStartIsEnabled())
     })()
-    const changeAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let checked = event.target.checked
         setAutoStart(checked)
         checked ? await autoStartEnable() : await autoStartDisable()
+    }
+
+    const validateIp = (value: string) => {
+        const ipPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+        return ipPattern.test(value)
+    }
+
+    const validatePort = (value: number) => {
+        return value >= 0 && value <= 65535
     }
 
     // 从配置文件中读取配置信息
@@ -76,46 +85,50 @@ const Setting: React.FC = () => {
     }, [])
 
     // 用于记录当前 Web 服务的设置
-    const [ipError, setIpError] = useState(false)
-    const [portError, setPortError] = useState(false)
+    const [webIpError, setWebIpError] = useState(false)
+    const [webPortError, setWebPortError] = useState(false)
 
-    const changeWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
         try {
-            setConfig(prevConfig => ({
-                ...prevConfig,
-                web_server_enable: value,
-            }))
             await invoke('set_web_server_enable', {value})
         } catch (err) {
             console.log('Failed to set web server enable:', err)
         }
     }
 
-    const validateIp = (value: string) => {
-        const ipPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
-        return ipPattern.test(value)
-    }
-
-    const validatePort = (value: string) => {
-        const portNumber = parseInt(value, 10)
-        return !isNaN(portNumber) && portNumber >= 0 && portNumber <= 65535
-    }
-
-    const handleIpChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleWebIp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
-        setIpError(!validateIp(value))
+        setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
+        setWebIpError(!validateIp(value))
+        if (validateIp(value)) {
+            try {
+                await invoke('set_web_server_host', {value})
+            } catch (err) {
+                console.log('Failed to set web server host:', err)
+            }
+        }
     }
 
-    const handlePortChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value
-        setPortError(!validatePort(value))
+    const handleWebPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(event.target.value) || 18687
+        const ok = validatePort(value)
+        setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
+        setWebPortError(!ok)
+        if (ok) {
+            try {
+                await invoke('set_web_server_port', {value: value})
+            } catch (err) {
+                console.log('Failed to set web server port:', err)
+            }
+        }
     }
 
     return (
         <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
             <Paper elevation={1} sx={{alignItems: "center", borderRadius: '8px 8px 0 0'}}>
-                <Tabs value={activeTab} onChange={changeTab} aria-label="设置导航">
+                <Tabs value={activeTab} onChange={handleTab} aria-label="设置导航">
                     <Tab label="基本设置"/>
                     <Tab label="代理设置"/>
                     <Tab label="Web 设置"/>
@@ -128,9 +141,9 @@ const Setting: React.FC = () => {
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>外观</Typography>
                                 <ButtonGroup variant="contained">
-                                    <Button onClick={() => changeTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
-                                    <Button onClick={() => changeTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
-                                    <Button onClick={() => changeTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
+                                    <Button onClick={() => handleTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
+                                    <Button onClick={() => handleTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
+                                    <Button onClick={() => handleTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
                                 </ButtonGroup>
                             </Stack>
                         </ListItemButton>
@@ -139,7 +152,7 @@ const Setting: React.FC = () => {
                         <ListItemButton sx={{p: 0, cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>开机启动</Typography>
-                                <Switch checked={autoStart} onChange={changeAutoStart}/>
+                                <Switch checked={autoStart} onChange={handleAutoStart}/>
                             </Stack>
                         </ListItemButton>
                     </ListItem>
@@ -252,7 +265,7 @@ const Setting: React.FC = () => {
                         <ListItemButton sx={{cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
-                                <Switch checked={config.web_server_enable} onChange={changeWebServerEnable}/>
+                                <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
                             </Stack>
                         </ListItemButton>
                     </ListItem>
@@ -262,17 +275,17 @@ const Setting: React.FC = () => {
                                 <TextField
                                     label="IP 地址"
                                     value={config.web_server_host}
-                                    onChange={handleIpChange}
-                                    error={ipError}
-                                    helperText={ipError ? "请输入有效的IP地址" : ""}
+                                    onChange={handleWebIp}
+                                    error={webIpError}
+                                    helperText={webIpError ? "请输入有效的IP地址" : ""}
                                     sx={{flex: 'auto'}}
                                 />
                                 <TextField
                                     label="端口"
                                     value={config.web_server_port}
-                                    onChange={handlePortChange}
-                                    error={portError}
-                                    helperText={portError ? "请输入有效的端口号 (0-65535)" : ""}
+                                    onChange={handleWebPort}
+                                    error={webPortError}
+                                    helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
                                     sx={{width: '220px'}}
                                 />
                             </Stack>
