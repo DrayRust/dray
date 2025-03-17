@@ -61,8 +61,7 @@ function isMacOSByKeydown() {
     })
 }
 
-function App() {
-
+const App: React.FC = () => {
     const navItems = [
         {path: '/', icon: <HomeIcon/>, text: '首页', value: 'home'},
         {path: '/server', icon: <StorageIcon/>, text: '服务器', value: 'server'},

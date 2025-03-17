@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { invoke } from "@tauri-apps/api/core"
 
-function Home() {
+const Home: React.FC = () => {
     const [drayMsg, setDrayMsg] = useState("")
     const [name, setName] = useState("")
 

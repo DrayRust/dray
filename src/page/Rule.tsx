@@ -5,7 +5,7 @@ import RestoreIcon from '@mui/icons-material/Restore'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 
-function Rule() {
+const Rule: React.FC = () => {
     const [value, setValue] = useState(0)
     return <div>
         <BottomNavigation

@@ -1,5 +1,4 @@
-
-function Server() {
+const Server: React.FC = () => {
     return <div>Server Page</div>
 }
 

@@ -1,5 +1,5 @@
-function Subscription() {
-    return <div>Subscription Page</div>;
+const Subscription: React.FC = () => {
+    return <div>Subscription Page</div>
 }
 
-export default Subscription;
+export default Subscription

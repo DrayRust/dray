@@ -1,5 +1,5 @@
-function Log() {
-    return <div>Log Page</div>;
+const Log: React.FC = () => {
+    return <div>Log Page</div>
 }
 
-export default Log;
+export default Log
