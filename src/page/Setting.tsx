@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react'
+import { useState, useEffect, SyntheticEvent } from 'react'
 import {
     Paper,
     Tabs,
@@ -14,7 +14,7 @@ import {
     TextField,
 } from '@mui/material'
 
-import { invoke } from "@tauri-apps/api/core"
+import { invoke } from '@tauri-apps/api/core'
 import { useTheme } from '../context/ThemeProvider'
 
 import {
@@ -22,15 +22,6 @@ import {
     isEnabled as autoStartIsEnabled,
     disable as autoStartDisable,
 } from '@tauri-apps/plugin-autostart'
-
-// 从配置文件中读取配置信息
-let config = {} as AppConfig
-
-async function load_config() {
-    config = await invoke('get_config_json')
-}
-
-load_config().catch(console.error)
 
 const Setting: React.FC = () => {
     // 从上下文中获取当前主题模式和切换模式的函数
@@ -56,17 +47,49 @@ const Setting: React.FC = () => {
         checked ? await autoStartEnable() : await autoStartDisable()
     }
 
+    // 从配置文件中读取配置信息
+    const [config, setConfig] = useState<AppConfig>({
+        "web_server_enable": true,
+        "web_server_host": "127.0.0.1",
+        "web_server_port": 18687,
+        "ray_log_level": "warning",
+        "ray_host": "127.0.0.1",
+        "ray_socks_port": 1086,
+        "ray_http_port": 1089,
+        "ray_start_socks": true,
+        "ray_start_http": true,
+        "auto_setup_pac": false,
+        "auto_setup_socks": true,
+        "auto_setup_http": false
+    })
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const data = await invoke('get_config_json')
+                const config = typeof data === 'string' ? JSON.parse(data) : data
+                setConfig(config as AppConfig)
+            } catch (err) {
+                console.log('Failed to get_config_json:', err)
+            }
+        })()
+    }, [])
+
     // 用于记录当前 Web 服务的设置
-    const [webServerEnable, setWebServerEnable] = useState(config.web_server_enable || false)
-    const [ip, setIp] = useState('127.0.0.1')
-    const [port, setPort] = useState('18687')
     const [ipError, setIpError] = useState(false)
     const [portError, setPortError] = useState(false)
 
     const changeWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
-        setWebServerEnable(value)
-        invoke("set_web_server_enable", {value})
+        try {
+            setConfig(prevConfig => ({
+                ...prevConfig,
+                web_server_enable: value,
+            }))
+            await invoke('set_web_server_enable', {value})
+        } catch (err) {
+            console.log('Failed to set web server enable:', err)
+        }
     }
 
     const validateIp = (value: string) => {
@@ -81,13 +104,11 @@ const Setting: React.FC = () => {
 
     const handleIpChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
-        setIp(value)
         setIpError(!validateIp(value))
     }
 
     const handlePortChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
-        setPort(value)
         setPortError(!validatePort(value))
     }
 
@@ -231,7 +252,7 @@ const Setting: React.FC = () => {
                         <ListItemButton sx={{cursor: 'default'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
                                 <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
-                                <Switch checked={webServerEnable} onChange={changeWebServerEnable}/>
+                                <Switch checked={config.web_server_enable} onChange={changeWebServerEnable}/>
                             </Stack>
                         </ListItemButton>
                     </ListItem>
@@ -240,7 +261,7 @@ const Setting: React.FC = () => {
                             <Stack direction="row" spacing={2} sx={{width: '100%', p: 1}}>
                                 <TextField
                                     label="IP 地址"
-                                    value={ip}
+                                    value={config.web_server_host}
                                     onChange={handleIpChange}
                                     error={ipError}
                                     helperText={ipError ? "请输入有效的IP地址" : ""}
@@ -248,7 +269,7 @@ const Setting: React.FC = () => {
                                 />
                                 <TextField
                                     label="端口"
-                                    value={port}
+                                    value={config.web_server_port}
                                     onChange={handlePortChange}
                                     error={portError}
                                     helperText={portError ? "请输入有效的端口号 (0-65535)" : ""}
