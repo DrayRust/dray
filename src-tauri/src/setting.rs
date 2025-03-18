@@ -1,3 +1,6 @@
+use logger::info;
+use std::net::TcpListener;
+
 use crate::config;
 use crate::web;
 
@@ -69,4 +72,15 @@ pub fn set_auto_setup_socks(value: bool) -> bool {
 
 pub fn set_auto_setup_http(value: bool) -> bool {
     config::set_auto_setup_http(value)
+}
+
+pub fn check_port_available(port: u32) -> bool {
+    let address = format!("127.0.0.1:{}", port);
+    match TcpListener::bind(&address) {
+        Ok(_) => true,
+        Err(e) => {
+            info!("Port {} is not available: {}", port, e);
+            false
+        }
+    }
 }

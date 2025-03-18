@@ -236,6 +236,11 @@ fn set_auto_setup_http(value: bool) -> bool {
     setting::set_auto_setup_http(value)
 }
 
+#[tauri::command]
+fn set_auto_setup_http(port: u32) -> bool {
+    setting::check_port_available(port)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
     log::init();
@@ -290,6 +295,7 @@ pub fn main() {
             set_auto_setup_pac,
             set_auto_setup_socks,
             set_auto_setup_http,
+            check_port_available,
             quit
         ])
         .run(tauri::generate_context!())
