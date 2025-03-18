@@ -74,7 +74,7 @@ const App: React.FC = () => {
         {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
-    const [navState, setNavState] = useState(0)
+    const [navState, setNavState] = useState(-1)
     const handleNavClick = (index: number) => {
         setNavState(index)
     }
