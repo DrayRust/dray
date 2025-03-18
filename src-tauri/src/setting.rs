@@ -1,6 +1,10 @@
 use crate::config;
 use crate::web;
 
+pub fn set_app_log_level(new_level: String) -> bool {
+    config::set_app_log_level(new_level)
+}
+
 pub fn set_web_server_enable(value: bool) -> bool {
     let success = config::set_web_server_enable(value);
     if success {
@@ -14,11 +18,17 @@ pub fn set_web_server_enable(value: bool) -> bool {
 }
 
 pub fn set_web_server_host(value: String) -> bool {
-    config::set_web_server_host(value) && { web::restart(); true }
+    config::set_web_server_host(value) && {
+        web::restart();
+        true
+    }
 }
 
 pub fn set_web_server_port(value: u32) -> bool {
-    config::set_web_server_port(value) && { web::restart(); true }
+    config::set_web_server_port(value) && {
+        web::restart();
+        true
+    }
 }
 
 pub fn set_ray_enable(value: bool) -> bool {

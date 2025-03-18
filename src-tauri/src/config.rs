@@ -136,6 +136,17 @@ pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+pub fn set_app_log_level(value: String) -> bool {
+    let mut config = get_config();
+    config.app_log_level = value;
+    save_config(&config)
+        .map_err(|e| {
+            error!("Failed to set app log level: {}", e);
+            e
+        })
+        .is_ok()
+}
+
 pub fn set_web_server_enable(value: bool) -> bool {
     let mut config = get_config();
     config.web_server_enable = value;

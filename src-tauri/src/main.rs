@@ -167,6 +167,11 @@ fn get_config_json() -> String {
 }
 
 #[tauri::command]
+fn set_app_log_level(new_level: String) {
+    setting::set_app_log_level(new_level)
+}
+
+#[tauri::command]
 fn set_web_server_enable(value: bool) -> bool {
     setting::set_web_server_enable(value)
 }
@@ -271,6 +276,7 @@ pub fn main() {
             enable_secure_web_proxy,
             disable_proxies,
             get_config_json,
+            set_app_log_level,
             set_web_server_enable,
             set_web_server_host,
             set_web_server_port,
