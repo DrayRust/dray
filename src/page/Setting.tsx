@@ -3,7 +3,9 @@ import {
     Paper,
     Tabs,
     Tab,
-    List,
+    Box,
+    Card,
+    Divider,
     ListItem,
     ListItemButton,
     Stack,
@@ -115,11 +117,11 @@ const Setting: React.FC = () => {
     }
 
     const handleWebPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = Number(event.target.value) || 18687
+        const value = Number(event.target.value) || 0
         const ok = validatePort(value)
         setWebPortError(!ok)
         setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
-        if (ok && config.web_server_port !== value) {
+        if (ok && value && config.web_server_port !== value) {
             invokeSend('set_web_server_port', value)
         }
     }
@@ -134,163 +136,117 @@ const Setting: React.FC = () => {
                 </Tabs>
             </Paper>
             {activeTab === 0 ? (
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>外观</Typography>
-                                <ButtonGroup variant="contained">
-                                    <Button onClick={() => handleTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
-                                    <Button onClick={() => handleTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
-                                    <Button onClick={() => handleTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
-                                </ButtonGroup>
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>开机启动</Typography>
-                                <Switch checked={autoStart} onChange={handleAutoStart}/>
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                <Box sx={{p: 2, maxWidth: 550}}>
+                    <Card>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1">外观</Typography>
+                            <ButtonGroup variant="contained">
+                                <Button onClick={() => handleTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
+                                <Button onClick={() => handleTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
+                                <Button onClick={() => handleTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
+                            </ButtonGroup>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1">开机启动</Typography>
+                            <Switch checked={autoStart} onChange={handleAutoStart}/>
+                        </Stack>
+                    </Card>
+                </Box>
             ) : activeTab === 1 ? (
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启动 Ray</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('start_ray')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>停止 Ray</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('stop_ray')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>强制重启 Ray</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('force_restart_ray')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>强制终止 Ray</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('force_kill_ray')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启用自动代理</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('enable_auto_proxy')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启用 Socks 代理</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('enable_socks_proxy')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启用 Web 代理</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('enable_web_proxy')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>启用安全 Web 代理</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('enable_secure_web_proxy')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>禁用代理</Typography>
-                                <Switch
-                                    checked={false}
-                                    onChange={() => invoke('disable_proxies')}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                <Box sx={{p: 2, maxWidth: 550}}>
+                    <Card>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
+                            <Switch checked={false} onChange={() => invoke('stop_ray')}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                            <TextField
+                                label="本机地址"
+                                value={config.ray_host}
+                                onChange={handleWebIp}
+                                error={webIpError}
+                                helperText={webIpError ? "请输入有效的IP地址" : ""}
+                                sx={{flex: 'auto'}}
+                            />
+                        </Stack>
+                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                            <TextField
+                                label="SOCKS 端口"
+                                value={config.ray_socks_port}
+                                onChange={handleWebPort}
+                                error={webPortError}
+                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                sx={{flex: 1}}
+                            />
+                            <TextField
+                                label="HTTP 端口"
+                                value={config.ray_http_port}
+                                onChange={handleWebPort}
+                                error={webPortError}
+                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                sx={{flex: 1}}
+                            />
+                        </Stack>
+                    </Card>
+                    <Card sx={{mt: 2}}>
+                        <Typography variant="h6" sx={{p: 2}}>自动设置</Typography>
+                        <Divider/>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{paddingLeft: 1}}>PAC 自动代理</Typography>
+                                    <Switch checked={false} onChange={() => invoke('enable_auto_proxy')}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{paddingLeft: 1}}>SOCKS 代理</Typography>
+                                    <Switch checked={false} onChange={() => invoke('enable_socks_proxy')}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{paddingLeft: 1}}>HTTP 代理</Typography>
+                                    <Switch checked={false} onChange={() => invoke('enable_web_proxy')}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                    </Card>
+                </Box>
             ) : activeTab === 2 && (
-                <List>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{p: 0, cursor: 'default'}}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%', p: 1}}>
-                                <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
-                                <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton sx={{cursor: 'default'}}>
-                            <Stack direction="row" spacing={2} sx={{width: '100%', p: 1}}>
-                                <TextField
-                                    label="IP 地址"
-                                    value={config.web_server_host}
-                                    onChange={handleWebIp}
-                                    error={webIpError}
-                                    helperText={webIpError ? "请输入有效的IP地址" : ""}
-                                    sx={{flex: 'auto'}}
-                                />
-                                <TextField
-                                    label="端口"
-                                    value={config.web_server_port}
-                                    onChange={handleWebPort}
-                                    error={webPortError}
-                                    helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
-                                    sx={{width: '220px'}}
-                                />
-                            </Stack>
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                <Box sx={{p: 2, maxWidth: 550}}>
+                    <Card>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
+                            <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                            <TextField
+                                label="本机地址"
+                                value={config.web_server_host}
+                                onChange={handleWebIp}
+                                error={webIpError}
+                                helperText={webIpError ? "请输入有效的IP地址" : ""}
+                                sx={{flex: 'auto'}}
+                            />
+                            <TextField
+                                label="Web 端口"
+                                value={config.web_server_port}
+                                onChange={handleWebPort}
+                                error={webPortError}
+                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                sx={{width: '210px'}}
+                            />
+                        </Stack>
+                    </Card>
+                </Box>
             )}
         </Paper>
     )
