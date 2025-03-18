@@ -1,5 +1,6 @@
 use crate::network;
 use crate::ray;
+use logger::info;
 use tauri::{plugin::Plugin, AppHandle, RunEvent, Runtime};
 
 pub struct CleanupPlugin;
@@ -26,4 +27,5 @@ pub fn init() -> CleanupPlugin {
 pub fn exit_cleanly() {
     network::disable_proxies();
     ray::force_kill_ray();
+    info!("Cleanup complete");
 }
