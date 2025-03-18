@@ -67,6 +67,7 @@ pub fn disable_proxies() -> bool {
 }
 
 /*
+// netsh 命令会修改所有用户，不建议使用，修改注册表只用修改当前用户，影响更小。
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
     let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
