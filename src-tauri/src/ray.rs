@@ -3,6 +3,7 @@ use logger::{debug, error, info};
 use std::process::{Child, Command};
 use std::sync::Mutex;
 
+const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
 static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 pub fn start() -> bool {
@@ -12,7 +13,7 @@ pub fn start() -> bool {
     }
 
     let ray_dir = dirs::get_dray_ray_dir().unwrap();
-    let ray_path: String = ray_dir.join("xray").to_str().unwrap().to_string();
+    let ray_path: String = ray_dir.join(DRAY_XRAY).to_str().unwrap().to_string();
     let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap().to_string();
     debug!("ray_path: {}", ray_path);
     debug!("ray_config_path: {}", ray_config_path);
@@ -74,7 +75,7 @@ pub fn force_kill_ray() -> bool {
 
     let mut killed = true;
     for (pid, process) in sys.processes() {
-        if process.name() == "xray" {
+        if process.name() == DRAY_XRAY {
             if process.kill() {
                 info!("Killed xray process with PID: {}", pid);
             } else {
