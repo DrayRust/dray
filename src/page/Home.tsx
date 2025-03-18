@@ -37,7 +37,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     }
 
     return (
-        <Paper sx={{
+        <Paper elevation={5} sx={{
             width: '100%',
             height: `calc(100vh - 20px)`,
             borderRadius: 3,
