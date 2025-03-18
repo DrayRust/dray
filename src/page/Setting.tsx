@@ -98,22 +98,38 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         invokeSend('set_ray_log_level', value)
     }
 
+    const [rayIpError, setRayIpError] = useState(false)
+    const [raySocksPortError, setRaySocksPortError] = useState(false)
+    const [rayHttpPortError, setRayHttpPortError] = useState(false)
+
     const handleRayHost = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
+        const ok = validateIp(value)
+        setRayIpError(!ok)
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
-        invokeSend('set_ray_host', value)
+        if (ok && config.ray_host !== value) {
+            invokeSend('set_ray_host', value)
+        }
     }
 
     const handleRaySocksPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
-        setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
-        invokeSend('set_ray_socks_port', value)
+        const ok = validatePort(value)
+        setRaySocksPortError(!ok)
+        setConfig(prevConfig => ({...prevConfig, ray_socks_port: value || ""}))
+        if (ok && value && config.ray_socks_port !== value) {
+            invokeSend('set_ray_socks_port', value)
+        }
     }
 
     const handleRayHttpPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
-        setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
-        invokeSend('set_ray_http_port', value)
+        const ok = validatePort(value)
+        setRayHttpPortError(!ok)
+        setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
+        if (ok && value && config.ray_http_port !== value) {
+            invokeSend('set_ray_http_port', value)
+        }
     }
 
     const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,8 +232,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 label="本机地址"
                                 value={config.ray_host}
                                 onChange={handleRayHost}
-                                error={webIpError}
-                                helperText={webIpError ? "请输入有效的IP地址" : ""}
+                                error={rayIpError}
+                                helperText={rayIpError ? "请输入有效的IP地址" : ""}
                                 sx={{flex: 'auto'}}
                             />
                         </Stack>
@@ -226,16 +242,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 label="SOCKS 端口"
                                 value={config.ray_socks_port}
                                 onChange={handleRaySocksPort}
-                                error={webPortError}
-                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                error={raySocksPortError}
+                                helperText={raySocksPortError ? "请输入有效的端口号 (0-65535)" : ""}
                                 sx={{flex: 1}}
                             />
                             <TextField
                                 label="HTTP 端口"
                                 value={config.ray_http_port}
                                 onChange={handleRayHttpPort}
-                                error={webPortError}
-                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                error={rayHttpPortError}
+                                helperText={rayHttpPortError ? "请输入有效的端口号 (0-65535)" : ""}
                                 sx={{flex: 1}}
                             />
                         </Stack>
