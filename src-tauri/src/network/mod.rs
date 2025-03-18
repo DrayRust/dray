@@ -5,6 +5,15 @@ pub mod linux;
 pub mod macos;
 pub mod windows;
 
+#[cfg(target_os = "linux")]
+pub use linux::*;
+
+#[cfg(target_os = "macos")]
+pub use macos::*;
+
+#[cfg(target_os = "windows")]
+pub use windows::*;
+
 pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
     let status = Command::new(command).args(args).status()?;
 
