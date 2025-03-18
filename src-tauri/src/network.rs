@@ -123,12 +123,5 @@ pub fn disable_secure_web_proxy() -> bool {
 }
 
 pub fn disable_proxies() -> bool {
-    let commands = vec![
-        "networksetup -setautoproxystate Wi-Fi off",
-        "networksetup -setsocksfirewallproxystate Wi-Fi off",
-        "networksetup -setwebproxystate Wi-Fi off",
-        "networksetup -setsecurewebproxystate Wi-Fi off",
-    ];
-    let command_str = commands.join("\n");
-    execute_commands(&command_str)
+    disable_auto_proxy() && disable_socks_proxy() && disable_web_proxy() && disable_secure_web_proxy()
 }
