@@ -33,7 +33,7 @@ pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::E
     Ok(())
 }
 
-pub fn parse_and_execute_commands(command_str: &str) -> bool {
+pub fn execute_commands(command_str: &str) -> bool {
     let commands: Vec<&str> = command_str.trim().lines().collect();
     let mut all_success = true;
 
@@ -71,7 +71,7 @@ pub fn enable_auto_proxy() -> bool {
         "networksetup -setautoproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
-    parse_and_execute_commands(&command_str)
+    execute_commands(&command_str)
 }
 
 pub fn enable_socks_proxy() -> bool {
@@ -81,7 +81,7 @@ pub fn enable_socks_proxy() -> bool {
         "networksetup -setsocksfirewallproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
-    parse_and_execute_commands(&command_str)
+    execute_commands(&command_str)
 }
 
 pub fn enable_web_proxy() -> bool {
@@ -91,7 +91,7 @@ pub fn enable_web_proxy() -> bool {
         "networksetup -setwebproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
-    parse_and_execute_commands(&command_str)
+    execute_commands(&command_str)
 }
 
 pub fn enable_secure_web_proxy() -> bool {
@@ -101,7 +101,23 @@ pub fn enable_secure_web_proxy() -> bool {
         "networksetup -setsecurewebproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
-    parse_and_execute_commands(&command_str)
+    execute_commands(&command_str)
+}
+
+pub fn disable_auto_proxy() -> bool {
+    execute_commands("networksetup -setautoproxystate Wi-Fi off")
+}
+
+pub fn disable_socks_proxy() -> bool {
+    execute_commands("networksetup -setsocksfirewallproxystate Wi-Fi off")
+}
+
+pub fn disable_web_proxy() -> bool {
+    execute_commands("networksetup -setwebproxystate Wi-Fi off")
+}
+
+pub fn disable_secure_web_proxy() -> bool {
+    execute_commands("networksetup -setsecurewebproxystate Wi-Fi off")
 }
 
 pub fn disable_proxies() -> bool {
@@ -112,5 +128,5 @@ pub fn disable_proxies() -> bool {
         "networksetup -setsecurewebproxystate Wi-Fi off",
     ];
     let command_str = commands.join("\n");
-    parse_and_execute_commands(&command_str)
+    execute_commands(&command_str)
 }
