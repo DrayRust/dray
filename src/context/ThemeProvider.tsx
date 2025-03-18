@@ -37,7 +37,19 @@ export const ThemeProvider = ({children}: { children: React.ReactNode }) => {
 
     const theme = useMemo(() => {
         const paletteMode = mode === 'system' ? (prefersDarkMode ? 'dark' : 'light') : mode
-        return createTheme({palette: {mode: paletteMode}})
+        return createTheme({
+            palette: {mode: paletteMode},
+            components: {
+                MuiCard: {
+                    styleOverrides: {
+                        root: ({theme}) => ({
+                            border: theme.palette.mode === 'light' ? '1px solid' : 'none',
+                            borderColor: theme.palette.mode === 'light' ? theme.palette.divider : 'transparent'
+                        })
+                    }
+                }
+            }
+        })
     }, [mode, prefersDarkMode])
 
     return (
