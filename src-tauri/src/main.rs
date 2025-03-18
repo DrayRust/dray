@@ -167,8 +167,8 @@ fn get_config_json() -> String {
 }
 
 #[tauri::command]
-fn set_app_log_level(new_level: String) {
-    setting::set_app_log_level(new_level)
+fn set_app_log_level(value: String) -> bool {
+    setting::set_app_log_level(value)
 }
 
 #[tauri::command]
@@ -237,14 +237,14 @@ fn set_auto_setup_http(value: bool) -> bool {
 }
 
 #[tauri::command]
-fn set_auto_setup_http(port: u32) -> bool {
+fn check_port_available(port: u32) -> bool {
     setting::check_port_available(port)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn main() {
-    log::init();
     config::init();
+    log::init();
     info!("Dray started");
 
     tauri::Builder::default()

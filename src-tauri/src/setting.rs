@@ -2,10 +2,14 @@ use logger::info;
 use std::net::TcpListener;
 
 use crate::config;
+use crate::log;
 use crate::web;
 
-pub fn set_app_log_level(new_level: String) -> bool {
-    config::set_app_log_level(new_level)
+pub fn set_app_log_level(value: String) -> bool {
+    config::set_app_log_level(value) && {
+        log::init();
+        true
+    }
 }
 
 pub fn set_web_server_enable(value: bool) -> bool {
