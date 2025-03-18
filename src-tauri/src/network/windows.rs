@@ -20,28 +20,26 @@ pub fn enable_auto_proxy() -> bool {
     success && notify_proxy_change()
 }
 
-pub fn enable_socks_proxy() -> bool {
-    let config = config::get_config();
-    let proxy_server = format!("socks={}:{}", config.ray_host, config.ray_socks_port);
+fn enable_proxy(proxy_type: &str, host: &str, port: &u32) -> bool {
+    let proxy_server = format!("{}={}:{}", proxy_type, host, port);
     let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
         command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
     success && notify_proxy_change()
+}
+
+pub fn enable_socks_proxy() -> bool {
+    let config = config::get_config();
+    enable_proxy("socks", &config.ray_host, &config.ray_socks_port)
 }
 
 pub fn enable_web_proxy() -> bool {
     let config = config::get_config();
-    let proxy_server = format!("http={}:{}", config.ray_host, config.ray_http_port);
-    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
-        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
-    success && notify_proxy_change()
+    enable_proxy("http", &config.ray_host, &config.ray_http_port)
 }
 
 pub fn enable_secure_web_proxy() -> bool {
     let config = config::get_config();
-    let proxy_server = format!("https={}:{}", config.ray_host, config.ray_http_port);
-    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
-        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
-    success && notify_proxy_change()
+    enable_proxy("https", &config.ray_host, &config.ray_http_port)
 }
 
 pub fn disable_auto_proxy() -> bool {
