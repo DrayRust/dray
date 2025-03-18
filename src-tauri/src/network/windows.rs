@@ -1,6 +1,6 @@
 use super::command;
 use crate::config;
-use winapi::wininet::{InternetSetOptionW, INTERNET_OPTION_SETTINGS_CHANGED, INTERNET_OPTION_REFRESH};
+use winapi::um::wininet::{InternetSetOptionW, INTERNET_OPTION_SETTINGS_CHANGED, INTERNET_OPTION_REFRESH};
 use std::ptr::null_mut;
 
 const SETTINGS: &str = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";

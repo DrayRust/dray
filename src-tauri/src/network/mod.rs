@@ -1,18 +1,23 @@
 use logger::{error, info};
 use std::process::Command;
 
-pub mod linux;
+#[cfg(target_os = "macos")]
 pub mod macos;
+
+#[cfg(target_os = "windows")]
 pub mod windows;
 
 #[cfg(target_os = "linux")]
-pub use linux::*;
+pub mod linux;
 
 #[cfg(target_os = "macos")]
 pub use macos::*;
 
 #[cfg(target_os = "windows")]
 pub use windows::*;
+
+#[cfg(target_os = "linux")]
+pub use linux::*;
 
 pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
     let status = Command::new(command).args(args).status()?;
@@ -48,6 +53,6 @@ pub fn execute_command(cmd: &str) -> bool {
     }
 }
 
-pub fn execute_commands(command_str: &str) -> bool {
+/*pub fn execute_commands(command_str: &str) -> bool {
     command_str.trim().lines().all(|cmd| execute_command(cmd))
-}
+}*/
