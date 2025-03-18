@@ -12,6 +12,7 @@ pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::E
         return Err(format!("Command exited with status: {}", status).into());
     }
 
+    info!("Command '{} {}' executed successfully", command, args.join(" "));
     Ok(())
 }
 
@@ -34,7 +35,6 @@ pub fn execute_command(cmd: &str) -> bool {
         error!("Failed to execute command '{}': {}", cmd, e);
         false
     } else {
-        info!("Command '{}' executed successfully", cmd);
         true
     }
 }
