@@ -1,10 +1,7 @@
 use logger::info;
 use std::net::TcpListener;
 
-use crate::config;
-use crate::log;
-use crate::ray;
-use crate::web;
+use crate::{config, log, network, ray, web};
 
 pub fn set_app_log_level(value: String) -> bool {
     config::set_app_log_level(value) && {
@@ -44,8 +41,8 @@ pub fn set_ray_enable(value: bool) -> bool {
         && if value {
             ray::start()
         } else {
-            // ray::stop();
-            ray::force_kill_ray()
+            // ray::stop()
+            ray::force_kill_ray() && network::disable_proxies()
         }
 }
 
