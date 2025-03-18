@@ -98,6 +98,48 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         invokeSend('set_ray_log_level', value)
     }
 
+    const handleRayHost = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value
+        setConfig(prevConfig => ({...prevConfig, ray_host: value}))
+        invokeSend('set_ray_host', value)
+    }
+
+    const handleRaySocksPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(event.target.value) || 0
+        setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
+        invokeSend('set_ray_socks_port', value)
+    }
+
+    const handleRayHttpPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(event.target.value) || 0
+        setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
+        invokeSend('set_ray_http_port', value)
+    }
+
+    const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
+        invokeSend('set_ray_start_http', value)
+    }
+
+    const handleAutoSetupPac = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
+        invokeSend('set_auto_setup_pac', value)
+    }
+
+    const handleAutoSetupSocks = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
+        invokeSend('set_auto_setup_socks', value)
+    }
+
+    const handleAutoSetupHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
+        invokeSend('set_auto_setup_http', value)
+    }
+
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
@@ -173,7 +215,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 label="本机地址"
                                 value={config.ray_host}
-                                onChange={handleWebIp}
+                                onChange={handleRayHost}
                                 error={webIpError}
                                 helperText={webIpError ? "请输入有效的IP地址" : ""}
                                 sx={{flex: 'auto'}}
@@ -183,7 +225,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 label="SOCKS 端口"
                                 value={config.ray_socks_port}
-                                onChange={handleWebPort}
+                                onChange={handleRaySocksPort}
                                 error={webPortError}
                                 helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
                                 sx={{flex: 1}}
@@ -191,7 +233,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 label="HTTP 端口"
                                 value={config.ray_http_port}
-                                onChange={handleWebPort}
+                                onChange={handleRayHttpPort}
                                 error={webPortError}
                                 helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
                                 sx={{flex: 1}}
@@ -205,7 +247,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
-                            <Switch checked={config.ray_start_http} onChange={() => invoke('stop_ray')}/>
+                            <Switch checked={config.ray_start_http} onChange={handleRayStartHttp}/>
                         </Stack>
                     </Card>
                     <Card sx={{mt: 2}}>
@@ -215,7 +257,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
                                     <Typography variant="body1" sx={{pl: 1}}>PAC 自动代理</Typography>
-                                    <Switch checked={config.auto_setup_pac} onChange={() => invoke('enable_auto_proxy')}/>
+                                    <Switch checked={config.auto_setup_pac} onChange={handleAutoSetupPac}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
@@ -223,7 +265,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
                                     <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
-                                    <Switch checked={config.auto_setup_socks} onChange={() => invoke('enable_socks_proxy')}/>
+                                    <Switch checked={config.auto_setup_socks} onChange={handleAutoSetupSocks}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
@@ -231,7 +273,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
                                     <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
-                                    <Switch checked={config.auto_setup_http} onChange={() => invoke('enable_web_proxy')}/>
+                                    <Switch checked={config.auto_setup_http} onChange={handleAutoSetupHttp}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
