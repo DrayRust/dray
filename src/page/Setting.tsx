@@ -74,6 +74,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         "web_server_enable": true,
         "web_server_host": "127.0.0.1",
         "web_server_port": 18687,
+        "ray_enable": true,
         "ray_log_level": "warning",
         "ray_host": "127.0.0.1",
         "ray_socks_port": 1086,

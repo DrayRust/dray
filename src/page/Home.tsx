@@ -1,9 +1,40 @@
-// import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { invoke } from "@tauri-apps/api/core"
 import { Paper, Stack, Typography, Switch } from '@mui/material'
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
     setNavState(0)
+
+    // 从配置文件中读取配置信息
+    const [rayEnable, setRayEnable] = useState(false)
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const data = await invoke('get_config_json')
+                const config = typeof data === 'string' ? JSON.parse(data) : data
+                setRayEnable(config.ray_enable)
+            } catch (err) {
+                console.log('Failed to get_config_json:', err)
+            }
+        })()
+    }, [])
+
+    const invokeSend = (fn: string, value: string | number | boolean) => {
+        (async () => {
+            try {
+                await invoke(fn, {value})
+            } catch (err) {
+                console.log('Failed to invokeSend:', err)
+            }
+        })()
+    }
+
+    const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        let value = event.target.checked
+        setRayEnable(value)
+        invokeSend('ray_enable', value)
+    }
 
     return (
         <Paper sx={{
@@ -23,7 +54,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 p: 2
             }}>
                 <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
-                <Switch checked={false} onChange={() => invoke('stop_ray')}/>
+                <Switch checked={rayEnable} onChange={handleRayEnable}/>
             </Stack>
         </Paper>
     )
