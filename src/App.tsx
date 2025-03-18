@@ -74,9 +74,9 @@ const App: React.FC = () => {
         {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
-    const [navVal, setNavVal] = useState(0)
+    const [navState, setNavState] = useState(0)
     const handleNavClick = (index: number) => {
-        setNavVal(index)
+        setNavState(index)
     }
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
@@ -102,7 +102,7 @@ const App: React.FC = () => {
                                     <ListItemButton
                                         component={Link}
                                         to={item.path}
-                                        selected={navVal === index}
+                                        selected={navState === index}
                                         onClick={() => handleNavClick(index)}
                                     >
                                         <CustomListItemIcon>{item.icon}</CustomListItemIcon>
@@ -115,12 +115,12 @@ const App: React.FC = () => {
                 </div>
                 <div className="panel-right">
                     <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/server" element={<Server/>}/>
-                        <Route path="/subscription" element={<Subscription/>}/>
-                        <Route path="/rule" element={<Rule/>}/>
-                        <Route path="/log" element={<Log/>}/>
-                        <Route path="/setting" element={<Setting/>}/>
+                        <Route path="/" element={<Home setNavState={setNavState}/>}/>
+                        <Route path="/server" element={<Server setNavState={setNavState}/>}/>
+                        <Route path="/subscription" element={<Subscription setNavState={setNavState}/>}/>
+                        <Route path="/rule" element={<Rule setNavState={setNavState}/>}/>
+                        <Route path="/log" element={<Log setNavState={setNavState}/>}/>
+                        <Route path="/setting" element={<Setting setNavState={setNavState}/>}/>
                     </Routes>
                 </div>
             </Router>
