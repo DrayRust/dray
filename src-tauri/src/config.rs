@@ -136,156 +136,72 @@ pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn set_app_log_level(value: String) -> bool {
+fn set_config<F>(updater: F) -> bool
+where
+    F: FnOnce(&mut Config),
+{
     let mut config = get_config();
-    config.app_log_level = value;
+    updater(&mut config);
     save_config(&config)
         .map_err(|e| {
-            error!("Failed to set app log level: {}", e);
+            error!("Failed to update config: {}", e);
             e
         })
         .is_ok()
+}
+
+pub fn set_app_log_level(value: String) -> bool {
+    set_config(|config| config.app_log_level = value)
 }
 
 pub fn set_web_server_enable(value: bool) -> bool {
-    let mut config = get_config();
-    config.web_server_enable = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set web server enable: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.web_server_enable = value)
 }
 
 pub fn set_web_server_host(value: String) -> bool {
-    let mut config = get_config();
-    config.web_server_host = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set web server host: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.web_server_host = value)
 }
 
 pub fn set_web_server_port(value: u32) -> bool {
-    let mut config = get_config();
-    config.web_server_port = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set web server port: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.web_server_port = value)
 }
 
 pub fn set_ray_enable(value: bool) -> bool {
-    let mut config = get_config();
-    config.ray_enable = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray enable: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_enable = value)
 }
 
 pub fn set_ray_log_level(value: String) -> bool {
-    let mut config = get_config();
-    config.ray_log_level = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray log level: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_log_level = value)
 }
 
 pub fn set_ray_host(value: String) -> bool {
-    let mut config = get_config();
-    config.ray_host = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray host: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_host = value)
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
-    let mut config = get_config();
-    config.ray_socks_port = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray socks port: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_socks_port = value)
 }
 
 pub fn set_ray_http_port(value: u32) -> bool {
-    let mut config = get_config();
-    config.ray_http_port = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray http port: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_http_port = value)
 }
 
 pub fn set_ray_start_socks(value: bool) -> bool {
-    let mut config = get_config();
-    config.ray_start_socks = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray start socks: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_start_socks = value)
 }
 
 pub fn set_ray_start_http(value: bool) -> bool {
-    let mut config = get_config();
-    config.ray_start_http = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set ray start http: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.ray_start_http = value)
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {
-    let mut config = get_config();
-    config.auto_setup_pac = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set auto setup pac: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.auto_setup_pac = value)
 }
 
 pub fn set_auto_setup_socks(value: bool) -> bool {
-    let mut config = get_config();
-    config.auto_setup_socks = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set auto setup socks: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.auto_setup_socks = value)
 }
 
 pub fn set_auto_setup_http(value: bool) -> bool {
-    let mut config = get_config();
-    config.auto_setup_http = value;
-    save_config(&config)
-        .map_err(|e| {
-            error!("Failed to set auto setup http: {}", e);
-            e
-        })
-        .is_ok()
+    set_config(|config| config.auto_setup_http = value)
 }
