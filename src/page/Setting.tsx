@@ -158,11 +158,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             ) : activeTab === 1 ? (
                 <Box sx={{p: 2, maxWidth: 550}}>
                     <Card>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
-                            <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
-                            <Switch checked={false} onChange={() => invoke('stop_ray')}/>
-                        </Stack>
-                        <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="本机地址"
@@ -191,31 +186,41 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 sx={{flex: 1}}
                             />
                         </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
+                            <Switch checked={config.ray_start_socks} disabled/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
+                            <Switch checked={config.ray_start_http} onChange={() => invoke('stop_ray')}/>
+                        </Stack>
                     </Card>
                     <Card sx={{mt: 2}}>
-                        <Typography variant="h6" sx={{p: 2}}>自动设置</Typography>
+                        <Typography variant="h6" sx={{p: 2, pt: 1.1, pb: 0.9}}>自动设置</Typography>
                         <Divider/>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{paddingLeft: 1}}>PAC 自动代理</Typography>
-                                    <Switch checked={false} onChange={() => invoke('enable_auto_proxy')}/>
+                                    <Typography variant="body1" sx={{pl: 1}}>PAC 自动代理</Typography>
+                                    <Switch checked={config.auto_setup_pac} onChange={() => invoke('enable_auto_proxy')}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{paddingLeft: 1}}>SOCKS 代理</Typography>
-                                    <Switch checked={false} onChange={() => invoke('enable_socks_proxy')}/>
+                                    <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
+                                    <Switch checked={config.auto_setup_socks} onChange={() => invoke('enable_socks_proxy')}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{paddingLeft: 1}}>HTTP 代理</Typography>
-                                    <Switch checked={false} onChange={() => invoke('enable_web_proxy')}/>
+                                    <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
+                                    <Switch checked={config.auto_setup_http} onChange={() => invoke('enable_web_proxy')}/>
                                 </Stack>
                             </ListItemButton>
                         </ListItem>
@@ -225,7 +230,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 <Box sx={{p: 2, maxWidth: 550}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
-                            <Typography variant="body1" sx={{paddingLeft: 1}}>Web 服务</Typography>
+                            <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
                             <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
                         </Stack>
                         <Divider/>
