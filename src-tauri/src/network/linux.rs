@@ -1,6 +1,7 @@
 use crate::config;
 use super::{execute_command};
 
+// 暂时不考虑 nmcli 命令行的支持，毕竟 linux 用户都是高手，一般用不上。
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
     let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
