@@ -65,58 +65,42 @@ pub fn execute_commands(command_str: &str) -> bool {
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
     let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
-    let commands = vec![
-        format!("networksetup -setautoproxyurl Wi-Fi {}", url),
-        "networksetup -setautoproxystate Wi-Fi on".parse().unwrap(),
-    ];
-    let command_str = commands.join("\n");
-    execute_commands(&command_str)
+    execute_command(&format!("networksetup -setautoproxyurl Wi-Fi {}", url))
+        && execute_command("networksetup -setautoproxystate Wi-Fi on")
 }
 
 pub fn enable_socks_proxy() -> bool {
     let config = config::get_config();
-    let commands = vec![
-        format!("networksetup -setsocksfirewallproxy Wi-Fi {} {}", config.ray_host, config.ray_socks_port),
-        "networksetup -setsocksfirewallproxystate Wi-Fi on".parse().unwrap(),
-    ];
-    let command_str = commands.join("\n");
-    execute_commands(&command_str)
+    execute_command(&format!("networksetup -setsocksfirewallproxy Wi-Fi {} {}", config.ray_host, config.ray_socks_port))
+        && execute_command("networksetup -setsocksfirewallproxystate Wi-Fi on")
 }
 
 pub fn enable_web_proxy() -> bool {
     let config = config::get_config();
-    let commands = vec![
-        format!("networksetup -setwebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port),
-        "networksetup -setwebproxystate Wi-Fi on".parse().unwrap(),
-    ];
-    let command_str = commands.join("\n");
-    execute_commands(&command_str)
+    execute_command(&format!("networksetup -setwebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port))
+        && execute_command("networksetup -setwebproxystate Wi-Fi on")
 }
 
 pub fn enable_secure_web_proxy() -> bool {
     let config = config::get_config();
-    let commands = vec![
-        format!("networksetup -setsecurewebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port),
-        "networksetup -setsecurewebproxystate Wi-Fi on".parse().unwrap(),
-    ];
-    let command_str = commands.join("\n");
-    execute_commands(&command_str)
+    execute_command(&format!("networksetup -setsecurewebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port))
+        && execute_command("networksetup -setsecurewebproxystate Wi-Fi on")
 }
 
 pub fn disable_auto_proxy() -> bool {
-    execute_commands("networksetup -setautoproxystate Wi-Fi off")
+    execute_command("networksetup -setautoproxystate Wi-Fi off")
 }
 
 pub fn disable_socks_proxy() -> bool {
-    execute_commands("networksetup -setsocksfirewallproxystate Wi-Fi off")
+    execute_command("networksetup -setsocksfirewallproxystate Wi-Fi off")
 }
 
 pub fn disable_web_proxy() -> bool {
-    execute_commands("networksetup -setwebproxystate Wi-Fi off")
+    execute_command("networksetup -setwebproxystate Wi-Fi off")
 }
 
 pub fn disable_secure_web_proxy() -> bool {
-    execute_commands("networksetup -setsecurewebproxystate Wi-Fi off")
+    execute_command("networksetup -setsecurewebproxystate Wi-Fi off")
 }
 
 pub fn disable_proxies() -> bool {
