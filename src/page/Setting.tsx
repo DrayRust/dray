@@ -1,19 +1,13 @@
 import { useState, useEffect, SyntheticEvent } from 'react'
 import {
-    Paper,
-    Tabs,
-    Tab,
-    Box,
-    Card,
-    Divider,
-    ListItem,
-    ListItemButton,
+    Paper, Box, Card, Divider,
+    Tabs, Tab,
+    ListItem, ListItemButton,
     Stack,
     Typography,
     Switch,
-    Button,
-    ButtonGroup,
-    TextField,
+    Button, ButtonGroup, TextField,
+    Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
 
 import { invoke } from '@tauri-apps/api/core'
@@ -98,6 +92,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })()
     }, [])
 
+    const handleRayLogLevel = (event: SelectChangeEvent) => {
+        const value = event.target.value as AppConfig['ray_log_level']
+        setConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
+        invokeSend('set_ray_log_level', value)
+    }
+
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
@@ -158,6 +158,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             ) : activeTab === 1 ? (
                 <Box sx={{p: 2, maxWidth: 550}}>
                     <Card>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>日志级别</Typography>
+                            <Select value={config.ray_log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
+                                <MenuItem value="none">None</MenuItem>
+                                <MenuItem value="error">Error</MenuItem>
+                                <MenuItem value="warning">Warning</MenuItem>
+                                <MenuItem value="info">Info</MenuItem>
+                                <MenuItem value="debug">Debug</MenuItem>
+                            </Select>
+                        </Stack>
+                        <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="本机地址"
