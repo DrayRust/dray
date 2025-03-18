@@ -161,11 +161,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>日志级别</Typography>
                             <Select value={config.ray_log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
-                                <MenuItem value="none">None</MenuItem>
-                                <MenuItem value="error">Error</MenuItem>
-                                <MenuItem value="warning">Warning</MenuItem>
-                                <MenuItem value="info">Info</MenuItem>
-                                <MenuItem value="debug">Debug</MenuItem>
+                                <MenuItem value="none">关闭日志</MenuItem>
+                                <MenuItem value="error">错误日志</MenuItem>
+                                <MenuItem value="warning">警告日志</MenuItem>
+                                <MenuItem value="info">普通日志</MenuItem>
+                                <MenuItem value="debug">调试日志</MenuItem>
                             </Select>
                         </Stack>
                         <Divider/>
