@@ -8,6 +8,8 @@ use std::sync::Mutex;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
+    pub app_log_level: String,
+
     pub web_server_enable: bool,
     pub web_server_host: String,
     pub web_server_port: u32,
@@ -29,6 +31,8 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
+            app_log_level: "info".to_string(),
+
             web_server_enable: true,
             web_server_host: "127.0.0.1".to_string(),
             web_server_port: 18687,
