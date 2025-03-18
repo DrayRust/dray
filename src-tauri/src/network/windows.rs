@@ -22,21 +22,24 @@ pub fn enable_auto_proxy() -> bool {
 
 pub fn enable_socks_proxy() -> bool {
     let config = config::get_config();
-    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &format!("socks={}:{}", config.ray_host, config.ray_socks_port), "/f"]).is_ok() &&
+    let proxy_server = format!("socks={}:{}", config.ray_host, config.ray_socks_port);
+    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
         command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
     success && notify_proxy_change()
 }
 
 pub fn enable_web_proxy() -> bool {
     let config = config::get_config();
-    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &format!("http={}:{}", config.ray_host, config.ray_http_port), "/f"]).is_ok() &&
+    let proxy_server = format!("http={}:{}", config.ray_host, config.ray_http_port);
+    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
         command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
     success && notify_proxy_change()
 }
 
 pub fn enable_secure_web_proxy() -> bool {
     let config = config::get_config();
-    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &format!("https={}:{}", config.ray_host, config.ray_http_port), "/f"]).is_ok() &&
+    let proxy_server = format!("https={}:{}", config.ray_host, config.ray_http_port);
+    let success = command("reg", &["add", SETTINGS, "/v", "ProxyServer", "/t", "REG_SZ", "/d", &proxy_server, "/f"]).is_ok() &&
         command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
     success && notify_proxy_change()
 }
@@ -48,25 +51,21 @@ pub fn disable_auto_proxy() -> bool {
 }
 
 pub fn disable_socks_proxy() -> bool {
-    let success = command("reg", &["delete", SETTINGS, "/v", "ProxyServer", "/f"]).is_ok() &&
-        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f"]).is_ok();
-    success && notify_proxy_change()
+    disable_proxies()
 }
 
 pub fn disable_web_proxy() -> bool {
-    let success = command("reg", &["delete", SETTINGS, "/v", "ProxyServer", "/f"]).is_ok() &&
-        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f"]).is_ok();
-    success && notify_proxy_change()
+    disable_proxies()
 }
 
 pub fn disable_secure_web_proxy() -> bool {
-    let success = command("reg", &["delete", SETTINGS, "/v", "ProxyServer", "/f"]).is_ok() &&
-        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f"]).is_ok();
-    success && notify_proxy_change()
+    disable_proxies()
 }
 
 pub fn disable_proxies() -> bool {
-    disable_auto_proxy() && disable_socks_proxy() && disable_web_proxy() && disable_secure_web_proxy()
+    let success = command("reg", &["delete", SETTINGS, "/v", "ProxyServer", "/f"]).is_ok() &&
+        command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "0", "/f"]).is_ok();
+    success && notify_proxy_change()
 }
 
 /*
