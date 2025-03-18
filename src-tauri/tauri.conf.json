@@ -4,33 +4,33 @@
   "version": "1.0.0",
   "identifier": "rust.dray.app",
   "build": {
-	"beforeDevCommand": "yarn dev",
-	"devUrl": "http://localhost:1420",
-	"beforeBuildCommand": "yarn build",
-	"frontendDist": "../dist"
+    "beforeDevCommand": "yarn dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "yarn build",
+    "frontendDist": "../dist"
   },
   "app": {
-	"windows": [
-	  {
-		"title": "Dray",
-		"fullscreen": false,
-		"resizable": false,
-		"width": 1000,
-		"height": 600
-	  }
-	],
-	"security": {
-	  "csp": null
-	}
+    "windows": [
+      {
+        "title": "Dray",
+        "fullscreen": false,
+        "resizable": false,
+        "width": 800,
+        "height": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
   },
   "bundle": {
-	"active": true,
-	"targets": "all",
-	"icon": [
-	  "icons/64x64.png",
-	  "icons/icon.png",
-	  "icons/icon.icns",
-	  "icons/icon.ico"
-	]
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/64x64.png",
+      "icons/icon.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
   }
 }
