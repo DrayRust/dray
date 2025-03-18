@@ -3,6 +3,7 @@ use std::net::TcpListener;
 
 use crate::config;
 use crate::log;
+use crate::ray;
 use crate::web;
 
 pub fn set_app_log_level(value: String) -> bool {
@@ -40,6 +41,12 @@ pub fn set_web_server_port(value: u32) -> bool {
 
 pub fn set_ray_enable(value: bool) -> bool {
     config::set_ray_enable(value)
+        && if value {
+            ray::start()
+        } else {
+            // ray::stop();
+            ray::force_kill_ray()
+        }
 }
 
 pub fn set_ray_log_level(value: String) -> bool {
