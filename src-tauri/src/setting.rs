@@ -71,14 +71,23 @@ pub fn set_ray_start_http(value: bool) -> bool {
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {
+    if !value {
+        network::disable_auto_proxy();
+    }
     config::set_auto_setup_pac(value)
 }
 
 pub fn set_auto_setup_socks(value: bool) -> bool {
+    if !value {
+        network::disable_socks_proxy();
+    }
     config::set_auto_setup_socks(value)
 }
 
 pub fn set_auto_setup_http(value: bool) -> bool {
+    if !value {
+        network::disable_web_proxy();
+    }
     config::set_auto_setup_http(value)
 }
 
