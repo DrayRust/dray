@@ -1,3 +1,4 @@
+use crate::config;
 use logger::{error, info};
 use std::process::Command;
 
@@ -65,7 +66,8 @@ pub fn execute_commands(command_str: &str) -> bool {
 }
 
 pub fn enable_auto_proxy() -> bool {
-    let url = "http://127.0.0.1:18687/dray/proxy.js";
+    let config = config::get_config();
+    let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
     let commands = vec![
         format!("networksetup -setautoproxyurl Wi-Fi {}", url),
         "networksetup -setautoproxystate Wi-Fi on".parse().unwrap(),
@@ -75,9 +77,9 @@ pub fn enable_auto_proxy() -> bool {
 }
 
 pub fn enable_socks_proxy() -> bool {
-    let port = 1086;
+    let config = config::get_config();
     let commands = vec![
-        format!("networksetup -setsocksfirewallproxy Wi-Fi 127.0.0.1 {}", port),
+        format!("networksetup -setsocksfirewallproxy Wi-Fi {} {}", config.ray_host, config.ray_socks_port),
         "networksetup -setsocksfirewallproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
@@ -85,9 +87,9 @@ pub fn enable_socks_proxy() -> bool {
 }
 
 pub fn enable_web_proxy() -> bool {
-    let port = 1089;
+    let config = config::get_config();
     let commands = vec![
-        format!("networksetup -setwebproxy Wi-Fi 127.0.0.1 {}", port),
+        format!("networksetup -setwebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port),
         "networksetup -setwebproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
@@ -95,9 +97,9 @@ pub fn enable_web_proxy() -> bool {
 }
 
 pub fn enable_secure_web_proxy() -> bool {
-    let port = 1089;
+    let config = config::get_config();
     let commands = vec![
-        format!("networksetup -setsecurewebproxy Wi-Fi 127.0.0.1 {}", port),
+        format!("networksetup -setsecurewebproxy Wi-Fi {} {}", config.ray_host, config.ray_http_port),
         "networksetup -setsecurewebproxystate Wi-Fi on".parse().unwrap(),
     ];
     let command_str = commands.join("\n");
