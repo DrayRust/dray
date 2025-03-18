@@ -164,7 +164,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = Number(event.target.value) || 0
         const ok = validatePort(value)
         setWebPortError(!ok)
-        setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
+        setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
         if (ok && value && config.web_server_port !== value) {
             invokeSend('set_web_server_port', value)
         }

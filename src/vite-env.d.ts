@@ -3,13 +3,13 @@
 interface AppConfig {
     web_server_enable: boolean;
     web_server_host: string;
-    web_server_port: number;
+    web_server_port: number | "";
 
     ray_enable: boolean;
     ray_log_level: "debug" | "info" | "warning" | "error" | "none";
     ray_host: string;
-    ray_socks_port: number;
-    ray_http_port: number;
+    ray_socks_port: number | "";
+    ray_http_port: number | "";
 
     ray_start_socks: boolean;
     ray_start_http: boolean;
