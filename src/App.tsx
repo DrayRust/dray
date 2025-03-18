@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, cloneElement } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import {
@@ -115,12 +115,12 @@ const App: React.FC = () => {
                 </div>
                 <div className="panel-right">
                     <Routes>
-                        <Route path="/" element={<Home setNavState={setNavState}/>}/>
-                        <Route path="/server" element={<Server setNavState={setNavState}/>}/>
-                        <Route path="/subscription" element={<Subscription setNavState={setNavState}/>}/>
-                        <Route path="/rule" element={<Rule setNavState={setNavState}/>}/>
-                        <Route path="/log" element={<Log setNavState={setNavState}/>}/>
-                        <Route path="/setting" element={<Setting setNavState={setNavState}/>}/>
+                        <Route path="/" element={cloneElement(<Home/>, {setNavState})}/>
+                        <Route path="/server" element={cloneElement(<Server/>, {setNavState})}/>
+                        <Route path="/subscription" element={cloneElement(<Subscription/>, {setNavState})}/>
+                        <Route path="/rule" element={cloneElement(<Rule/>, {setNavState})}/>
+                        <Route path="/log" element={cloneElement(<Log/>, {setNavState})}/>
+                        <Route path="/setting" element={cloneElement(<Setting/>, {setNavState})}/>
                     </Routes>
                 </div>
             </Router>
