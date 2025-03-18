@@ -14,3 +14,7 @@ interface AppConfig {
     auto_setup_socks: boolean;
     auto_setup_http: boolean;
 }
+
+interface NavProps {
+    setNavState?: any
+}

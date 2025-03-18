@@ -5,11 +5,7 @@ import RestoreIcon from '@mui/icons-material/Restore'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 
-interface RuleProps {
-    setNavState?: any
-}
-
-const Rule: React.FC = ({setNavState}: RuleProps) => {
+const Rule: React.FC<NavProps> = ({setNavState}) => {
     setNavState(3)
     const [value, setValue] = useState(0)
     return <div>

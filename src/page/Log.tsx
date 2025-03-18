@@ -1,8 +1,4 @@
-interface LogProps {
-    setNavState?: any;
-}
-
-const Log: React.FC = ({setNavState}: LogProps) => {
+const Log: React.FC<NavProps> = ({setNavState}) => {
     setNavState(4)
     return <div>Log Page</div>
 }

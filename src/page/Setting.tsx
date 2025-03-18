@@ -25,11 +25,7 @@ import {
     disable as autoStartDisable,
 } from '@tauri-apps/plugin-autostart'
 
-interface SettingProps {
-    setNavState?: any
-}
-
-const Setting: React.FC = ({setNavState}: SettingProps) => {
+const Setting: React.FC<NavProps> = ({setNavState}) => {
     setNavState(5)
     // 从上下文中获取当前主题模式和切换模式的函数
     const {mode, toggleMode} = useTheme()

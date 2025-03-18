@@ -1,8 +1,4 @@
-interface ServerProps {
-    setNavState?: any
-}
-
-const Server: React.FC = ({setNavState}: ServerProps) => {
+const Server: React.FC<NavProps> = ({setNavState}) => {
     setNavState(1)
     return <div>Server Page</div>
 }

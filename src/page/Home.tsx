@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { invoke } from "@tauri-apps/api/core"
 
-interface HomeProps {
-    setNavState?: any
-}
-
-const Home: React.FC<HomeProps> = ({setNavState}) => {
+const Home: React.FC<NavProps> = ({setNavState}) => {
     setNavState(0)
     const [drayMsg, setDrayMsg] = useState("")
     const [name, setName] = useState("")
