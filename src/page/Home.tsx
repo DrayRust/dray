@@ -54,7 +54,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 p: 2
             }}>
                 <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
-                <Switch checked={rayEnable} onChange={handleRayEnable}/>
+                <Switch checked={rayEnable} onChange={handleRayEnable} sx={{transform: 'scale(1.3)'}}/>
             </Stack>
         </Paper>
     )
