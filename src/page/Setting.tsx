@@ -236,7 +236,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 <Box sx={{p: 2, maxWidth: 550}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>日志级别</Typography>
+                            <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
                             <Select value={config.ray_log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
                                 <MenuItem value="none">关闭日志</MenuItem>
                                 <MenuItem value="error">错误日志</MenuItem>
