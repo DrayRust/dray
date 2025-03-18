@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 interface AppConfig {
+    app_log_level: "none" | "error" | "warn" | "info" | "debug" | "trace";
     web_server_enable: boolean;
     web_server_host: string;
     web_server_port: number | "";

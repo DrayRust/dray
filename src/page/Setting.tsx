@@ -65,6 +65,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
     // 从配置文件中读取配置信息
     const [config, setConfig] = useState<AppConfig>({
+        "app_log_level": "info",
         "web_server_enable": true,
         "web_server_host": "127.0.0.1",
         "web_server_port": 18687,
@@ -91,6 +92,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             }
         })()
     }, [])
+
+    const handleAppLogLevel = (event: SelectChangeEvent) => {
+        const value = event.target.value as AppConfig['app_log_level']
+        setConfig(prevConfig => ({...prevConfig, app_log_level: value}))
+        invokeSend('set_app_log_level', value)
+    }
 
     const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as AppConfig['ray_log_level']
@@ -210,6 +217,18 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">开机启动</Typography>
                             <Switch checked={autoStart} onChange={handleAutoStart}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>日志级别</Typography>
+                            <Select value={config.app_log_level} onChange={handleAppLogLevel} sx={{width: 120}}>
+                                <MenuItem value="none">关闭日志</MenuItem>
+                                <MenuItem value="error">错误日志</MenuItem>
+                                <MenuItem value="warn">警告日志</MenuItem>
+                                <MenuItem value="info">普通日志</MenuItem>
+                                <MenuItem value="debug">调试日志</MenuItem>
+                                <MenuItem value="trace">追踪日志</MenuItem>
+                            </Select>
                         </Stack>
                     </Card>
                 </Box>
