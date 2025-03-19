@@ -14,7 +14,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import { invoke } from '@tauri-apps/api/core'
 import { useTheme } from '../context/ThemeProvider'
-import { debounce } from '../util/util.ts'
+import { debounce, log } from '../util/util.ts'
 
 import {
     enable as autoStartEnable,
@@ -46,7 +46,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             try {
                 setAutoStart(await autoStartIsEnabled())
             } catch (err) {
-                console.log('Failed to autoStartIsEnabled:', err)
+                log.error('Failed to autoStartIsEnabled:', err)
             }
         })()
     }, [])
@@ -56,7 +56,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setAutoStart(checked)
             checked ? await autoStartEnable() : await autoStartDisable()
         } catch (err) {
-            console.log('Failed to handleAutoStart:', err)
+            log.error('Failed to handleAutoStart:', err)
         }
     }
 
@@ -73,7 +73,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         try {
             return await invoke<boolean>('check_port_available', {port})
         } catch (err) {
-            console.log('Failed to check port availability:', err)
+            log.error('Failed to check port availability:', err)
             return false
         }
     }
@@ -83,7 +83,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             try {
                 await invoke(fn, {value})
             } catch (err) {
-                console.log('Failed to invokeSend:', err)
+                log.error('Failed to invokeSend:', err)
             }
         })()
     }
@@ -114,7 +114,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 const config = JSON.parse(data)
                 setConfig(config as AppConfig)
             } catch (err) {
-                console.log('Failed to get_config_json:', err)
+                log.error('Failed to get_config_json:', err)
             }
         })()
     }, [])
@@ -136,7 +136,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             json.log.loglevel = value
             await invoke('save_ray_config', {text: JSON.stringify(json, null, 2)}) // 保存
         } catch (err) {
-            console.log('Failed to change RayLogLevel:', err)
+            log.error('Failed to change RayLogLevel:', err)
         }
 
         invokeSend('set_ray_log_level', value)
