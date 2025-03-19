@@ -6,9 +6,11 @@ import {
     Stack,
     Typography,
     Switch,
-    Button, ButtonGroup, TextField,
+    Button, ButtonGroup, TextField, IconButton,
     Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
+
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import { invoke } from '@tauri-apps/api/core'
 import { useTheme } from '../context/ThemeProvider'
@@ -331,7 +333,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 <Box sx={{p: 2}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
-                            <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
+                            <Typography variant="body1" sx={{pl: 1}}>Web 服务
+                                <IconButton color="primary" href={`http://${config.web_server_host}:${config.web_server_port}/dray/`} target="_blank">
+                                    <OpenInNewIcon/>
+                                </IconButton>
+                            </Typography>
                             <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
                         </Stack>
                         <Divider/>
