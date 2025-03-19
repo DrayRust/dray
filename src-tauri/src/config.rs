@@ -128,14 +128,7 @@ pub fn save_config_to_file(config: &Config, file_path: &str) -> Result<(), Box<d
 }
 
 pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
-    // 更新全局配置
-    *CONFIG.lock().unwrap() = config.clone();
-
-    // 保存配置到文件
-    let config_json = serde_json::to_string_pretty(config)?;
-    fs::write(CONFIG_PATH.lock().unwrap().to_str().unwrap(), config_json)?;
-
-    Ok(())
+    save_config_to_file(config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
 }
 
 fn set_config<F>(updater: F) -> bool
