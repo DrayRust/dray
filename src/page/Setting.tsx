@@ -12,7 +12,7 @@ import {
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
-import { invoke } from '@tauri-apps/api/core'
+import { invoke, isTauri } from '@tauri-apps/api/core'
 import { useTheme } from '../context/ThemeProvider'
 import { debounce, log } from '../util/util.ts'
 
@@ -42,6 +42,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     // 用于记录当前开机自动启动的设置，初始值为false（即未设置自动启动）
     const [autoStart, setAutoStart] = useState(false)
     useEffect(() => {
+        if (!isTauri()) return
         (async () => {
             try {
                 setAutoStart(await autoStartIsEnabled())
@@ -108,6 +109,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     })
 
     useEffect(() => {
+        if (!isTauri()) return
         (async () => {
             try {
                 const data = await invoke('get_config_json') as string
