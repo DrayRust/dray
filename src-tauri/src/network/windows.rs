@@ -38,7 +38,7 @@ fn notify_proxy_change() -> bool {
 
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
-    let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
+    let url = format!("http://{}:{}/proxy.pac", config.web_server_host, config.web_server_port);
     let success = command("reg", &["add", SETTINGS, "/v", "AutoConfigURL", "/t", "REG_SZ", "/d", &url, "/f"]).is_ok() &&
         command("reg", &["add", SETTINGS, "/v", "ProxyEnable", "/t", "REG_DWORD", "/d", "1", "/f"]).is_ok();
     success && notify_proxy_change()

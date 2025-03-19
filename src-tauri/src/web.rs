@@ -62,6 +62,16 @@ pub fn start() {
     });
 }
 
+async fn handle_proxy_pac() -> actix_web::HttpResponse {
+    let pac_path = dirs::get_dray_web_server_dir().unwrap().join("proxy.js");
+    match std::fs::read_to_string(pac_path) {
+        Ok(content) => actix_web::HttpResponse::Ok()
+            .content_type("application/x-ns-proxy-autoconfig")
+            .body(content),
+        Err(_) => actix_web::HttpResponse::NotFound().body("proxy.js not found"),
+    }
+}
+
 async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::get_config();
     let server_address = format!("{}:{}", config.web_server_host, config.web_server_port);
@@ -70,6 +80,7 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
             .wrap(Logger::new("%D %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\""))
             .service(Files::new("/dray", dirs::get_dray_web_server_dir().unwrap().to_str().unwrap()).show_files_listing())
             .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
+            .route("/proxy.pac", web::get().to(handle_proxy_pac))
     })
     .bind(&server_address)
     .map_err(|e| {
