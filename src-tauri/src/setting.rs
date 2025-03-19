@@ -109,7 +109,10 @@ pub fn set_auto_setup_https(value: bool) -> bool {
 pub fn check_port_available(port: u32) -> bool {
     let address = format!("127.0.0.1:{}", port);
     match TcpListener::bind(&address) {
-        Ok(_) => true,
+        Ok(_) => {
+            info!("Port {} is available", port);
+            true
+        },
         Err(e) => {
             info!("Port {} is not available: {}", port, e);
             false
