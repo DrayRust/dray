@@ -37,8 +37,8 @@ pub fn start() -> bool {
 }
 
 pub fn stop() -> bool {
-    let child_opt = CHILD_PROCESS.lock().unwrap().take();
-    if let Some(mut child) = child_opt {
+    let child_process = CHILD_PROCESS.lock().unwrap().take();
+    if let Some(mut child) = child_process {
         if let Err(e) = child.kill() {
             error!("Failed to kill Ray Server: {}", e);
             *CHILD_PROCESS.lock().unwrap() = Some(child);
@@ -54,19 +54,6 @@ pub fn stop() -> bool {
         error!("Ray Server is not running, no need to stop");
         false
     }
-}
-
-pub fn force_restart_ray() -> bool {
-    if CHILD_PROCESS.lock().unwrap().is_some() {
-        *CHILD_PROCESS.lock().unwrap() = None;
-    }
-    force_kill();
-    if !start() {
-        error!("Failed to start Ray Server");
-        return false;
-    }
-    info!("Ray Server force restarted successfully");
-    true
 }
 
 pub fn force_kill() -> bool {
@@ -86,4 +73,14 @@ pub fn force_kill() -> bool {
     }
     *CHILD_PROCESS.lock().unwrap() = None;
     killed
+}
+
+pub fn force_restart() -> bool {
+    let success = force_kill() && start();
+    if success {
+        info!("Ray Server force restarted successfully");
+    } else {
+        error!("Ray Server force restart failed");
+    }
+    success
 }
