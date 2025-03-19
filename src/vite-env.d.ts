@@ -19,6 +19,7 @@ interface AppConfig {
     auto_setup_pac: boolean;
     auto_setup_socks: boolean;
     auto_setup_http: boolean;
+    auto_setup_https: boolean;
 }
 
 interface NavProps {

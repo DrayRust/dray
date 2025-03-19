@@ -78,7 +78,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         "ray_start_http": true,
         "auto_setup_pac": false,
         "auto_setup_socks": true,
-        "auto_setup_http": false
+        "auto_setup_http": false,
+        "auto_setup_https": false
     })
 
     useEffect(() => {
@@ -163,6 +164,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         invokeSend('set_auto_setup_http', value)
     }
 
+    const handleAutoSetupHttps = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
+        invokeSend('set_auto_setup_https', value)
+    }
+
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
@@ -203,7 +210,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 </Tabs>
             </Paper>
             {activeTab === 0 ? (
-                <Box sx={{p: 2, maxWidth: 550}}>
+                <Box sx={{p: 2}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">外观</Typography>
@@ -233,7 +240,43 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 </Box>
             ) : activeTab === 1 ? (
-                <Box sx={{p: 2, maxWidth: 550}}>
+                <Box sx={{p: 2}}>
+                    <Card sx={{mb: 2}}>
+                        <Typography variant="h6" sx={{p: 2, pt: 1.1, pb: 0.9}}>自动设置</Typography>
+                        <Divider/>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{pl: 1}}>PAC 自动配置代理</Typography>
+                                    <Switch checked={config.auto_setup_pac} onChange={handleAutoSetupPac}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
+                                    <Switch checked={config.auto_setup_socks} onChange={handleAutoSetupSocks}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
+                                    <Switch checked={config.auto_setup_http} onChange={handleAutoSetupHttp}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton sx={{cursor: 'default'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                    <Typography variant="body1" sx={{pl: 1}}>HTTPS 代理</Typography>
+                                    <Switch checked={config.auto_setup_https} onChange={handleAutoSetupHttps}/>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                    </Card>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
@@ -253,10 +296,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 onChange={handleRayHost}
                                 error={rayIpError}
                                 helperText={rayIpError ? "请输入有效的IP地址" : ""}
-                                sx={{flex: 'auto'}}
+                                sx={{flex: 1}}
                             />
-                        </Stack>
-                        <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="SOCKS 端口"
                                 value={config.ray_socks_port}
@@ -285,37 +326,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Switch checked={config.ray_start_http} onChange={handleRayStartHttp}/>
                         </Stack>
                     </Card>
-                    <Card sx={{mt: 2}}>
-                        <Typography variant="h6" sx={{p: 2, pt: 1.1, pb: 0.9}}>自动设置</Typography>
-                        <Divider/>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{pl: 1}}>PAC 自动代理</Typography>
-                                    <Switch checked={config.auto_setup_pac} onChange={handleAutoSetupPac}/>
-                                </Stack>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
-                                    <Switch checked={config.auto_setup_socks} onChange={handleAutoSetupSocks}/>
-                                </Stack>
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                                    <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
-                                    <Switch checked={config.auto_setup_http} onChange={handleAutoSetupHttp}/>
-                                </Stack>
-                            </ListItemButton>
-                        </ListItem>
-                    </Card>
                 </Box>
             ) : activeTab === 2 && (
-                <Box sx={{p: 2, maxWidth: 550}}>
+                <Box sx={{p: 2}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
