@@ -6,14 +6,28 @@ export function debounce(func: Function, wait: number) {
     }
 }
 
+function sendLog(value: string) {
+    try {
+        window?.__TAURI__.core.invoke('send_log', {msg: value}).catch()
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 export const log = {
     error: (message: string, ...args: any[]) => {
-        console.log(`[ERROR] ${message}`, ...args)
+        const logMessage = `[ERROR] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
+        console.log(logMessage)
+        sendLog(logMessage)
     },
     warn: (message: string, ...args: any[]) => {
-        console.log(`[WARN] ${message}`, ...args)
+        const logMessage = `[WARN] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
+        console.log(logMessage)
+        sendLog(logMessage)
     },
     info: (message: string, ...args: any[]) => {
-        console.log(`[INFO] ${message}`, ...args)
+        const logMessage = `[INFO] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
+        console.log(logMessage)
+        sendLog(logMessage)
     },
 }

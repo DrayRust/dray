@@ -34,18 +34,18 @@ interface Tauri {
         getTauriVersion(): Promise<string>;
         hide(): Promise<void>;
         show(): Promise<void>;
-        setTheme(theme?): Promise<void>;
+        setTheme(theme?: string): Promise<void>;
     };
     core: {
-        invoke<T>(cmd, args, options?): Promise<T>;
+        invoke(cmd: string, args?: Record<string, any>, options?: Record<string, any>): Promise<void>;
         isTauri(): boolean;
     }
     dpi: any;
     event: {
-        emit(event, payload?): Promise<void>;
-        emitTo(target, event, payload?): Promise<void>;
-        listen<T>(event, handler, options?): Promise<UnlistenFn>;
-        once<T>(event, handler, options?): Promise<UnlistenFn>;
+        emit(event: string, payload?: any): Promise<void>;
+        emitTo(target: string, event: string, payload?: any): Promise<void>;
+        listen(event: string, handler: any): Promise<void>;
+        once(event: string, handler: any): Promise<void>;
     };
     image: any;
     menu: any;
@@ -55,9 +55,9 @@ interface Tauri {
     webview: any;
     webviewWindow: any;
     window: {
-        cursorPosition(): Promise<PhysicalPosition>;
-        getAllWindows(): Promise<Window[]>;
-        getCurrentWindow(): Window;
+        cursorPosition(): Promise<void>;
+        getAllWindows(): Promise<void>;
+        getCurrentWindow(): any;
     };
 }
 
