@@ -65,12 +65,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const debouncedSetRayHost = debounce((value: string) => invokeSend('set_ray_host', value), 500)
-    const debouncedSetRaySocksPort = debounce((value: number) => invokeSend('set_ray_socks_port', value), 500)
-    const debouncedSetRayHttpPort = debounce((value: number) => invokeSend('set_ray_http_port', value), 500)
-    const debouncedSetWebServerHost = debounce((value: string) => invokeSend('set_web_server_host', value), 500)
-    const debouncedSetWebServerPort = debounce((value: number) => invokeSend('set_web_server_port', value), 500)
-
     const invokeSend = (fn: string, value: string | number | boolean) => {
         (async () => {
             try {
@@ -126,65 +120,76 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
     const [rayIpError, setRayIpError] = useState(false)
     const [raySocksPortError, setRaySocksPortError] = useState(false)
+    const [raySocksPortErrorText, setRaySocksPortErrorText] = useState('')
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
 
-    const handleRayHost = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const debouncedSetRayHost = debounce((value: string) => invokeSend('set_ray_host', value), 500)
+    const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
         setRayIpError(!ok)
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         if (ok && config.ray_host !== value) {
-            debouncedSetRayHost()
+            debouncedSetRayHost(value)
         }
     }
 
-    const handleRaySocksPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const debouncedSetRaySocksPort = debounce(async (value: number) => {
+        if (!value || !validatePort(value)) return
+        const ok = await checkPortAvailable(value)
+        if (!ok) {
+            setRaySocksPortError(true)
+            setRaySocksPortErrorText('本机端口不可用')
+        } else if (config.ray_socks_port !== value) {
+            invokeSend('set_ray_socks_port', value)
+        }
+    }, 500)
+    const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
-        const ok = validatePort(value)
-        const portOk = ok && value && await checkPortAvailable(value)
-        setRaySocksPortError(!ok)
-        setRaySocksPortError(!portOk)
         setConfig(prevConfig => ({...prevConfig, ray_socks_port: value || ""}))
-        if (portOk && config.ray_socks_port !== value) {
-            debouncedSetRaySocksPort()
-        }
+        setRaySocksPortErrorText('')
+        const ok = validatePort(value)
+        setRaySocksPortError(!ok)
+        !ok && setRaySocksPortErrorText('请输入有效的端口号 (0-65535)')
+        debouncedSetRaySocksPort(value)
     }
 
-    const handleRayHttpPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const debouncedSetRayHttpPort = debounce((value: number) => invokeSend('set_ray_http_port', value), 500)
+    const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         const ok = validatePort(value)
         setRayHttpPortError(!ok)
         setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
         if (ok && value && config.ray_http_port !== value) {
-            debouncedSetRayHttpPort()
+            debouncedSetRayHttpPort(value)
         }
     }
 
-    const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRayStartHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
         invokeSend('set_ray_start_http', value)
     }
 
-    const handleAutoSetupPac = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
         invokeSend('set_auto_setup_pac', value)
     }
 
-    const handleAutoSetupSocks = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
         invokeSend('set_auto_setup_socks', value)
     }
 
-    const handleAutoSetupHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAutoSetupHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
         invokeSend('set_auto_setup_http', value)
     }
 
-    const handleAutoSetupHttps = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAutoSetupHttps = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
         invokeSend('set_auto_setup_https', value)
@@ -194,29 +199,32 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
 
-    const handleWebServerEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleWebServerEnable = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
         invokeSend('set_web_server_enable', value)
     }
 
-    const handleWebIp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    const debouncedSetWebServerHost = debounce((value: string) => invokeSend('set_web_server_host', value), 500)
+    const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
         setWebIpError(!ok)
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
         if (ok && config.web_server_host !== value) {
-            debouncedSetWebServerHost()
+            debouncedSetWebServerHost(value)
         }
     }
 
-    const handleWebPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const debouncedSetWebServerPort = debounce((value: number) => invokeSend('set_web_server_port', value), 500)
+    const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         const ok = validatePort(value)
         setWebPortError(!ok)
         setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
         if (ok && value && config.web_server_port !== value) {
-            debouncedSetWebServerPort()
+            debouncedSetWebServerPort(value)
         }
     }
 
@@ -323,7 +331,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 value={config.ray_socks_port}
                                 onChange={handleRaySocksPort}
                                 error={raySocksPortError}
-                                helperText={raySocksPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                helperText={raySocksPortErrorText}
                                 sx={{flex: 1}}
                             />
                             <TextField
