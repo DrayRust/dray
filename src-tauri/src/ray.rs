@@ -38,7 +38,7 @@ pub fn start() -> bool {
     true
 }
 
-pub fn stop() -> bool {
+/*pub fn stop() -> bool {
     let child_process = CHILD_PROCESS.lock().unwrap().take();
     if let Some(mut child) = child_process {
         if let Err(e) = child.kill() {
@@ -56,7 +56,7 @@ pub fn stop() -> bool {
         error!("Ray Server is not running, no need to stop");
         false
     }
-}
+}*/
 
 pub fn force_kill() -> bool {
     let mut sys = sysinfo::System::new_all();
