@@ -14,6 +14,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import { invoke } from '@tauri-apps/api/core'
 import { useTheme } from '../context/ThemeProvider'
+import { debounce } from '../util/util.ts'
 
 import {
     enable as autoStartEnable,
@@ -54,6 +55,21 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const validatePort = (value: number) => {
         return value >= 0 && value <= 65535
     }
+
+    const checkPortAvailable = async (port: number) => {
+        try {
+            return await invoke<boolean>('check_port_available', {port})
+        } catch (err) {
+            console.error('Failed to check port availability:', err)
+            return false
+        }
+    }
+
+    const debouncedSetRayHost = debounce((value: string) => invokeSend('set_ray_host', value), 500)
+    const debouncedSetRaySocksPort = debounce((value: number) => invokeSend('set_ray_socks_port', value), 500)
+    const debouncedSetRayHttpPort = debounce((value: number) => invokeSend('set_ray_http_port', value), 500)
+    const debouncedSetWebServerHost = debounce((value: string) => invokeSend('set_web_server_host', value), 500)
+    const debouncedSetWebServerPort = debounce((value: number) => invokeSend('set_web_server_port', value), 500)
 
     const invokeSend = (fn: string, value: string | number | boolean) => {
         (async () => {
@@ -118,17 +134,19 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRayIpError(!ok)
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         if (ok && config.ray_host !== value) {
-            invokeSend('set_ray_host', value)
+            debouncedSetRayHost()
         }
     }
 
     const handleRaySocksPort = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         const ok = validatePort(value)
+        const portOk = ok && value && await checkPortAvailable(value)
         setRaySocksPortError(!ok)
+        setRaySocksPortError(!portOk)
         setConfig(prevConfig => ({...prevConfig, ray_socks_port: value || ""}))
-        if (ok && value && config.ray_socks_port !== value) {
-            invokeSend('set_ray_socks_port', value)
+        if (portOk && config.ray_socks_port !== value) {
+            debouncedSetRaySocksPort()
         }
     }
 
@@ -138,7 +156,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRayHttpPortError(!ok)
         setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
         if (ok && value && config.ray_http_port !== value) {
-            invokeSend('set_ray_http_port', value)
+            debouncedSetRayHttpPort()
         }
     }
 
@@ -188,7 +206,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setWebIpError(!ok)
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
         if (ok && config.web_server_host !== value) {
-            invokeSend('set_web_server_host', value)
+            debouncedSetWebServerHost()
         }
     }
 
@@ -198,7 +216,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setWebPortError(!ok)
         setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
         if (ok && value && config.web_server_port !== value) {
-            invokeSend('set_web_server_port', value)
+            debouncedSetWebServerPort()
         }
     }
 
