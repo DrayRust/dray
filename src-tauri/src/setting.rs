@@ -4,6 +4,7 @@ use std::net::TcpListener;
 use crate::{config, log, network, ray, web};
 
 pub fn set_app_log_level(value: String) -> bool {
+    info!("set_app_log_level: {}", value);
     config::set_app_log_level(value) && {
         log::init();
         true
