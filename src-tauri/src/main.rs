@@ -237,6 +237,11 @@ fn set_auto_setup_http(value: bool) -> bool {
 }
 
 #[tauri::command]
+fn set_auto_setup_https(value: bool) -> bool {
+    setting::set_auto_setup_https(value)
+}
+
+#[tauri::command]
 fn check_port_available(port: u32) -> bool {
     setting::check_port_available(port)
 }
@@ -295,6 +300,7 @@ pub fn main() {
             set_auto_setup_pac,
             set_auto_setup_socks,
             set_auto_setup_http,
+            set_auto_setup_https,
             check_port_available,
             quit
         ])

@@ -91,6 +91,13 @@ pub fn set_auto_setup_http(value: bool) -> bool {
     config::set_auto_setup_http(value)
 }
 
+pub fn set_auto_setup_https(value: bool) -> bool {
+    if !value {
+        network::disable_secure_web_proxy();
+    }
+    config::set_auto_setup_https(value)
+}
+
 pub fn check_port_available(port: u32) -> bool {
     let address = format!("127.0.0.1:{}", port);
     match TcpListener::bind(&address) {

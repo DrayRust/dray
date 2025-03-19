@@ -26,6 +26,7 @@ pub struct Config {
     pub auto_setup_pac: bool,
     pub auto_setup_socks: bool,
     pub auto_setup_http: bool,
+    pub auto_setup_https: bool,
 }
 
 impl Default for Config {
@@ -49,6 +50,7 @@ impl Default for Config {
             auto_setup_pac: false,
             auto_setup_socks: true,
             auto_setup_http: false,
+            auto_setup_https: false,
         }
     }
 }
@@ -204,4 +206,8 @@ pub fn set_auto_setup_socks(value: bool) -> bool {
 
 pub fn set_auto_setup_http(value: bool) -> bool {
     set_config(|config| config.auto_setup_http = value)
+}
+
+pub fn set_auto_setup_https(value: bool) -> bool {
+    set_config(|config| config.auto_setup_https = value)
 }
