@@ -71,39 +71,39 @@ pub fn set_ray_start_http(value: bool) -> bool {
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {
+    config::set_auto_setup_pac(value);
     if value {
-        network::enable_auto_proxy();
+        network::enable_auto_proxy()
     } else {
-        network::disable_auto_proxy();
+        network::disable_auto_proxy()
     }
-    config::set_auto_setup_pac(value)
 }
 
 pub fn set_auto_setup_socks(value: bool) -> bool {
+    config::set_auto_setup_socks(value);
     if value {
-        network::enable_socks_proxy();
+        network::enable_socks_proxy()
     } else {
-        network::disable_socks_proxy();
+        network::disable_socks_proxy()
     }
-    config::set_auto_setup_socks(value)
 }
 
 pub fn set_auto_setup_http(value: bool) -> bool {
+    config::set_auto_setup_http(value);
     if value {
-        network::enable_web_proxy();
+        network::enable_web_proxy()
     } else {
-        network::disable_web_proxy();
+        network::disable_web_proxy()
     }
-    config::set_auto_setup_http(value)
 }
 
 pub fn set_auto_setup_https(value: bool) -> bool {
+    config::set_auto_setup_https(value);
     if value {
-        network::enable_secure_web_proxy();
+        network::enable_secure_web_proxy()
     } else {
-        network::disable_secure_web_proxy();
+        network::disable_secure_web_proxy()
     }
-    config::set_auto_setup_https(value)
 }
 
 pub fn check_port_available(port: u32) -> bool {
