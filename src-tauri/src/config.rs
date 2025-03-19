@@ -127,17 +127,13 @@ pub fn save_config_to_file(config: &Config, file_path: &str) -> Result<(), Box<d
     Ok(())
 }
 
-pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
-    save_config_to_file(config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
-}
-
 fn set_config<F>(updater: F) -> bool
 where
     F: FnOnce(&mut Config),
 {
     let mut config = get_config();
     updater(&mut config);
-    save_config(&config)
+    save_config_to_file(&config, CONFIG_PATH.lock().unwrap().to_str().unwrap())
         .map_err(|e| {
             error!("Failed to update config: {}", e);
             e
