@@ -60,19 +60,19 @@ pub fn force_kill() -> bool {
     let mut sys = sysinfo::System::new_all();
     sys.refresh_all();
 
-    let mut killed = true;
+    let mut success = true;
     for (pid, process) in sys.processes() {
         if process.name() == DRAY_XRAY {
             if process.kill() {
                 info!("Killed xray process with PID: {}", pid);
             } else {
                 error!("Failed to kill xray process with PID: {}", pid);
-                killed = false;
+                success = false;
             }
         }
     }
     *CHILD_PROCESS.lock().unwrap() = None;
-    killed
+    success
 }
 
 pub fn force_restart() -> bool {

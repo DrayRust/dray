@@ -47,27 +47,27 @@ pub fn set_ray_enable(value: bool) -> bool {
 }
 
 pub fn set_ray_log_level(value: String) -> bool {
-    config::set_ray_log_level(value)
+    config::set_ray_log_level(value) && ray::force_restart()
 }
 
 pub fn set_ray_host(value: String) -> bool {
-    config::set_ray_host(value)
+    config::set_ray_host(value) && ray::force_restart() && network::setup_proxies()
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
-    config::set_ray_socks_port(value)
+    config::set_ray_socks_port(value) && ray::force_restart() && network::setup_proxies()
 }
 
 pub fn set_ray_http_port(value: u32) -> bool {
-    config::set_ray_http_port(value)
+    config::set_ray_http_port(value) && ray::force_restart() && network::setup_proxies()
 }
 
 pub fn set_ray_start_socks(value: bool) -> bool {
-    config::set_ray_start_socks(value)
+    config::set_ray_start_socks(value) && ray::force_restart()
 }
 
 pub fn set_ray_start_http(value: bool) -> bool {
-    config::set_ray_start_http(value)
+    config::set_ray_start_http(value) && ray::force_restart()
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {

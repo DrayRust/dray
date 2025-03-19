@@ -58,18 +58,26 @@ pub fn execute_command(cmd: &str) -> bool {
     command_str.trim().lines().all(|cmd| execute_command(cmd))
 }*/
 
-pub fn setup_proxies() {
+pub fn setup_proxies() -> bool {
     let config = config::get_config();
+    let mut success = true;
+
     if config.auto_setup_pac && !enable_auto_proxy() {
         error!("Failed to enable auto proxy (PAC)");
+        success = false;
     }
     if config.auto_setup_socks && !enable_socks_proxy() {
         error!("Failed to enable SOCKS proxy");
+        success = false;
     }
     if config.auto_setup_http && !enable_web_proxy() {
         error!("Failed to enable HTTP proxy");
+        success = false;
     }
     if config.auto_setup_https && !enable_secure_web_proxy() {
         error!("Failed to enable HTTPS proxy");
+        success = false;
     }
+
+    success
 }
