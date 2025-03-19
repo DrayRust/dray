@@ -53,7 +53,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const validatePort = (value: number) => {
-        return value >= 0 && value <= 65535
+        return value > 0 && value <= 65535
     }
 
     const checkPortAvailable = async (port: number) => {
@@ -150,7 +150,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRaySocksPortErrorText('')
         const ok = validatePort(value)
         setRaySocksPortError(!ok)
-        !ok && setRaySocksPortErrorText('请输入有效的端口号 (0-65535)')
+        !ok && setRaySocksPortErrorText('请输入有效的端口号 (1-65535)')
         debouncedSetRaySocksPort(value)
     }
 
@@ -317,15 +317,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </Select>
                         </Stack>
                         <Divider/>
-                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2, pb: 1}}>
                             <TextField
                                 label="本机地址"
                                 value={config.ray_host}
                                 onChange={handleRayHost}
                                 error={rayIpError}
                                 helperText={rayIpError ? "请输入有效的IP地址" : ""}
-                                sx={{flex: 1}}
+                                sx={{flex: 'auto'}}
                             />
+                        </Stack>
+                        <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="SOCKS 端口"
                                 value={config.ray_socks_port}
