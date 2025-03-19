@@ -23,5 +23,44 @@ interface AppConfig {
 }
 
 interface NavProps {
-    setNavState?: any
+    setNavState?: any;
+}
+
+interface Tauri {
+    app: {
+        defaultWindowIcon(): Promise<Image | null>;
+        getName(): Promise<string>;
+        getVersion(): Promise<string>;
+        getTauriVersion(): Promise<string>;
+        hide(): Promise<void>;
+        show(): Promise<void>;
+        setTheme(theme?): Promise<void>;
+    };
+    core: {
+        invoke<T>(cmd, args, options?): Promise<T>;
+        isTauri(): boolean;
+    }
+    dpi: any;
+    event: {
+        emit(event, payload?): Promise<void>;
+        emitTo(target, event, payload?): Promise<void>;
+        listen<T>(event, handler, options?): Promise<UnlistenFn>;
+        once<T>(event, handler, options?): Promise<UnlistenFn>;
+    };
+    image: any;
+    menu: any;
+    mocks: any;
+    path: any;
+    tray: any;
+    webview: any;
+    webviewWindow: any;
+    window: {
+        cursorPosition(): Promise<PhysicalPosition>;
+        getAllWindows(): Promise<Window[]>;
+        getCurrentWindow(): Window;
+    };
+}
+
+interface Window {
+    __TAURI__: Tauri;
 }
