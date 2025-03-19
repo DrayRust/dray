@@ -60,7 +60,7 @@ pub fn force_restart_ray() -> bool {
     if CHILD_PROCESS.lock().unwrap().is_some() {
         *CHILD_PROCESS.lock().unwrap() = None;
     }
-    force_kill_ray();
+    force_kill();
     if !start() {
         error!("Failed to start Ray Server");
         return false;
@@ -69,7 +69,7 @@ pub fn force_restart_ray() -> bool {
     true
 }
 
-pub fn force_kill_ray() -> bool {
+pub fn force_kill() -> bool {
     let mut sys = sysinfo::System::new_all();
     sys.refresh_all();
 

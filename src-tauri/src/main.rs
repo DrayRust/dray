@@ -80,94 +80,22 @@ fn dray(name: &str) -> String {
 }
 
 #[tauri::command]
+fn quit() -> String {
+    cleanup::exit_cleanly();
+    info!("Dray quit");
+    std::process::exit(0);
+}
+
+#[tauri::command]
 fn get_paths_json() -> String {
     info!("get_paths_json triggered");
     dirs::get_paths_json()
 }
 
 #[tauri::command]
-fn sys_info_json() -> String {
-    info!("sys_info_json triggered");
-    sys_info::sys_info_json()
-}
-
-#[tauri::command]
-fn start_web() -> String {
-    info!("Request to start Web Server");
-    web::start();
-    "web_start send ok!".to_string()
-}
-
-#[tauri::command]
-fn stop_web() -> String {
-    info!("Request to stop Web Server");
-    web::stop();
-    "stop_web send ok!".to_string()
-}
-
-#[tauri::command]
-fn start_ray() -> String {
-    info!("start_ray triggered");
-    ray::start();
-    "start_ray send ok!".to_string()
-}
-
-#[tauri::command]
-fn stop_ray() -> String {
-    info!("stop_ray triggered");
-    ray::stop();
-    "stop_ray send ok!".to_string()
-}
-
-#[tauri::command]
-fn force_restart_ray() -> String {
-    info!("force_restart_ray triggered");
-    ray::force_restart_ray();
-    "force_restart_ray send ok!".to_string()
-}
-
-#[tauri::command]
-fn force_kill_ray() -> String {
-    info!("force_kill_ray triggered");
-    ray::force_kill_ray();
-    "force_kill_ray send ok!".to_string()
-}
-
-#[tauri::command]
-fn enable_auto_proxy() -> String {
-    network::enable_auto_proxy();
-    "enable_auto_proxy send ok!".to_string()
-}
-
-#[tauri::command]
-fn enable_socks_proxy() -> String {
-    network::enable_socks_proxy();
-    "enable_socks_proxy send ok!".to_string()
-}
-
-#[tauri::command]
-fn enable_web_proxy() -> String {
-    network::enable_web_proxy();
-    "enable_web_proxy send ok!".to_string()
-}
-
-#[tauri::command]
-fn enable_secure_web_proxy() -> String {
-    network::enable_secure_web_proxy();
-    "enable_secure_web_proxy send ok!".to_string()
-}
-
-#[tauri::command]
-fn disable_proxies() -> String {
-    network::disable_proxies();
-    "disable_proxies send ok!".to_string()
-}
-
-#[tauri::command]
-fn quit() -> String {
-    cleanup::exit_cleanly();
-    info!("Dray quit");
-    std::process::exit(0);
+fn get_sys_info_json() -> String {
+    info!("get_sys_info_json triggered");
+    sys_info::get_sys_info_json()
 }
 
 #[tauri::command]
@@ -282,18 +210,7 @@ pub fn main() {
         .invoke_handler(tauri::generate_handler![
             dray,
             get_paths_json,
-            sys_info_json,
-            start_web,
-            stop_web,
-            start_ray,
-            stop_ray,
-            force_restart_ray,
-            force_kill_ray,
-            enable_auto_proxy,
-            enable_socks_proxy,
-            enable_web_proxy,
-            enable_secure_web_proxy,
-            disable_proxies,
+            get_sys_info_json,
             get_config_json,
             set_app_log_level,
             set_web_server_enable,

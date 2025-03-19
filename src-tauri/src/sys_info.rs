@@ -29,7 +29,7 @@ struct ComponentInfo {
     temperature: String,
 }
 
-pub fn sys_info_json() -> String {
+pub fn get_sys_info_json() -> String {
     let mut sys = System::new_all();
     sys.refresh_all();
 

@@ -42,7 +42,7 @@ pub fn set_ray_enable(value: bool) -> bool {
             ray::start()
         } else {
             // ray::stop()
-            ray::force_kill_ray() && network::disable_proxies()
+            ray::force_kill() && network::disable_proxies()
         }
 }
 
