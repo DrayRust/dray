@@ -20,6 +20,25 @@ fn get_nmcli_connection_name() -> Option<String> {
     output.ok().and_then(|s| s.lines().next().map(|line| line.to_string()))
 }
 
+pub fn enable_auto_proxy() -> bool {
+    let config = config::get_config();
+    let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
+
+    if HAS_GSETTINGS {
+        execute_command(&format!("{} autoconfig-url '{}'", GSETTINGS_PROXY, url))
+            && execute_command(&format!("{} mode 'auto'", GSETTINGS_PROXY))
+    } else if HAS_NMCLI {
+        if let Some(conn_name) = get_nmcli_connection_name() {
+            execute_command(&format!("{} '{}' proxy.pac-url '{}'", NMCLI_CONNECTION, conn_name, url))
+                && execute_command(&format!("{} '{}' proxy.method auto", NMCLI_CONNECTION, conn_name))
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
 pub fn enable_socks_proxy() -> bool {
     let config = config::get_config();
 

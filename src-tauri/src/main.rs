@@ -267,7 +267,7 @@ pub fn main() {
 
             ray::start(); // Start ray server
             web::start(); // Start web server
-            network::enable_auto_proxy(); // Set proxy
+            network::setup_proxies();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
