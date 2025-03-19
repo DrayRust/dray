@@ -12,6 +12,30 @@ fn notify_proxy_change() -> bool {
     }
 }
 
+/*
+// 备选方案，使用 PowerShell 脚本通知代理设置更改
+fn notify_proxy_change() -> bool {
+    // 使用 PowerShell 脚本通知代理设置更改
+    let script = r#"
+        Add-Type -TypeDefinition @"
+        using System;
+        using System.Runtime.InteropServices;
+        public class WinInet {
+            [DllImport("wininet.dll", SetLastError = true)]
+            public static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
+            public const int INTERNET_OPTION_SETTINGS_CHANGED = 39;
+            public const int INTERNET_OPTION_REFRESH = 37;
+        }
+        "@
+        [WinInet]::InternetSetOption([IntPtr]::Zero, [WinInet]::INTERNET_OPTION_SETTINGS_CHANGED, [IntPtr]::Zero, 0)
+        [WinInet]::InternetSetOption([IntPtr]::Zero, [WinInet]::INTERNET_OPTION_REFRESH, [IntPtr]::Zero, 0)
+    "#;
+
+    // 执行 PowerShell 脚本
+    command("powershell", &["-Command", script]).is_ok()
+}
+*/
+
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
     let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
