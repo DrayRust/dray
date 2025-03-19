@@ -1,5 +1,30 @@
+use super::execute_command;
 use crate::config;
-use super::{execute_command};
+
+/*
+// 获取当前使用的网络接口名称
+use std::process::Command;
+fn get_active_network_interface() -> Option<String> {
+    let output = Command::new("networksetup")
+        .arg("-listallnetworkservices")
+        .output()
+        .ok()
+        .and_then(|output| {
+            if output.status.success() {
+                String::from_utf8(output.stdout).ok()
+            } else {
+                None
+            }
+        });
+
+    output.and_then(|s| {
+        s.lines()
+            .skip(1) // 跳过第一行提示信息
+            .find(|line| !line.starts_with('*')) // 找到第一个未标记为禁用的接口
+            .map(|line| line.trim().to_string())
+    })
+}
+*/
 
 pub fn enable_auto_proxy() -> bool {
     let config = config::get_config();
