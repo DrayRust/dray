@@ -40,9 +40,8 @@ pub fn set_ray_enable(value: bool) -> bool {
     info!("set_ray_enable: {}", value);
     config::set_ray_enable(value)
         && if value {
-            ray::start()
+            ray::start() && network::setup_proxies()
         } else {
-            // ray::stop()
             ray::force_kill() && network::disable_proxies()
         }
 }
