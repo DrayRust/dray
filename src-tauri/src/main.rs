@@ -63,6 +63,16 @@ fn setup_menu<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
     Ok(())
 }
 
+fn setup_services() {
+    let config = config::get_config();
+    if config.ray_enable {
+        ray::start();
+    }
+    if config.web_server_enable {
+        web::start();
+    }
+}
+
 #[tauri::command]
 fn dray(name: &str) -> String {
     info!("dray triggered");
@@ -265,8 +275,7 @@ pub fn main() {
             setup_menu(app)?;
             setup_tray(app)?;
 
-            ray::start(); // Start ray server
-            web::start(); // Start web server
+            setup_services();
             network::setup_proxies();
             Ok(())
         })
