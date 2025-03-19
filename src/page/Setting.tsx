@@ -100,8 +100,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         (async () => {
             try {
-                const data = await invoke('get_config_json')
-                const config = typeof data === 'string' ? JSON.parse(data) : data
+                const data = await invoke('get_config_json') as string
+                const config = JSON.parse(data)
                 setConfig(config as AppConfig)
             } catch (err) {
                 console.log('Failed to get_config_json:', err)
@@ -121,8 +121,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
         try {
             // 读取 Ray 的配置信息，保证时效性
-            const data = await invoke('read_ray_config')
-            const json = typeof data === 'string' ? JSON.parse(data) : data
+            const data = await invoke('read_ray_config') as string
+            const json = JSON.parse(data)
             json.log.loglevel = value
             await invoke('save_ray_config', {text: JSON.stringify(json, null, 2)}) // 保存
         } catch (err) {
@@ -267,6 +267,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 <Tabs value={activeTab} onChange={handleTab} aria-label="设置导航">
                     <Tab label="基本设置"/>
                     <Tab label="代理设置"/>
+                    <Tab label="Ray 设置"/>
                     <Tab label="Web 设置"/>
                 </Tabs>
             </Paper>
@@ -302,7 +303,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 </Box>
             ) : activeTab === 1 ? (
                 <Box sx={{p: 2}}>
-                    <Card sx={{mb: 2}}>
+                    <Card>
                         <Typography variant="h6" sx={{p: 2, pt: 1.1, pb: 0.9}}>自动设置</Typography>
                         <Divider/>
                         <ListItem disablePadding>
@@ -338,6 +339,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </ListItemButton>
                         </ListItem>
                     </Card>
+                </Box>
+            ) : activeTab === 2 ? (
+                <Box sx={{p: 2}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
@@ -390,7 +394,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </Stack>
                     </Card>
                 </Box>
-            ) : activeTab === 2 && (
+            ) : activeTab === 3 && (
                 <Box sx={{p: 2}}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
