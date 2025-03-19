@@ -45,10 +45,7 @@ pub fn enable_socks_proxy() -> bool {
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("nmcli connection modify '{}' proxy.socks-host '{}'", conn_name, config.ray_host))
-                && execute_command(&format!(
-                    "nmcli connection modify '{}' proxy.socks-port {}",
-                    conn_name, config.ray_socks_port
-                ))
+                && execute_command(&format!("nmcli connection modify '{}' proxy.socks-port {}", conn_name, config.ray_socks_port))
                 && execute_command(&format!("nmcli connection modify '{}' proxy.method manual", conn_name))
         } else {
             false
@@ -68,10 +65,7 @@ pub fn enable_web_proxy() -> bool {
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("nmcli connection modify '{}' proxy.http-host '{}'", conn_name, config.ray_host))
-                && execute_command(&format!(
-                    "nmcli connection modify '{}' proxy.http-port {}",
-                    conn_name, config.ray_http_port
-                ))
+                && execute_command(&format!("nmcli connection modify '{}' proxy.http-port {}", conn_name, config.ray_http_port))
                 && execute_command(&format!("nmcli connection modify '{}' proxy.method manual", conn_name))
         } else {
             false
@@ -91,10 +85,7 @@ pub fn enable_secure_web_proxy() -> bool {
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("nmcli connection modify '{}' proxy.https-host '{}'", conn_name, config.ray_host))
-                && execute_command(&format!(
-                    "nmcli connection modify '{}' proxy.https-port {}",
-                    conn_name, config.ray_http_port
-                ))
+                && execute_command(&format!("nmcli connection modify '{}' proxy.https-port {}", conn_name, config.ray_http_port))
                 && execute_command(&format!("nmcli connection modify '{}' proxy.method manual", conn_name))
         } else {
             false
@@ -120,8 +111,7 @@ pub fn disable_auto_proxy() -> bool {
 
 pub fn disable_socks_proxy() -> bool {
     if HAS_GSETTINGS {
-        execute_command("gsettings set org.gnome.system.proxy.socks host ''")
-            && execute_command("gsettings set org.gnome.system.proxy.socks port 0")
+        execute_command("gsettings set org.gnome.system.proxy.socks host ''") && execute_command("gsettings set org.gnome.system.proxy.socks port 0")
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("nmcli connection modify '{}' proxy.socks-host ''", conn_name))
@@ -136,8 +126,7 @@ pub fn disable_socks_proxy() -> bool {
 
 pub fn disable_web_proxy() -> bool {
     if HAS_GSETTINGS {
-        execute_command("gsettings set org.gnome.system.proxy.http host ''")
-            && execute_command("gsettings set org.gnome.system.proxy.http port 0")
+        execute_command("gsettings set org.gnome.system.proxy.http host ''") && execute_command("gsettings set org.gnome.system.proxy.http port 0")
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("nmcli connection modify '{}' proxy.http-host ''", conn_name))
