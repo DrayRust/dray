@@ -108,6 +108,7 @@ pub fn save_ray_config(text: &str) -> bool {
                 error!("Failed to write config file: {}", e);
                 return false;
             }
+            info!("Ray config saved successfully");
             true
         }
         Err(e) => {
