@@ -23,7 +23,10 @@ import {
 } from '@tauri-apps/plugin-autostart'
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
-    setNavState(5)
+    useEffect(() => {
+        setNavState(5)
+    }, [setNavState])
+
     // 从上下文中获取当前主题模式和切换模式的函数
     const {mode, toggleMode} = useTheme()
     const handleTheme = (newMode: string) => {
@@ -112,9 +115,20 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         invokeSend('set_app_log_level', value)
     }
 
-    const handleRayLogLevel = (event: SelectChangeEvent) => {
+    const handleRayLogLevel = async (event: SelectChangeEvent) => {
         const value = event.target.value as AppConfig['ray_log_level']
         setConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
+
+        try {
+            // 读取 Ray 的配置信息，保证时效性
+            const data = await invoke('read_ray_config')
+            const json = typeof data === 'string' ? JSON.parse(data) : data
+            json.log.loglevel = value
+            await invoke('save_ray_config', {text: JSON.stringify(json, null, 2)}) // 保存
+        } catch (err) {
+            console.log('Failed to change RayLogLevel:', err)
+        }
+
         invokeSend('set_ray_log_level', value)
     }
 

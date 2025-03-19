@@ -15,8 +15,8 @@
         "title": "Dray",
         "fullscreen": false,
         "resizable": false,
-        "width": 800,
-        "height": 600
+        "width": 1400,
+        "height": 1000
       }
     ],
     "security": {
