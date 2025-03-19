@@ -8,7 +8,7 @@ export function debounce(func: Function, wait: number) {
 
 function sendLog(msg: string) {
     try {
-        window?.__TAURI__.core.invoke('send_log', {msg}).catch((e) => {
+        window?.__TAURI__?.core.invoke('send_log', {msg}).catch((e) => {
             console.error('Failed to send log:', e)
         })
     } catch (e) {
@@ -18,18 +18,15 @@ function sendLog(msg: string) {
 
 export const log = {
     error: (message: string, ...args: any[]) => {
-        const logMessage = `[ERROR] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
-        console.log(logMessage)
-        sendLog(logMessage)
+        console.log(`[ERROR] ${message}`, ...args)
+        sendLog(`[ERROR] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`)
     },
     warn: (message: string, ...args: any[]) => {
-        const logMessage = `[WARN] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
-        console.log(logMessage)
-        sendLog(logMessage)
+        console.log(`[WARN] ${message}`, ...args)
+        sendLog(`[WARN] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`)
     },
     info: (message: string, ...args: any[]) => {
-        const logMessage = `[INFO] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`
-        console.log(logMessage)
-        sendLog(logMessage)
+        console.log(`[INFO] ${message}`, ...args)
+        sendLog(`[INFO] ${message} ${args.map(arg => JSON.stringify(arg)).join(' ')}`)
     },
 }
