@@ -88,14 +88,14 @@ async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn stop() {
-    tauri::async_runtime::spawn(async {
-        let handle = SERVER_HANDLE.lock().unwrap().take();
-        if let Some(handle) = handle {
+    let server_handle = SERVER_HANDLE.lock().unwrap().take();
+    if let Some(handle) = server_handle {
+        tauri::async_runtime::block_on(async {
             handle.stop(false).await;
             info!("Web server stopped");
-        }
-        *SERVER_HANDLE.lock().unwrap() = None;
-    });
+        });
+    }
+    *SERVER_HANDLE.lock().unwrap() = None;
 }
 
 pub fn restart() {
