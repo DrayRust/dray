@@ -269,7 +269,7 @@ pub fn main() {
             Option::Some(vec!["-s", "quiet"]),
         ))
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_fs::init())
+        // .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             setup_main_window(&app.handle())?;
             setup_menu(app)?;
