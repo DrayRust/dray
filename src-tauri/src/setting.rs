@@ -37,6 +37,7 @@ pub fn set_web_server_port(value: u32) -> bool {
 }
 
 pub fn set_ray_enable(value: bool) -> bool {
+    info!("set_ray_enable: {}", value);
     config::set_ray_enable(value)
         && if value {
             ray::start()

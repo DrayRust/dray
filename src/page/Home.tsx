@@ -33,7 +33,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setRayEnable(value)
-        invokeSend('ray_enable', value)
+        invokeSend('set_ray_enable', value)
     }
 
     return (
