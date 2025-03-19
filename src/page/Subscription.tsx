@@ -1,5 +1,9 @@
+import { useEffect } from 'react'
+
 const Subscription: React.FC<NavProps> = ({setNavState}) => {
-    setNavState(2)
+    useEffect(() => {
+        setNavState(2)
+    }, [setNavState])
     return <div>Subscription Page</div>
 }
 

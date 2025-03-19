@@ -3,7 +3,9 @@ import { invoke } from "@tauri-apps/api/core"
 import { Paper, Stack, Typography, Switch } from '@mui/material'
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
-    setNavState(0)
+    useEffect(() => {
+        setNavState(0)
+    }, [setNavState])
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
