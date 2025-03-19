@@ -6,11 +6,13 @@ export function debounce(func: Function, wait: number) {
     }
 }
 
-function sendLog(value: string) {
+function sendLog(msg: string) {
     try {
-        window?.__TAURI__.core.invoke('send_log', {msg: value}).catch()
+        window?.__TAURI__.core.invoke('send_log', {msg}).catch((e) => {
+            console.error('Failed to send log:', e)
+        })
     } catch (e) {
-        console.log(e)
+        console.log('[Failed to sendLog]', e)
     }
 }
 
