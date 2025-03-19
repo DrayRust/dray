@@ -55,11 +55,11 @@ pub fn set_ray_host(value: String) -> bool {
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
-    config::set_ray_socks_port(value) && ray::force_restart() && network::setup_proxies()
+    config::set_ray_socks_port(value) && ray::force_restart() && network::enable_socks_proxy()
 }
 
 pub fn set_ray_http_port(value: u32) -> bool {
-    config::set_ray_http_port(value) && ray::force_restart() && network::setup_proxies()
+    config::set_ray_http_port(value) && ray::force_restart() && network::enable_web_proxy()
 }
 
 pub fn set_ray_start_socks(value: bool) -> bool {
