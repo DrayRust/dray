@@ -200,6 +200,36 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
+    const handleRayStartSocks = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, ray_start_socks: value}))
+
+        try {
+            const data = await invoke('read_ray_config') as string
+            const c = JSON.parse(data)
+            if (c.inbounds && Array.isArray(c.inbounds)) {
+                if (value) {
+                    c.inbounds.push({
+                        "tag": "socks-in",
+                        "protocol": "socks",
+                        "listen": config.ray_host,
+                        "port": config.ray_socks_port,
+                        "settings": {
+                            "udp": false
+                        }
+                    })
+                } else {
+                    c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
+                }
+            }
+            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
+        } catch (err) {
+            log.error('Failed to change RayStartSocks:', err)
+        }
+
+        invokeSend('set_ray_start_socks', value)
+    }
+
     const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
@@ -417,7 +447,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
-                            <Switch checked={config.ray_start_socks} disabled/>
+                            <Switch checked={config.ray_start_socks} onChange={handleRayStartSocks}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
