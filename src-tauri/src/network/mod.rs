@@ -1,6 +1,9 @@
 use logger::{error, info};
 use std::process::Command;
 
+#[cfg(target_os = "linux")]
+pub mod linux;
+
 #[cfg(target_os = "macos")]
 pub mod macos;
 
@@ -8,16 +11,13 @@ pub mod macos;
 pub mod windows;
 
 #[cfg(target_os = "linux")]
-pub mod linux;
+pub use linux::*;
 
 #[cfg(target_os = "macos")]
 pub use macos::*;
 
 #[cfg(target_os = "windows")]
 pub use windows::*;
-
-#[cfg(target_os = "linux")]
-pub use linux::*;
 
 pub fn command(command: &str, args: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
     let status = Command::new(command).args(args).status()?;
