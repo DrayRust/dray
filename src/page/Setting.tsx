@@ -132,11 +132,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
 
         try {
-            // 读取 Ray 的配置信息，保证时效性
             const data = await invoke('read_ray_config') as string
-            const json = JSON.parse(data)
-            json.log.loglevel = value
-            await invoke('save_ray_config', {text: JSON.stringify(json, null, 2)}) // 保存
+            const c = JSON.parse(data)
+            c.log.loglevel = value
+            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
         } catch (err) {
             log.error('Failed to change RayLogLevel:', err)
         }
