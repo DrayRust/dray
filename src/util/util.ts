@@ -1,3 +1,5 @@
+import { invoke, isTauri } from '@tauri-apps/api/core'
+
 export function debounce(func: Function, wait: number) {
     let timeout: ReturnType<typeof setTimeout> | null = null
     return function (this: any, ...args: any[]) {
@@ -8,7 +10,8 @@ export function debounce(func: Function, wait: number) {
 
 function sendLog(msg: string) {
     try {
-        window?.__TAURI__?.core.invoke('send_log', {msg}).catch((e) => {
+        // window?.__TAURI__?.core // 全局变量，增加了安全性风险，性能影响，页面加载变慢
+        isTauri() && invoke('send_log', {msg}).catch((e) => {
             console.error('Failed to send log:', e)
         })
     } catch (e) {
