@@ -201,9 +201,30 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
-    const handleRayStartHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
+
+        try {
+            const data = await invoke('read_ray_config') as string
+            const c = JSON.parse(data)
+            if (c.inbounds && Array.isArray(c.inbounds)) {
+                if (value) {
+                    c.inbounds.push({
+                        "tag": "http-in",
+                        "protocol": "http",
+                        "listen": config.ray_host,
+                        "port": config.ray_http_port
+                    })
+                } else {
+                    c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
+                }
+            }
+            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
+        } catch (err) {
+            log.error('Failed to change RayStartHttp:', err)
+        }
+
         invokeSend('set_ray_start_http', value)
     }
 
