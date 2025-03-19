@@ -87,6 +87,21 @@ fn quit() -> String {
 }
 
 #[tauri::command]
+fn force_ray_restart() -> bool {
+    ray::force_restart()
+}
+
+#[tauri::command]
+fn read_ray_config() -> String {
+    ray::read_ray_config()
+}
+
+#[tauri::command]
+fn save_ray_config(text: String) -> bool {
+    ray::save_ray_config(&text)
+}
+
+#[tauri::command]
 fn get_paths_json() -> String {
     info!("get_paths_json triggered");
     dirs::get_paths_json()
@@ -209,6 +224,9 @@ pub fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             dray,
+            force_ray_restart,
+            read_ray_config,
+            save_ray_config,
             get_paths_json,
             get_sys_info_json,
             get_config_json,

@@ -1,5 +1,7 @@
 use crate::dirs;
 use logger::{debug, error, info};
+use std::fs;
+use std::io::Write;
 use std::process::{Child, Command};
 use std::sync::Mutex;
 
@@ -83,4 +85,34 @@ pub fn force_restart() -> bool {
         error!("Ray Server force restart failed");
     }
     success
+}
+
+fn get_ray_config_path() -> String {
+    dirs::get_dray_ray_dir().unwrap().join("config.json").to_str().unwrap().to_string()
+}
+
+pub fn read_ray_config() -> String {
+    info!("read_ray_config triggered");
+    let config_path = get_ray_config_path();
+    fs::read_to_string(config_path).unwrap_or_else(|e| {
+        error!("Failed to read config file: {}", e);
+        "{}".to_string()
+    })
+}
+
+pub fn save_ray_config(text: &str) -> bool {
+    let config_path = get_ray_config_path();
+    match fs::File::create(config_path) {
+        Ok(mut file) => {
+            if let Err(e) = file.write_all(text.as_bytes()) {
+                error!("Failed to write config file: {}", e);
+                return false;
+            }
+            true
+        }
+        Err(e) => {
+            error!("Failed to create config file: {}", e);
+            false
+        }
+    }
 }
