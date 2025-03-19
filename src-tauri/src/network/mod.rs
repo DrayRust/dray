@@ -1,3 +1,4 @@
+use crate::config;
 use logger::{error, info};
 use std::process::Command;
 
@@ -56,3 +57,19 @@ pub fn execute_command(cmd: &str) -> bool {
 /*pub fn execute_commands(command_str: &str) -> bool {
     command_str.trim().lines().all(|cmd| execute_command(cmd))
 }*/
+
+pub fn setup_proxies() {
+    let config = config::get_config();
+    if config.auto_setup_pac && !enable_auto_proxy() {
+        error!("Failed to enable auto proxy (PAC)");
+    }
+    if config.auto_setup_socks && !enable_socks_proxy() {
+        error!("Failed to enable SOCKS proxy");
+    }
+    if config.auto_setup_http && !enable_web_proxy() {
+        error!("Failed to enable HTTP proxy");
+    }
+    if config.auto_setup_https && !enable_secure_web_proxy() {
+        error!("Failed to enable HTTPS proxy");
+    }
+}
