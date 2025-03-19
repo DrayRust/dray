@@ -122,6 +122,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [raySocksPortError, setRaySocksPortError] = useState(false)
     const [raySocksPortErrorText, setRaySocksPortErrorText] = useState('')
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
+    const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
     const debouncedSetRayHost = debounce((value: string) => invokeSend('set_ray_host', value), 500)
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,15 +155,24 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRaySocksPort(value)
     }
 
-    const debouncedSetRayHttpPort = debounce((value: number) => invokeSend('set_ray_http_port', value), 500)
+    const debouncedSetRayHttpPort = debounce(async (value: number) => {
+        if (!value || !validatePort(value)) return
+        const ok = await checkPortAvailable(value)
+        if (!ok) {
+            setRayHttpPortError(true)
+            setRayHttpPortErrorText('本机端口不可用')
+        } else if (config.ray_http_port !== value) {
+            invokeSend('set_ray_http_port', value)
+        }
+    }, 500)
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
+        setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
+        setRayHttpPortErrorText('')
         const ok = validatePort(value)
         setRayHttpPortError(!ok)
-        setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
-        if (ok && value && config.ray_http_port !== value) {
-            debouncedSetRayHttpPort(value)
-        }
+        !ok && setRayHttpPortErrorText('请输入有效的端口号 (1-65535)')
+        debouncedSetRayHttpPort(value)
     }
 
     const handleRayStartHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,13 +208,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
+    const [webPortErrorText, setWebPortErrorText] = useState('')
 
     const handleWebServerEnable = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
         invokeSend('set_web_server_enable', value)
     }
-
 
     const debouncedSetWebServerHost = debounce((value: string) => invokeSend('set_web_server_host', value), 500)
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,15 +227,24 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const debouncedSetWebServerPort = debounce((value: number) => invokeSend('set_web_server_port', value), 500)
+    const debouncedSetWebServerPort = debounce(async (value: number) => {
+        if (!value || !validatePort(value)) return
+        const ok = await checkPortAvailable(value)
+        if (!ok) {
+            setWebPortError(true)
+            setWebPortErrorText('本机端口不可用')
+        } else if (config.web_server_port !== value) {
+            invokeSend('set_web_server_port', value)
+        }
+    }, 500)
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
+        setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
+        setWebPortErrorText('')
         const ok = validatePort(value)
         setWebPortError(!ok)
-        setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
-        if (ok && value && config.web_server_port !== value) {
-            debouncedSetWebServerPort(value)
-        }
+        !ok && setWebPortErrorText('请输入有效的端口号 (1-65535)')
+        debouncedSetWebServerPort(value)
     }
 
     return (
@@ -341,7 +360,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 value={config.ray_http_port}
                                 onChange={handleRayHttpPort}
                                 error={rayHttpPortError}
-                                helperText={rayHttpPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                helperText={rayHttpPortErrorText}
                                 sx={{flex: 1}}
                             />
                         </Stack>
@@ -383,7 +402,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 value={config.web_server_port}
                                 onChange={handleWebPort}
                                 error={webPortError}
-                                helperText={webPortError ? "请输入有效的端口号 (0-65535)" : ""}
+                                helperText={webPortErrorText}
                                 sx={{width: '210px'}}
                             />
                         </Stack>
