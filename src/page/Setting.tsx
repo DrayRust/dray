@@ -40,14 +40,24 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // 用于记录当前开机自动启动的设置，初始值为false（即未设置自动启动）
-    const [autoStart, setAutoStart] = useState(false);
-    (async () => {
-        setAutoStart(await autoStartIsEnabled())
-    })()
+    const [autoStart, setAutoStart] = useState(false)
+    useEffect(() => {
+        (async () => {
+            try {
+                setAutoStart(await autoStartIsEnabled())
+            } catch (err) {
+                console.log('Failed to autoStartIsEnabled:', err)
+            }
+        })()
+    }, [])
     const handleAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        let checked = event.target.checked
-        setAutoStart(checked)
-        checked ? await autoStartEnable() : await autoStartDisable()
+        try {
+            let checked = event.target.checked
+            setAutoStart(checked)
+            checked ? await autoStartEnable() : await autoStartDisable()
+        } catch (err) {
+            console.log('Failed to handleAutoStart:', err)
+        }
     }
 
     const validateIp = (value: string) => {
@@ -63,7 +73,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         try {
             return await invoke<boolean>('check_port_available', {port})
         } catch (err) {
-            console.error('Failed to check port availability:', err)
+            console.log('Failed to check port availability:', err)
             return false
         }
     }
