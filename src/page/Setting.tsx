@@ -471,42 +471,45 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Typography variant="body1" sx={{pl: 1}}>Sniffing 流量探测</Typography>
                             <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
                         </Stack>
-                        <Divider/>
-                        <Stack spacing={2} sx={{p: 2}}>
-                            <Typography variant="body1">探测类型</Typography>
-                            <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
-                                        onChange={() => handleDestOverride("http")}/>}
-                                    label="HTTP"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
-                                        onChange={() => handleDestOverride("tls")}/>}
-                                    label="TLS"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
-                                        onChange={() => handleDestOverride("quic")}/>}
-                                    label="QUIC"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
-                                        onChange={() => handleDestOverride("fakedns")}/>}
-                                    label="FakeDNS"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
-                                        onChange={() => handleDestOverride("fakedns+others")}/>}
-                                    label="FakeDNS+Others"
-                                />
+                        {rayCommonConfig.socks_sniffing && (<>
+                            <Divider/>
+                            <Stack spacing={2} sx={{p: 2}}>
+                                <Typography variant="body1">探测类型</Typography>
+                                <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
+                                            onChange={() => handleDestOverride("http")}/>}
+                                        label="HTTP"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
+                                            onChange={() => handleDestOverride("tls")}/>}
+                                        label="TLS"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
+                                            onChange={() => handleDestOverride("quic")}/>}
+                                        label="QUIC"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
+                                            onChange={() => handleDestOverride("fakedns")}/>}
+                                        label="FakeDNS"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
+                                            onChange={() => handleDestOverride("fakedns+others")}/>}
+                                        label="FakeDNS+Others"
+                                    />
+                                </Stack>
                             </Stack>
-                        </Stack>
+                        </>)}
+
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢。" placement="right">
@@ -514,15 +517,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </Tooltip>
                             <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayOutboundsMux}/>
                         </Stack>
-                        <Divider/>
-                        <Stack sx={{p: 2}}>
-                            <Typography variant="body2">并发数</Typography>
-                            <Box sx={{p: '15px 10px 0'}}>
-                                <Slider defaultValue={rayCommonConfig.outbounds_concurrency}
-                                        onChange={(_, value) => handleRayOutboundsConcurrency(value as number)}
-                                        min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
-                            </Box>
-                        </Stack>
+                        {rayCommonConfig.outbounds_mux && (<>
+                            <Divider/>
+                            <Stack sx={{p: 2}}>
+                                <Typography variant="body2">并发数</Typography>
+                                <Box sx={{p: '15px 10px 0'}}>
+                                    <Slider defaultValue={rayCommonConfig.outbounds_concurrency}
+                                            onChange={(_, value) => handleRayOutboundsConcurrency(value as number)}
+                                            min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
+                                </Box>
+                            </Stack>
+                        </>)}
                     </Card>
                 </Box>
             ) : activeTab === 3 && (
