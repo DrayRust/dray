@@ -223,13 +223,12 @@ fn log_startup_info() {
     // rustc -Vv
     // rustc_version::version_meta().unwrap().short_version_string
     // export RUSTC_VERSION=$(rustc -V)
+    // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.profile OR
+    // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.zshrc
+    // source ~/.zshrc
     // echo $RUSTC_VERSION
-    info!(
-        "Dray started v{}, tauri {}, {}",
-        env!("CARGO_PKG_VERSION").to_string(),
-        tauri::VERSION.to_string(),
-        option_env!("RUSTC_VERSION").unwrap_or("rustc 1.84.0 (9fc6b4312 2025-01-07)")
-    );
+    let rust_version = option_env!("RUSTC_VERSION").unwrap_or("rustc 1.84.0 (9fc6b4312 2025-01-07)");
+    info!("Dray started v{}, tauri {}, {}", env!("CARGO_PKG_VERSION"), tauri::VERSION, rust_version);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
