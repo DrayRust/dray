@@ -87,6 +87,11 @@ fn quit() -> String {
 }
 
 #[tauri::command]
+fn get_dray_logs_dir() -> String {
+    dirs::get_dray_logs_dir_str()
+}
+
+#[tauri::command]
 fn ensure_log_dir() -> bool {
     log::ensure_log_dir()
 }
@@ -239,6 +244,7 @@ pub fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             dray,
+            get_dray_logs_dir,
             ensure_log_dir,
             send_log,
             restart_ray,

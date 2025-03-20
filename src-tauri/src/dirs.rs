@@ -74,6 +74,10 @@ pub fn get_dray_ray_dir() -> Option<std::path::PathBuf> {
     Some(home_dir.join("dray").join("ray-core"))
 }
 
+pub fn get_dray_logs_dir_str() -> String {
+    get_dray_logs_dir().and_then(|p| p.to_str().map(str::to_string)).unwrap_or_default()
+}
+
 pub fn get_paths_json() -> String {
     let dirs = Paths {
         audio_dir: dirs::audio_dir(),
