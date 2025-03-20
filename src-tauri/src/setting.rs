@@ -26,14 +26,14 @@ pub fn set_web_server_enable(value: bool) -> bool {
 pub fn set_web_server_host(value: String) -> bool {
     config::set_web_server_host(value) && {
         web::restart();
-        network::enable_auto_proxy()
+        true
     }
 }
 
 pub fn set_web_server_port(value: u32) -> bool {
     config::set_web_server_port(value) && {
         web::restart();
-        network::enable_auto_proxy()
+        true
     }
 }
 
