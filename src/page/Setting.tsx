@@ -10,18 +10,22 @@ import {
     FormControlLabel, Checkbox,
     Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
-
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-
-import { invoke, isTauri } from '@tauri-apps/api/core'
-import { useTheme } from '../context/ThemeProvider'
-import { debounce, log } from '../util/util.ts'
 
 import {
     enable as autoStartEnable,
     isEnabled as autoStartIsEnabled,
     disable as autoStartDisable,
 } from '@tauri-apps/plugin-autostart'
+
+import { useTheme } from '../context/ThemeProvider'
+import { debounce, validateIp, validatePort } from '../util/util.ts'
+import {
+    log, isTauri, checkPortAvailable,
+    readAppConfig, setAppConfig,
+    readRayCommonConfig, saveRayCommonConfig,
+    readRayConfig, saveRayConfig
+} from '../util/invoke.ts'
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -43,7 +47,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     // 用于记录当前开机自动启动的设置，初始值为false（即未设置自动启动）
     const [autoStart, setAutoStart] = useState(false)
     useEffect(() => {
-        if (!isTauri()) return
+        if (!isTauri) return
         (async () => {
             try {
                 setAutoStart(await autoStartIsEnabled())
@@ -53,6 +57,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })()
     }, [])
     const handleAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!isTauri) return
         try {
             let checked = event.target.checked
             setAutoStart(checked)
@@ -62,86 +67,60 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const validateIp = (value: string) => {
-        const ipPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
-        return ipPattern.test(value)
-    }
-
-    const validatePort = (value: number) => {
-        return value > 0 && value <= 65535
-    }
-
-    const checkPortAvailable = async (port: number) => {
-        try {
-            return await invoke<boolean>('check_port_available', {port})
-        } catch (err) {
-            log.error('Failed to check port availability:', err)
-            return false
-        }
-    }
-
-    const invokeSend = (fn: string, value: string | number | boolean) => {
-        (async () => {
-            try {
-                await invoke(fn, {value})
-            } catch (err) {
-                log.error('Failed to invokeSend:', err)
-            }
-        })()
-    }
-
     // 从配置文件中读取配置信息
     const [config, setConfig] = useState<AppConfig>({
         "app_log_level": "info",
+
         "web_server_enable": true,
         "web_server_host": "127.0.0.1",
         "web_server_port": 18687,
+
         "ray_enable": true,
-        "ray_log_level": "warning",
+        "ray_force_restart": true,
         "ray_host": "127.0.0.1",
         "ray_socks_port": 1086,
-        "ray_http_port": 1089,
-        "ray_start_socks": true,
-        "ray_start_http": true,
+        "ray_http_port": 1087,
+
         "auto_setup_pac": false,
         "auto_setup_socks": true,
         "auto_setup_http": false,
         "auto_setup_https": false
     })
 
+    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>({
+        "log_level": "warning",
+
+        "socks_enabled": true,
+        "http_enabled": true,
+
+        "socks_udp": false,
+        "socks_sniffing": false,
+        "socks_sniffing_dest_override": ["http", "tls"],
+
+        "outbounds_mux": false,
+        "outbounds_concurrency": 8,
+    })
+
     useEffect(() => {
-        if (!isTauri()) return
-        (async () => {
-            try {
-                const data = await invoke('get_config_json') as string
-                const config = JSON.parse(data)
-                setConfig(config as AppConfig)
-            } catch (err) {
-                log.error('Failed to get_config_json:', err)
-            }
-        })()
+        readAppConfig().then(c => setConfig(c))
+        readRayCommonConfig().then(c => setRayCommonConfig(c))
     }, [])
 
     const handleAppLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as AppConfig['app_log_level']
         setConfig(prevConfig => ({...prevConfig, app_log_level: value}))
-        invokeSend('set_app_log_level', value)
+        setAppConfig('set_app_log_level', value)
     }
 
     const handleRayLogLevel = async (event: SelectChangeEvent) => {
-        const value = event.target.value as AppConfig['ray_log_level']
-        setConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
+        const value = event.target.value as RayCommonConfig['log_level']
+        setRayCommonConfig(prevConfig => ({...prevConfig, log_level: value}))
 
-        try {
-            const data = await invoke('read_ray_config') as string
-            const c = JSON.parse(data)
+        await readRayConfig().then(c => {
             c.log.loglevel = value
-            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
-        } catch (err) {
-            log.error('Failed to change RayLogLevel:', err)
-        }
-
-        invokeSend('set_ray_log_level', value)
+            saveRayConfig(c) // 保存 Ray 配置
+        })
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
     }
 
     const [rayIpError, setRayIpError] = useState(false)
@@ -150,7 +129,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
     const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
-    const debouncedSetRayHost = debounce((value: string) => invokeSend('set_ray_host', value), 500)
+    const debouncedSetRayHost = debounce((value: string) => setAppConfig('set_ray_host', value), 500)
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
@@ -168,7 +147,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setRaySocksPortError(true)
             setRaySocksPortErrorText('本机端口不可用')
         } else if (config.ray_socks_port !== value) {
-            invokeSend('set_ray_socks_port', value)
+            setAppConfig('set_ray_socks_port', value)
         }
     }, 500)
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,7 +174,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setRayHttpPortError(true)
             setRayHttpPortErrorText('本机端口不可用')
         } else if (config.ray_http_port !== value) {
-            invokeSend('set_ray_http_port', value)
+            setAppConfig('set_ray_http_port', value)
         }
     }, 500)
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,85 +187,73 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
-    const handleRayStartSocks = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRaySocksEnabled = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_start_socks: value}))
 
-        try {
-            const data = await invoke('read_ray_config') as string
-            const c = JSON.parse(data)
-            if (c.inbounds && Array.isArray(c.inbounds)) {
-                if (value) {
-                    c.inbounds.push({
-                        "tag": "socks-in",
-                        "protocol": "socks",
-                        "listen": config.ray_host,
-                        "port": config.ray_socks_port,
-                        "settings": {
-                            "udp": false
-                        }
-                    })
-                } else {
-                    c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
-                }
+        await readRayConfig().then(c => {
+            if (!c.inbounds || Array.isArray(c.inbounds)) return
+            if (value) {
+                c.inbounds.push({
+                    "tag": "socks-in",
+                    "protocol": "socks",
+                    "listen": config.ray_host,
+                    "port": config.ray_socks_port,
+                    "settings": {
+                        "udp": false
+                    }
+                })
+            } else {
+                c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
             }
-            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
-        } catch (err) {
-            log.error('Failed to change RayStartSocks:', err)
-        }
-
-        invokeSend('set_ray_start_socks', value)
+            saveRayConfig(c) // 保存 Ray 配置
+        })
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
     }
 
-    const handleRayStartHttp = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRayHttpEnabled = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
 
-        try {
-            const data = await invoke('read_ray_config') as string
-            const c = JSON.parse(data)
-            if (c.inbounds && Array.isArray(c.inbounds)) {
-                if (value) {
-                    c.inbounds.push({
-                        "tag": "http-in",
-                        "protocol": "http",
-                        "listen": config.ray_host,
-                        "port": config.ray_http_port
-                    })
-                } else {
-                    c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
-                }
+        await readRayConfig().then(c => {
+            if (!c.inbounds || Array.isArray(c.inbounds)) return
+            if (value) {
+                c.inbounds.push({
+                    "tag": "http-in",
+                    "protocol": "http",
+                    "listen": config.ray_host,
+                    "port": config.ray_http_port
+                })
+            } else {
+                c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
             }
-            await invoke('save_ray_config', {text: JSON.stringify(c, null, 2)})
-        } catch (err) {
-            log.error('Failed to change RayStartHttp:', err)
-        }
-
-        invokeSend('set_ray_start_http', value)
+            saveRayConfig(c) // 保存 Ray 配置
+        })
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
     }
 
     const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
-        invokeSend('set_auto_setup_pac', value)
+        setAppConfig('set_auto_setup_pac', value)
     }
 
     const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
-        invokeSend('set_auto_setup_socks', value)
+        setAppConfig('set_auto_setup_socks', value)
     }
 
     const handleAutoSetupHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
-        invokeSend('set_auto_setup_http', value)
+        setAppConfig('set_auto_setup_http', value)
     }
 
     const handleAutoSetupHttps = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
-        invokeSend('set_auto_setup_https', value)
+        setAppConfig('set_auto_setup_https', value)
     }
 
     // 用于记录当前 Web 服务的设置
@@ -297,10 +264,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const handleWebServerEnable = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
-        invokeSend('set_web_server_enable', value)
+        setAppConfig('set_web_server_enable', value)
     }
 
-    const debouncedSetWebServerHost = debounce((value: string) => invokeSend('set_web_server_host', value), 500)
+    const debouncedSetWebServerHost = debounce((value: string) => setAppConfig('set_web_server_host', value), 500)
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
@@ -318,7 +285,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setWebPortError(true)
             setWebPortErrorText('本机端口不可用')
         } else if (config.web_server_port !== value) {
-            invokeSend('set_web_server_port', value)
+            setAppConfig('set_web_server_port', value)
         }
     }, 500)
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -415,7 +382,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
-                            <Select value={config.ray_log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
+                            <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
                                 <MenuItem value="none">关闭日志</MenuItem>
                                 <MenuItem value="error">错误日志</MenuItem>
                                 <MenuItem value="warning">警告日志</MenuItem>
@@ -458,12 +425,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
-                            <Switch checked={config.ray_start_socks} onChange={handleRayStartSocks}/>
+                            <Switch checked={rayCommonConfig.socks_enabled} onChange={handleRaySocksEnabled}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
-                            <Switch checked={config.ray_start_http} onChange={handleRayStartHttp}/>
+                            <Switch checked={rayCommonConfig.http_enabled} onChange={handleRayHttpEnabled}/>
                         </Stack>
                     </Card>
                 </Box>

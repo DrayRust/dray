@@ -78,15 +78,16 @@ export async function readRayCommonConfig(): Promise<RayCommonConfig> {
     })
 }
 
-export function saveRayCommonConfig(content: RayCommonConfig) {
-    if (!isTauri) return
+export async function saveRayCommonConfig(content: RayCommonConfig) {
+    if (!isTauri) return false
     try {
-        invoke('save_conf', {
+        return invoke<Boolean>('save_conf', {
             'filename': 'ray_common_config.json',
             'content': JSON.stringify(content, null, 2)
         })
     } catch (err) {
         log.error('Failed to saveRayCommonConfig:', err)
+        return false
     }
 }
 
@@ -104,20 +105,22 @@ export async function readRayConfig(): Promise<any> {
     })
 }
 
-export function saveRayConfig(content: any) {
-    if (!isTauri) return
+export async function saveRayConfig(content: any) {
+    if (!isTauri) return false
     try {
-        invoke('save_ray_config', {'content': JSON.stringify(content, null, 2)})
+        return await invoke<Boolean>('save_ray_config', {'content': JSON.stringify(content, null, 2)})
     } catch (err) {
         log.error('Failed to saveRayConfig:', err)
+        return false
     }
 }
 
-export function saveProxyPac(content: any) {
-    if (!isTauri) return
+export async function saveProxyPac(content: any) {
+    if (!isTauri) return false
     try {
-        invoke('save_proxy_pac', {'content': content.trim()})
+        return await invoke<Boolean>('save_proxy_pac', {'content': content.trim()})
     } catch (err) {
         log.error('Failed to saveProxyPac:', err)
+        return false
     }
 }
