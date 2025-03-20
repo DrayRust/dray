@@ -1,5 +1,5 @@
 use crate::dirs;
-use logger::{error, info};
+use logger::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
@@ -79,7 +79,7 @@ pub fn init() {
         match load_config_from_file(config_path.to_str().unwrap()) {
             Ok(config) => {
                 *CONFIG.lock().unwrap() = config;
-                info!("Config loaded successfully");
+                debug!("Config loaded successfully");
             }
             Err(e) => {
                 error!("Failed to load config file: {}", e);
