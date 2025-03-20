@@ -12,7 +12,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         readAppConfig().then((c) => {
             setRayEnable(c.ray_enable)
-        })
+        }).catch(_ => 0)
     }, [])
 
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {

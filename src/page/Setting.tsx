@@ -57,10 +57,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })()
     }, [])
     const handleAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        let checked = event.target.checked
+        setAutoStart(checked)
         if (!isTauri) return
         try {
-            let checked = event.target.checked
-            setAutoStart(checked)
             checked ? await autoStartEnable() : await autoStartDisable()
         } catch (err) {
             log.error('Failed to handleAutoStart:', err)
@@ -113,15 +113,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_app_log_level', value)
     }
 
-    const handleRayLogLevel = async (event: SelectChangeEvent) => {
+    const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['log_level']
         setRayCommonConfig(prevConfig => ({...prevConfig, log_level: value}))
 
-        await readRayConfig().then(c => {
+        readRayConfig().then(async c => {
+            if (!c.log) return
             c.log.loglevel = value
-            saveRayConfig(c) // 保存 Ray 配置
-        })
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+            await saveRayConfig(c) // 保存 Ray 配置
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+        }).catch(_ => 0)
     }
 
     const [rayIpError, setRayIpError] = useState(false)
@@ -188,11 +189,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
-    const handleRaySocksEnabled = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, ray_start_socks: value}))
+    const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['socks_enabled']
+        setRayCommonConfig(prevConfig => ({...prevConfig, socks_enabled: value}))
 
-        await readRayConfig().then(c => {
+        readRayConfig().then(async c => {
             if (!c.inbounds || Array.isArray(c.inbounds)) return
             if (value) {
                 c.inbounds.push({
@@ -207,16 +208,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             } else {
                 c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
             }
-            saveRayConfig(c) // 保存 Ray 配置
-        })
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+            await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+        }).catch(_ => 0)
     }
 
-    const handleRayHttpEnabled = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, ray_start_http: value}))
+    const handleRayHttpEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['http_enabled']
+        setRayCommonConfig(prevConfig => ({...prevConfig, http_enabled: value}))
 
-        await readRayConfig().then(c => {
+        readRayConfig().then(async c => {
             if (!c.inbounds || Array.isArray(c.inbounds)) return
             if (value) {
                 c.inbounds.push({
@@ -228,9 +229,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             } else {
                 c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
             }
-            saveRayConfig(c) // 保存 Ray 配置
-        })
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+            await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+        }).catch(_ => 0)
     }
 
     const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -327,9 +328,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Switch checked={autoStart} onChange={handleAutoStart}/>
                         </Stack>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>日志级别</Typography>
-                            <Select value={config.app_log_level} onChange={handleAppLogLevel} sx={{width: 120}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1">日志级别</Typography>
+                            <Select value={config.app_log_level} onChange={handleAppLogLevel} sx={{minWidth: 120}}>
                                 <MenuItem value="none">关闭日志</MenuItem>
                                 <MenuItem value="error">错误日志</MenuItem>
                                 <MenuItem value="warn">警告日志</MenuItem>
@@ -382,9 +383,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             ) : activeTab === 2 ? (
                 <Box sx={sxBox}>
                     <Card>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
-                            <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel} sx={{width: 120}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                            <Typography variant="body1">Ray 日志级别</Typography>
+                            <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel} sx={{minWidth: 120}}>
                                 <MenuItem value="none">关闭日志</MenuItem>
                                 <MenuItem value="error">错误日志</MenuItem>
                                 <MenuItem value="warning">警告日志</MenuItem>
