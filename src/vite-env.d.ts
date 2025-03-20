@@ -8,6 +8,7 @@ interface AppConfig {
     web_server_port: number | "";
 
     ray_enable: boolean;
+    ray_force_restart: boolean;
     ray_host: string;
     ray_socks_port: number | "";
     ray_http_port: number | "";
@@ -26,7 +27,7 @@ interface RayConfig {
 
     socks_udp: boolean;
     socks_sniffing: boolean;
-    socks_sniffing_dest_override: "http" | "tls" | "quic" | "fakedns" | "fakedns+others";
+    socks_sniffing_dest_override: ("http" | "tls" | "quic" | "fakedns" | "fakedns+others")[];
 
     outbounds_mux: boolean;
     outbounds_concurrency: number;
