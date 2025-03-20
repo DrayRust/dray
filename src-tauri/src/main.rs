@@ -9,7 +9,6 @@ mod sys_info;
 mod web;
 
 use logger::info;
-use rustc_version::version_meta;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::Manager;
 
@@ -221,11 +220,12 @@ fn check_port_available(port: u32) -> bool {
 }
 
 fn log_startup_info() {
+    // rustc -Vv
+    // rustc_version::version_meta().unwrap().short_version_string
     info!(
-        "Dray started v{}, tauri {}, {}",
+        "Dray started v{}, tauri {}, rustc 1.84.0 (9fc6b4312 2025-01-07)",
         env!("CARGO_PKG_VERSION").to_string(),
-        tauri::VERSION.to_string(),
-        version_meta().unwrap().short_version_string
+        tauri::VERSION.to_string()
     );
 }
 
