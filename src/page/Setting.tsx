@@ -7,6 +7,7 @@ import {
     Typography,
     Switch,
     Button, ButtonGroup, TextField, IconButton,
+    FormControlLabel, Checkbox,
     Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
 
@@ -178,6 +179,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRaySocksPortError(!ok)
         !ok && setRaySocksPortErrorText('请输入有效的端口号 (1-65535)')
         debouncedSetRaySocksPort(value)
+    }
+
+    const handleRayUdpChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        console.log('handleRayUdpChange', value)
+        // setConfig(prevConfig => ({...prevConfig, ray_start_udp: value}))
+        // invokeSend('set_ray_start_udp', value)
     }
 
     const debouncedSetRayHttpPort = debounce(async (value: number) => {
@@ -416,7 +424,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </Select>
                         </Stack>
                         <Divider/>
-                        <Stack direction="row" spacing={2} sx={{p: 2, pb: 1}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="本机地址"
                                 value={config.ray_host}
@@ -426,7 +434,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 sx={{flex: 'auto'}}
                             />
                         </Stack>
-                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2, py: 1}}>
                             <TextField
                                 label="SOCKS 端口"
                                 value={config.ray_socks_port}
@@ -443,6 +451,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 helperText={rayHttpPortErrorText}
                                 sx={{flex: 1}}
                             />
+                        </Stack>
+                        <Stack direction="row" spacing={2} sx={{px: 1, pt: 0, pb: 2}}>
+                            <FormControlLabel control={<Checkbox defaultChecked onChange={handleRayUdpChange}/>} label="UDP"/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
