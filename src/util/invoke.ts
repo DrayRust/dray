@@ -38,6 +38,15 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
+export function restartRay() {
+    if (!isTauri) return
+    try {
+        invoke('restart_ray')
+    } catch (err) {
+        log.error('Failed to restartRay:', err)
+    }
+}
+
 export async function readAppConfig(): Promise<AppConfig> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()

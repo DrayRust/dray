@@ -26,6 +26,7 @@ import {
     readRayCommonConfig, saveRayCommonConfig,
     readRayConfig, saveRayConfig
 } from '../util/invoke.ts'
+import { rayHttpEnabled, raySocksEnabled } from "../util/ray.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -113,7 +114,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_app_log_level', value)
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
@@ -138,7 +139,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_auto_setup_https', value)
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['log_level']
         setRayCommonConfig(prevConfig => ({...prevConfig, log_level: value}))
@@ -157,7 +158,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_ray_force_restart', value)
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     const [rayIpError, setRayIpError] = useState(false)
     const [raySocksPortError, setRaySocksPortError] = useState(false)
     const [raySocksPortErrorText, setRaySocksPortErrorText] = useState('')
@@ -215,57 +216,23 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_enabled']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_enabled: value}))
-
-        readRayConfig().then(async c => {
-            if (!c.inbounds || Array.isArray(c.inbounds)) return
-            if (value) {
-                c.inbounds.push({
-                    "tag": "socks-in",
-                    "protocol": "socks",
-                    "listen": config.ray_host,
-                    "port": config.ray_socks_port,
-                    "settings": {
-                        "udp": false
-                    }
-                })
-            } else {
-                c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
-            }
-            await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
-        }).catch(_ => 0)
+        raySocksEnabled(value, config, rayCommonConfig)
     }
 
     const handleRayHttpEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['http_enabled']
         setRayCommonConfig(prevConfig => ({...prevConfig, http_enabled: value}))
-
-        readRayConfig().then(async c => {
-            if (!c.inbounds || Array.isArray(c.inbounds)) return
-            if (value) {
-                c.inbounds.push({
-                    "tag": "http-in",
-                    "protocol": "http",
-                    "listen": config.ray_host,
-                    "port": config.ray_http_port
-                })
-            } else {
-                c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
-            }
-            await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
-        }).catch(_ => 0)
+        rayHttpEnabled(value, config, rayCommonConfig)
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_udp']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_udp: value}))
-
     }
 
     const handleRaySocksSniffing = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -291,7 +258,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_concurrency: value}))
     }
 
-    // ====================================================================================================================================
+    // ======================================================================================================
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
