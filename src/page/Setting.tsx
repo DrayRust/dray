@@ -5,9 +5,9 @@ import {
     ListItem, ListItemButton,
     Stack,
     Typography,
-    Switch,
+    Switch, Slider, Tooltip,
     Button, ButtonGroup, TextField, IconButton,
-    FormControlLabel, Checkbox,
+    FormControl, FormControlLabel, Checkbox,
     Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
@@ -111,6 +111,30 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.value as AppConfig['app_log_level']
         setConfig(prevConfig => ({...prevConfig, app_log_level: value}))
         setAppConfig('set_app_log_level', value)
+    }
+
+    const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
+        setAppConfig('set_auto_setup_pac', value)
+    }
+
+    const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
+        setAppConfig('set_auto_setup_socks', value)
+    }
+
+    const handleAutoSetupHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
+        setAppConfig('set_auto_setup_http', value)
+    }
+
+    const handleAutoSetupHttps = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
+        setAppConfig('set_auto_setup_https', value)
     }
 
     const handleRayLogLevel = (event: SelectChangeEvent) => {
@@ -234,28 +258,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }).catch(_ => 0)
     }
 
-    const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
-        setAppConfig('set_auto_setup_pac', value)
-    }
+    const [sniffingOptions, setSniffingOptions] = useState<("http" | "tls" | "quic" | "fakedns" | "fakedns+others")[]>([])
 
-    const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
-        setAppConfig('set_auto_setup_socks', value)
-    }
-
-    const handleAutoSetupHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
-        setAppConfig('set_auto_setup_http', value)
-    }
-
-    const handleAutoSetupHttps = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
-        setAppConfig('set_auto_setup_https', value)
+    const handleSniffingChange = (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
+        setSniffingOptions(prev => {
+            if (prev.includes(option)) {
+                return prev.filter(item => item !== option)
+            } else {
+                return [...prev, option]
+            }
+        })
     }
 
     // 用于记录当前 Web 服务的设置
@@ -300,7 +312,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetWebServerPort(value)
     }
 
-    const sxBox = {p: 2, m: '0 auto', maxWidth: 620}
+    const sxBox = {p: 2, m: '0 auto', maxWidth: 660}
     return (
         <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
             <Paper elevation={1} sx={{display: 'flex', justifyContent: 'center', borderRadius: '8px 8px 0 0'}}>
@@ -330,14 +342,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">日志级别</Typography>
-                            <Select value={config.app_log_level} onChange={handleAppLogLevel} sx={{minWidth: 120}}>
-                                <MenuItem value="none">关闭日志</MenuItem>
-                                <MenuItem value="error">错误日志</MenuItem>
-                                <MenuItem value="warn">警告日志</MenuItem>
-                                <MenuItem value="info">普通日志</MenuItem>
-                                <MenuItem value="debug">调试日志</MenuItem>
-                                <MenuItem value="trace">追踪日志</MenuItem>
-                            </Select>
+                            <FormControl sx={{minWidth: 120}} size="small">
+                                <Select value={config.app_log_level} onChange={handleAppLogLevel}>
+                                    <MenuItem value="none">关闭日志</MenuItem>
+                                    <MenuItem value="error">错误日志</MenuItem>
+                                    <MenuItem value="warn">警告日志</MenuItem>
+                                    <MenuItem value="info">普通日志</MenuItem>
+                                    <MenuItem value="debug">调试日志</MenuItem>
+                                    <MenuItem value="trace">追踪日志</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Stack>
                     </Card>
                 </Box>
@@ -385,18 +399,21 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">Ray 日志级别</Typography>
-                            <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel} sx={{minWidth: 120}}>
-                                <MenuItem value="none">关闭日志</MenuItem>
-                                <MenuItem value="error">错误日志</MenuItem>
-                                <MenuItem value="warning">警告日志</MenuItem>
-                                <MenuItem value="info">普通日志</MenuItem>
-                                <MenuItem value="debug">调试日志</MenuItem>
-                            </Select>
+                            <FormControl sx={{minWidth: 120}} size="small">
+                                <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel}>
+                                    <MenuItem value="none">关闭日志</MenuItem>
+                                    <MenuItem value="error">错误日志</MenuItem>
+                                    <MenuItem value="warning">警告日志</MenuItem>
+                                    <MenuItem value="info">普通日志</MenuItem>
+                                    <MenuItem value="debug">调试日志</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="本机地址"
+                                variant="standard"
                                 value={config.ray_host}
                                 onChange={handleRayHost}
                                 error={rayIpError}
@@ -404,9 +421,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 sx={{flex: 'auto'}}
                             />
                         </Stack>
-                        <Stack direction="row" spacing={2} sx={{p: 2, py: 1}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2, pt: 1}}>
                             <TextField
                                 label="SOCKS 端口"
+                                variant="standard"
                                 value={config.ray_socks_port}
                                 onChange={handleRaySocksPort}
                                 error={raySocksPortError}
@@ -415,15 +433,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             />
                             <TextField
                                 label="HTTP 端口"
+                                variant="standard"
                                 value={config.ray_http_port}
                                 onChange={handleRayHttpPort}
                                 error={rayHttpPortError}
                                 helperText={rayHttpPortErrorText}
                                 sx={{flex: 1}}
                             />
-                        </Stack>
-                        <Stack direction="row" spacing={2} sx={{px: 1, pt: 0, pb: 2}}>
-                            <FormControlLabel control={<Checkbox defaultChecked onChange={handleRayUdpChange}/>} label="UDP"/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
@@ -434,6 +450,56 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
                             <Switch checked={rayCommonConfig.http_enabled} onChange={handleRayHttpEnabled}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
+                            <Switch checked={rayCommonConfig.socks_udp} onChange={handleRayUdpChange}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>Sniffing 流量探测</Typography>
+                            <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRayUdpChange}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack spacing={2} sx={{p: 2}}>
+                            <Typography variant="body1">探测类型</Typography>
+                            <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                                <FormControlLabel
+                                    control={<Checkbox checked={sniffingOptions.includes("http")} onChange={() => handleSniffingChange("http")}/>}
+                                    label="HTTP"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox checked={sniffingOptions.includes("tls")} onChange={() => handleSniffingChange("tls")}/>}
+                                    label="TLS"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox checked={sniffingOptions.includes("quic")} onChange={() => handleSniffingChange("quic")}/>}
+                                    label="QUIC"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox checked={sniffingOptions.includes("fakedns")} onChange={() => handleSniffingChange("fakedns")}/>}
+                                    label="FakeDNS"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox checked={sniffingOptions.includes("fakedns+others")} onChange={() => handleSniffingChange("fakedns+others")}/>}
+                                    label="FakeDNS+Others"
+                                />
+                            </Stack>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢。" placement="right">
+                                <Typography variant="body1" sx={{pl: 1}}>Mux 协议</Typography>
+                            </Tooltip>
+                            <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayUdpChange}/>
+                        </Stack>
+                        <Divider/>
+                        <Stack sx={{p: 2}}>
+                            <Typography variant="body2">并发连接数</Typography>
+                            <Box sx={{p: '15px 10px 0'}}>
+                                <Slider defaultValue={rayCommonConfig.outbounds_concurrency} min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
+                            </Box>
                         </Stack>
                     </Card>
                 </Box>
