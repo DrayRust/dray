@@ -3,7 +3,7 @@ use crate::dirs;
 use chrono::Local;
 use logger::{error, info};
 use std::fs::{self, OpenOptions};
-use std::io::BufWriter;
+use std::io::{BufWriter, Write};
 
 pub fn init() {
     let config = config::get_config();
@@ -17,14 +17,7 @@ pub fn init() {
 }
 
 pub fn ensure_log_dir() -> bool {
-    let log_dir = match dirs::get_dray_logs_dir() {
-        Ok(dir) => dir,
-        Err(e) => {
-            error!("Failed to get log directory: {}", e);
-            return false;
-        }
-    };
-
+    let log_dir = dirs::get_dray_conf_dir().unwrap();
     if !log_dir.exists() {
         if let Err(e) = fs::create_dir_all(&log_dir) {
             error!("Failed to create log directory: {}", e);

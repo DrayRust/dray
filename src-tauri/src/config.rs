@@ -2,6 +2,7 @@ use crate::dirs;
 use logger::{error, info};
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::LazyLock;
 use std::sync::Mutex;
