@@ -1,20 +1,16 @@
 /// <reference types="vite/client" />
 
 interface AppConfig {
-    app_log_level: "none" | "error" | "warn" | "info" | "debug" | "trace";
+    log_level: "none" | "error" | "warn" | "info" | "debug" | "trace";
 
     web_server_enable: boolean;
     web_server_host: string;
     web_server_port: number | "";
 
     ray_enable: boolean;
-    ray_log_level: "debug" | "info" | "warning" | "error" | "none";
     ray_host: string;
     ray_socks_port: number | "";
     ray_http_port: number | "";
-
-    ray_start_socks: boolean;
-    ray_start_http: boolean;
 
     auto_setup_pac: boolean;
     auto_setup_socks: boolean;
@@ -23,6 +19,11 @@ interface AppConfig {
 }
 
 interface RayConfig {
+    log_level: "debug" | "info" | "warning" | "error" | "none";
+
+    socks_enabled: boolean;
+    http_enabled: boolean;
+
     socks_udp: boolean;
     socks_sniffing: boolean;
     socks_sniffing_dest_override: "http" | "tls" | "quic" | "fakedns" | "fakedns+others";
