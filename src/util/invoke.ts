@@ -38,14 +38,18 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
-export async function readConfig() {
-    if (!isTauri) return
-    try {
-        const data = await invoke('get_config_json') as string
-        return JSON.parse(data) as AppConfig
-    } catch (err) {
-        log.error('Failed to readConfig:', err)
-    }
+export async function readConfig(): Promise<AppConfig> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            const data = await invoke('get_config_json') as string
+            const config = JSON.parse(data) as AppConfig
+            resolve(config)
+        } catch (err) {
+            log.error('Failed to readConfig:', err)
+            reject(err)
+        }
+    })
 }
 
 export function setConfig(cmd: string, value: string | number | boolean) {
@@ -60,17 +64,21 @@ export function setConfig(cmd: string, value: string | number | boolean) {
     })()
 }
 
-export async function readRayCommonConfig() {
-    if (!isTauri) return
-    try {
-        const data = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
-        return JSON.parse(data) as RayConfig
-    } catch (err) {
-        log.error('Failed to readRayCommonConfig:', err)
-    }
+export async function readRayCommonConfig(): Promise<RayCommonConfig> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            const data = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
+            const config = JSON.parse(data) as RayCommonConfig
+            resolve(config)
+        } catch (err) {
+            log.error('Failed to readRayCommonConfig:', err)
+            reject(err)
+        }
+    })
 }
 
-export function saveRayCommonConfig(content: RayConfig) {
+export function saveRayCommonConfig(content: RayCommonConfig) {
     if (!isTauri) return
     try {
         invoke('save_conf', {
@@ -82,14 +90,18 @@ export function saveRayCommonConfig(content: RayConfig) {
     }
 }
 
-export async function readRayConfig() {
-    if (!isTauri) return
-    try {
-        const data = await invoke('read_ray_config') as string
-        return JSON.parse(data)
-    } catch (err) {
-        log.error('Failed to readRayConfig:', err)
-    }
+export async function readRayConfig(): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            const data = await invoke('read_ray_config') as string
+            const config = JSON.parse(data)
+            resolve(config)
+        } catch (err) {
+            log.error('Failed to readRayConfig:', err)
+            reject(err)
+        }
+    })
 }
 
 export function saveRayConfig(content: any) {

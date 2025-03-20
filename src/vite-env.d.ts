@@ -19,7 +19,7 @@ interface AppConfig {
     auto_setup_https: boolean;
 }
 
-interface RayConfig {
+interface RayCommonConfig {
     log_level: "debug" | "info" | "warning" | "error" | "none";
 
     socks_enabled: boolean;
