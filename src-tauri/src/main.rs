@@ -102,6 +102,16 @@ fn save_ray_config(text: String) -> bool {
 }
 
 #[tauri::command]
+fn read_ray_common_config() -> String {
+    ray::read_ray_common_config()
+}
+
+#[tauri::command]
+fn save_ray_common_config(text: String) -> bool {
+    ray::save_ray_common_config(&text)
+}
+
+#[tauri::command]
 fn get_paths_json() -> String {
     info!("get_paths_json triggered");
     dirs::get_paths_json()
@@ -217,6 +227,8 @@ pub fn main() {
             restart_ray,
             read_ray_config,
             save_ray_config,
+            read_ray_common_config,
+            save_ray_common_config,
             get_paths_json,
             get_sys_info_json,
             get_config_json,
