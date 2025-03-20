@@ -102,11 +102,11 @@ pub fn read_ray_config() -> String {
     })
 }
 
-pub fn save_ray_config(text: &str) -> bool {
+pub fn save_ray_config(content: &str) -> bool {
     let config_path = get_ray_config_path();
     match fs::File::create(config_path) {
         Ok(mut file) => {
-            if let Err(e) = file.write_all(text.as_bytes()) {
+            if let Err(e) = file.write_all(content.as_bytes()) {
                 error!("Failed to write config file: {}", e);
                 return false;
             }
@@ -115,42 +115,6 @@ pub fn save_ray_config(text: &str) -> bool {
         }
         Err(e) => {
             error!("Failed to create config file: {}", e);
-            false
-        }
-    }
-}
-
-fn get_ray_common_config_path() -> String {
-    dirs::get_dray_conf_dir()
-        .unwrap()
-        .join("ray_common_config.json")
-        .to_str()
-        .unwrap()
-        .to_string()
-}
-
-pub fn read_ray_common_config() -> String {
-    info!("read_ray_common_config triggered");
-    let config_path = get_ray_common_config_path();
-    fs::read_to_string(config_path).unwrap_or_else(|e| {
-        error!("Failed to read common config file: {}", e);
-        "{}".to_string()
-    })
-}
-
-pub fn save_ray_common_config(text: &str) -> bool {
-    let config_path = get_ray_common_config_path();
-    match fs::File::create(config_path) {
-        Ok(mut file) => {
-            if let Err(e) = file.write_all(text.as_bytes()) {
-                error!("Failed to write common config file: {}", e);
-                return false;
-            }
-            info!("Ray common config saved successfully");
-            true
-        }
-        Err(e) => {
-            error!("Failed to create common config file: {}", e);
             false
         }
     }

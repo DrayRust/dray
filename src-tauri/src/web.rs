@@ -115,11 +115,11 @@ pub fn restart() {
     start();
 }
 
-pub fn save_proxy_pac(text: &str) -> bool {
+pub fn save_proxy_pac(content: &str) -> bool {
     let config_path = dirs::get_dray_web_server_dir().unwrap().join("proxy.js").to_str().unwrap().to_string();
     match fs::File::create(config_path) {
         Ok(mut file) => {
-            if let Err(e) = file.write_all(text.as_bytes()) {
+            if let Err(e) = file.write_all(content.as_bytes()) {
                 error!("Failed to write proxy.js file: {}", e);
                 return false;
             }

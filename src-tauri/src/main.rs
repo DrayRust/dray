@@ -97,23 +97,23 @@ fn read_ray_config() -> String {
 }
 
 #[tauri::command]
-fn save_ray_config(text: String) -> bool {
-    ray::save_ray_config(&text)
+fn save_ray_config(content: String) -> bool {
+    ray::save_ray_config(&content)
 }
 
 #[tauri::command]
-fn read_ray_common_config() -> String {
-    ray::read_ray_common_config()
+fn read_conf(filename: String) -> String {
+    config::read_conf(&filename)
 }
 
 #[tauri::command]
-fn save_ray_common_config(text: String) -> bool {
-    ray::save_ray_common_config(&text)
+fn save_conf(filename: String, content: String) -> bool {
+    config::save_conf(&filename, &content)
 }
 
 #[tauri::command]
-fn save_proxy_pac(text: String) -> bool {
-    web::save_proxy_pac(&text)
+fn save_proxy_pac(content: String) -> bool {
+    web::save_proxy_pac(&content)
 }
 
 #[tauri::command]
@@ -232,8 +232,8 @@ pub fn main() {
             restart_ray,
             read_ray_config,
             save_ray_config,
-            read_ray_common_config,
-            save_ray_common_config,
+            read_conf,
+            save_conf,
             save_proxy_pac,
             get_paths_json,
             get_sys_info_json,

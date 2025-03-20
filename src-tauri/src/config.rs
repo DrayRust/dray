@@ -186,3 +186,50 @@ pub fn set_auto_setup_http(value: bool) -> bool {
 pub fn set_auto_setup_https(value: bool) -> bool {
     set_config(|config| config.auto_setup_https = value)
 }
+
+const ALLOWED_CONFIG_FILES: [&str; 4] = ["ray_common_config.json", "proxy.txt", "direct.txt", "block.txt"];
+
+fn get_conf_path(filename: &str) -> Result<String, String> {
+    if !ALLOWED_CONFIG_FILES.contains(&filename) {
+        return Err(format!("Filename '{}' is not allowed", filename));
+    }
+    Ok(dirs::get_dray_conf_dir().unwrap().join(filename).to_str().unwrap().to_string())
+}
+
+pub fn read_conf(filename: &str) -> String {
+    info!("read_conf triggered for file: {}", filename);
+    match get_conf_path(filename) {
+        Ok(config_path) => fs::read_to_string(config_path).unwrap_or_else(|e| {
+            error!("Failed to read config file: {}", e);
+            "{}".to_string()
+        }),
+        Err(e) => {
+            error!("{}", e);
+            "".to_string()
+        }
+    }
+}
+
+pub fn save_conf(filename: &str, content: &str) -> bool {
+    match get_conf_path(filename) {
+        Ok(config_path) => match fs::File::create(config_path) {
+            Ok(mut file) => {
+                if let Err(e) = file.write_all(content.as_bytes()) {
+                    error!("Failed to write config file: {}", e);
+                    false
+                } else {
+                    info!("Config saved successfully: {}", filename);
+                    true
+                }
+            }
+            Err(e) => {
+                error!("Failed to create config file: {}", e);
+                false
+            }
+        },
+        Err(e) => {
+            error!("{}", e);
+            false
+        }
+    }
+}
