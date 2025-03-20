@@ -77,7 +77,7 @@ pub fn force_kill() -> bool {
     success
 }
 
-pub fn force_restart() -> bool {
+pub fn restart() -> bool {
     let config = config::get_config();
     let stop_success = if config.ray_force_restart { force_kill() } else { stop() };
     let success = stop_success && start();

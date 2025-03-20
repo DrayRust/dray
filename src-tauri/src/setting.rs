@@ -53,15 +53,15 @@ pub fn set_ray_force_restart(value: bool) -> bool {
 }
 
 pub fn set_ray_host(value: String) -> bool {
-    config::set_ray_host(value) && ray::force_restart() && network::setup_proxies()
+    config::set_ray_host(value) && ray::restart() && network::setup_proxies()
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
-    config::set_ray_socks_port(value) && ray::force_restart() && network::enable_socks_proxy()
+    config::set_ray_socks_port(value) && ray::restart() && network::enable_socks_proxy()
 }
 
 pub fn set_ray_http_port(value: u32) -> bool {
-    config::set_ray_http_port(value) && ray::force_restart() && network::enable_web_proxy()
+    config::set_ray_http_port(value) && ray::restart() && network::enable_web_proxy()
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {

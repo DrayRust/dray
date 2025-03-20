@@ -87,8 +87,8 @@ fn quit() -> String {
 }
 
 #[tauri::command]
-fn force_ray_restart() -> bool {
-    ray::force_restart()
+fn restart_ray() -> bool {
+    ray::restart()
 }
 
 #[tauri::command]
@@ -214,7 +214,7 @@ pub fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             dray,
-            force_ray_restart,
+            restart_ray,
             read_ray_config,
             save_ray_config,
             get_paths_json,
