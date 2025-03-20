@@ -22,6 +22,15 @@ interface AppConfig {
     auto_setup_https: boolean;
 }
 
+interface RayConfig {
+    socks_udp: boolean;
+    socks_sniffing: boolean;
+    socks_sniffing_dest_override: "http" | "tls" | "quic" | "fakedns" | "fakedns+others";
+
+    outbounds_mux: boolean;
+    outbounds_concurrency: number;
+}
+
 interface NavProps {
     setNavState?: any;
 }
