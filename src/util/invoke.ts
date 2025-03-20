@@ -100,3 +100,12 @@ export function saveRayConfig(content: any) {
         log.error('Failed to saveRayConfig:', err)
     }
 }
+
+export function saveProxyPac(content: any) {
+    if (!isTauri) return
+    try {
+        invoke('save_proxy_pac', {'content': content.trim()})
+    } catch (err) {
+        log.error('Failed to saveProxyPac:', err)
+    }
+}
