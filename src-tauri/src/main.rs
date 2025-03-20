@@ -112,6 +112,11 @@ fn save_ray_common_config(text: String) -> bool {
 }
 
 #[tauri::command]
+fn save_proxy_pac(text: String) -> bool {
+    web::save_proxy_pac(&text)
+}
+
+#[tauri::command]
 fn get_paths_json() -> String {
     info!("get_paths_json triggered");
     dirs::get_paths_json()
@@ -229,6 +234,7 @@ pub fn main() {
             save_ray_config,
             read_ray_common_config,
             save_ray_common_config,
+            save_proxy_pac,
             get_paths_json,
             get_sys_info_json,
             get_config_json,

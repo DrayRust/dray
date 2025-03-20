@@ -4,6 +4,7 @@ use actix_files::Files;
 use actix_web::{dev, web, App, HttpServer};
 use logger::{error, info};
 use once_cell::sync::Lazy;
+use std::fs;
 use std::sync::Mutex;
 
 use actix_web::middleware::Logger;
@@ -112,4 +113,22 @@ pub fn stop() {
 pub fn restart() {
     stop();
     start();
+}
+
+pub fn save_proxy_pac(text: &str) -> bool {
+    let config_path = dirs::get_dray_web_server_dir().unwrap().join("proxy.js").to_str().unwrap().to_string();
+    match fs::File::create(config_path) {
+        Ok(mut file) => {
+            if let Err(e) = file.write_all(text.as_bytes()) {
+                error!("Failed to write proxy.js file: {}", e);
+                return false;
+            }
+            info!("proxy.js saved successfully");
+            true
+        }
+        Err(e) => {
+            error!("Failed to create proxy.js file: {}", e);
+            false
+        }
+    }
 }
