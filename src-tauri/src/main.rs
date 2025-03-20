@@ -87,6 +87,16 @@ fn quit() -> String {
 }
 
 #[tauri::command]
+fn ensure_log_dir() -> bool {
+    log::ensure_log_dir()
+}
+
+#[tauri::command]
+fn send_log(content: String) -> bool {
+    log::write_web_interface_log(&content)
+}
+
+#[tauri::command]
 fn restart_ray() -> bool {
     ray::restart()
 }
@@ -229,6 +239,8 @@ pub fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             dray,
+            ensure_log_dir,
+            send_log,
             restart_ray,
             read_ray_config,
             save_ray_config,
