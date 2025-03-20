@@ -168,7 +168,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
     const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
-    const debouncedSetRayHost = debounce((value: string) => setAppConfig('set_ray_host', value), 500)
+    const debouncedSetRayHost = debounce((value: string) => {
+        setAppConfig('set_ray_host', value)
+        rayHostChange(value)
+    }, 500)
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         const ok = validateIp(value)
@@ -176,7 +179,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         if (ok && config.ray_host !== value) {
             debouncedSetRayHost(value)
-            rayHostChange(value)
         }
     }
 
