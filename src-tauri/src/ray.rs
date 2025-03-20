@@ -1,4 +1,4 @@
-use crate::dirs;
+use crate::{config, dirs};
 use logger::{debug, error, info};
 use std::fs;
 use std::io::Write;
@@ -78,7 +78,9 @@ pub fn force_kill() -> bool {
 }
 
 pub fn force_restart() -> bool {
-    let success = force_kill() && start();
+    let config = config::get_config();
+    let stop_success = if config.ray_force_restart { force_kill() } else { stop() };
+    let success = stop_success && start();
     if success {
         info!("Ray Server force restarted successfully");
     } else {
