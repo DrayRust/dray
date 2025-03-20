@@ -186,13 +186,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRaySocksPort(value)
     }
 
-    const handleRayUdpChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        console.log('handleRayUdpChange', value)
-        // setConfig(prevConfig => ({...prevConfig, ray_start_udp: value}))
-        // invokeSend('set_ray_start_udp', value)
-    }
-
     const debouncedSetRayHttpPort = debounce(async (value: number) => {
         if (!value || !validatePort(value)) return
         const ok = await checkPortAvailable(value)
@@ -258,16 +251,33 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }).catch(_ => 0)
     }
 
-    const [sniffingOptions, setSniffingOptions] = useState<("http" | "tls" | "quic" | "fakedns" | "fakedns+others")[]>([])
+    const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['socks_udp']
+        setRayCommonConfig(prevConfig => ({...prevConfig, socks_udp: value}))
 
-    const handleSniffingChange = (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
-        setSniffingOptions(prev => {
-            if (prev.includes(option)) {
-                return prev.filter(item => item !== option)
-            } else {
-                return [...prev, option]
-            }
-        })
+    }
+
+    const handleRaySocksSniffing = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['socks_sniffing']
+        setRayCommonConfig(prevConfig => ({...prevConfig, socks_sniffing: value}))
+    }
+
+    const handleDestOverride = async (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
+        setRayCommonConfig(prevConfig => ({
+            ...prevConfig,
+            socks_sniffing_dest_override: prevConfig.socks_sniffing_dest_override.includes(option)
+                ? prevConfig.socks_sniffing_dest_override.filter(item => item !== option)
+                : [...prevConfig.socks_sniffing_dest_override, option]
+        }))
+    }
+
+    const handleRayOutboundsMux = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['outbounds_mux']
+        setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_mux: value}))
+    }
+
+    const handleRayOutboundsConcurrency = async (value: number) => {
+        setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_concurrency: value}))
     }
 
     // 用于记录当前 Web 服务的设置
@@ -454,35 +464,45 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
-                            <Switch checked={rayCommonConfig.socks_udp} onChange={handleRayUdpChange}/>
+                            <Switch checked={rayCommonConfig.socks_udp} onChange={handleRaySocksUdp}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>Sniffing 流量探测</Typography>
-                            <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRayUdpChange}/>
+                            <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
                         </Stack>
                         <Divider/>
                         <Stack spacing={2} sx={{p: 2}}>
                             <Typography variant="body1">探测类型</Typography>
                             <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                                 <FormControlLabel
-                                    control={<Checkbox checked={sniffingOptions.includes("http")} onChange={() => handleSniffingChange("http")}/>}
+                                    control={<Checkbox
+                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
+                                        onChange={() => handleDestOverride("http")}/>}
                                     label="HTTP"
                                 />
                                 <FormControlLabel
-                                    control={<Checkbox checked={sniffingOptions.includes("tls")} onChange={() => handleSniffingChange("tls")}/>}
+                                    control={<Checkbox
+                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
+                                        onChange={() => handleDestOverride("tls")}/>}
                                     label="TLS"
                                 />
                                 <FormControlLabel
-                                    control={<Checkbox checked={sniffingOptions.includes("quic")} onChange={() => handleSniffingChange("quic")}/>}
+                                    control={<Checkbox
+                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
+                                        onChange={() => handleDestOverride("quic")}/>}
                                     label="QUIC"
                                 />
                                 <FormControlLabel
-                                    control={<Checkbox checked={sniffingOptions.includes("fakedns")} onChange={() => handleSniffingChange("fakedns")}/>}
+                                    control={<Checkbox
+                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
+                                        onChange={() => handleDestOverride("fakedns")}/>}
                                     label="FakeDNS"
                                 />
                                 <FormControlLabel
-                                    control={<Checkbox checked={sniffingOptions.includes("fakedns+others")} onChange={() => handleSniffingChange("fakedns+others")}/>}
+                                    control={<Checkbox
+                                        checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
+                                        onChange={() => handleDestOverride("fakedns+others")}/>}
                                     label="FakeDNS+Others"
                                 />
                             </Stack>
@@ -492,13 +512,15 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢。" placement="right">
                                 <Typography variant="body1" sx={{pl: 1}}>Mux 协议</Typography>
                             </Tooltip>
-                            <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayUdpChange}/>
+                            <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayOutboundsMux}/>
                         </Stack>
                         <Divider/>
                         <Stack sx={{p: 2}}>
-                            <Typography variant="body2">并发连接数</Typography>
+                            <Typography variant="body2">并发数</Typography>
                             <Box sx={{p: '15px 10px 0'}}>
-                                <Slider defaultValue={rayCommonConfig.outbounds_concurrency} min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
+                                <Slider defaultValue={rayCommonConfig.outbounds_concurrency}
+                                        onChange={(_, value) => handleRayOutboundsConcurrency(value as number)}
+                                        min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
                             </Box>
                         </Stack>
                     </Card>
