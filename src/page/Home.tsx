@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { invoke } from "@tauri-apps/api/core"
 import { Paper, Stack, Typography, Switch } from '@mui/material'
+import { readConfig, setConfig } from "../util/invoke.ts"
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -9,33 +9,16 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
-
     useEffect(() => {
-        (async () => {
-            try {
-                const data = await invoke('get_config_json')
-                const config = typeof data === 'string' ? JSON.parse(data) : data
-                setRayEnable(config.ray_enable)
-            } catch (err) {
-                console.log('Failed to get_config_json:', err)
-            }
-        })()
+        readConfig().then((c) => {
+            setRayEnable(c.ray_enable)
+        })
     }, [])
-
-    const invokeSend = (fn: string, value: string | number | boolean) => {
-        (async () => {
-            try {
-                await invoke(fn, {value})
-            } catch (err) {
-                console.log('Failed to invokeSend:', err)
-            }
-        })()
-    }
 
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setRayEnable(value)
-        invokeSend('set_ray_enable', value)
+        setConfig('set_ray_enable', value)
     }
 
     return (
