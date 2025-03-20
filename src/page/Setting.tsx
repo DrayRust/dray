@@ -299,9 +299,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetWebServerPort(value)
     }
 
+    const sxBox = {p: 2, m: '0 auto', maxWidth: 620}
     return (
         <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
-            <Paper elevation={1} sx={{alignItems: "center", borderRadius: '8px 8px 0 0'}}>
+            <Paper elevation={1} sx={{display: 'flex', justifyContent: 'center', borderRadius: '8px 8px 0 0'}}>
                 <Tabs value={activeTab} onChange={handleTab} aria-label="设置导航">
                     <Tab label="基本设置"/>
                     <Tab label="代理设置"/>
@@ -310,7 +311,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 </Tabs>
             </Paper>
             {activeTab === 0 ? (
-                <Box sx={{p: 2}}>
+                <Box sx={sxBox}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">外观</Typography>
@@ -340,9 +341,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 </Box>
             ) : activeTab === 1 ? (
-                <Box sx={{p: 2}}>
+                <Box sx={sxBox}>
                     <Card>
-                        <Typography variant="h6" sx={{p: 2, pt: 1.1, pb: 0.9}}>自动设置</Typography>
+                        <Typography variant="body1" sx={{p: 2}}>自动设置</Typography>
                         <Divider/>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
@@ -379,7 +380,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 </Box>
             ) : activeTab === 2 ? (
-                <Box sx={{p: 2}}>
+                <Box sx={sxBox}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>Ray 日志级别</Typography>
@@ -436,7 +437,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 </Box>
             ) : activeTab === 3 && (
-                <Box sx={{p: 2}}>
+                <Box sx={sxBox}>
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务
