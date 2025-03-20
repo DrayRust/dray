@@ -15,13 +15,10 @@ pub struct Config {
     pub web_server_port: u32,
 
     pub ray_enable: bool,
-    pub ray_log_level: String,
+    pub ray_force_restart: bool,
     pub ray_host: String,
     pub ray_socks_port: u32,
     pub ray_http_port: u32,
-
-    pub ray_start_socks: bool,
-    pub ray_start_http: bool,
 
     pub auto_setup_pac: bool,
     pub auto_setup_socks: bool,
@@ -39,13 +36,10 @@ impl Default for Config {
             web_server_port: 18687,
 
             ray_enable: true,
-            ray_log_level: "warning".to_string(),
+            ray_force_restart: true,
             ray_host: "127.0.0.1".to_string(),
             ray_socks_port: 1086,
             ray_http_port: 1089,
-
-            ray_start_socks: true,
-            ray_start_http: true,
 
             auto_setup_pac: false,
             auto_setup_socks: true,
@@ -161,8 +155,8 @@ pub fn set_ray_enable(value: bool) -> bool {
     set_config(|config| config.ray_enable = value)
 }
 
-pub fn set_ray_log_level(value: String) -> bool {
-    set_config(|config| config.ray_log_level = value)
+pub fn set_ray_force_restart(value: bool) -> bool {
+    set_config(|config| config.ray_force_restart = value)
 }
 
 pub fn set_ray_host(value: String) -> bool {
@@ -175,14 +169,6 @@ pub fn set_ray_socks_port(value: u32) -> bool {
 
 pub fn set_ray_http_port(value: u32) -> bool {
     set_config(|config| config.ray_http_port = value)
-}
-
-pub fn set_ray_start_socks(value: bool) -> bool {
-    set_config(|config| config.ray_start_socks = value)
-}
-
-pub fn set_ray_start_http(value: bool) -> bool {
-    set_config(|config| config.ray_start_http = value)
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {

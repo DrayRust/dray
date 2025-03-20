@@ -145,8 +145,8 @@ fn set_ray_enable(value: bool) -> bool {
 }
 
 #[tauri::command]
-fn set_ray_log_level(value: String) -> bool {
-    setting::set_ray_log_level(value)
+fn set_ray_force_restart(value: bool) -> bool {
+    setting::set_ray_force_restart(value)
 }
 
 #[tauri::command]
@@ -162,16 +162,6 @@ fn set_ray_socks_port(value: u32) -> bool {
 #[tauri::command]
 fn set_ray_http_port(value: u32) -> bool {
     setting::set_ray_http_port(value)
-}
-
-#[tauri::command]
-fn set_ray_start_socks(value: bool) -> bool {
-    setting::set_ray_start_socks(value)
-}
-
-#[tauri::command]
-fn set_ray_start_http(value: bool) -> bool {
-    setting::set_ray_start_http(value)
 }
 
 #[tauri::command]
@@ -235,12 +225,10 @@ pub fn main() {
             set_web_server_host,
             set_web_server_port,
             set_ray_enable,
-            set_ray_log_level,
+            set_ray_force_restart,
             set_ray_host,
             set_ray_socks_port,
             set_ray_http_port,
-            set_ray_start_socks,
-            set_ray_start_http,
             set_auto_setup_pac,
             set_auto_setup_socks,
             set_auto_setup_http,

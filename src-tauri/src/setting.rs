@@ -47,8 +47,9 @@ pub fn set_ray_enable(value: bool) -> bool {
         }
 }
 
-pub fn set_ray_log_level(value: String) -> bool {
-    config::set_ray_log_level(value) && ray::force_restart()
+pub fn set_ray_force_restart(value: bool) -> bool {
+    info!("set_ray_force_restart: {}", value);
+    config::set_ray_force_restart(value)
 }
 
 pub fn set_ray_host(value: String) -> bool {
@@ -61,14 +62,6 @@ pub fn set_ray_socks_port(value: u32) -> bool {
 
 pub fn set_ray_http_port(value: u32) -> bool {
     config::set_ray_http_port(value) && ray::force_restart() && network::enable_web_proxy()
-}
-
-pub fn set_ray_start_socks(value: bool) -> bool {
-    config::set_ray_start_socks(value) && ray::force_restart()
-}
-
-pub fn set_ray_start_http(value: bool) -> bool {
-    config::set_ray_start_http(value) && ray::force_restart()
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {
@@ -113,7 +106,7 @@ pub fn check_port_available(port: u32) -> bool {
         Ok(_) => {
             info!("Port {} is available", port);
             true
-        },
+        }
         Err(e) => {
             info!("Port {} is not available: {}", port, e);
             false
