@@ -79,7 +79,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         "ray_force_restart": true,
         "ray_host": "127.0.0.1",
         "ray_socks_port": 1086,
-        "ray_http_port": 1087,
+        "ray_http_port": 1089,
 
         "auto_setup_pac": false,
         "auto_setup_socks": true,
@@ -113,6 +113,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_app_log_level', value)
     }
 
+    // ====================================================================================================================================
     const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
@@ -137,6 +138,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_auto_setup_https', value)
     }
 
+    // ====================================================================================================================================
     const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['log_level']
         setRayCommonConfig(prevConfig => ({...prevConfig, log_level: value}))
@@ -149,6 +151,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }).catch(_ => 0)
     }
 
+    const handleRayForceRestart = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked
+        setConfig(prevConfig => ({...prevConfig, ray_force_restart: value}))
+        setAppConfig('set_ray_force_restart', value)
+    }
+
+    // ====================================================================================================================================
     const [rayIpError, setRayIpError] = useState(false)
     const [raySocksPortError, setRaySocksPortError] = useState(false)
     const [raySocksPortErrorText, setRaySocksPortErrorText] = useState('')
@@ -206,6 +215,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         debouncedSetRayHttpPort(value)
     }
 
+    // ====================================================================================================================================
     const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_enabled']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_enabled: value}))
@@ -251,6 +261,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }).catch(_ => 0)
     }
 
+    // ====================================================================================================================================
     const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_udp']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_udp: value}))
@@ -280,6 +291,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_concurrency: value}))
     }
 
+    // ====================================================================================================================================
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
@@ -420,6 +432,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </FormControl>
                         </Stack>
                         <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>粗暴重启</Typography>
+                            <Switch checked={config.ray_force_restart} onChange={handleRayForceRestart}/>
+                        </Stack>
+                        <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
                                 label="本机地址"
@@ -468,7 +485,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>Sniffing 流量探测</Typography>
+                            <Typography variant="body1" sx={{pl: 1}}>Sniffing 探测</Typography>
                             <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
                         </Stack>
                         {rayCommonConfig.socks_sniffing && (<>
