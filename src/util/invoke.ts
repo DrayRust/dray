@@ -38,7 +38,7 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
-export async function readConfig(): Promise<AppConfig> {
+export async function readAppConfig(): Promise<AppConfig> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
@@ -52,7 +52,7 @@ export async function readConfig(): Promise<AppConfig> {
     })
 }
 
-export function setConfig(cmd: string, value: string | number | boolean) {
+export function setAppConfig(cmd: string, value: string | number | boolean) {
     if (!isTauri) return
     (async () => {
         try {

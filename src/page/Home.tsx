@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Paper, Stack, Typography, Switch } from '@mui/material'
-import { readConfig, setConfig } from "../util/invoke.ts"
+import { readAppConfig, setAppConfig } from "../util/invoke.ts"
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -10,7 +10,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     useEffect(() => {
-        readConfig().then((c) => {
+        readAppConfig().then((c) => {
             setRayEnable(c.ray_enable)
         })
     }, [])
@@ -18,7 +18,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
         setRayEnable(value)
-        setConfig('set_ray_enable', value)
+        setAppConfig('set_ray_enable', value)
     }
 
     return (
