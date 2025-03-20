@@ -26,7 +26,10 @@ import {
     readRayCommonConfig, saveRayCommonConfig,
     readRayConfig, saveRayConfig
 } from '../util/invoke.ts'
-import { rayHttpEnabled, raySocksEnabled } from "../util/ray.ts"
+import {
+    rayHostChange, raySocksPortChange, rayHttpPortChange,
+    raySocksEnabledChange, rayHttpEnabledChange
+} from "../util/ray.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -173,6 +176,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         if (ok && config.ray_host !== value) {
             debouncedSetRayHost(value)
+            rayHostChange(value)
         }
     }
 
@@ -184,6 +188,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setRaySocksPortErrorText('本机端口不可用')
         } else if (config.ray_socks_port !== value) {
             setAppConfig('set_ray_socks_port', value)
+            raySocksPortChange(value)
         }
     }, 500)
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,6 +209,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             setRayHttpPortErrorText('本机端口不可用')
         } else if (config.ray_http_port !== value) {
             setAppConfig('set_ray_http_port', value)
+            rayHttpPortChange(value)
         }
     }, 500)
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,13 +226,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_enabled']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_enabled: value}))
-        raySocksEnabled(value, config, rayCommonConfig)
+        raySocksEnabledChange(value, config, rayCommonConfig)
     }
 
     const handleRayHttpEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['http_enabled']
         setRayCommonConfig(prevConfig => ({...prevConfig, http_enabled: value}))
-        rayHttpEnabled(value, config, rayCommonConfig)
+        rayHttpEnabledChange(value, config, rayCommonConfig)
     }
 
     // ======================================================================================================
