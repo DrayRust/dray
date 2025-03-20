@@ -102,6 +102,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     })
 
     useEffect(() => {
+        if (!isTauri) return
         readAppConfig().then(c => setConfig(c))
         readRayCommonConfig().then(c => setRayCommonConfig(c))
     }, [])
