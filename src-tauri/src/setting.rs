@@ -23,18 +23,28 @@ pub fn set_web_server_enable(value: bool) -> bool {
     success
 }
 
-pub fn set_web_server_host(value: String) -> bool {
-    config::set_web_server_host(value) && {
-        web::restart();
-        network::setup_pac_proxy()
+fn set_web_server_host(value: String) -> bool {
+    let success = config::set_web_server_host(value);
+    if success {
+        let config = config::get_config();
+        if config.web_server_enable {
+            web::restart();
+            network::setup_pac_proxy();
+        }
     }
+    success
 }
 
-pub fn set_web_server_port(value: u32) -> bool {
-    config::set_web_server_port(value) && {
-        web::restart();
-        network::setup_pac_proxy()
+fn set_web_server_port(value: u32) -> bool {
+    let success = config::set_web_server_port(value);
+    if success {
+        let config = config::get_config();
+        if config.web_server_enable {
+            web::restart();
+            network::setup_pac_proxy();
+        }
     }
+    success
 }
 
 pub fn set_ray_enable(value: bool) -> bool {
