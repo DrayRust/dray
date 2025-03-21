@@ -77,9 +77,14 @@ export async function readRayCommonConfig(): Promise<RayCommonConfig> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            const data = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
-            const config = JSON.parse(data) as RayCommonConfig
-            resolve(config)
+            let data = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
+            data = data.trim()
+            if (data) {
+                const config = JSON.parse(data) as RayCommonConfig
+                resolve(config)
+            } else {
+                reject()
+            }
         } catch (err) {
             log.error('Failed to readRayCommonConfig:', err)
             reject(err)
@@ -104,9 +109,14 @@ export async function readRayConfig(): Promise<any> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            const data = await invoke('read_ray_config') as string
-            const config = JSON.parse(data)
-            resolve(config)
+            let data = await invoke('read_ray_config') as string
+            data = data.trim()
+            if (data) {
+                const config = JSON.parse(data)
+                resolve(config)
+            } else {
+                reject()
+            }
         } catch (err) {
             log.error('Failed to readRayConfig:', err)
             reject(err)
