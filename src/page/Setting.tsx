@@ -300,10 +300,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
+    const debouncedRayOutboundsConcurrency = useMemo(() => debounce(async (value: number, updatedConfig: RayCommonConfig) => {
+        rayOutboundsConcurrencyChange(value, updatedConfig)
+    }, 1000), [])
     const handleRayOutboundsConcurrency = async (value: number) => {
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, outbounds_concurrency: value}
-            rayOutboundsConcurrencyChange(value, updatedConfig)
+            debouncedRayOutboundsConcurrency(value, updatedConfig)
             return updatedConfig
         })
     }
@@ -567,7 +570,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Stack sx={{p: 2}}>
                                 <Typography variant="body2">并发数</Typography>
                                 <Box sx={{p: '15px 10px 0'}}>
-                                    <Slider defaultValue={rayCommonConfig.outbounds_concurrency}
+                                    <Slider value={rayCommonConfig.outbounds_concurrency}
                                             onChange={(_, value) => handleRayOutboundsConcurrency(value as number)}
                                             min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
                                 </Box>
