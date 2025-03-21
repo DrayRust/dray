@@ -202,10 +202,10 @@ pub fn read_conf(filename: &str) -> String {
     match get_conf_path(filename) {
         Ok(config_path) => fs::read_to_string(config_path).unwrap_or_else(|e| {
             error!("Failed to read config file: {}", e);
-            "{}".to_string()
+            "".to_string()
         }),
         Err(e) => {
-            error!("{}", e);
+            // error!("Failed to get config path: {}", e);
             "".to_string()
         }
     }
