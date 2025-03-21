@@ -41,7 +41,7 @@ pub fn write_web_interface_log(log_msg: &str) -> bool {
         Ok(file) => {
             let mut writer = BufWriter::new(file);
             let now = Local::now().format("%Y-%m-%d %H:%M:%S");
-            if let Err(e) = writeln!(writer, "[{}] {}", now, log_msg) {
+            if let Err(e) = writeln!(writer, "{} {}", now, log_msg) {
                 error!("Failed to write log: {}", e);
                 return false;
             }
