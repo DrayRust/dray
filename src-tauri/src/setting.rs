@@ -23,7 +23,7 @@ pub fn set_web_server_enable(value: bool) -> bool {
     success
 }
 
-fn set_web_server_host(value: String) -> bool {
+pub fn set_web_server_host(value: String) -> bool {
     let success = config::set_web_server_host(value);
     if success {
         let config = config::get_config();
@@ -35,7 +35,7 @@ fn set_web_server_host(value: String) -> bool {
     success
 }
 
-fn set_web_server_port(value: u32) -> bool {
+pub fn set_web_server_port(value: u32) -> bool {
     let success = config::set_web_server_port(value);
     if success {
         let config = config::get_config();
