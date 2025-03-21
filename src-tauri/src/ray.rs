@@ -1,6 +1,7 @@
 use crate::{config, dirs};
 use logger::{debug, error, info};
 use std::fs;
+use std::io::BufRead;
 use std::io::Write;
 use std::process::{Child, Command};
 use std::sync::Mutex;
@@ -20,10 +21,10 @@ pub fn start() -> bool {
     debug!("ray_path: {}", ray_path);
     debug!("ray_config_path: {}", ray_config_path);
 
-    let child = match Command::new(&ray_path)
+    let mut child = match Command::new(&ray_path)
         .args(&["run", "-c", &ray_config_path])
-        // .stdout(std::process::Stdio::piped()) // 捕获标准输出
-        // .stderr(std::process::Stdio::piped()) // 捕获标准错误
+        .stdout(std::process::Stdio::piped()) // 捕获标准输出
+        .stderr(std::process::Stdio::piped()) // 捕获标准错误
         .spawn()
     {
         Ok(child) => child,
@@ -32,6 +33,38 @@ pub fn start() -> bool {
             return false;
         }
     };
+
+    let stdout = child.stdout.take().unwrap();
+    let stderr = child.stderr.take().unwrap();
+    std::thread::spawn(move || {
+        let mut stdout_reader = std::io::BufReader::new(stdout);
+        let mut stderr_reader = std::io::BufReader::new(stderr);
+        let mut stdout_line = String::new();
+        let mut stderr_line = String::new();
+        loop {
+            stdout_line.clear();
+            stderr_line.clear();
+
+            let stdout_result = stdout_reader.read_line(&mut stdout_line);
+            let stderr_result = stderr_reader.read_line(&mut stderr_line);
+
+            if let Ok(_) = stdout_result {
+                if !stdout_line.is_empty() {
+                    info!("Ray Server stdout: {}", stdout_line.trim());
+                }
+            }
+
+            if let Ok(_) = stderr_result {
+                if !stderr_line.is_empty() {
+                    error!("Ray Server stderr: {}", stderr_line.trim());
+                }
+            }
+
+            if stdout_result.is_err() && stderr_result.is_err() {
+                break;
+            }
+        }
+    });
 
     info!("Ray Server started with PID: {}", child.id());
     *CHILD_PROCESS.lock().unwrap() = Some(child);
