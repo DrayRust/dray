@@ -111,7 +111,9 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         if (!isTauri) return
         readAppConfig().then(c => setConfig(c))
-        readRayCommonConfig().then(c => setRayCommonConfig(c)).catch(_ => {
+        readRayCommonConfig().then(c => {
+            setRayCommonConfig({...defaultRayCommonConfig, ...c})
+        }).catch(_ => {
             saveRayCommonConfig(defaultRayCommonConfig).catch(_ => 0) // 初始化 Ray Common 配置
         })
     }, [])
