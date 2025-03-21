@@ -94,7 +94,7 @@ fn get_ray_config_path() -> String {
 }
 
 pub fn read_ray_config() -> String {
-    info!("read_ray_config triggered");
+    debug!("read_ray_config triggered");
     let config_path = get_ray_config_path();
     fs::read_to_string(config_path).unwrap_or_else(|e| {
         error!("Failed to read config file: {}", e);

@@ -198,7 +198,7 @@ fn get_conf_path(filename: &str) -> Result<String, String> {
 }
 
 pub fn read_conf(filename: &str) -> String {
-    info!("read_conf triggered for file: {}", filename);
+    debug!("read_conf triggered for file: {}", filename);
     match get_conf_path(filename) {
         Ok(config_path) => fs::read_to_string(config_path).unwrap_or_else(|e| {
             error!("Failed to read config file: {}", e);

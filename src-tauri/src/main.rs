@@ -8,7 +8,7 @@ mod setting;
 mod sys_info;
 mod web;
 
-use logger::info;
+use logger::{debug, info};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::Manager;
 
@@ -75,7 +75,7 @@ fn setup_services() {
 
 #[tauri::command]
 fn dray(name: &str) -> String {
-    info!("dray triggered");
+    debug!("dray triggered");
     format!("Hello, {}! Do you know Dray is great?", name)
 }
 
@@ -133,19 +133,19 @@ fn save_proxy_pac(content: String) -> bool {
 
 #[tauri::command]
 fn get_paths_json() -> String {
-    info!("get_paths_json triggered");
+    debug!("get_paths_json triggered");
     dirs::get_paths_json()
 }
 
 #[tauri::command]
 fn get_sys_info_json() -> String {
-    info!("get_sys_info_json triggered");
+    debug!("get_sys_info_json triggered");
     sys_info::get_sys_info_json()
 }
 
 #[tauri::command]
 fn get_config_json() -> String {
-    info!("get_config_json triggered");
+    debug!("get_config_json triggered");
     config::get_config_json()
 }
 
