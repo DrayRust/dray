@@ -97,15 +97,22 @@ pub fn setup_pac_proxy() -> bool {
 
 pub fn setup_socks_proxy() -> bool {
     let config = config::get_config();
+    let mut success = true;
+
     if config.auto_setup_socks {
         if !enable_socks_proxy() {
             error!("Failed to enable SOCKS proxy");
-            return false;
+            success = false;
         }
-        true
-    } else {
-        true
     }
+    if config.auto_setup_pac {
+        if !enable_auto_proxy() {
+            error!("Failed to enable auto proxy (PAC)");
+            success = false;
+        }
+    }
+
+    success
 }
 
 pub fn setup_http_proxy() -> bool {
