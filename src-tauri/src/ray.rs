@@ -1,6 +1,6 @@
 use crate::{config, dirs};
-use libc::{fcntl, F_SETFL, O_NONBLOCK};
 use logger::{debug, error, info};
+use nix::fcntl::{fcntl, FcntlArg, OFlag};
 use std::fs;
 use std::io::BufRead;
 use std::io::ErrorKind;
@@ -37,17 +37,17 @@ pub fn start() -> bool {
         }
     };
 
-    // 将 stdout 和 stderr 设置为非阻塞模式
+    // 使用 nix 将 stdout 和 stderr 设置为非阻塞模式
     if let Some(stdout) = &child.stdout {
         let fd = stdout.as_raw_fd();
-        unsafe {
-            fcntl(fd, F_SETFL, O_NONBLOCK);
+        if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
+            error!("Failed to set non-blocking mode for stdout: {}", e);
         }
     }
     if let Some(stderr) = &child.stderr {
         let fd = stderr.as_raw_fd();
-        unsafe {
-            fcntl(fd, F_SETFL, O_NONBLOCK);
+        if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
+            error!("Failed to set non-blocking mode for stderr: {}", e);
         }
     }
 
