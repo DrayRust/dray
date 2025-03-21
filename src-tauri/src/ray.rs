@@ -1,11 +1,9 @@
 use crate::{config, dirs};
 use logger::{debug, error, info, trace};
-use nix::fcntl::{fcntl, FcntlArg, OFlag};
 use std::fs;
 use std::io::BufRead;
 use std::io::ErrorKind;
 use std::io::Write;
-use std::os::unix::io::AsRawFd;
 use std::process::{Child, Command};
 use std::sync::Mutex;
 
@@ -40,6 +38,8 @@ pub fn start() -> bool {
     // 使用 nix 将 stdout 和 stderr 设置为非阻塞模式
     #[cfg(unix)]
     {
+        use nix::fcntl::{fcntl, FcntlArg, OFlag};
+        use std::os::unix::io::AsRawFd;
         if let Some(stdout) = &child.stdout {
             let fd = stdout.as_raw_fd();
             if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
