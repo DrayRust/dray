@@ -82,9 +82,9 @@ pub fn restart() -> bool {
     let stop_success = if config.ray_force_kill { force_kill() } else { stop() };
     let success = stop_success && start();
     if success {
-        info!("Ray Server force restarted successfully");
+        info!("Ray Server restarted successfully");
     } else {
-        error!("Ray Server force restart failed");
+        error!("Ray Server restart failed");
     }
     success
 }
