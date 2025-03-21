@@ -1,8 +1,11 @@
 use crate::{config, dirs};
+use libc::{fcntl, F_SETFL, O_NONBLOCK};
 use logger::{debug, error, info};
 use std::fs;
 use std::io::BufRead;
+use std::io::ErrorKind;
 use std::io::Write;
+use std::os::unix::io::AsRawFd;
 use std::process::{Child, Command};
 use std::sync::Mutex;
 
@@ -34,6 +37,20 @@ pub fn start() -> bool {
         }
     };
 
+    // 将 stdout 和 stderr 设置为非阻塞模式
+    if let Some(stdout) = &child.stdout {
+        let fd = stdout.as_raw_fd();
+        unsafe {
+            fcntl(fd, F_SETFL, O_NONBLOCK);
+        }
+    }
+    if let Some(stderr) = &child.stderr {
+        let fd = stderr.as_raw_fd();
+        unsafe {
+            fcntl(fd, F_SETFL, O_NONBLOCK);
+        }
+    }
+
     let stdout = child.stdout.take().unwrap();
     let stderr = child.stderr.take().unwrap();
     std::thread::spawn(move || {
@@ -46,49 +63,63 @@ pub fn start() -> bool {
 }
 
 fn handle_logs(stdout: std::process::ChildStdout, stderr: std::process::ChildStderr) {
+    let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
+    let mut log_file = match fs::OpenOptions::new().create(true).write(true).truncate(true).open(log_file_path) {
+        Ok(file) => file,
+        Err(e) => {
+            error!("Failed to open log file: {}", e);
+            return;
+        }
+    };
+
     let mut stdout_reader = std::io::BufReader::new(stdout);
     let mut stderr_reader = std::io::BufReader::new(stderr);
     let mut stdout_line = String::new();
     let mut stderr_line = String::new();
 
-    let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
-    let mut log_file = fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(log_file_path)
-        .expect("Failed to open log file");
-
     loop {
         stdout_line.clear();
         stderr_line.clear();
 
-        let stdout_result = stdout_reader.read_line(&mut stdout_line);
-        let stderr_result = stderr_reader.read_line(&mut stderr_line);
-
-        if let Ok(_) = stdout_result {
-            if !stdout_line.is_empty() {
+        // 读取 stdout 一行
+        match stdout_reader.read_line(&mut stdout_line) {
+            Ok(n) if n > 0 => {
                 let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
-                info!("{}", log_message.trim());
+                debug!("{}", log_message.trim());
                 if let Err(e) = log_file.write_all(log_message.as_bytes()) {
                     error!("Failed to write to log file: {}", e);
                 }
             }
+            Err(e) if e.kind() == ErrorKind::WouldBlock => {
+                continue; // 如果是非阻塞模式下的 EAGAIN 错误，继续循环
+            }
+            Err(e) => {
+                error!("Failed to read stdout: {}", e);
+                break;
+            }
+            _ => {}
         }
 
-        if let Ok(_) = stderr_result {
-            if !stderr_line.is_empty() {
+        // 读取 stderr 一行
+        match stderr_reader.read_line(&mut stderr_line) {
+            Ok(n) if n > 0 => {
                 let log_message = format!("Ray Server stderr: {}\n", stderr_line.trim());
                 error!("{}", log_message.trim());
                 if let Err(e) = log_file.write_all(log_message.as_bytes()) {
                     error!("Failed to write to log file: {}", e);
                 }
             }
+            Err(e) if e.kind() == ErrorKind::WouldBlock => {
+                continue; // 如果是非阻塞模式下的 EAGAIN 错误，继续循环
+            }
+            Err(e) => {
+                error!("Failed to read stderr: {}", e);
+                break;
+            }
+            _ => {}
         }
 
-        if stdout_result.is_err() && stderr_result.is_err() {
-            break;
-        }
+        // std::thread::sleep(Duration::from_millis(100));
     }
 }
 
