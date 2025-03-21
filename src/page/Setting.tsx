@@ -183,7 +183,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 rayHostChange(value)
             }
         }).catch(_ => 0)
-    }, 600), [])
+    }, 1000), [])
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.trim()
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
@@ -206,7 +206,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 }
             }
         }).catch(_ => 0)
-    }, 600), [])
+    }, 1500), [])
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, ray_socks_port: value || ""}))
@@ -231,7 +231,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 }
             }
         }).catch(_ => 0)
-    }, 600), [])
+    }, 1500), [])
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
@@ -308,7 +308,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setAppConfig('set_web_server_host', value)
             }
         }).catch(_ => 0)
-    }, 600), [])
+    }, 1000), [])
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.trim()
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
@@ -330,7 +330,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 }
             }
         }).catch(_ => 0)
-    }, 600), [])
+    }, 1500), [])
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
