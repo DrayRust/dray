@@ -41,6 +41,15 @@ pub fn start() -> bool {
         let mut stderr_reader = std::io::BufReader::new(stderr);
         let mut stdout_line = String::new();
         let mut stderr_line = String::new();
+
+        let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
+        let mut log_file = fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(log_file_path)
+            .expect("Failed to open log file");
+
         loop {
             stdout_line.clear();
             stderr_line.clear();
@@ -50,13 +59,21 @@ pub fn start() -> bool {
 
             if let Ok(_) = stdout_result {
                 if !stdout_line.is_empty() {
-                    info!("Ray Server stdout: {}", stdout_line.trim());
+                    let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
+                    info!("{}", log_message.trim());
+                    if let Err(e) = log_file.write_all(log_message.as_bytes()) {
+                        error!("Failed to write to log file: {}", e);
+                    }
                 }
             }
 
             if let Ok(_) = stderr_result {
                 if !stderr_line.is_empty() {
-                    error!("Ray Server stderr: {}", stderr_line.trim());
+                    let log_message = format!("Ray Server stderr: {}\n", stderr_line.trim());
+                    error!("{}", log_message.trim());
+                    if let Err(e) = log_file.write_all(log_message.as_bytes()) {
+                        error!("Failed to write to log file: {}", e);
+                    }
                 }
             }
 
