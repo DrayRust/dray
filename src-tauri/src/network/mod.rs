@@ -81,3 +81,49 @@ pub fn setup_proxies() -> bool {
 
     success
 }
+
+pub fn setup_pac_proxy() -> bool {
+    let config = config::get_config();
+    if config.auto_setup_pac {
+        if !enable_auto_proxy() {
+            error!("Failed to enable auto proxy (PAC)");
+            return false;
+        }
+        true
+    } else {
+        true
+    }
+}
+
+pub fn setup_socks_proxy() -> bool {
+    let config = config::get_config();
+    if config.auto_setup_socks {
+        if !enable_socks_proxy() {
+            error!("Failed to enable SOCKS proxy");
+            return false;
+        }
+        true
+    } else {
+        true
+    }
+}
+
+pub fn setup_http_proxy() -> bool {
+    let config = config::get_config();
+    let mut success = true;
+
+    if config.auto_setup_http {
+        if !enable_web_proxy() {
+            error!("Failed to enable HTTP proxy");
+            success = false;
+        }
+    }
+    if config.auto_setup_https {
+        if !enable_secure_web_proxy() {
+            error!("Failed to enable HTTPS proxy");
+            success = false;
+        }
+    }
+
+    success
+}

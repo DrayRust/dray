@@ -219,6 +219,26 @@ fn check_port_available(port: u32) -> bool {
     setting::check_port_available(port)
 }
 
+#[tauri::command]
+fn setup_proxies() -> bool {
+    network::setup_proxies()
+}
+
+#[tauri::command]
+fn setup_pac_proxy() -> bool {
+    network::setup_pac_proxy()
+}
+
+#[tauri::command]
+fn setup_socks_proxy() -> bool {
+    network::setup_socks_proxy()
+}
+
+#[tauri::command]
+fn setup_http_proxy() -> bool {
+    network::setup_http_proxy()
+}
+
 fn log_startup_info() {
     // rustc -Vv
     // rustc_version::version_meta().unwrap().short_version_string
@@ -282,6 +302,10 @@ pub fn main() {
             set_auto_setup_http,
             set_auto_setup_https,
             check_port_available,
+            setup_proxies,
+            setup_pac_proxy,
+            setup_socks_proxy,
+            setup_http_proxy,
             quit
         ])
         .run(tauri::generate_context!())
