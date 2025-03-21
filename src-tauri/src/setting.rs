@@ -63,15 +63,15 @@ pub fn set_ray_force_kill(value: bool) -> bool {
 }
 
 pub fn set_ray_host(value: String) -> bool {
-    config::set_ray_host(value)
+    config::set_ray_host(value) && network::setup_proxies()
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
-    config::set_ray_socks_port(value)
+    config::set_ray_socks_port(value) && network::setup_socks_proxy()
 }
 
 pub fn set_ray_http_port(value: u32) -> bool {
-    config::set_ray_http_port(value)
+    config::set_ray_http_port(value) && network::setup_http_proxy()
 }
 
 pub fn set_auto_setup_pac(value: bool) -> bool {
