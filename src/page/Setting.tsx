@@ -301,27 +301,35 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_web_server_enable', value)
     }
 
-    const debouncedSetWebServerHost = useMemo(() =>
-        debounce((value: string) => setAppConfig('set_web_server_host', value), 600), [])
+    const debouncedSetWebServerHost = useMemo(() => debounce((value: string) => {
+        readAppConfig().then(async c => {
+            if (c.web_server_host !== value) {
+                setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
+                setAppConfig('set_web_server_host', value)
+            }
+        }).catch(_ => 0)
+    }, 600), [])
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value
+        const value = event.target.value.trim()
+        setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
         const ok = validateIp(value)
         setWebIpError(!ok)
-        setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
-        if (ok && config.web_server_host !== value) {
-            debouncedSetWebServerHost(value)
-        }
+        if (ok) debouncedSetWebServerHost(value)
     }
 
     const debouncedSetWebServerPort = useMemo(() => debounce(async (value: number) => {
-        if (!value || !validatePort(value)) return
-        const ok = await checkPortAvailable(value)
-        setWebPortError(!ok)
-        !ok && setWebPortErrorText('本机端口不可用')
-        if (ok && config.web_server_port !== value) {
-            setWebPortErrorText('')
-            setAppConfig('set_web_server_port', value)
-        }
+        readAppConfig().then(async c => {
+            if (c.web_server_port !== value) {
+                const ok = await checkPortAvailable(value)
+                setWebPortError(!ok)
+                !ok && setWebPortErrorText('本机端口不可用')
+                if (ok) {
+                    setWebPortErrorText('')
+                    setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
+                    setAppConfig('set_web_server_port', value)
+                }
+            }
+        }).catch(_ => 0)
     }, 600), [])
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
