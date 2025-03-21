@@ -1,5 +1,15 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
 
+export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (c.log) {
+            c.log.loglevel = value
+            const ok = await saveRayConfig(c) // 保存 Ray 配置
+            ok && await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+        }
+    }).catch(_ => 0)
+}
+
 export function rayHostChange(host: string) {
     readRayConfig().then(async c => {
         if (c.inbounds && Array.isArray(c.inbounds)) {

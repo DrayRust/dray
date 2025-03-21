@@ -24,12 +24,13 @@ import {
     log, isTauri, checkPortAvailable,
     readAppConfig, setAppConfig,
     readRayCommonConfig, saveRayCommonConfig,
-    readRayConfig, saveRayConfig
 } from '../util/invoke.ts'
 import {
+    rayLogLevelChange,
     rayHostChange, raySocksPortChange, rayHttpPortChange,
     raySocksEnabledChange, rayHttpEnabledChange,
-    raySocksUdpChange, raySocksSniffingChange, raySocksDestOverrideChange,
+    raySocksUdpChange,
+    raySocksSniffingChange, raySocksDestOverrideChange,
     rayOutboundsMuxChange, rayOutboundsConcurrencyChange
 } from "../util/ray.ts"
 
@@ -152,20 +153,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     // ======================================================================================================
     const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['ray_log_level']
-        setRayCommonConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
-
-        readRayConfig().then(async c => {
-            if (!c.log) return
-            c.log.loglevel = value
-            const ok = await saveRayConfig(c) // 保存 Ray 配置
-            ok && await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
-        }).catch(_ => 0)
+        setRayCommonConfig(prevConfig => {
+            const updatedConfig = {...prevConfig, ray_log_level: value}
+            rayLogLevelChange(value, updatedConfig)
+            return updatedConfig
+        })
     }
 
     const handleRayForceRestart = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_force_restart: value}))
-        setAppConfig('set_ray_force_restart', value)
+        setAppConfig('set_ray_force_restart', value) // 仅仅设置一个值，不做任何处理
     }
 
     // ======================================================================================================
