@@ -465,53 +465,55 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
                             <Switch checked={rayCommonConfig.http_enabled} onChange={handleRayHttpEnabled}/>
                         </Stack>
-                        <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
-                            <Switch checked={rayCommonConfig.socks_udp} onChange={handleRaySocksUdp}/>
-                        </Stack>
-                        <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>Sniffing 探测</Typography>
-                            <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
-                        </Stack>
-                        {rayCommonConfig.socks_sniffing && (<>
+                        {rayCommonConfig.socks_enabled && (<>
                             <Divider/>
-                            <Stack spacing={2} sx={{p: 2}}>
-                                <Typography variant="body1">探测类型</Typography>
-                                <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
-                                            onChange={() => handleDestOverride("http")}/>}
-                                        label="HTTP"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
-                                            onChange={() => handleDestOverride("tls")}/>}
-                                        label="TLS"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
-                                            onChange={() => handleDestOverride("quic")}/>}
-                                        label="QUIC"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
-                                            onChange={() => handleDestOverride("fakedns")}/>}
-                                        label="FakeDNS"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
-                                            onChange={() => handleDestOverride("fakedns+others")}/>}
-                                        label="FakeDNS+Others"
-                                    />
-                                </Stack>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                                <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
+                                <Switch checked={rayCommonConfig.socks_udp} onChange={handleRaySocksUdp}/>
                             </Stack>
+                            <Divider/>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                                <Typography variant="body1" sx={{pl: 1}}>Sniffing 探测</Typography>
+                                <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
+                            </Stack>
+                            {rayCommonConfig.socks_sniffing && (<>
+                                <Divider/>
+                                <Stack spacing={2} sx={{p: 2}}>
+                                    <Typography variant="body1">探测类型</Typography>
+                                    <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
+                                                onChange={() => handleDestOverride("http")}/>}
+                                            label="HTTP"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
+                                                onChange={() => handleDestOverride("tls")}/>}
+                                            label="TLS"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
+                                                onChange={() => handleDestOverride("quic")}/>}
+                                            label="QUIC"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
+                                                onChange={() => handleDestOverride("fakedns")}/>}
+                                            label="FakeDNS"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
+                                                onChange={() => handleDestOverride("fakedns+others")}/>}
+                                            label="FakeDNS+Others"
+                                        />
+                                    </Stack>
+                                </Stack>
+                            </>)}
                         </>)}
 
                         <Divider/>

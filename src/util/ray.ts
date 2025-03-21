@@ -53,10 +53,10 @@ export function raySocksEnabledChange(value: boolean, config: AppConfig, rayComm
                 "port": config.ray_socks_port,
                 "settings": {
                     "udp": rayCommonConfig.socks_udp,
-                    "sniffing": {
-                        enabled: rayCommonConfig.socks_sniffing,
-                        destOverride: rayCommonConfig.socks_sniffing_dest_override
-                    }
+                },
+                "sniffing": {
+                    enabled: rayCommonConfig.socks_sniffing,
+                    destOverride: rayCommonConfig.socks_sniffing_dest_override
                 }
             })
         } else {
