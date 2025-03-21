@@ -9,8 +9,8 @@ export function rayHostChange(host: string) {
                 }
             }
         }
-        await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-        restartRay() // 重载 Ray 服务
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        ok && restartRay() // 重启 Ray 服务
     }).catch(_ => 0)
 }
 
@@ -23,8 +23,8 @@ export function raySocksPortChange(port: number) {
                 }
             }
         }
-        await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-        restartRay() // 重载 Ray 服务
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        ok && restartRay() // 重启 Ray 服务
     }).catch(_ => 0)
 }
 
@@ -37,8 +37,8 @@ export function rayHttpPortChange(port: number) {
                 }
             }
         }
-        await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-        restartRay() // 重载 Ray 服务
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        ok && restartRay() // 重启 Ray 服务
     }).catch(_ => 0)
 }
 
@@ -52,15 +52,21 @@ export function raySocksEnabledChange(value: boolean, config: AppConfig, rayComm
                 "listen": config.ray_host,
                 "port": config.ray_socks_port,
                 "settings": {
-                    "udp": false
+                    "udp": rayCommonConfig.socks_udp,
+                    "sniffing": {
+                        enabled: rayCommonConfig.socks_sniffing,
+                        destOverride: rayCommonConfig.socks_sniffing_dest_override
+                    }
                 }
             })
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
         }
-        await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-        await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
-        restartRay() // 重载 Ray 服务
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
     }).catch(_ => 0)
 }
 
@@ -77,8 +83,98 @@ export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommo
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
         }
-        await saveRayConfig(c).catch(_ => 0) // 保存 Ray 配置
-        await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
-        restartRay() // 重载 Ray 服务
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
+    }).catch(_ => 0)
+}
+
+export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (!c.inbounds || !Array.isArray(c.inbounds)) return
+        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
+        if (socksInbound) {
+            socksInbound.udp = value // 修改是否启用 UDP 协议转发
+        }
+        const ok = await saveRayConfig(c)
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
+    }).catch(_ => 0)
+}
+
+export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (!c.inbounds || !Array.isArray(c.inbounds)) return
+        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
+        if (socksInbound) {
+            socksInbound.sniffing = {
+                enabled: value,
+                destOverride: rayCommonConfig.socks_sniffing_dest_override
+            }
+        }
+        const ok = await saveRayConfig(c)
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
+    }).catch(_ => 0)
+}
+
+export function raySocksDestOverrideChange(value: string[], rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (!c.inbounds || !Array.isArray(c.inbounds)) return
+        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
+        if (socksInbound?.sniffing) {
+            socksInbound.sniffing.destOverride = value
+        }
+        const ok = await saveRayConfig(c)
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
+    }).catch(_ => 0)
+}
+
+export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (!c.outbounds || !Array.isArray(c.outbounds)) return
+        for (let i = 0; i < c.outbounds.length; i++) {
+            const outbound = c.outbounds[i]
+            if (outbound.mux) {
+                outbound.mux.enabled = value
+                outbound.mux.concurrency = rayCommonConfig.outbounds_concurrency
+            } else if (outbound.tag === "proxy") {
+                outbound.mux = {
+                    enabled: value,
+                    concurrency: rayCommonConfig.outbounds_concurrency
+                }
+            }
+        }
+        const ok = await saveRayConfig(c)
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
+    }).catch(_ => 0)
+}
+
+export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        if (!c.outbounds || !Array.isArray(c.outbounds)) return
+        for (let i = 0; i < c.outbounds.length; i++) {
+            const outbound = c.outbounds[i]
+            if (outbound.mux?.enabled) {
+                outbound.mux.concurrency = value
+            }
+        }
+        const ok = await saveRayConfig(c)
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
+        }
     }).catch(_ => 0)
 }

@@ -28,7 +28,9 @@ import {
 } from '../util/invoke.ts'
 import {
     rayHostChange, raySocksPortChange, rayHttpPortChange,
-    raySocksEnabledChange, rayHttpEnabledChange
+    raySocksEnabledChange, rayHttpEnabledChange,
+    raySocksUdpChange, raySocksSniffingChange, raySocksDestOverrideChange,
+    rayOutboundsMuxChange, rayOutboundsConcurrencyChange
 } from "../util/ray.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
@@ -241,11 +243,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_udp']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_udp: value}))
+        raySocksUdpChange(value, rayCommonConfig)
     }
 
     const handleRaySocksSniffing = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_sniffing']
         setRayCommonConfig(prevConfig => ({...prevConfig, socks_sniffing: value}))
+        raySocksSniffingChange(value, rayCommonConfig)
     }
 
     const handleDestOverride = async (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
@@ -255,15 +259,18 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 ? prevConfig.socks_sniffing_dest_override.filter(item => item !== option)
                 : [...prevConfig.socks_sniffing_dest_override, option]
         }))
+        raySocksDestOverrideChange(rayCommonConfig.socks_sniffing_dest_override, rayCommonConfig)
     }
 
     const handleRayOutboundsMux = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['outbounds_mux']
         setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_mux: value}))
+        rayOutboundsMuxChange(value, rayCommonConfig)
     }
 
     const handleRayOutboundsConcurrency = async (value: number) => {
         setRayCommonConfig(prevConfig => ({...prevConfig, outbounds_concurrency: value}))
+        rayOutboundsConcurrencyChange(value, rayCommonConfig)
     }
 
     // ======================================================================================================
