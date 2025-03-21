@@ -114,7 +114,7 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
     }
 
     let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-    let log_message = format!("[{}] [{}] {}\n", timestamp, level_str(level), message);
+    let log_message = format!("{} [{}] {}\n", timestamp, level_str(level), message);
 
     // 输出到控制台
     match level {
