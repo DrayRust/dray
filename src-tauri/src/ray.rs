@@ -79,7 +79,7 @@ pub fn force_kill() -> bool {
 
 pub fn restart() -> bool {
     let config = config::get_config();
-    let stop_success = if config.ray_force_restart { force_kill() } else { stop() };
+    let stop_success = if config.ray_force_kill { force_kill() } else { stop() };
     let success = stop_success && start();
     if success {
         info!("Ray Server force restarted successfully");

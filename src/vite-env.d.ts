@@ -8,7 +8,7 @@ interface AppConfig {
     web_server_port: number | "";
 
     ray_enable: boolean;
-    ray_force_restart: boolean;
+    ray_force_kill: boolean;
     ray_host: string;
     ray_socks_port: number | "";
     ray_http_port: number | "";
