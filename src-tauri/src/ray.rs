@@ -38,16 +38,19 @@ pub fn start() -> bool {
     };
 
     // 使用 nix 将 stdout 和 stderr 设置为非阻塞模式
-    if let Some(stdout) = &child.stdout {
-        let fd = stdout.as_raw_fd();
-        if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
-            error!("Failed to set non-blocking mode for stdout: {}", e);
+    #[cfg(unix)]
+    {
+        if let Some(stdout) = &child.stdout {
+            let fd = stdout.as_raw_fd();
+            if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
+                error!("Failed to set non-blocking mode for stdout: {}", e);
+            }
         }
-    }
-    if let Some(stderr) = &child.stderr {
-        let fd = stderr.as_raw_fd();
-        if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
-            error!("Failed to set non-blocking mode for stderr: {}", e);
+        if let Some(stderr) = &child.stderr {
+            let fd = stderr.as_raw_fd();
+            if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
+                error!("Failed to set non-blocking mode for stderr: {}", e);
+            }
         }
     }
 
