@@ -1,9 +1,6 @@
-import { useRef, useEffect } from 'react'
-
-export function debounce<T extends (...args: any[]) => any>(func: T, wait: number) {
+export function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
     let timeout: ReturnType<typeof setTimeout> | null = null
-
-    const debounced = function (this: any, ...args: Parameters<T>) {
+    return function (this: any, ...args: Parameters<T>) {
         const later = () => {
             timeout = null
             func.apply(this, args)
@@ -11,23 +8,23 @@ export function debounce<T extends (...args: any[]) => any>(func: T, wait: numbe
         if (timeout) clearTimeout(timeout)
         timeout = setTimeout(later, wait)
     }
-
-    debounced.cancel = () => {
-        if (timeout) {
-            clearTimeout(timeout)
-            timeout = null
-        }
-    }
-
-    return debounced
 }
 
-export const useDebounce = <T extends (...args: any[]) => any>(callback: T, delay: number) => {
-    const debouncedCallback = useRef(debounce(callback, delay))
-    useEffect(() => {
-        return () => debouncedCallback.current.cancel()
-    }, [callback, delay])
-    return debouncedCallback.current
+export function debounceWithCallback<T extends (...args: any[]) => any>(
+    func: T,
+    wait: number,
+    callback?: () => void
+): (...args: Parameters<T>) => void {
+    let timeout: ReturnType<typeof setTimeout> | null = null
+    return function (this: any, ...args: Parameters<T>) {
+        const later = () => {
+            timeout = null
+            func.apply(this, args)
+            if (callback) callback()
+        }
+        if (timeout) clearTimeout(timeout)
+        timeout = setTimeout(later, wait)
+    }
 }
 
 export function validateIp(value: string) {

@@ -16,11 +16,11 @@ export const log = {
     },
 }
 
-function sendLog(msg: string) {
+function sendLog(content: string) {
     if (!isTauri) return
     try {
         // window?.__TAURI__?.core // 全局变量，增加了安全性风险，性能影响，页面加载变慢
-        invoke('send_log', {msg}).catch((e) => {
+        invoke('send_log', {content}).catch((e) => {
             console.error('Failed to send log:', e)
         })
     } catch (e) {
