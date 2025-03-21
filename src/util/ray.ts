@@ -96,7 +96,11 @@ export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConf
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
         for (let i = 0; i < c.inbounds.length; i++) {
             if (c.inbounds[i].protocol === "socks") {
-                c.inbounds[i].udp = value // 修改是否启用 UDP 协议转发
+                if (c.inbounds[i].settings && typeof c.inbounds[i].settings === 'object') {
+                    c.inbounds[i].settings.udp = value // 修改是否启用 UDP 协议转发
+                } else {
+                    c.inbounds[i].settings = {udp: value} // 初始化 settings 对象
+                }
                 // break
             }
         }
