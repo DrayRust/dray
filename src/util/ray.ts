@@ -94,9 +94,12 @@ export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommo
 export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
-        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
-        if (socksInbound) {
-            socksInbound.udp = value // 修改是否启用 UDP 协议转发
+        for (let i = 0; i < c.inbounds.length; i++) {
+            if (c.inbounds[i].protocol === "socks") {
+                if (!c.inbounds[i].settings) c.inbounds[i].settings = {}
+                c.inbounds[i].settings.udp = value // 修改是否启用 UDP 协议转发
+                // break
+            }
         }
         const ok = await saveRayConfig(c)
         if (ok) {
@@ -109,11 +112,13 @@ export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConf
 export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
-        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
-        if (socksInbound) {
-            socksInbound.sniffing = {
-                enabled: value,
-                destOverride: rayCommonConfig.socks_sniffing_dest_override
+        for (let i = 0; i < c.inbounds.length; i++) {
+            if (c.inbounds[i].protocol === "socks") {
+                c.inbounds[i].sniffing = {
+                    enabled: value,
+                    destOverride: rayCommonConfig.socks_sniffing_dest_override
+                }
+                // break
             }
         }
         const ok = await saveRayConfig(c)
@@ -127,9 +132,11 @@ export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommo
 export function raySocksDestOverrideChange(value: string[], rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
-        const socksInbound = c.inbounds.find((item: any) => item.protocol === "socks")
-        if (socksInbound?.sniffing) {
-            socksInbound.sniffing.destOverride = value
+        for (let i = 0; i < c.inbounds.length; i++) {
+            if (c.inbounds[i].protocol === "socks" && c.inbounds[i].sniffing) {
+                c.inbounds[i].sniffing.destOverride = value
+                // break
+            }
         }
         const ok = await saveRayConfig(c)
         if (ok) {
