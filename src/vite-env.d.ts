@@ -20,7 +20,7 @@ interface AppConfig {
 }
 
 interface RayCommonConfig {
-    log_level: "debug" | "info" | "warning" | "error" | "none";
+    ray_log_level: "debug" | "info" | "warning" | "error" | "none";
 
     socks_enabled: boolean;
     http_enabled: boolean;

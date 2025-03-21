@@ -93,8 +93,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         "auto_setup_https": false
     })
 
-    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>({
-        "log_level": "warning",
+    const defaultRayCommonConfig: RayCommonConfig = {
+        "ray_log_level": "warning",
 
         "socks_enabled": true,
         "http_enabled": true,
@@ -105,12 +105,15 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
         "outbounds_mux": false,
         "outbounds_concurrency": 8,
-    })
+    }
+    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(defaultRayCommonConfig)
 
     useEffect(() => {
         if (!isTauri) return
         readAppConfig().then(c => setConfig(c))
-        readRayCommonConfig().then(c => setRayCommonConfig(c))
+        readRayCommonConfig().then(c => setRayCommonConfig(c)).catch(_ => {
+            saveRayCommonConfig(defaultRayCommonConfig).catch(_ => 0) // 初始化 Ray Common 配置
+        })
     }, [])
 
     const handleAppLogLevel = (event: SelectChangeEvent) => {
@@ -146,14 +149,14 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
     // ======================================================================================================
     const handleRayLogLevel = (event: SelectChangeEvent) => {
-        const value = event.target.value as RayCommonConfig['log_level']
-        setRayCommonConfig(prevConfig => ({...prevConfig, log_level: value}))
+        const value = event.target.value as RayCommonConfig['ray_log_level']
+        setRayCommonConfig(prevConfig => ({...prevConfig, ray_log_level: value}))
 
         readRayConfig().then(async c => {
             if (!c.log) return
             c.log.loglevel = value
-            await saveRayConfig(c) // 保存 Ray 配置
-            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            const ok = await saveRayConfig(c) // 保存 Ray 配置
+            ok && await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
         }).catch(_ => 0)
     }
 
@@ -404,7 +407,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">Ray 日志级别</Typography>
                             <FormControl sx={{minWidth: 120}} size="small">
-                                <Select value={rayCommonConfig.log_level} onChange={handleRayLogLevel}>
+                                <Select value={rayCommonConfig.ray_log_level} onChange={handleRayLogLevel}>
                                     <MenuItem value="none">关闭日志</MenuItem>
                                     <MenuItem value="error">错误日志</MenuItem>
                                     <MenuItem value="warning">警告日志</MenuItem>
