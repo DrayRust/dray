@@ -37,55 +37,59 @@ pub fn start() -> bool {
     let stdout = child.stdout.take().unwrap();
     let stderr = child.stderr.take().unwrap();
     std::thread::spawn(move || {
-        let mut stdout_reader = std::io::BufReader::new(stdout);
-        let mut stderr_reader = std::io::BufReader::new(stderr);
-        let mut stdout_line = String::new();
-        let mut stderr_line = String::new();
-
-        let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
-        let mut log_file = fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(log_file_path)
-            .expect("Failed to open log file");
-
-        loop {
-            stdout_line.clear();
-            stderr_line.clear();
-
-            let stdout_result = stdout_reader.read_line(&mut stdout_line);
-            let stderr_result = stderr_reader.read_line(&mut stderr_line);
-
-            if let Ok(_) = stdout_result {
-                if !stdout_line.is_empty() {
-                    let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
-                    info!("{}", log_message.trim());
-                    if let Err(e) = log_file.write_all(log_message.as_bytes()) {
-                        error!("Failed to write to log file: {}", e);
-                    }
-                }
-            }
-
-            if let Ok(_) = stderr_result {
-                if !stderr_line.is_empty() {
-                    let log_message = format!("Ray Server stderr: {}\n", stderr_line.trim());
-                    error!("{}", log_message.trim());
-                    if let Err(e) = log_file.write_all(log_message.as_bytes()) {
-                        error!("Failed to write to log file: {}", e);
-                    }
-                }
-            }
-
-            if stdout_result.is_err() && stderr_result.is_err() {
-                break;
-            }
-        }
+        handle_logs(stdout, stderr);
     });
 
     info!("Ray Server started with PID: {}", child.id());
     *CHILD_PROCESS.lock().unwrap() = Some(child);
     true
+}
+
+fn handle_logs(stdout: std::process::ChildStdout, stderr: std::process::ChildStderr) {
+    let mut stdout_reader = std::io::BufReader::new(stdout);
+    let mut stderr_reader = std::io::BufReader::new(stderr);
+    let mut stdout_line = String::new();
+    let mut stderr_line = String::new();
+
+    let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
+    let mut log_file = fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(log_file_path)
+        .expect("Failed to open log file");
+
+    loop {
+        stdout_line.clear();
+        stderr_line.clear();
+
+        let stdout_result = stdout_reader.read_line(&mut stdout_line);
+        let stderr_result = stderr_reader.read_line(&mut stderr_line);
+
+        if let Ok(_) = stdout_result {
+            if !stdout_line.is_empty() {
+                let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
+                info!("{}", log_message.trim());
+                if let Err(e) = log_file.write_all(log_message.as_bytes()) {
+                    error!("Failed to write to log file: {}", e);
+                }
+            }
+        }
+
+        if let Ok(_) = stderr_result {
+            if !stderr_line.is_empty() {
+                let log_message = format!("Ray Server stderr: {}\n", stderr_line.trim());
+                error!("{}", log_message.trim());
+                if let Err(e) = log_file.write_all(log_message.as_bytes()) {
+                    error!("Failed to write to log file: {}", e);
+                }
+            }
+        }
+
+        if stdout_result.is_err() && stderr_result.is_err() {
+            break;
+        }
+    }
 }
 
 pub fn stop() -> bool {
