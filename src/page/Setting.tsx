@@ -160,7 +160,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
-    const handleRayForceRestart = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRayForceKill = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, ray_force_kill: value}))
         setAppConfig('set_ray_force_kill', value) // 仅仅设置一个值，不做任何处理
@@ -463,7 +463,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>粗暴重启</Typography>
-                            <Switch checked={config.ray_force_kill} onChange={handleRayForceRestart}/>
+                            <Switch checked={config.ray_force_kill} onChange={handleRayForceKill}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
