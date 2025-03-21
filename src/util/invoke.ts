@@ -143,3 +143,17 @@ export async function saveProxyPac(content: any) {
         return false
     }
 }
+
+export async function readAllLogsList() {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            const data = await invoke('read_all_logs_list') as string
+            const config = JSON.parse(data)
+            resolve(config)
+        } catch (err) {
+            log.error('Failed to readAllLogsList:', err)
+            reject(err)
+        }
+    })
+}

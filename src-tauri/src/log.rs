@@ -57,3 +57,46 @@ pub fn write_web_interface_log(log_msg: &str) -> bool {
         }
     }
 }
+
+pub fn read_all_logs_list() -> String {
+    let log_dir = match dirs::get_dray_logs_dir() {
+        Some(dir) => dir,
+        None => {
+            error!("Failed to get logs directory");
+            return serde_json::json!({"error": "Failed to get logs directory"}).to_string();
+        }
+    };
+
+    let mut logs = Vec::new();
+    let mut total_size = 0;
+
+    // 读取目录下的所有文件
+    if let Ok(entries) = fs::read_dir(log_dir) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let path = entry.path();
+                if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
+                    if let Ok(metadata) = fs::metadata(&path) {
+                        let file_size = metadata.len();
+                        total_size += file_size;
+                        logs.push(serde_json::json!({
+                            "filename": path.file_name().unwrap().to_string_lossy(),
+                            "size": file_size,
+                            "last_modified": metadata.modified().unwrap(),
+                        }));
+                    } else {
+                        error!("Failed to get metadata for file: {}", path.display());
+                    }
+                }
+            }
+        }
+    }
+
+    // 返回 JSON 格式的数据
+    serde_json::json!({
+        "total_files": logs.len(),
+        "total_size": total_size,
+        "logs": logs
+    })
+    .to_string()
+}
