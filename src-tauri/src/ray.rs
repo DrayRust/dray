@@ -1,5 +1,5 @@
 use crate::{config, dirs};
-use logger::{debug, error, info};
+use logger::{debug, error, info, trace};
 use nix::fcntl::{fcntl, FcntlArg, OFlag};
 use std::fs;
 use std::io::BufRead;
@@ -88,7 +88,7 @@ fn handle_logs(stdout: std::process::ChildStdout, stderr: std::process::ChildStd
         match stdout_reader.read_line(&mut stdout_line) {
             Ok(n) if n > 0 => {
                 let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
-                debug!("{}", log_message.trim());
+                trace!("{}", log_message.trim());
                 if let Err(e) = log_file.write_all(log_message.as_bytes()) {
                     error!("Failed to write to log file: {}", e);
                 }
