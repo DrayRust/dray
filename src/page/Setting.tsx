@@ -176,29 +176,36 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
     const debouncedSetRayHost = useMemo(() => debounce((value: string) => {
-        setAppConfig('set_ray_host', value)
-        rayHostChange(value)
+        readAppConfig().then(async c => {
+            if (c.ray_host !== value) {
+                setConfig(prevConfig => ({...prevConfig, ray_host: value}))
+                setAppConfig('set_ray_host', value)
+                rayHostChange(value)
+            }
+        }).catch(_ => 0)
     }, 600), [])
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value
+        const value = event.target.value.trim()
+        setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         const ok = validateIp(value)
         setRayIpError(!ok)
-        setConfig(prevConfig => ({...prevConfig, ray_host: value}))
-        if (ok && config.ray_host !== value) {
-            debouncedSetRayHost(value)
-        }
+        if (ok) debouncedSetRayHost(value)
     }
 
-    const debouncedSetRaySocksPort = useMemo(() => debounce(async (value: number) => {
-        if (!value || !validatePort(value)) return
-        const ok = await checkPortAvailable(value)
-        setRaySocksPortError(!ok)
-        !ok && setRaySocksPortErrorText('本机端口不可用')
-        if (config.ray_socks_port !== value) {
-            setRaySocksPortErrorText('')
-            setAppConfig('set_ray_socks_port', value)
-            raySocksPortChange(value)
-        }
+    const debouncedSetRaySocksPort = useMemo(() => debounce((value: number) => {
+        readAppConfig().then(async c => {
+            if (c.ray_socks_port !== value) {
+                const ok = await checkPortAvailable(value)
+                setRaySocksPortError(!ok)
+                !ok && setRaySocksPortErrorText('本机端口不可用')
+                if (ok) {
+                    setRaySocksPortErrorText('')
+                    setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
+                    setAppConfig('set_ray_socks_port', value)
+                    raySocksPortChange(value)
+                }
+            }
+        }).catch(_ => 0)
     }, 600), [])
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
@@ -211,14 +218,19 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const debouncedSetRayHttpPort = useMemo(() => debounce(async (value: number) => {
-        const ok = await checkPortAvailable(value)
-        setRayHttpPortError(!ok)
-        !ok && setRayHttpPortErrorText('本机端口不可用')
-        if (config.ray_http_port !== value) {
-            setRayHttpPortErrorText('')
-            setAppConfig('set_ray_http_port', value)
-            rayHttpPortChange(value)
-        }
+        readAppConfig().then(async c => {
+            if (c.ray_http_port !== value) {
+                const ok = await checkPortAvailable(value)
+                setRayHttpPortError(!ok)
+                !ok && setRayHttpPortErrorText('本机端口不可用')
+                if (ok) {
+                    setRayHttpPortErrorText('')
+                    setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
+                    setAppConfig('set_ray_http_port', value)
+                    rayHttpPortChange(value)
+                }
+            }
+        }).catch(_ => 0)
     }, 600), [])
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
@@ -306,7 +318,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const ok = await checkPortAvailable(value)
         setWebPortError(!ok)
         !ok && setWebPortErrorText('本机端口不可用')
-        if (config.web_server_port !== value) {
+        if (ok && config.web_server_port !== value) {
             setWebPortErrorText('')
             setAppConfig('set_web_server_port', value)
         }
