@@ -15,9 +15,7 @@ pub fn start() -> bool {
         return false;
     } */
 
-    std::thread::spawn(move || {
-        run_server();
-    });
+    std::thread::spawn(|| run_server());
     true
 }
 
@@ -124,8 +122,7 @@ pub fn force_kill() -> bool {
 pub fn restart() -> bool {
     // let config = config::get_config();
     // let success = if config.ray_force_kill { force_kill() } else { stop() };
-    let success = force_kill();
-    start();
+    let success = force_kill() && start();
     if success {
         info!("Ray Server restarted successfully");
     } else {
