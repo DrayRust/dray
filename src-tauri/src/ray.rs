@@ -122,7 +122,7 @@ pub fn force_kill() -> bool {
 
 pub fn restart() -> bool {
     // let config = config::get_config();
-    // let stop_success = if config.ray_force_kill { force_kill() } else { stop() };
+    // let success = if config.ray_force_kill { force_kill() } else { stop() };
     let success = force_kill();
     start();
     if success {
