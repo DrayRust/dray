@@ -1,11 +1,9 @@
 use crate::config;
 use crate::dirs;
-use chrono::Local;
-use chrono::TimeZone;
+use chrono::{Local, TimeZone};
 use logger::{error, info};
-use std::fs::{self, OpenOptions, File};
-use std::io::{BufWriter, Write};
-use std::io::{Read, Seek, SeekFrom};
+use std::fs::{self, File, OpenOptions};
+use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
 
 pub fn init() {
     let config = config::get_config();

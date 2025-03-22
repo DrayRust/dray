@@ -1,11 +1,12 @@
 use crate::dirs;
 use logger::{debug, error, info, trace};
 use std::fs;
-use std::io::{BufReader, BufRead, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 // use std::sync::Mutex;
 
 const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
+
 // static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 pub fn start() -> bool {
