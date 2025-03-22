@@ -3,8 +3,7 @@ use crate::dirs;
 use chrono::Local;
 use chrono::TimeZone;
 use logger::{error, info};
-use std::fs::File;
-use std::fs::{self, OpenOptions};
+use std::fs::{self, OpenOptions, File};
 use std::io::{BufWriter, Write};
 use std::io::{Read, Seek, SeekFrom};
 
@@ -61,29 +60,19 @@ pub fn write_web_interface_log(log_msg: &str) -> bool {
 }
 
 pub fn read_logs_all_list() -> String {
-    let log_dir = match dirs::get_dray_logs_dir() {
-        Some(dir) => dir,
-        None => {
-            error!("Failed to get logs directory");
-            return serde_json::json!({"error": "Failed to get logs directory"}).to_string();
-        }
-    };
-
     let mut logs = Vec::new();
-    let mut total_size = 0;
 
     // 读取目录下的所有文件
+    let log_dir = dirs::get_dray_logs_dir().unwrap();
     if let Ok(entries) = fs::read_dir(log_dir) {
         for entry in entries {
             if let Ok(entry) = entry {
                 let path = entry.path();
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
                     if let Ok(metadata) = fs::metadata(&path) {
-                        let file_size = metadata.len();
-                        total_size += file_size;
                         logs.push(serde_json::json!({
                             "filename": path.file_name().unwrap().to_string_lossy(),
-                            "size": file_size,
+                            "size": metadata.len(),
                             "last_modified": metadata.modified().map_or("0000-00-00 00:00:00".to_string(), |t| format_timestamp(t)),
                         }));
                     } else {
@@ -94,13 +83,7 @@ pub fn read_logs_all_list() -> String {
         }
     }
 
-    // 返回 JSON 格式的数据
-    serde_json::json!({
-        "total_files": logs.len(),
-        "total_size": total_size,
-        "logs": logs
-    })
-    .to_string()
+    serde_json::json!(logs).to_string()
 }
 
 fn format_timestamp(modified_time: std::time::SystemTime) -> String {
@@ -114,15 +97,7 @@ fn format_timestamp(modified_time: std::time::SystemTime) -> String {
 }
 
 pub fn read_log_file_tail(filename: &str, tail_lines: usize) -> String {
-    let log_dir = match dirs::get_dray_logs_dir() {
-        Some(dir) => dir,
-        None => {
-            error!("Failed to get logs directory");
-            return serde_json::json!([]).to_string();
-        }
-    };
-
-    let file_path = log_dir.join(filename);
+    let file_path = dirs::get_dray_logs_dir().unwrap().join(filename);
     let mut file = match File::open(&file_path) {
         Ok(file) => file,
         Err(e) => {
@@ -173,16 +148,8 @@ pub fn read_log_file_tail(filename: &str, tail_lines: usize) -> String {
 }
 
 pub fn clear_log_all_files() -> bool {
-    let log_dir = match dirs::get_dray_logs_dir() {
-        Some(dir) => dir,
-        None => {
-            error!("Failed to get logs directory");
-            return false;
-        }
-    };
-
     let mut success = true;
-
+    let log_dir = dirs::get_dray_logs_dir().unwrap();
     if let Ok(entries) = fs::read_dir(log_dir) {
         for entry in entries {
             if let Ok(entry) = entry {
@@ -195,7 +162,6 @@ pub fn clear_log_all_files() -> bool {
             }
         }
     }
-
     success
 }
 
