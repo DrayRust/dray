@@ -2,7 +2,7 @@ use crate::config;
 use crate::dirs;
 use actix_files::Files;
 use actix_web::{dev, rt, web, App, HttpServer};
-use logger::{error, info};
+use logger::{debug, error, info};
 use once_cell::sync::Lazy;
 use std::fs;
 use std::sync::Mutex;
@@ -37,7 +37,7 @@ fn init_logger() {
         .filter_module("actix_http::h1::dispatcher", LevelFilter::Off)
         .format(|buf, record| {
             buf.write_fmt(format_args!(
-                "[{}] [{}] {}: {}\n",
+                "{} [{}] {}: {}\n",
                 chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
                 record.level(),
                 record.target(),
@@ -89,12 +89,12 @@ fn run_server() {
             }
             Ok(http_server) => {
                 let server = http_server.run();
-                info!("Web server running on http://{}", server_address);
-                *SERVER_HANDLE.lock().unwrap() = Some(server.handle().clone());
+                info!("Web Server running on http://{}", server_address);
+                *SERVER_HANDLE.lock().unwrap() = Some(server.handle());
                 if let Err(e) = server.await {
-                    error!("Web server encountered an error: {}", e);
+                    error!("Web Server encountered an error: {}", e);
                 }
-                info!("Web server has been shut down");
+                debug!("Web Server has been shut down.");
             }
         }
     })
@@ -105,7 +105,7 @@ pub fn stop() -> bool {
     if let Some(handle) = server_handle {
         rt::System::new().block_on(async {
             handle.stop(false).await;
-            info!("Web server stopped");
+            info!("Web Server stopped");
         })
     }
     true
