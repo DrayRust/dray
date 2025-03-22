@@ -42,7 +42,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
             <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
         </Box>
         <TableContainer component={Paper}>
-            {!logsList || !logsList.logs ? (
+            {!logsList ? (
                 <div style={{padding: '30px', textAlign: 'center'}}>
                     <Typography variant="h6" color="textSecondary">暂无日志</Typography>
                 </div>
@@ -56,7 +56,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {logsList.logs.map((row) => (
+                        {logsList.map((row) => (
                             <TableRow key={row.filename} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
                                 <TableCell component="th" scope="row">{formatLogName(row.filename)}</TableCell>
                                 <TableCell align="right">{sizeToUnit(row.size)}</TableCell>

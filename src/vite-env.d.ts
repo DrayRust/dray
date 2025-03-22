@@ -43,11 +43,7 @@ interface LogEntry {
     size: number;
 }
 
-interface LogsList {
-    logs: LogEntry[];
-    total_files: number;
-    total_size: number;
-}
+interface LogsList extends Array<LogEntry> {}
 
 /*interface Tauri {
     app: {
