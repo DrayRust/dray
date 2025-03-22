@@ -87,7 +87,7 @@ fn quit() -> String {
 }
 
 #[tauri::command]
-fn read_logs_all_list_list() -> String {
+fn read_logs_all_list() -> String {
     log::read_logs_all_list()
 }
 
