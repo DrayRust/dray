@@ -191,11 +191,6 @@ fn set_ray_enable(value: bool) -> bool {
 }
 
 #[tauri::command]
-fn set_ray_force_kill(value: bool) -> bool {
-    setting::set_ray_force_kill(value)
-}
-
-#[tauri::command]
 fn set_ray_host(value: String) -> bool {
     setting::set_ray_host(value)
 }
@@ -291,7 +286,6 @@ pub fn main() {
             set_web_server_host,
             set_web_server_port,
             set_ray_enable,
-            set_ray_force_kill,
             set_ray_host,
             set_ray_socks_port,
             set_ray_http_port,

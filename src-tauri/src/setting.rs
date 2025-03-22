@@ -57,11 +57,6 @@ pub fn set_ray_enable(value: bool) -> bool {
         }
 }
 
-pub fn set_ray_force_kill(value: bool) -> bool {
-    info!("set_ray_force_kill: {}", value);
-    config::set_ray_force_kill(value)
-}
-
 pub fn set_ray_host(value: String) -> bool {
     config::set_ray_host(value) && network::setup_proxies()
 }

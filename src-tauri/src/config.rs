@@ -16,7 +16,6 @@ pub struct Config {
     pub web_server_port: u32,
 
     pub ray_enable: bool,
-    pub ray_force_kill: bool,
     pub ray_host: String,
     pub ray_socks_port: u32,
     pub ray_http_port: u32,
@@ -37,7 +36,6 @@ impl Default for Config {
             web_server_port: 18687,
 
             ray_enable: true,
-            ray_force_kill: true,
             ray_host: "127.0.0.1".to_string(),
             ray_socks_port: 1086,
             ray_http_port: 1089,
@@ -154,10 +152,6 @@ pub fn set_web_server_port(value: u32) -> bool {
 
 pub fn set_ray_enable(value: bool) -> bool {
     set_config(|config| config.ray_enable = value)
-}
-
-pub fn set_ray_force_kill(value: bool) -> bool {
-    set_config(|config| config.ray_force_kill = value)
 }
 
 pub fn set_ray_host(value: String) -> bool {
