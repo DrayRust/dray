@@ -144,7 +144,7 @@ export async function saveProxyPac(content: any) {
     }
 }
 
-export async function readAllLogsList() {
+export async function readLogsAllList() {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
@@ -152,7 +152,7 @@ export async function readAllLogsList() {
             const config = JSON.parse(data)
             resolve(config)
         } catch (err) {
-            log.error('Failed to readAllLogsList:', err)
+            log.error('Failed to readLogsAllList:', err)
             reject(err)
         }
     })

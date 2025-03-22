@@ -27,6 +27,20 @@ export function debounceWithCallback<T extends (...args: any[]) => any>(
     }
 }
 
+export const sizeToUnit = (size: number): string => {
+    if (size <= 0) return '0 B'
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    let unitIndex = 0
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024
+        unitIndex++
+    }
+
+    const decimalPlaces = unitIndex === 0 ? 0 : 2
+    return `${size.toFixed(decimalPlaces)} ${units[unitIndex]}`
+}
+
 export function validateIp(value: string) {
     // IPv4 正则表达式
     const ipv4Pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/

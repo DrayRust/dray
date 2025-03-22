@@ -37,7 +37,19 @@ interface NavProps {
     setNavState?: any;
 }
 
-interface Tauri {
+interface LogEntry {
+    filename: string;
+    last_modified: string;
+    size: number;
+}
+
+interface LogsList {
+    logs: LogEntry[];
+    total_files: number;
+    total_size: number;
+}
+
+/*interface Tauri {
     app: {
         defaultWindowIcon(): Promise<Image | null>;
         getName(): Promise<string>;
@@ -74,4 +86,4 @@ interface Tauri {
 
 interface Window {
     __TAURI__: Tauri;
-}
+}*/
