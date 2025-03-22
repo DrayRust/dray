@@ -172,37 +172,30 @@ pub fn read_log_file_tail(filename: &str, tail_lines: usize) -> String {
     serde_json::json!(result).to_string()
 }
 
-pub fn clear_log_all_files() -> String {
+pub fn clear_log_all_files() -> bool {
     let log_dir = match dirs::get_dray_logs_dir() {
         Some(dir) => dir,
         None => {
             error!("Failed to get logs directory");
-            return serde_json::json!({"error": "Failed to get logs directory"}).to_string();
+            return false;
         }
     };
 
-    let mut cleared_files = 0;
-    let mut errors = 0;
+    let mut success = true;
 
     if let Ok(entries) = fs::read_dir(log_dir) {
         for entry in entries {
             if let Ok(entry) = entry {
                 let path = entry.path();
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
-                    match OpenOptions::new().write(true).truncate(true).open(&path) {
-                        Ok(_) => cleared_files += 1,
-                        Err(e) => {
-                            error!("Failed to clear file {}: {}", path.display(), e);
-                            errors += 1;
-                        }
+                    if OpenOptions::new().write(true).truncate(true).open(&path).is_err() {
+                        error!("Failed to clear file {}: {}", path.display());
+                        success = false;
                     }
                 }
             }
         }
     }
 
-    serde_json::json!({
-        "cleared_files": cleared_files,
-        "errors": errors
-    }).to_string()
+    success
 }

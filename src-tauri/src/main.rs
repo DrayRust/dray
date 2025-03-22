@@ -97,7 +97,7 @@ fn read_log_file_tail(filename: String, tail_lines: usize) -> String {
 }
 
 #[tauri::command]
-fn clear_log_all_files() -> String {
+fn clear_log_all_files() -> bool {
     log::clear_log_all_files()
 }
 

@@ -157,3 +157,13 @@ export async function readLogsAllList() {
         }
     })
 }
+
+export async function clearAllLogFiles() {
+    if (!isTauri) return false
+    try {
+        return await invoke<boolean>('clear_log_all_files')
+    } catch (err) {
+        log.error('Failed to clearAllLogFiles:', err)
+        return false
+    }
+}

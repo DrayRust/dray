@@ -4,18 +4,20 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
 
-import { readLogsAllList } from "../util/invoke.ts"
+import { clearAllLogFiles, readLogsAllList } from "../util/invoke.ts"
 import { sizeToUnit } from "../util/util.ts"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
 
-    const [logsList, setLogsList] = useState<LogsList>()
-    useEffect(() => {
+    const readList = () => {
         readLogsAllList().then((d) => {
             setLogsList(d as LogsList)
         }).catch(_ => 0)
-    }, [])
+    }
+
+    const [logsList, setLogsList] = useState<LogsList>()
+    useEffect(() => readList(), [])
 
     const logNameMap: Record<string, string> = {
         'dray.log': 'Dray 运行日志',
@@ -30,9 +32,14 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         return logNameMap[filename] || filename
     }
 
+    const handleClearLogs = async () => {
+        const ok = await clearAllLogFiles()
+        ok && readList()
+    }
+
     return (<>
         <Box sx={{mb: 1, display: 'flex', justifyContent: 'flex-end'}}>
-            <Button variant="contained">清空日志</Button>
+            <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
         </Box>
         <TableContainer component={Paper}>
             {!logsList || !logsList.logs ? (
