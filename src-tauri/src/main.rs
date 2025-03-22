@@ -67,6 +67,7 @@ fn setup_services() {
     let config = config::get_config();
     if config.ray_enable {
         ray::start();
+        network::setup_proxies();
     }
     if config.web_server_enable {
         web::start();
@@ -266,7 +267,6 @@ pub fn main() {
             setup_tray(app)?;
 
             setup_services();
-            network::setup_proxies();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
