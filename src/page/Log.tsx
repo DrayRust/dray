@@ -12,8 +12,8 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
 
     const [logsList, setLogsList] = useState<LogsList>()
     useEffect(() => {
-        readLogsAllList().then((c) => {
-            setLogsList(c as LogsList)
+        readLogsAllList().then((d) => {
+            setLogsList(d as LogsList)
         }).catch(_ => 0)
     }, [])
 
@@ -35,7 +35,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
             <Button variant="contained">清空日志</Button>
         </Box>
         <TableContainer component={Paper}>
-            {!logsList || logsList.logs.length === 0 ? (
+            {!logsList || !logsList.logs ? (
                 <div style={{padding: '30px', textAlign: 'center'}}>
                     <Typography variant="h6" color="textSecondary">暂无日志</Typography>
                 </div>
