@@ -35,6 +35,7 @@ fn init_logger() {
         .target(env_logger::Target::Pipe(Box::new(log_file)))
         .filter_level(LevelFilter::Info) // 设置日志级别参数: Off Error Warn Info Debug Trace
         .filter_module("actix_http::h1::dispatcher", LevelFilter::Off)
+        .filter_module("actix_server::worker", LevelFilter::Off)
         .format(|buf, record| {
             buf.write_fmt(format_args!(
                 "{} [{}] {}: {}\n",
@@ -85,7 +86,7 @@ fn run_server() {
         .bind(&server_address)
         {
             Err(e) => {
-                error!("Failed to bind to {}: {}", server_address, e);
+                error!("Web Server failed to bind to {}: {}", server_address, e);
             }
             Ok(http_server) => {
                 let server = http_server.run();
