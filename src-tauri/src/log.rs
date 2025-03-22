@@ -61,7 +61,7 @@ pub fn write_web_interface_log(log_msg: &str) -> bool {
     }
 }
 
-pub fn read_all_logs_list() -> String {
+pub fn read_logs_all_list() -> String {
     let log_dir = match dirs::get_dray_logs_dir() {
         Some(dir) => dir,
         None => {

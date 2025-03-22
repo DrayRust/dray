@@ -148,7 +148,7 @@ export async function readAllLogsList() {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            const data = await invoke('read_all_logs_list') as string
+            const data = await invoke('read_logs_all_list') as string
             const config = JSON.parse(data)
             resolve(config)
         } catch (err) {

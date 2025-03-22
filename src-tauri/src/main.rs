@@ -87,8 +87,8 @@ fn quit() -> String {
 }
 
 #[tauri::command]
-fn read_all_logs_list() -> String {
-    log::read_all_logs_list()
+fn read_logs_all_list_list() -> String {
+    log::read_logs_all_list()
 }
 
 #[tauri::command]
@@ -266,7 +266,7 @@ pub fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             dray,
-            read_all_logs_list,
+            read_logs_all_list,
             read_log_file_tail,
             get_dray_logs_dir,
             ensure_log_dir,
