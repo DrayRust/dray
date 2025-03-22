@@ -97,6 +97,11 @@ fn read_log_file_tail(filename: String, tail_lines: usize) -> String {
 }
 
 #[tauri::command]
+fn clear_log_all_files() -> String {
+    log::clear_log_all_files()
+}
+
+#[tauri::command]
 fn get_dray_logs_dir() -> String {
     dirs::get_dray_logs_dir_str()
 }
@@ -268,6 +273,7 @@ pub fn main() {
             dray,
             read_logs_all_list,
             read_log_file_tail,
+            clear_log_all_files,
             get_dray_logs_dir,
             ensure_log_dir,
             send_log,
