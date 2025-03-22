@@ -188,8 +188,7 @@ pub fn clear_log_all_files() -> bool {
             if let Ok(entry) = entry {
                 let path = entry.path();
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
-                    if OpenOptions::new().write(true).truncate(true).open(&path).is_err() {
-                        error!("Failed to clear file {}: {}", path.display());
+                    if !clear_log_file(&path) {
                         success = false;
                     }
                 }
@@ -198,4 +197,14 @@ pub fn clear_log_all_files() -> bool {
     }
 
     success
+}
+
+fn clear_log_file(path: &std::path::Path) -> bool {
+    match OpenOptions::new().write(true).truncate(true).open(path) {
+        Ok(_) => true,
+        Err(e) => {
+            error!("Failed to clear file {}: {}", path.display(), e);
+            false
+        }
+    }
 }

@@ -109,7 +109,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(defaultRayCommonConfig)
 
-    useMemo(() => {
+    useEffect(() => {
         if (!isTauri) return
         readAppConfig().then(c => setConfig(c))
         readRayCommonConfig().then(c => {
