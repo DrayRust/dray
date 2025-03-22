@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
-    Paper, Box, Button, Typography,
+    Paper, Box, Button, Skeleton, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
 
@@ -9,6 +10,7 @@ import { sizeToUnit } from "../util/util.ts"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
+    const navigate = useNavigate()
 
     const readList = () => {
         readLogsAllList().then((d) => {
@@ -43,9 +45,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         </Box>
         <TableContainer component={Paper}>
             {!logsList ? (
-                <div style={{padding: '30px', textAlign: 'center'}}>
-                    <Typography variant="h6" color="textSecondary">暂无日志</Typography>
-                </div>
+                <Skeleton variant="rounded" animation="wave" height={60}/>
             ) : (
                 <Table sx={{minWidth: 650}}>
                     <TableHead>
@@ -58,7 +58,11 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
                     <TableBody>
                         {logsList.map((row) => (
                             <TableRow key={row.filename} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                <TableCell component="th" scope="row">{formatLogName(row.filename)}</TableCell>
+                                <TableCell component="th" scope="row" sx={{cursor: 'pointer'}}>
+                                    <Link underline="hover" onClick={() => navigate(`/log_detail?filename=${row.filename}`)}>
+                                        {formatLogName(row.filename)}
+                                    </Link>
+                                </TableCell>
                                 <TableCell align="right">{sizeToUnit(row.size)}</TableCell>
                                 <TableCell align="right">{row.last_modified}</TableCell>
                             </TableRow>
