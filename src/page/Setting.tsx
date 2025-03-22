@@ -83,7 +83,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         "web_server_port": 18687,
 
         "ray_enable": true,
-        "ray_force_kill": true,
         "ray_host": "127.0.0.1",
         "ray_socks_port": 1086,
         "ray_http_port": 1089,
@@ -158,12 +157,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             rayLogLevelChange(value, updatedConfig)
             return updatedConfig
         })
-    }
-
-    const handleRayForceKill = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
-        setConfig(prevConfig => ({...prevConfig, ray_force_kill: value}))
-        setAppConfig('set_ray_force_kill', value) // 仅仅设置一个值，不做任何处理
     }
 
     // ======================================================================================================
@@ -459,11 +452,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <MenuItem value="debug">调试日志</MenuItem>
                                 </Select>
                             </FormControl>
-                        </Stack>
-                        <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
-                            <Typography variant="body1" sx={{pl: 1}}>粗暴重启</Typography>
-                            <Switch checked={config.ray_force_kill} onChange={handleRayForceKill}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
