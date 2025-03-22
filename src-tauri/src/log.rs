@@ -3,8 +3,10 @@ use crate::dirs;
 use chrono::Local;
 use chrono::TimeZone;
 use logger::{error, info};
+use std::fs::File;
 use std::fs::{self, OpenOptions};
 use std::io::{BufWriter, Write};
+use std::io::{Read, Seek, SeekFrom};
 
 pub fn init() {
     let config = config::get_config();
@@ -110,4 +112,63 @@ fn format_timestamp(modified_time: std::time::SystemTime) -> String {
         },
         Err(_) => "0000-00-00 00:00:00".to_string(),
     }
+}
+
+pub fn read_log_file_tail(filename: &str, tail_lines: usize) -> String {
+    let log_dir = match dirs::get_dray_logs_dir() {
+        Some(dir) => dir,
+        None => {
+            error!("Failed to get logs directory");
+            return serde_json::json!([]).to_string();
+        }
+    };
+
+    let file_path = log_dir.join(filename);
+    let mut file = match File::open(&file_path) {
+        Ok(file) => file,
+        Err(e) => {
+            error!("Failed to open log file {}: {}", file_path.display(), e);
+            return serde_json::json!([]).to_string();
+        }
+    };
+
+    let file_size = match file.seek(SeekFrom::End(0)) {
+        Ok(size) => size,
+        Err(e) => {
+            error!("Failed to get file size: {}", e);
+            return serde_json::json!([]).to_string();
+        }
+    };
+
+    // 从文件末尾开始读取，最多读取1MB数据
+    let start_position = if file_size > 1024 * 1024 { file_size - 1024 * 1024 } else { 0 };
+
+    if let Err(e) = file.seek(SeekFrom::Start(start_position)) {
+        error!("Failed to seek file: {}", e);
+        return serde_json::json!([]).to_string();
+    }
+
+    let mut buffer = vec![0; (file_size - start_position) as usize];
+    let bytes_read = match file.read(&mut buffer) {
+        Ok(size) => size,
+        Err(e) => {
+            error!("Failed to read file: {}", e);
+            return serde_json::json!([]).to_string();
+        }
+    };
+    buffer.truncate(bytes_read);
+
+    let content = match String::from_utf8(buffer) {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Failed to convert bytes to string: {}", e);
+            return serde_json::json!([]).to_string();
+        }
+    };
+
+    let lines: Vec<&str> = content.lines().collect();
+    let start_line = if lines.len() > tail_lines { lines.len() - tail_lines } else { 0 };
+
+    let result: Vec<&str> = lines[start_line..].to_vec();
+    serde_json::json!(result).to_string()
 }

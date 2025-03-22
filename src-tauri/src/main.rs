@@ -92,6 +92,11 @@ fn read_all_logs_list() -> String {
 }
 
 #[tauri::command]
+fn read_log_file_tail(filename: String, tail_lines: usize) -> String {
+    log::read_log_file_tail(&filename, tail_lines)
+}
+
+#[tauri::command]
 fn get_dray_logs_dir() -> String {
     dirs::get_dray_logs_dir_str()
 }
@@ -262,6 +267,7 @@ pub fn main() {
         .invoke_handler(tauri::generate_handler![
             dray,
             read_all_logs_list,
+            read_log_file_tail,
             get_dray_logs_dir,
             ensure_log_dir,
             send_log,
