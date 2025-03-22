@@ -24,8 +24,8 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         'web_interface.log': 'Dray 交互日志',
         'web_server.log': 'Web 访问日志',
         'ray_server.log': 'Xray 启动日志',
-        'xray_access.log': 'Xray 运行日志',
-        'xray_error.log': 'Xray 错误日志',
+        'xray_access.log': 'Xray 请求日志',
+        'xray_error.log': 'Xray 运行日志',
     }
 
     const formatLogName = (filename: string) => {
