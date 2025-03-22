@@ -1,21 +1,26 @@
-use crate::{config, dirs};
+use crate::dirs;
 use logger::{debug, error, info, trace};
 use std::fs;
-use std::io::BufRead;
-use std::io::ErrorKind;
-use std::io::Write;
-use std::process::{Child, Command};
-use std::sync::Mutex;
+use std::io::{BufReader, BufRead, Write};
+use std::process::{Command, Stdio};
+// use std::sync::Mutex;
 
 const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
-static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
+// static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 
 pub fn start() -> bool {
-    if CHILD_PROCESS.lock().unwrap().is_some() {
+    /* if CHILD_PROCESS.lock().unwrap().is_some() {
         error!("Ray Server is already running");
         return false;
-    }
+    } */
 
+    std::thread::spawn(move || {
+        run_server();
+    });
+    true
+}
+
+fn run_server() {
     let ray_dir = dirs::get_dray_ray_dir().unwrap();
     let ray_path: String = ray_dir.join(DRAY_XRAY).to_str().unwrap().to_string();
     let ray_config_path: String = ray_dir.join("config.json").to_str().unwrap().to_string();
@@ -24,48 +29,19 @@ pub fn start() -> bool {
 
     let mut child = match Command::new(&ray_path)
         .args(&["run", "-c", &ray_config_path])
-        .stdout(std::process::Stdio::piped()) // 捕获标准输出
-        .stderr(std::process::Stdio::piped()) // 捕获标准错误
+        .stdout(Stdio::piped()) // 捕获标准输出
+        .stderr(Stdio::piped()) // 捕获标准错误
         .spawn()
     {
         Ok(child) => child,
         Err(e) => {
             error!("Failed to start Ray Server: {:?}", e);
-            return false;
+            return;
         }
     };
 
-    // 使用 nix 将 stdout 和 stderr 设置为非阻塞模式
-    #[cfg(unix)]
-    {
-        use nix::fcntl::{fcntl, FcntlArg, OFlag};
-        use std::os::unix::io::AsRawFd;
-        if let Some(stdout) = &child.stdout {
-            let fd = stdout.as_raw_fd();
-            if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
-                error!("Failed to set non-blocking mode for stdout: {}", e);
-            }
-        }
-        if let Some(stderr) = &child.stderr {
-            let fd = stderr.as_raw_fd();
-            if let Err(e) = fcntl(fd, FcntlArg::F_SETFL(OFlag::O_NONBLOCK)) {
-                error!("Failed to set non-blocking mode for stderr: {}", e);
-            }
-        }
-    }
-
-    let stdout = child.stdout.take().unwrap();
-    let stderr = child.stderr.take().unwrap();
-    std::thread::spawn(move || {
-        handle_logs(stdout, stderr);
-    });
-
     info!("Ray Server started with PID: {}", child.id());
-    *CHILD_PROCESS.lock().unwrap() = Some(child);
-    true
-}
 
-fn handle_logs(stdout: std::process::ChildStdout, stderr: std::process::ChildStderr) {
     let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
     let mut log_file = match fs::OpenOptions::new().create(true).write(true).truncate(true).open(log_file_path) {
         Ok(file) => file,
@@ -75,58 +51,37 @@ fn handle_logs(stdout: std::process::ChildStdout, stderr: std::process::ChildStd
         }
     };
 
-    let mut stdout_reader = std::io::BufReader::new(stdout);
-    let mut stderr_reader = std::io::BufReader::new(stderr);
-    let mut stdout_line = String::new();
-    let mut stderr_line = String::new();
-
-    loop {
-        stdout_line.clear();
-        stderr_line.clear();
-
-        // 读取 stdout 一行
-        match stdout_reader.read_line(&mut stdout_line) {
-            Ok(n) if n > 0 => {
-                let log_message = format!("Ray Server stdout: {}\n", stdout_line.trim());
+    if let Some(stdout) = child.stdout.take() {
+        let reader = BufReader::new(stdout);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let log_message = format!("Ray Server stdout: {}\n", line.trim());
                 trace!("{}", log_message.trim());
                 if let Err(e) = log_file.write_all(log_message.as_bytes()) {
                     error!("Failed to write to log file: {}", e);
                 }
             }
-            Err(e) if e.kind() == ErrorKind::WouldBlock => {
-                continue; // 如果是非阻塞模式下的 EAGAIN 错误，继续循环
-            }
-            Err(e) => {
-                error!("Failed to read stdout: {}", e);
-                break;
-            }
-            _ => {}
         }
+    }
 
-        // 读取 stderr 一行
-        match stderr_reader.read_line(&mut stderr_line) {
-            Ok(n) if n > 0 => {
-                let log_message = format!("Ray Server stderr: {}\n", stderr_line.trim());
+    if let Some(stderr) = child.stderr.take() {
+        let reader = BufReader::new(stderr);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let log_message = format!("Ray Server stderr: {}\n", line.trim());
                 error!("{}", log_message.trim());
                 if let Err(e) = log_file.write_all(log_message.as_bytes()) {
                     error!("Failed to write to log file: {}", e);
                 }
             }
-            Err(e) if e.kind() == ErrorKind::WouldBlock => {
-                continue; // 如果是非阻塞模式下的 EAGAIN 错误，继续循环
-            }
-            Err(e) => {
-                error!("Failed to read stderr: {}", e);
-                break;
-            }
-            _ => {}
         }
-
-        // std::thread::sleep(Duration::from_millis(100));
     }
+
+    // *CHILD_PROCESS.lock().unwrap() = Some(child);
+    info!("Ray Server exited");
 }
 
-pub fn stop() -> bool {
+/* pub fn stop() -> bool {
     let child_process = CHILD_PROCESS.lock().unwrap().take();
     if let Some(mut child) = child_process {
         if let Err(e) = child.kill() {
@@ -144,7 +99,7 @@ pub fn stop() -> bool {
         error!("Ray Server is not running, no need to stop");
         false
     }
-}
+} */
 
 pub fn force_kill() -> bool {
     let mut sys = sysinfo::System::new_all();
@@ -161,14 +116,15 @@ pub fn force_kill() -> bool {
             }
         }
     }
-    *CHILD_PROCESS.lock().unwrap() = None;
+    // *CHILD_PROCESS.lock().unwrap() = None;
     success
 }
 
 pub fn restart() -> bool {
-    let config = config::get_config();
-    let stop_success = if config.ray_force_kill { force_kill() } else { stop() };
-    let success = stop_success && start();
+    // let config = config::get_config();
+    // let stop_success = if config.ray_force_kill { force_kill() } else { stop() };
+    let success = force_kill();
+    start();
     if success {
         info!("Ray Server restarted successfully");
     } else {
