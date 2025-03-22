@@ -148,13 +148,31 @@ pub fn read_log_file_tail(filename: &str, tail_lines: usize) -> String {
 pub fn clear_log_all_files() -> bool {
     let mut success = true;
     let log_dir = dirs::get_dray_logs_dir().unwrap();
+
+    let preserve_files = [
+        "dray.log",
+        "web_interface.log",
+        "web_server.log",
+        "ray_server.log",
+        "xray_access.log",
+        "xray_error.log",
+    ];
+
     if let Ok(entries) = fs::read_dir(log_dir) {
         for entry in entries {
             if let Ok(entry) = entry {
                 let path = entry.path();
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
-                    if !clear_log_file(&path) {
-                        success = false;
+                    let filename = path.file_name().unwrap().to_string_lossy().to_string();
+                    if preserve_files.contains(&filename.as_str()) {
+                        if !clear_log_file(&path) {
+                            success = false;
+                        }
+                    } else {
+                        if let Err(e) = fs::remove_file(&path) {
+                            error!("Failed to delete file {}: {}", path.display(), e);
+                            success = false;
+                        }
                     }
                 }
             }
