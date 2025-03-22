@@ -1,6 +1,7 @@
 use crate::config;
 use crate::dirs;
 use chrono::Local;
+use chrono::TimeZone;
 use logger::{error, info};
 use std::fs::{self, OpenOptions};
 use std::io::{BufWriter, Write};
@@ -82,7 +83,7 @@ pub fn read_all_logs_list() -> String {
                         logs.push(serde_json::json!({
                             "filename": path.file_name().unwrap().to_string_lossy(),
                             "size": file_size,
-                            "last_modified": metadata.modified().unwrap(),
+                            "last_modified": metadata.modified().map_or("0000-00-00 00:00:00".to_string(), |t| format_timestamp(t)),
                         }));
                     } else {
                         error!("Failed to get metadata for file: {}", path.display());
@@ -99,4 +100,14 @@ pub fn read_all_logs_list() -> String {
         "logs": logs
     })
     .to_string()
+}
+
+fn format_timestamp(modified_time: std::time::SystemTime) -> String {
+    match modified_time.duration_since(std::time::UNIX_EPOCH) {
+        Ok(system_time) => match Local.timestamp_opt(system_time.as_secs() as i64, system_time.subsec_nanos()) {
+            chrono::LocalResult::Single(dt) => dt.format("%Y-%m-%d %H:%M:%S").to_string(),
+            _ => "0000-00-00 00:00:00".to_string(),
+        },
+        Err(_) => "0000-00-00 00:00:00".to_string(),
+    }
 }
