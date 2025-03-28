@@ -56,31 +56,31 @@ function uriToVlessRow(uri: string): ServerRow {
 
     const base64 = uri.replace('vless://', '')
     const decoded = decodeBase64(base64)
-    const data = JSON.parse(decoded)
+    const d = JSON.parse(decoded)
     return {
-        ps: data.ps || '',
+        ps: d.ps || '',
         type: 'vless',
-        host: `${data.add}:${data.port || 0}`,
-        scy: data.scy || 'none',
+        host: `${d.add}:${d.port || 0}`,
+        scy: d.scy || 'none',
         data: {
-            add: data.add,
-            port: data.port,
-            id: data.id,
-            flow: data.flow || '',
-            scy: data.scy || 'none',
-            encryption: data.encryption || 'none',
-            type: data.type || 'tcp',
-            host: data.host || '',
-            path: data.path || '',
-            net: data.net || 'tcp',
-            fp: data.fp || 'chrome',
-            pbk: data.pbk || '',
-            sid: data.sid || '',
-            sni: data.sni || '',
-            serviceName: data.serviceName || '',
-            headerType: data.headerType || '',
-            seed: data.seed || '',
-            mode: data.mode || ''
+            add: d.add,
+            port: d.port,
+            id: d.id,
+            flow: d.flow || '',
+            scy: d.scy || 'none',
+            encryption: d.encryption || 'none',
+            type: d.type || 'tcp',
+            host: d.host || '',
+            path: d.path || '',
+            net: d.net || 'tcp',
+            fp: d.fp || 'chrome',
+            pbk: d.pbk || '',
+            sid: d.sid || '',
+            sni: d.sni || '',
+            serviceName: d.serviceName || '',
+            headerType: d.headerType || '',
+            seed: d.seed || '',
+            mode: d.mode || ''
         }
     }
 }
@@ -117,28 +117,28 @@ function uriToVmessRow(uri: string): ServerRow {
 
     const base64 = uri.replace('vmess://', '')
     const decoded = decodeBase64(base64)
-    const data = JSON.parse(decoded)
+    const d = JSON.parse(decoded)
     return {
-        ps: data.ps || '',
+        ps: d.ps || '',
         type: 'vmess',
-        host: `${data.add}:${data.port || 0}`,
-        scy: data.scy || 'auto',
+        host: `${d.add}:${d.port || 0}`,
+        scy: d.scy || 'auto',
         data: {
-            add: data.add,
-            port: data.port,
-            id: data.id,
-            aid: data.aid || 0,
-            scy: data.scy || 'auto',
-            alpn: data.alpn || '',
-            sni: data.sni || '',
-            net: data.net || 'tcp',
-            host: data.host || '',
-            path: data.path || '',
-            tls: data.tls || 'none',
-            fp: data.fp || 'chrome',
-            type: data.type || '',
-            seed: data.seed || '',
-            mode: data.mode || ''
+            add: d.add,
+            port: d.port,
+            id: d.id,
+            aid: d.aid || 0,
+            scy: d.scy || 'auto',
+            alpn: d.alpn || '',
+            sni: d.sni || '',
+            net: d.net || 'tcp',
+            host: d.host || '',
+            path: d.path || '',
+            tls: d.tls || 'none',
+            fp: d.fp || 'chrome',
+            type: d.type || '',
+            seed: d.seed || '',
+            mode: d.mode || ''
         }
     }
 }
@@ -164,17 +164,17 @@ function uriToSsRow(uri: string): ServerRow {
 
     const base64 = uri.replace('ss://', '')
     const decoded = decodeBase64(base64)
-    const data = JSON.parse(decoded)
+    const d = JSON.parse(decoded)
     return {
-        ps: data.ps || '',
+        ps: d.ps || '',
         type: 'ss',
-        host: `${data.add}:${data.port || 0}`,
-        scy: data.scy || 'aes-256-gcm',
+        host: `${d.add}:${d.port || 0}`,
+        scy: d.scy || 'aes-256-gcm',
         data: {
-            add: data.add,
-            port: data.port,
-            scy: data.scy || 'aes-256-gcm',
-            pwd: data.pwd || ''
+            add: d.add,
+            port: d.port,
+            scy: d.scy || 'aes-256-gcm',
+            pwd: d.pwd || ''
         }
     }
 }
@@ -203,20 +203,20 @@ function uriToTrojanRow(uri: string): ServerRow {
 
     const base64 = uri.replace('trojan://', '')
     const decoded = decodeBase64(base64)
-    const data = JSON.parse(decoded)
+    const d = JSON.parse(decoded)
     return {
-        ps: data.ps || '',
+        ps: d.ps || '',
         type: 'trojan',
-        host: `${data.add}:${data.port || 0}`,
-        scy: data.scy || 'tls',
+        host: `${d.add}:${d.port || 0}`,
+        scy: d.scy || 'tls',
         data: {
-            add: data.add,
-            port: data.port,
-            pwd: data.pwd || '',
-            flow: data.flow || '',
-            scy: data.scy || 'tls',
-            sni: data.sni || url.hostname,
-            fp: data.fp || 'chrome'
+            add: d.add,
+            port: d.port,
+            pwd: d.pwd || '',
+            flow: d.flow || '',
+            scy: d.scy || 'tls',
+            sni: d.sni || url.hostname,
+            fp: d.fp || 'chrome'
         }
     }
 }
