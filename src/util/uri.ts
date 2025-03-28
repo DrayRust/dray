@@ -24,9 +24,10 @@ export function uriToServerRow(uri: string): ServerRow | null {
 function uriToVlessRow(uri: string): ServerRow {
     const url = new URL(uri)
     const p = new URLSearchParams(url.search)
+    const ps = url.hash ? url.hash.slice(1) : ''
 
     return {
-        ps: '',
+        ps,
         type: 'vless',
         host: `${url.hostname}:${url.port || 0}`,
         scy: p.get('security') || 'none',
@@ -56,9 +57,10 @@ function uriToVlessRow(uri: string): ServerRow {
 function uriToVmessRow(uri: string): ServerRow {
     const url = new URL(uri)
     const p = new URLSearchParams(url.search)
+    const ps = url.hash ? url.hash.slice(1) : ''
 
     return {
-        ps: '',
+        ps,
         type: 'vmess',
         host: `${url.hostname}:${url.port || 0}`,
         scy: p.get('security') || 'auto',
@@ -85,9 +87,10 @@ function uriToVmessRow(uri: string): ServerRow {
 function uriToSsRow(uri: string): ServerRow {
     const url = new URL(uri)
     const [method, password] = encodeBase64(url.username).split(':')
+    const ps = url.hash ? url.hash.slice(1) : ''
 
     return {
-        ps: '',
+        ps,
         type: 'ss',
         host: `${url.hostname}:${url.port || 0}`,
         scy: method || 'aes-256-gcm',
@@ -103,9 +106,10 @@ function uriToSsRow(uri: string): ServerRow {
 function uriToTrojanRow(uri: string): ServerRow {
     const url = new URL(uri)
     const p = new URLSearchParams(url.search)
+    const ps = url.hash ? url.hash.slice(1) : ''
 
     return {
-        ps: '',
+        ps,
         type: 'trojan',
         host: `${url.hostname}:${url.port || 0}`,
         scy: p.get('security') || 'tls',
@@ -128,6 +132,81 @@ export function isValidUri(uri: string): boolean {
     } catch (e) {
         return false
     }
+}
+
+export function vlessRowToUri(row: VlessRow, ps: string): string {
+    const url = new URL('vless://')
+    url.hostname = row.add
+    url.port = row.port.toString()
+    url.username = row.id
+    url.hash = ps ? `#${ps}` : ''
+
+    const p = new URLSearchParams()
+    if (row.flow) p.set('flow', row.flow)
+    if (row.encryption) p.set('encryption', row.encryption)
+    if (row.type) p.set('type', row.type)
+    if (row.host) p.set('host', row.host)
+    if (row.path) p.set('path', row.path)
+    if (row.fp) p.set('fp', row.fp)
+    if (row.pbk) p.set('pbk', row.pbk)
+    if (row.sid) p.set('sid', row.sid)
+    if (row.sni) p.set('sni', row.sni)
+    if (row.serviceName) p.set('serviceName', row.serviceName)
+    if (row.headerType) p.set('headerType', row.headerType)
+    if (row.seed) p.set('seed', row.seed)
+    if (row.mode) p.set('mode', row.mode)
+
+    url.search = p.toString()
+    return url.toString()
+}
+
+export function vmessRowToUri(row: VmessRow, ps: string): string {
+    const url = new URL('vmess://')
+    url.hostname = row.add
+    url.port = row.port.toString()
+    url.username = row.id
+    url.hash = ps ? `#${ps}` : ''
+
+    const p = new URLSearchParams()
+    if (row.aid) p.set('aid', row.aid.toString())
+    if (row.alpn) p.set('alpn', row.alpn)
+    if (row.sni) p.set('sni', row.sni)
+    if (row.net) p.set('net', row.net)
+    if (row.host) p.set('host', row.host)
+    if (row.path) p.set('path', row.path)
+    if (row.tls) p.set('tls', row.tls)
+    if (row.fp) p.set('fp', row.fp)
+    if (row.type) p.set('type', row.type)
+    if (row.seed) p.set('seed', row.seed)
+    if (row.mode) p.set('mode', row.mode)
+
+    url.search = p.toString()
+    return url.toString()
+}
+
+export function ssRowToUri(row: SsRow, ps: string): string {
+    const url = new URL('ss://')
+    url.hostname = row.add
+    url.port = row.port.toString()
+    url.username = `${row.scy}:${row.pwd}`
+    url.hash = ps ? `#${ps}` : ''
+    return url.toString()
+}
+
+export function trojanRowToUri(row: TrojanRow, ps: string): string {
+    const url = new URL('trojan://')
+    url.hostname = row.add
+    url.port = row.port.toString()
+    url.username = row.pwd
+    url.hash = ps ? `#${ps}` : ''
+
+    const p = new URLSearchParams()
+    if (row.flow) p.set('flow', row.flow)
+    if (row.sni) p.set('sni', row.sni)
+    if (row.fp) p.set('fp', row.fp)
+
+    url.search = p.toString()
+    return url.toString()
 }
 
 export function vlessRowToConf(row: VlessRow): any {
