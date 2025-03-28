@@ -1,5 +1,5 @@
 import { log } from './invoke.ts'
-import { encodeBase64 } from './base64.ts'
+import { decodeBase64, encodeBase64 } from './base64.ts'
 
 export function uriToServerRow(uri: string): ServerRow | null {
     if (!isValidUri(uri)) {
@@ -86,7 +86,7 @@ function uriToVmessRow(uri: string): ServerRow {
 
 function uriToSsRow(uri: string): ServerRow {
     const url = new URL(uri)
-    const [method, password] = encodeBase64(url.username).split(':')
+    const [method, password] = decodeBase64(url.username).split(':')
     const ps = url.hash ? url.hash.slice(1) : ''
 
     return {
@@ -207,6 +207,26 @@ export function trojanRowToUri(row: TrojanRow, ps: string): string {
 
     url.search = p.toString()
     return url.toString()
+}
+
+export function vlessRowToBase64Uri(row: VlessRow, ps: string): string {
+    const data = {ps, ...row}
+    return `vless://${encodeBase64(JSON.stringify(data))}`
+}
+
+export function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
+    const data = {ps, v: 2, ...row}
+    return `vmess://${encodeBase64(JSON.stringify(data))}`
+}
+
+export function ssRowToBase64Uri(row: SsRow, ps: string): string {
+    const data = {ps, ...row}
+    return `ss://${encodeBase64(JSON.stringify(data))}`
+}
+
+export function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
+    const data = {ps, ...row}
+    return `trojan://${encodeBase64(JSON.stringify(data))}`
 }
 
 export function vlessRowToConf(row: VlessRow): any {
