@@ -5,8 +5,8 @@ mod log;
 mod network;
 mod ray;
 mod setting;
-mod sys_info;
 mod setup;
+mod sys_info;
 mod web;
 use logger::{debug, info};
 
@@ -191,6 +191,7 @@ pub fn run() {
             Option::Some(vec!["-s", "quiet"]),
         ))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(|app| {
             setup::init(app)?;
             Ok(())
