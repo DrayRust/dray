@@ -316,14 +316,14 @@ export function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
     return `trojan://${encodeBase64(JSON.stringify(data))}`
 }
 
-export function isValidUri(uri: string): boolean {
+/*export function isValidUri(uri: string): boolean {
     try {
         new URL(uri)
         return true
     } catch (e) {
         return false
     }
-}
+}*/
 
 export function vlessRowToConf(row: VlessRow): any {
     return {
