@@ -61,16 +61,17 @@ interface PrevLogContent {
 }
 
 // ============= server ============
-interface serverRow {
+interface ServerRow {
     ps: string; // 附言 postscript / 服务器备注 remark
     type: string; // 类型 vless / vmess / ss / trojan
     host: string; // 主机名+端口 如：example.com:8080
     scy: string; // 加密方式 security
+    data: VlessRow | VmessRow | SsRow | TrojanRow;
 }
 
-interface vlessRow {
+interface VlessRow {
     add: string; // 地址 address
-    port: number;
+    port: number; // 端口 port
     id: string; // uuid
     flow: string;
     scy: string; // 加密方式 security
@@ -89,9 +90,9 @@ interface vlessRow {
     mode: string;
 }
 
-interface vmessRow {
+interface VmessRow {
     add: string; // 地址 address
-    port: number;
+    port: number; // 端口 port
     id: string; // uuid
     aid: number; // 用户副ID alterId
     scy: string; // 加密方式 security
@@ -107,19 +108,19 @@ interface vmessRow {
     mode: string;
 }
 
-interface ssRow {
+interface SsRow {
     add: string; // 地址 address
-    port: number;
-    scy: string; // 加密方式 method
+    port: number; // 端口 port
     pwd: string; // 密码 password
+    scy: string; // 加密方式 method
 }
 
-interface trojanRow {
+interface TrojanRow {
     add: string; // 地址 address
-    port: number;
+    port: number; // 端口 port
     pwd: string; // 密码 password
-    flow: string;
     scy: string; // 加密方式 security
+    flow: string;
     sni: string;
     fp: string;
 }
