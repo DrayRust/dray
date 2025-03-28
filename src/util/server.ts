@@ -2,30 +2,63 @@ import { log } from './invoke.ts'
 import { decodeBase64, encodeBase64 } from './base64.ts'
 
 export function uriToServerRow(uri: string): ServerRow | null {
-    if (!isValidUri(uri)) {
-        log.error("Invalid URI:", uri)
-        return null
-    }
-
-    if (uri.startsWith('vless://')) {
-        return uriToVlessRow(uri)
-    } else if (uri.startsWith('vmess://')) {
-        return uriToVmessRow(uri)
-    } else if (uri.startsWith('ss://')) {
-        return uriToSsRow(uri)
-    } else if (uri.startsWith('trojan://')) {
-        return uriToTrojanRow(uri)
-    } else {
-        log.error("Unsupported protocol, url:", uri)
+    try {
+        if (uri.startsWith('vless://')) {
+            return uriToVlessRow(uri)
+        } else if (uri.startsWith('vmess://')) {
+            return uriToVmessRow(uri)
+        } else if (uri.startsWith('ss://')) {
+            return uriToSsRow(uri)
+        } else if (uri.startsWith('trojan://')) {
+            return uriToTrojanRow(uri)
+        } else {
+            log.error("Unsupported protocol, url:", uri)
+            return null
+        }
+    } catch (e) {
+        log.error("Invalid url:", uri)
         return null
     }
 }
 
 function uriToVlessRow(uri: string): ServerRow {
     const url = new URL(uri)
-    const p = new URLSearchParams(url.search)
     const ps = url.hash ? url.hash.slice(1) : ''
 
+    if (!url.search) {
+        const base64 = uri.replace('vless://', '')
+        const decoded = decodeBase64(base64)
+        const data = JSON.parse(decoded)
+
+        return {
+            ps: data.ps || '',
+            type: 'vless',
+            host: `${data.add}:${data.port || 0}`,
+            scy: data.scy || 'none',
+            data: {
+                add: data.add,
+                port: data.port,
+                id: data.id,
+                flow: data.flow || '',
+                scy: data.scy || 'none',
+                encryption: data.encryption || 'none',
+                type: data.type || 'tcp',
+                host: data.host || '',
+                path: data.path || '',
+                net: data.net || 'tcp',
+                fp: data.fp || 'chrome',
+                pbk: data.pbk || '',
+                sid: data.sid || '',
+                sni: data.sni || '',
+                serviceName: data.serviceName || '',
+                headerType: data.headerType || '',
+                seed: data.seed || '',
+                mode: data.mode || ''
+            }
+        }
+    }
+
+    const p = new URLSearchParams(url.search)
     return {
         ps,
         type: 'vless',
@@ -56,9 +89,39 @@ function uriToVlessRow(uri: string): ServerRow {
 
 function uriToVmessRow(uri: string): ServerRow {
     const url = new URL(uri)
-    const p = new URLSearchParams(url.search)
     const ps = url.hash ? url.hash.slice(1) : ''
 
+    if (!url.search) {
+        const base64 = uri.replace('vmess://', '')
+        const decoded = decodeBase64(base64)
+        const data = JSON.parse(decoded)
+
+        return {
+            ps: data.ps || '',
+            type: 'vmess',
+            host: `${data.add}:${data.port || 0}`,
+            scy: data.scy || 'auto',
+            data: {
+                add: data.add,
+                port: data.port,
+                id: data.id,
+                aid: data.aid || 0,
+                scy: data.scy || 'auto',
+                alpn: data.alpn || '',
+                sni: data.sni || '',
+                net: data.net || 'tcp',
+                host: data.host || '',
+                path: data.path || '',
+                tls: data.tls || 'none',
+                fp: data.fp || 'chrome',
+                type: data.type || '',
+                seed: data.seed || '',
+                mode: data.mode || ''
+            }
+        }
+    }
+
+    const p = new URLSearchParams(url.search)
     return {
         ps,
         type: 'vmess',
@@ -86,9 +149,28 @@ function uriToVmessRow(uri: string): ServerRow {
 
 function uriToSsRow(uri: string): ServerRow {
     const url = new URL(uri)
-    const [method, password] = decodeBase64(url.username).split(':')
     const ps = url.hash ? url.hash.slice(1) : ''
 
+    if (!url.search) {
+        const base64 = uri.replace('ss://', '')
+        const decoded = decodeBase64(base64)
+        const data = JSON.parse(decoded)
+
+        return {
+            ps: data.ps || '',
+            type: 'ss',
+            host: `${data.add}:${data.port || 0}`,
+            scy: data.scy || 'aes-256-gcm',
+            data: {
+                add: data.add,
+                port: data.port,
+                scy: data.scy || 'aes-256-gcm',
+                pwd: data.pwd || ''
+            }
+        }
+    }
+
+    const [method, password] = decodeBase64(url.username).split(':')
     return {
         ps,
         type: 'ss',
@@ -105,9 +187,31 @@ function uriToSsRow(uri: string): ServerRow {
 
 function uriToTrojanRow(uri: string): ServerRow {
     const url = new URL(uri)
-    const p = new URLSearchParams(url.search)
     const ps = url.hash ? url.hash.slice(1) : ''
 
+    if (!url.search) {
+        const base64 = uri.replace('trojan://', '')
+        const decoded = decodeBase64(base64)
+        const data = JSON.parse(decoded)
+
+        return {
+            ps: data.ps || '',
+            type: 'trojan',
+            host: `${data.add}:${data.port || 0}`,
+            scy: data.scy || 'tls',
+            data: {
+                add: data.add,
+                port: data.port,
+                pwd: data.pwd || '',
+                flow: data.flow || '',
+                scy: data.scy || 'tls',
+                sni: data.sni || url.hostname,
+                fp: data.fp || 'chrome'
+            }
+        }
+    }
+
+    const p = new URLSearchParams(url.search)
     return {
         ps,
         type: 'trojan',
@@ -122,15 +226,6 @@ function uriToTrojanRow(uri: string): ServerRow {
             sni: p.get('sni') || url.hostname,
             fp: p.get('fp') || 'chrome'
         }
-    }
-}
-
-export function isValidUri(uri: string): boolean {
-    try {
-        new URL(uri)
-        return true
-    } catch (e) {
-        return false
     }
 }
 
@@ -227,6 +322,15 @@ export function ssRowToBase64Uri(row: SsRow, ps: string): string {
 export function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
     const data = {ps, ...row}
     return `trojan://${encodeBase64(JSON.stringify(data))}`
+}
+
+export function isValidUri(uri: string): boolean {
+    try {
+        new URL(uri)
+        return true
+    } catch (e) {
+        return false
+    }
 }
 
 export function vlessRowToConf(row: VlessRow): any {
