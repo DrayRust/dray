@@ -1,15 +1,15 @@
-use crate::dirs;
 use crate::config;
+use crate::dirs;
+use crate::network;
 use crate::ray;
 use crate::web;
-use crate::network;
 use logger::{error, info};
-use tauri::{App, Manager, Runtime};
-use tauri::path::BaseDirectory;
-use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::menu::{Submenu, MenuBuilder, PredefinedMenuItem};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
+use tauri::menu::{MenuBuilder, PredefinedMenuItem, Submenu};
+use tauri::path::BaseDirectory;
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::{App, Manager, Runtime};
 
 pub fn init<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
     if let Err(e) = set_main_window(app) {

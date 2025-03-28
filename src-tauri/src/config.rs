@@ -204,7 +204,7 @@ pub fn read_conf(filename: &str) -> String {
                 error!("Failed to read config file: {}", e);
                 "".to_string()
             })
-        },
+        }
         Err(_e) => {
             // error!("Failed to get config path: {}", _e);
             "".to_string()
