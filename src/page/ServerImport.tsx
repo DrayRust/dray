@@ -56,21 +56,19 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 showSnackbar('导入失败', 'error')
             } else {
                 if (errNum) {
-                    showSnackbar(`${errMsg}， ${okMsg}， ${existMsg}`, 'error')
+                    showSnackbar(`${errMsg}，${okMsg}，${existMsg}`, 'error')
                 } else if (existNum) {
-                    showSnackbar(`${existMsg}， ${okMsg}`, 'warning')
+                    showSnackbar(`${existMsg}，${okMsg}`, 'warning')
                 } else {
                     showSnackbar(okMsg)
                 }
-                setTimeout(() => {
-                    navigate(`/server`)
-                }, 1000)
+                setTimeout(() => navigate(`/server`), 1000)
             }
         } else if (existNum) {
             if (errNum) {
-                showSnackbar(`${existMsg}， ${errMsg}， ${okMsg}`, 'error')
+                showSnackbar(`${existMsg}，${errMsg}，${okMsg}`, 'error')
             } else if (existNum) {
-                showSnackbar(`${existMsg}， ${okMsg}`, 'warning')
+                showSnackbar(`${existMsg}，${okMsg}`, 'warning')
             }
         } else {
             showSnackbar(errMsg, 'error')

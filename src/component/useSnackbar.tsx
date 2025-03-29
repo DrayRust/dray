@@ -31,7 +31,7 @@ export const useSnackbar = () => {
     const SnackbarComponent = () => (
         <Snackbar open={open} onClose={handleClose} autoHideDuration={autoHideDuration}
                   anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}>
-            <Alert severity={severity} action={action} onClose={handleClose}>{message}</Alert>
+            <Alert variant="filled" severity={severity} action={action} onClose={handleClose}>{message}</Alert>
         </Snackbar>
     )
 
