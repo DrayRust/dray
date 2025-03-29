@@ -1,8 +1,7 @@
-import { useState, Fragment } from 'react'
-import { Snackbar, IconButton, Alert } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+import { useState } from 'react'
+import { Snackbar, Alert } from '@mui/material'
 
-export const useSnackbar = () => {
+export const useSnackbar = (showTop?: boolean) => {
     const [open, setOpen] = useState(false)
     const [message, setMessage] = useState('')
     const [autoHideDuration, setAutoHideDuration] = useState<number>(3000)
@@ -20,18 +19,10 @@ export const useSnackbar = () => {
         setOpen(true)
     }
 
-    const action = (
-        <Fragment>
-            <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
-                <CloseIcon fontSize="small"/>
-            </IconButton>
-        </Fragment>
-    )
-
     const SnackbarComponent = () => (
         <Snackbar open={open} onClose={handleClose} autoHideDuration={autoHideDuration}
-                  anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}>
-            <Alert variant="filled" severity={severity} action={action} onClose={handleClose}>{message}</Alert>
+                  anchorOrigin={showTop ? {vertical: 'top', horizontal: 'center'} : {vertical: 'bottom', horizontal: 'right'}}>
+            <Alert variant="filled" severity={severity} onClose={handleClose}>{message}</Alert>
         </Snackbar>
     )
 

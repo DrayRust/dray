@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { IconButton, Alert, Collapse } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+import { Alert, Collapse } from '@mui/material'
 
 export const useAlert = () => {
     const [open, setOpen] = useState(false)
@@ -13,16 +12,9 @@ export const useAlert = () => {
         setOpen(true)
     }
 
-    const handleClose = () => setOpen(false)
-    const action = (
-        <IconButton aria-label="close" color="inherit" size="small" onClick={handleClose}>
-            <CloseIcon fontSize="inherit"/>
-        </IconButton>
-    )
-
     const AlertComponent = () => (
         <Collapse in={open}>
-            <Alert sx={{mt: 2}} severity={severity} action={action} onClose={handleClose}>{msg}</Alert>
+            <Alert sx={{mt: 2, maxWidth: 600}} variant="filled" severity={severity} onClose={() => setOpen(false)}>{msg}</Alert>
         </Collapse>
     )
 

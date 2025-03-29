@@ -4,7 +4,7 @@ import { AppBar, Card, TextField, Typography, Button, Stack } from '@mui/materia
 import PublishIcon from '@mui/icons-material/Publish'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { uriToServerRow } from "../util/server.ts"
-import { useAlert } from "../component/useAlert.tsx"
+import { useSnackbar } from "../component/useSnackbar.tsx"
 
 const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -56,30 +56,31 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             serverList = [...newServerList, ...serverList]
             const ok = await saveServerList(serverList)
             if (!ok) {
-                showAlert('导入失败', 'error')
+                showSnackbar('导入失败', 'error')
             } else {
                 if (errNum) {
-                    showAlert(`${errMsg}，${okMsg}，${existMsg}`, 'error')
+                    showSnackbar(`${errMsg}，${okMsg}，${existMsg}`, 'error')
                 } else if (existNum) {
-                    showAlert(`${existMsg}，${okMsg}`, 'warning')
+                    showSnackbar(`${existMsg}，${okMsg}`, 'warning')
                 } else {
-                    showAlert(okMsg)
+                    showSnackbar(okMsg)
                 }
                 setTimeout(() => navigate(`/server`), 1000)
             }
         } else if (existNum) {
             if (errNum) {
-                showAlert(`${existMsg}，${errMsg}，${okMsg}`, 'error')
+                showSnackbar(`${existMsg}，${errMsg}，${okMsg}`, 'error')
             } else if (existNum) {
-                showAlert(`${existMsg}，${okMsg}`, 'warning')
+                showSnackbar(`${existMsg}，${okMsg}`, 'warning')
             }
         } else {
-            showAlert(errMsg, 'error')
+            showSnackbar(errMsg, 'error')
         }
     }
 
-    const {AlertComponent, showAlert} = useAlert()
+    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     return (<>
+        <SnackbarComponent/>
         <AppBar position="static" sx={{p: 1, pl: 1.5, display: 'flex', flexDirection: 'row', justifyContent: "flex-start", alignItems: "center"}}>
             <PublishIcon sx={{mr: 1}}/>
             <Typography variant="body1">导入</Typography>
@@ -88,7 +89,6 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={inputValue}
                        placeholder="每行一条，例如：vless://xxxxxxx" autoFocus={true} error={error}
                        onChange={(e) => setInputValue(e.target.value)}/>
-            <AlertComponent/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
                 <Button variant="contained" onClick={handleSubmit}>确认</Button>
                 <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
