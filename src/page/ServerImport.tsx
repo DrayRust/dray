@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AppBar, Card, TextField, Typography, Button, Stack } from '@mui/material'
-import PublishIcon from '@mui/icons-material/Publish'
+import { Card, TextField, Button, Stack } from '@mui/material'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { uriToServerRow } from "../util/server.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { useAppBar } from "../component/useAppBar.tsx"
 
 const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -79,12 +79,10 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {AppBarComponent} = useAppBar('导入')
     return (<>
         <SnackbarComponent/>
-        <AppBar position="static" sx={{p: 1, pl: 1.5, display: 'flex', flexDirection: 'row', justifyContent: "flex-start", alignItems: "center"}}>
-            <PublishIcon sx={{mr: 1}}/>
-            <Typography variant="body1">导入</Typography>
-        </AppBar>
+        <AppBarComponent/>
         <Card sx={{p: 2, mt: 1}}>
             <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={inputValue}
                        placeholder="每行一条，例如：vless://xxxxxxx" autoFocus={true} error={error}
