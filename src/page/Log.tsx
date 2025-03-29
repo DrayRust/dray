@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Paper, Box, Button, CircularProgress, Link,
+    Card, Box, Button, CircularProgress, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
 import FmdBadIcon from '@mui/icons-material/FmdBad'
@@ -29,17 +29,17 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 20px)`, textAlign: 'center'}
     return (<>
         {!logList ? (
-            <Paper sx={paperSx}><CircularProgress/></Paper>
+            <Card sx={paperSx}><CircularProgress/></Card>
         ) : logList.length === 0 ? (
-            <Paper sx={paperSx}>
+            <Card sx={paperSx}>
                 <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
                 <div>暂无日志</div>
-            </Paper>
+            </Card>
         ) : (<>
             <Box sx={{mb: 1}}>
                 <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
             </Box>
-            <TableContainer component={Paper}>
+            <TableContainer component={Card}>
                 <Table sx={{minWidth: 650}}>
                     <TableHead>
                         <TableRow>

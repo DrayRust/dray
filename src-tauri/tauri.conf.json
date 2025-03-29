@@ -18,6 +18,8 @@
         "resizable": true,
         "devtools": true,
         "create": true,
+        "focus": true,
+        "alwaysOnTop": false,
         "backgroundColor": "#121212",
         "minWidth": 800,
         "minHeight": 600,
