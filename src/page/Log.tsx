@@ -4,6 +4,7 @@ import {
     Paper, Box, Button, CircularProgress, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
+import FmdBadIcon from '@mui/icons-material/FmdBad'
 
 import { clearLogAll, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
@@ -25,11 +26,15 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         ok && readList()
     }
 
+    const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 20px)`, textAlign: 'center'}
     return (<>
         {!logList ? (
-            <Box sx={{p: 3, textAlign: 'center'}}><CircularProgress/></Box>
+            <Paper sx={paperSx}><CircularProgress/></Paper>
         ) : logList.length === 0 ? (
-            <Box sx={{p: 3, textAlign: 'center', color: 'text.secondary'}}>暂无日志</Box>
+            <Paper sx={paperSx}>
+                <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
+                <div>暂无日志</div>
+            </Paper>
         ) : (<>
             <Box sx={{mb: 1}}>
                 <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
