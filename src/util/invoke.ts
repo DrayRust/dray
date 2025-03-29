@@ -51,9 +51,9 @@ export async function readAppConfig(): Promise<AppConfig> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            const data = await invoke('get_config_json') as string
-            const config = JSON.parse(data) as AppConfig
-            resolve(config)
+            const s = await invoke('get_config_json') as string
+            const data = JSON.parse(s) as AppConfig
+            resolve(data)
         } catch (err) {
             log.error('Failed to readConfig:', err)
             reject(err)
@@ -77,11 +77,11 @@ export async function readRayCommonConfig(): Promise<RayCommonConfig> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            let data = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
-            data = data.trim()
-            if (data) {
-                const config = JSON.parse(data) as RayCommonConfig
-                resolve(config)
+            let s = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s) as RayCommonConfig
+                resolve(data)
             } else {
                 reject()
             }
@@ -109,11 +109,11 @@ export async function readServerList(): Promise<any> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            let data = await invoke('read_conf', {'filename': 'server.json'}) as string
-            data = data.trim()
-            if (data) {
-                const obj = JSON.parse(data)
-                resolve(obj)
+            let s = await invoke('read_conf', {'filename': 'server.json'}) as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s)
+                resolve(data)
             } else {
                 reject()
             }
@@ -141,11 +141,11 @@ export async function readRayConfig(): Promise<any> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            let data = await invoke('read_ray_config') as string
-            data = data.trim()
-            if (data) {
-                const config = JSON.parse(data)
-                resolve(config)
+            let s = await invoke('read_ray_config') as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s)
+                resolve(data)
             } else {
                 reject()
             }
@@ -200,9 +200,14 @@ export async function readLogList() {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
-            const s = await invoke('read_log_list') as string
-            const data = JSON.parse(s) as LogList
-            resolve(data)
+            let s = await invoke('read_log_list') as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s) as LogList
+                resolve(data)
+            } else {
+                reject()
+            }
         } catch (err) {
             log.error('Failed to readLogList:', err)
             reject(err)
