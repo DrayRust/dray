@@ -105,17 +105,17 @@ export async function saveRayCommonConfig(content: RayCommonConfig) {
     }
 }
 
-export async function readServerList(): Promise<any> {
+export async function readServerList(): Promise<ServerList> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
             let s = await invoke('read_conf', {'filename': 'server.json'}) as string
             s = s.trim()
             if (s) {
-                const data = JSON.parse(s)
+                const data = JSON.parse(s) as ServerList
                 resolve(data)
             } else {
-                reject()
+                resolve([])
             }
         } catch (err) {
             log.error('Failed to readServerList:', err)
