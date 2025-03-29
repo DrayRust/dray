@@ -67,7 +67,7 @@ interface ServerRow {
     type: string; // 类型 vless / vmess / ss / trojan
     scy: string; // 加密方式 security
     hash: string; // data JSON 字符串的哈希值，用来排重
-    data: VlessRow | VmessRow | SsRow | TrojanRow;
+    data: VlessRow | VmessRow | SsRow | TrojanRow | null;
 }
 
 interface ServerList extends Array<ServerRow> {
