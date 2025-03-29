@@ -124,13 +124,12 @@ export async function readServerList(): Promise<ServerList> {
     })
 }
 
-export async function saveServerList(content: any) {
+export async function saveServerList(serverList: ServerList) {
     if (!isTauri) return false
     try {
-        return invoke<Boolean>('save_conf', {
-            'filename': 'server.json',
-            'content': JSON.stringify(content, null, 2)
-        })
+        return invoke<Boolean>('save_conf',
+            {'filename': 'server.json', 'content': JSON.stringify(serverList, null, 2)}
+        )
     } catch (err) {
         log.error('Failed to saveServerList:', err)
         return false
@@ -196,7 +195,7 @@ export async function clearLogAll() {
     }
 }
 
-export async function readLogList() {
+export async function readLogList(): Promise<LogList> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
         try {
@@ -206,7 +205,7 @@ export async function readLogList() {
                 const data = JSON.parse(s) as LogList
                 resolve(data)
             } else {
-                reject()
+                resolve([])
             }
         } catch (err) {
             log.error('Failed to readLogList:', err)
