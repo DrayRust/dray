@@ -21,6 +21,10 @@ import { ThemeProvider } from './context/ThemeProvider.tsx'
 
 import Home from "./page/Home.tsx"
 import Server from "./page/Server.tsx"
+import ServerCreate from "./page/ServerCreate.tsx"
+import ServerExport from "./page/ServerExport.tsx"
+import ServerImport from "./page/ServerImport.tsx"
+import ServerUpdate from "./page/ServerUpdate.tsx"
 import Subscription from "./page/Subscription.tsx"
 import Rule from "./page/Rule.tsx"
 import Log from "./page/Log.tsx"
@@ -84,6 +88,10 @@ const App: React.FC = () => {
                     <Routes>
                         <Route path="/" element={<Home setNavState={setNavState}/>}/>
                         <Route path="/server" element={<Server setNavState={setNavState}/>}/>
+                        <Route path="/server_create" element={<ServerCreate setNavState={setNavState}/>}/>
+                        <Route path="/server_import" element={<ServerImport setNavState={setNavState}/>}/>
+                        <Route path="/server_export" element={<ServerExport setNavState={setNavState}/>}/>
+                        <Route path="/server_update" element={<ServerUpdate setNavState={setNavState}/>}/>
                         <Route path="/subscription" element={<Subscription setNavState={setNavState}/>}/>
                         <Route path="/rule" element={<Rule setNavState={setNavState}/>}/>
                         <Route path="/log" element={<Log setNavState={setNavState}/>}/>

@@ -38,8 +38,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_export`)
     }
 
-    const handleEdit = (key: number) => {
-        navigate(`/server_edit?key=${key}`)
+    const handleUpdate = (key: number) => {
+        navigate(`/server_update?key=${key}`)
     }
 
     const handleDelete = (key: number) => {
@@ -49,9 +49,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 64px)`, textAlign: 'center'}
     return (<>
         <Stack direction="row" spacing={1} sx={{mb: 1}}>
-            <Button variant="contained" onClick={handleCreate}>添加</Button>
-            <Button variant="contained" onClick={handleImport}>导入</Button>
-            <Button variant="contained" onClick={handleExport}>导出</Button>
+            <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
+            <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
+            <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
         </Stack>
         {!serverList ? (
             <Paper sx={paperSx}><CircularProgress/></Paper>
@@ -82,7 +82,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell>
                                     <Stack direction="row" spacing={1}>
                                         <Button variant="contained" color="primary" startIcon={<EditIcon/>}
-                                                onClick={() => handleEdit(key)}>修改</Button>
+                                                onClick={() => handleUpdate(key)}>修改</Button>
                                         <Button variant="contained" color="error" startIcon={<DeleteIcon/>}
                                                 onClick={() => handleDelete(key)}>删除</Button>
                                     </Stack>
