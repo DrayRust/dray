@@ -181,7 +181,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }, [])
 
     const Row = ({index, style}: { index: number; style: React.CSSProperties }) => (
-        <pre style={style} dangerouslySetInnerHTML={{__html: logList[index]}}/>
+        <pre style={style} dangerouslySetInnerHTML={{__html: logList[index] + "\n"}}/>
     )
 
     const {SnackbarComponent, showSnackbar} = useSnackbar()
