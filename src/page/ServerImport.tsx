@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppBar, Card, TextField, Typography, Button, Stack } from '@mui/material'
 import PublishIcon from '@mui/icons-material/Publish'
@@ -11,13 +11,24 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     const navigate = useNavigate()
     const [inputValue, setInputValue] = useState('')
 
-    const handleSubmit = async () => {
-        const arr = inputValue.trim().split('\n')
+    // 防抖处理，防止频繁提交
+    const timeoutRef = useRef<number>()
+    const handleSubmit = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(submitFn, 300)
+    }
+
+    const submitFn = async () => {
+        const s = inputValue.trim()
+        if (!s) return
+        // setInputValue('')
+
         let errNum = 0
         let newNum = 0
         let existNum = 0
         let newServerList: ServerList = []
         let serverList = await readServerList() || []
+        const arr = s.split('\n')
         for (let uri of arr) {
             uri = uri.trim()
             if (!uri) continue
@@ -35,20 +46,34 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             }
         }
 
-        if (errNum) showSnackbar(`解析链接（URI）错误: ${errNum} 条`, 'error')
+        const errMsg = `解析链接（URI）错误: ${errNum} 条`
+        const okMsg = `导入成功: ${newNum} 条`
+        const existMsg = `已存在: ${existNum} 条`
         if (newNum) {
             serverList = [...newServerList, ...serverList]
             const ok = await saveServerList(serverList)
             if (!ok) {
                 showSnackbar('导入失败', 'error')
             } else {
-                showSnackbar(`导入成功: ${newNum} 条` + (existNum ? `，已存在: ${existNum} 条` : ''))
+                if (errNum) {
+                    showSnackbar(`${errMsg}， ${okMsg}， ${existMsg}`, 'error')
+                } else if (existNum) {
+                    showSnackbar(`${existMsg}， ${okMsg}`, 'warning')
+                } else {
+                    showSnackbar(okMsg)
+                }
                 setTimeout(() => {
                     navigate(`/server`)
                 }, 1000)
             }
         } else if (existNum) {
-            showSnackbar(`已存在: ${existNum} 条，导入成功: ${newNum} 条`, 'warning')
+            if (errNum) {
+                showSnackbar(`${existMsg}， ${errMsg}， ${okMsg}`, 'error')
+            } else if (existNum) {
+                showSnackbar(`${existMsg}， ${okMsg}`, 'warning')
+            }
+        } else {
+            showSnackbar(errMsg, 'error')
         }
     }
 
