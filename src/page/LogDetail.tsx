@@ -168,7 +168,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
 
         const isAtTop = scrollOffset === 0
         const isAtBottom = scrollOffset + window.innerHeight - 75 >= listRef.current.props.itemSize * logList.length
-        if (isAtTop || isAtBottom) debouncedScroll(isAtTop, isAtBottom)
+        debouncedScroll(isAtTop, isAtBottom)
     }
 
     const [listHeight, setListHeight] = useState(window.innerHeight - 75)
