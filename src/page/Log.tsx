@@ -12,13 +12,12 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
     const navigate = useNavigate()
 
+    const [logList, setLogList] = useState<LogList>()
     const readList = () => {
         readLogList().then((d) => {
             setLogList(d as LogList)
         }).catch(_ => 0)
     }
-
-    const [logList, setLogList] = useState<LogList>()
     useEffect(() => readList(), [])
 
     const handleClearLogs = async () => {
@@ -27,15 +26,15 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     }
 
     return (<>
-        <Box sx={{mb: 1, display: 'flex', justifyContent: 'flex-end'}}>
-            <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
-        </Box>
-        <TableContainer component={Paper}>
-            {!logList ? (
-                <Box sx={{p: 3, textAlign: 'center'}}><CircularProgress/></Box>
-            ) : logList.length === 0 ? (
-                <Box sx={{p: 3, textAlign: 'center', color: 'text.secondary'}}>暂无日志</Box>
-            ) : (
+        {!logList ? (
+            <Box sx={{p: 3, textAlign: 'center'}}><CircularProgress/></Box>
+        ) : logList.length === 0 ? (
+            <Box sx={{p: 3, textAlign: 'center', color: 'text.secondary'}}>暂无日志</Box>
+        ) : (<>
+            <Box sx={{mb: 1}}>
+                <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
+            </Box>
+            <TableContainer component={Paper}>
                 <Table sx={{minWidth: 650}}>
                     <TableHead>
                         <TableRow>
@@ -58,8 +57,8 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
                         ))}
                     </TableBody>
                 </Table>
-            )}
-        </TableContainer>
+            </TableContainer>
+        </>)}
     </>)
 }
 
