@@ -63,8 +63,8 @@ interface PrevLogContent {
 // ============= server ============
 interface ServerRow {
     ps: string; // 附言 postscript / 服务器备注 remark
-    type: string; // 类型 vless / vmess / ss / trojan
     host: string; // 主机名+端口 如：example.com:8080
+    type: string; // 类型 vless / vmess / ss / trojan
     scy: string; // 加密方式 security
     hash: string; // data JSON 字符串的哈希值，用来排重
     data: VlessRow | VmessRow | SsRow | TrojanRow;
