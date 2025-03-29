@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Paper, Stack,
+    Card, Stack,
     Button, CircularProgress,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material'
@@ -46,7 +46,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         console.log(`Delete server: ${key}`)
     }
 
-    const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 64px)`, textAlign: 'center'}
+    const cardSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 64px)`, textAlign: 'center'}
     return (<>
         <Stack direction="row" spacing={1} sx={{mb: 1}}>
             <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
@@ -54,14 +54,14 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
         </Stack>
         {!serverList ? (
-            <Paper sx={paperSx}><CircularProgress/></Paper>
+            <Card sx={cardSx}><CircularProgress/></Card>
         ) : serverList.length === 0 ? (
-            <Paper sx={paperSx}>
+            <Card sx={cardSx}>
                 <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
                 <div>暂无服务器</div>
-            </Paper>
+            </Card>
         ) : (<>
-            <TableContainer component={Paper}>
+            <TableContainer component={Card}>
                 <Table sx={{minWidth: 650}}>
                     <TableHead>
                         <TableRow>
