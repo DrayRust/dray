@@ -3,6 +3,10 @@ import { decodeBase64, encodeBase64 } from './base64.ts'
 import { hashString } from "./util.ts"
 
 export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
+    if (!isValidUri(uri)) {
+        log.error("Invalid url:", uri)
+        return null
+    }
     try {
         if (uri.startsWith('vless://')) {
             return uriToVlessRow(uri)
@@ -17,7 +21,7 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
             return null
         }
     } catch (e) {
-        log.error("Invalid url:", uri)
+        log.error("Failed to parse url:", uri, e)
         return null
     }
 }
@@ -320,14 +324,14 @@ export function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
     return `trojan://${encodeBase64(JSON.stringify(data))}`
 }
 
-/*export function isValidUri(uri: string): boolean {
+export function isValidUri(uri: string): boolean {
     try {
         new URL(uri)
         return true
     } catch (e) {
         return false
     }
-}*/
+}
 
 export function vlessRowToConf(row: VlessRow): any {
     return {
