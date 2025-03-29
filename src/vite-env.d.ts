@@ -66,7 +66,11 @@ interface ServerRow {
     type: string; // 类型 vless / vmess / ss / trojan
     host: string; // 主机名+端口 如：example.com:8080
     scy: string; // 加密方式 security
+    hash: string; // data JSON 字符串的哈希值，用来排重
     data: VlessRow | VmessRow | SsRow | TrojanRow;
+}
+
+interface ServerList extends Array<ServerRow> {
 }
 
 interface VlessRow {

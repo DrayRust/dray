@@ -1,7 +1,8 @@
 import { log } from './invoke.ts'
 import { decodeBase64, encodeBase64 } from './base64.ts'
+import { hashString } from "./util.ts"
 
-export function uriToServerRow(uri: string): ServerRow | null {
+export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
     try {
         if (uri.startsWith('vless://')) {
             return uriToVlessRow(uri)
@@ -21,50 +22,41 @@ export function uriToServerRow(uri: string): ServerRow | null {
     }
 }
 
-function uriToVlessRow(uri: string): ServerRow {
+async function uriToVlessRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
+    let ps = ''
+    let data: VlessRow
     if (url.search) {
-        const ps = url.hash ? url.hash.slice(1) : ''
+        if (url.hash) ps = url.hash.slice(1).trim()
         const p = new URLSearchParams(url.search)
-        return {
-            ps,
-            type: 'vless',
-            host: `${url.hostname}:${url.port || 0}`,
+        data = {
+            add: url.hostname,
+            port: Number(url.port) || 0,
+            id: url.username,
+            flow: p.get('flow') || '',
             scy: p.get('security') || 'none',
-            data: {
-                add: url.hostname,
-                port: Number(url.port),
-                id: url.username,
-                flow: p.get('flow') || '',
-                scy: p.get('security') || 'none',
-                encryption: p.get('encryption') || 'none',
-                type: p.get('type') || 'tcp',
-                host: p.get('host') || '',
-                path: p.get('path') || '',
-                net: p.get('type') || 'tcp',
-                fp: p.get('fp') || 'chrome',
-                pbk: p.get('pbk') || '',
-                sid: p.get('sid') || '',
-                sni: p.get('sni') || '',
-                serviceName: p.get('serviceName') || '',
-                headerType: p.get('headerType') || '',
-                seed: p.get('seed') || '',
-                mode: p.get('mode') || ''
-            }
+            encryption: p.get('encryption') || 'none',
+            type: p.get('type') || 'tcp',
+            host: p.get('host') || '',
+            path: p.get('path') || '',
+            net: p.get('type') || 'tcp',
+            fp: p.get('fp') || 'chrome',
+            pbk: p.get('pbk') || '',
+            sid: p.get('sid') || '',
+            sni: p.get('sni') || '',
+            serviceName: p.get('serviceName') || '',
+            headerType: p.get('headerType') || '',
+            seed: p.get('seed') || '',
+            mode: p.get('mode') || ''
         }
-    }
-
-    const base64 = uri.replace('vless://', '')
-    const decoded = decodeBase64(base64)
-    const d = JSON.parse(decoded)
-    return {
-        ps: d.ps || '',
-        type: 'vless',
-        host: `${d.add}:${d.port || 0}`,
-        scy: d.scy || 'none',
-        data: {
+    } else {
+        const base64 = uri.replace('vless://', '')
+        const decoded = decodeBase64(base64)
+        const d = JSON.parse(decoded)
+        ps = d.ps || ''
+        data = {
             add: d.add,
-            port: d.port,
+            port: Number(d.port) || 0,
             id: d.id,
             flow: d.flow || '',
             scy: d.scy || 'none',
@@ -83,49 +75,50 @@ function uriToVlessRow(uri: string): ServerRow {
             mode: d.mode || ''
         }
     }
+
+    return {
+        ps: ps,
+        type: 'vless',
+        host: `${data.add}:${url.port}`,
+        scy: data.scy,
+        hash: await hashString(JSON.stringify(data)),
+        data
+    }
 }
 
-function uriToVmessRow(uri: string): ServerRow {
+async function uriToVmessRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
-    if (url.search) {
-        const ps = url.hash ? url.hash.slice(1) : ''
-        const p = new URLSearchParams(url.search)
-        return {
-            ps,
-            type: 'vmess',
-            host: `${url.hostname}:${url.port || 0}`,
-            scy: p.get('security') || 'auto',
-            data: {
-                add: url.hostname,
-                port: Number(url.port),
-                id: url.username,
-                aid: Number(p.get('aid')) || 0,
-                scy: p.get('security') || 'auto',
-                alpn: p.get('alpn') || '',
-                sni: p.get('sni') || '',
-                net: p.get('net') || 'tcp',
-                host: p.get('host') || '',
-                path: p.get('path') || '',
-                tls: p.get('tls') || 'none',
-                fp: p.get('fp') || 'chrome',
-                type: p.get('type') || '',
-                seed: p.get('seed') || '',
-                mode: p.get('mode') || ''
-            }
-        }
-    }
+    let ps = ''
+    let data: VmessRow
 
-    const base64 = uri.replace('vmess://', '')
-    const decoded = decodeBase64(base64)
-    const d = JSON.parse(decoded)
-    return {
-        ps: d.ps || '',
-        type: 'vmess',
-        host: `${d.add}:${d.port || 0}`,
-        scy: d.scy || 'auto',
-        data: {
+    if (url.search) {
+        if (url.hash) ps = url.hash.slice(1).trim()
+        const p = new URLSearchParams(url.search)
+        data = {
+            add: url.hostname,
+            port: Number(url.port) || 0,
+            id: url.username,
+            aid: Number(p.get('aid')) || 0,
+            scy: p.get('security') || 'auto',
+            alpn: p.get('alpn') || '',
+            sni: p.get('sni') || '',
+            net: p.get('net') || 'tcp',
+            host: p.get('host') || '',
+            path: p.get('path') || '',
+            tls: p.get('tls') || 'none',
+            fp: p.get('fp') || 'chrome',
+            type: p.get('type') || '',
+            seed: p.get('seed') || '',
+            mode: p.get('mode') || ''
+        }
+    } else {
+        const base64 = uri.replace('vmess://', '')
+        const decoded = decodeBase64(base64)
+        const d = JSON.parse(decoded)
+        ps = d.ps || ''
+        data = {
             add: d.add,
-            port: d.port,
+            port: Number(d.port) || 0,
             id: d.id,
             aid: d.aid || 0,
             scy: d.scy || 'auto',
@@ -141,83 +134,94 @@ function uriToVmessRow(uri: string): ServerRow {
             mode: d.mode || ''
         }
     }
+
+    return {
+        ps,
+        type: 'vmess',
+        host: `${data.add}:${url.port}`,
+        scy: data.scy,
+        hash: await hashString(JSON.stringify(data)),
+        data
+    }
 }
 
-function uriToSsRow(uri: string): ServerRow {
+async function uriToSsRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
-    if (url.search) {
-        const ps = url.hash ? url.hash.slice(1) : ''
-        const [method, password] = decodeBase64(url.username).split(':')
-        return {
-            ps,
-            type: 'ss',
-            host: `${url.hostname}:${url.port || 0}`,
-            scy: method || 'aes-256-gcm',
-            data: {
-                add: url.hostname,
-                port: Number(url.port),
-                scy: method || 'aes-256-gcm',
-                pwd: password || ''
-            }
-        }
-    }
+    let ps = ''
+    let data: SsRow
 
-    const base64 = uri.replace('ss://', '')
-    const decoded = decodeBase64(base64)
-    const d = JSON.parse(decoded)
-    return {
-        ps: d.ps || '',
-        type: 'ss',
-        host: `${d.add}:${d.port || 0}`,
-        scy: d.scy || 'aes-256-gcm',
-        data: {
+    if (url.search) {
+        if (url.hash) ps = url.hash.slice(1).trim()
+        const [method, password] = decodeBase64(url.username).split(':')
+        data = {
+            add: url.hostname,
+            port: Number(url.port) || 0,
+            scy: method || 'aes-256-gcm',
+            pwd: password || ''
+        }
+    } else {
+        const base64 = uri.replace('ss://', '')
+        const decoded = decodeBase64(base64)
+        const d = JSON.parse(decoded)
+        ps = d.ps || ''
+        data = {
             add: d.add,
-            port: d.port,
+            port: Number(d.port) || 0,
             scy: d.scy || 'aes-256-gcm',
             pwd: d.pwd || ''
         }
     }
+
+    return {
+        ps,
+        type: 'ss',
+        host: `${data.add}:${url.port}`,
+        scy: data.scy,
+        hash: await hashString(JSON.stringify(data)),
+        data
+    }
 }
 
-function uriToTrojanRow(uri: string): ServerRow {
+async function uriToTrojanRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
-    if (url.search) {
-        const ps = url.hash ? url.hash.slice(1) : ''
-        const p = new URLSearchParams(url.search)
-        return {
-            ps,
-            type: 'trojan',
-            host: `${url.hostname}:${url.port || 0}`,
-            scy: p.get('security') || 'tls',
-            data: {
-                add: url.hostname,
-                port: Number(url.port),
-                pwd: url.username,
-                flow: p.get('flow') || '',
-                scy: p.get('security') || 'tls',
-                sni: p.get('sni') || url.hostname,
-                fp: p.get('fp') || 'chrome'
-            }
-        }
-    }
+    let ps = ''
+    let data: TrojanRow
 
-    const base64 = uri.replace('trojan://', '')
-    const decoded = decodeBase64(base64)
-    const d = JSON.parse(decoded)
-    return {
-        ps: d.ps || '',
-        type: 'trojan',
-        host: `${d.add}:${d.port || 0}`,
-        scy: d.scy || 'tls',
-        data: {
+    if (url.search) {
+        if (url.hash) ps = url.hash.slice(1).trim()
+        const p = new URLSearchParams(url.search)
+        data = {
+            add: url.hostname,
+            port: Number(url.port) || 0,
+            pwd: url.username,
+            flow: p.get('flow') || '',
+            scy: p.get('security') || 'tls',
+            sni: p.get('sni') || url.hostname,
+            fp: p.get('fp') || 'chrome'
+        }
+    } else {
+        const base64 = uri.replace('trojan://', '')
+        const decoded = decodeBase64(base64)
+        const d = JSON.parse(decoded)
+        ps = d.ps || ''
+        data = {
             add: d.add,
-            port: d.port,
+            port: Number(d.port) || 0,
             pwd: d.pwd || '',
             flow: d.flow || '',
             scy: d.scy || 'tls',
             sni: d.sni || url.hostname,
             fp: d.fp || 'chrome'
         }
+    }
+
+    return {
+        ps,
+        type: 'trojan',
+        host: `${data.add}:${url.port}`,
+        scy: data.scy,
+        hash: await hashString(JSON.stringify(data)),
+        data
     }
 }
 
