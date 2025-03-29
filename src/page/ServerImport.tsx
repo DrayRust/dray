@@ -88,7 +88,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                        placeholder="每行一条，例如：vless://xxxxxxx" autoFocus={true} error={error}
                        onChange={(e) => setInputValue(e.target.value)}/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                <Button variant="contained" onClick={handleSubmit}>确认</Button>
+                <Button variant="contained" onClick={handleSubmit} disabled={!inputValue}>确认</Button>
                 <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
             </Stack>
         </Card>
