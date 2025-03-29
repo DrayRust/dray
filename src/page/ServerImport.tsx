@@ -13,32 +13,42 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
 
     const handleSubmit = async () => {
         const arr = inputValue.trim().split('\n')
-        let err = 0
-        let num = 0
+        let errNum = 0
+        let newNum = 0
+        let existNum = 0
         let newServerList: ServerList = []
-        for (const uri of arr) {
+        let serverList = await readServerList() || []
+        for (let uri of arr) {
+            uri = uri.trim()
+            if (!uri) continue
             const row = await uriToServerRow(uri)
             if (!row) {
-                err++
+                errNum++
             } else {
-                num++
-                newServerList.push(row)
+                const isExist = serverList.some(server => server.hash === row.hash)
+                if (isExist) {
+                    existNum++
+                } else {
+                    newNum++
+                    newServerList.push(row)
+                }
             }
         }
 
-        if (err) showSnackbar(`解析链接（URI）错误: ${err} 条`, 'error')
-        if (num) {
-            let serverList = await readServerList()
+        if (errNum) showSnackbar(`解析链接（URI）错误: ${errNum} 条`, 'error')
+        if (newNum) {
             serverList = [...newServerList, ...serverList]
             const ok = await saveServerList(serverList)
             if (!ok) {
                 showSnackbar('导入失败', 'error')
             } else {
-                showSnackbar(`导入成功: ${num} 条`)
+                showSnackbar(`导入成功: ${newNum} 条` + (existNum ? `，已存在: ${existNum} 条` : ''))
                 setTimeout(() => {
                     navigate(`/server`)
                 }, 1000)
             }
+        } else if (existNum) {
+            showSnackbar(`已存在: ${existNum} 条，导入成功: ${newNum} 条`, 'warning')
         }
     }
 
@@ -50,7 +60,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             <Typography variant="body1">导入</Typography>
         </AppBar>
         <Card sx={{p: 2, mt: 1}}>
-            <TextField label="请输入链接(URI)" multiline rows={5} fullWidth variant="outlined" value={inputValue}
+            <TextField label="请输入链接(URI)" multiline rows={6} fullWidth variant="outlined" value={inputValue}
                        onChange={(e) => setInputValue(e.target.value)}/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
                 <Button variant="contained" onClick={handleSubmit}>确认</Button>
