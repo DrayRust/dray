@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { QRCodeSVG } from 'qrcode.react'
 import {
-    Card, Box, Divider, Typography, Switch,
-    FormControlLabel, Checkbox,
+    Card, Box, Divider, Typography, Switch, Tooltip,
+    FormControlLabel, Checkbox, TextField, IconButton,
     CircularProgress, Stack, Button
 } from '@mui/material'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import FileCopyIcon from '@mui/icons-material/FileCopy'
 
 import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
@@ -12,10 +15,16 @@ import { log, readServerList, saveTextFile } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
 
+interface QRCode {
+    ps: string;
+    uri: string;
+}
+
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
     const navigate = useNavigate()
 
+    const [showQRCodeList, setShowQRCodeList] = useState<QRCode[]>([])
     const [serverList, setServerList] = useState<ServerList>()
     const readList = () => {
         readServerList().then((d) => {
@@ -27,13 +36,18 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     const [selectedAll, setSelectedAll] = useState(true)
     const [selectedServers, setSelectedServers] = useState<boolean[]>([])
     const [isBase64, setIsBase64] = useState(false)
+    const [isDisabled, setIsDisabled] = useState(true)
 
     useEffect(() => {
-        if (serverList) setSelectedServers(new Array(serverList.length).fill(true))
+        if (serverList) {
+            setSelectedServers(new Array(serverList.length).fill(selectedAll))
+            setIsDisabled(!selectedAll)
+        }
     }, [serverList])
 
     const handleSelectAll = (checked: boolean) => {
         setSelectedAll(checked)
+        setIsDisabled(!checked)
         if (serverList) setSelectedServers(new Array(serverList.length).fill(checked))
     }
 
@@ -42,14 +56,19 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         newSelected[index] = checked
         setSelectedServers(newSelected)
         setSelectedAll(newSelected.every(Boolean))
+        setIsDisabled(!newSelected.some(Boolean))
     }
 
     const handleExportQRCode = () => {
         const selected = serverList?.filter((_, index) => selectedServers[index])
         if (selected && selected.length > 0) {
-            console.log(selected)
-        } else {
-            showSnackbar(`请选择要导出的服务器`, 'error')
+            const qrCodeList = selected.map(server => {
+                return {
+                    ps: server.ps,
+                    uri: isBase64 ? serverRowToBase64Uri(server) : serverRowToUri(server)
+                }
+            })
+            setShowQRCodeList(qrCodeList)
         }
     }
 
@@ -64,8 +83,6 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
             }).join('\n')
             const ok = await saveTextFile(path, content)
             if (!ok) showSnackbar(`保存文件失败`, 'error')
-        } else {
-            showSnackbar(`请选择要导出的服务器`, 'warning')
         }
     }
 
@@ -88,44 +105,78 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     return <>
         <SnackbarComponent/>
         <AppBarComponent/>
-        <Card sx={{mt: 1}}>
-            <Box sx={{px: 2, py: 1}}>
-                <FormControlLabel
-                    control={<Checkbox
-                        checked={selectedAll}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                    />}
-                    label={`全选`}
-                />
-                <div>
-                    {!serverList ? (
-                        <CircularProgress sx={{m: 3}}/>
-                    ) : serverList?.map((server, index) => (
-                        <FormControlLabel
-                            key={index}
-                            control={
-                                <Checkbox
-                                    checked={selectedServers[index] ?? false}
-                                    onChange={(e) => handleSelectServer(index, e.target.checked)}
-                                />
-                            }
-                            label={`${server.ps}`}
-                        />
-                    ))}
-                </div>
-            </Box>
-            <Divider/>
-            <Stack direction="row" spacing={1} sx={{p: 2, pt: 1, pb: 0, alignItems: 'center'}}>
-                <Typography>URL 格式</Typography>
-                <Switch checked={isBase64} onChange={(e) => setIsBase64(e.target.checked)}/>
-                <Typography>Base64 URI 格式</Typography>
-            </Stack>
-            <Stack direction="row" spacing={1} sx={{p: 2, pt: 1}}>
-                <Button variant="contained" color="secondary" onClick={handleExportQRCode}>导出二维码</Button>
-                <Button variant="contained" color="success" onClick={handleExportTextFile}>导出备份文件</Button>
-                <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
-            </Stack>
-        </Card>
+        {showQRCodeList.length > 0 ? (
+            <Card sx={{mt: 1, p: 2}}>
+                <Button variant="outlined" onClick={() => setShowQRCodeList([])}>返回</Button>
+                {showQRCodeList?.map((v, i) => (
+                    <Card sx={{mt: 2, p: 2, border: '1px solid #ddd', textAlign: 'left'}}>
+                        <Typography gutterBottom variant="h5" component="div">{v.ps}</Typography>
+                        <QRCodeSVG id={`qrcode-${i}`} value={v.uri} title={v.ps} size={256}/>
+                        <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
+                        <Box sx={{mt: 1}}>
+                            <Tooltip title="复制 URI">
+                                <IconButton title="" onClick={async () => {
+                                    await navigator.clipboard.writeText(v.uri)
+                                    showSnackbar('URI 已复制', 'success')
+                                }}>
+                                    <ContentCopyIcon/>
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="复制二维码 SVG">
+                                <IconButton onClick={async () => {
+                                    const qrCodeHtml = document.getElementById(`qrcode-${i}`)?.outerHTML
+                                    if (qrCodeHtml) {
+                                        await navigator.clipboard.writeText(qrCodeHtml)
+                                        showSnackbar('二维码 SVG 已复制', 'success')
+                                    }
+                                }}>
+                                    <FileCopyIcon/>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                    </Card>
+                ))}
+            </Card>
+        ) : (
+            <Card sx={{mt: 1}}>
+                <Box sx={{px: 2, py: 1}}>
+                    <FormControlLabel
+                        label={`全选`}
+                        control={<Checkbox
+                            checked={selectedAll}
+                            onChange={(e) => handleSelectAll(e.target.checked)}
+                        />}
+                    />
+                    <div>
+                        {!serverList ? (
+                            <CircularProgress sx={{m: 3}}/>
+                        ) : serverList?.map((server, index) => (
+                            <FormControlLabel
+                                key={index}
+                                label={`${server.ps}`}
+                                control={
+                                    <Checkbox
+                                        checked={selectedServers[index] ?? false}
+                                        onChange={(e) => handleSelectServer(index, e.target.checked)}
+                                    />
+                                }
+                            />
+                        ))}
+                    </div>
+                </Box>
+                <Divider/>
+                <Stack direction="row" spacing={1} sx={{p: 2, pt: 1, pb: 0, alignItems: 'center'}}>
+                    <Typography>URL 格式</Typography>
+                    <Switch checked={isBase64} onChange={(e) => setIsBase64(e.target.checked)}/>
+                    <Typography>Base64 URI 格式</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1} sx={{p: 2, pt: 1}}>
+                    <Button variant="contained" color="secondary" onClick={handleExportQRCode} disabled={isDisabled}>导出二维码</Button>
+                    <Button variant="contained" color="success" onClick={handleExportTextFile} disabled={isDisabled}>导出备份文件</Button>
+                    <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
+                </Stack>
+            </Card>
+        )}
     </>
 }
 
