@@ -2,9 +2,18 @@ import { log } from './invoke.ts'
 import { decodeBase64, encodeBase64 } from './base64.ts'
 import { hashString } from "./util.ts"
 
+export function isValidUri(uri: string): boolean {
+    try {
+        new URL(uri)
+        return true
+    } catch (e) {
+        return false
+    }
+}
+
 export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
     if (!isValidUri(uri)) {
-        log.error("Invalid url:", uri)
+        log.error("Invalid URI:", uri)
         return null
     }
     try {
@@ -17,11 +26,11 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
         } else if (uri.startsWith('trojan://')) {
             return uriToTrojanRow(uri)
         } else {
-            log.error("Unsupported protocol, url:", uri)
+            log.error("Unsupported protocol, URI:", uri)
             return null
         }
     } catch (e) {
-        log.error("Failed to parse url:", uri, e)
+        log.error("Failed to parse URI:", uri, e)
         return null
     }
 }
@@ -229,7 +238,29 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
     }
 }
 
-export function vlessRowToUri(row: VlessRow, ps: string): string {
+export function serverRowToUri(row: ServerRow): string {
+    const {type, data, ps} = row
+    try {
+        switch (type) {
+            case 'vless':
+                return vlessRowToUri(data as VlessRow, ps)
+            case 'vmess':
+                return vmessRowToUri(data as VmessRow, ps)
+            case 'ss':
+                return ssRowToUri(data as SsRow, ps)
+            case 'trojan':
+                return trojanRowToUri(data as TrojanRow, ps)
+            default:
+                log.error("Unknown server type:", type)
+                return ''
+        }
+    } catch (e) {
+        log.error("Error converting server row to URI:", e)
+        return ''
+    }
+}
+
+function vlessRowToUri(row: VlessRow, ps: string): string {
     const url = new URL('vless://')
     url.hostname = row.add
     url.port = row.port.toString()
@@ -255,7 +286,7 @@ export function vlessRowToUri(row: VlessRow, ps: string): string {
     return url.toString()
 }
 
-export function vmessRowToUri(row: VmessRow, ps: string): string {
+function vmessRowToUri(row: VmessRow, ps: string): string {
     const url = new URL('vmess://')
     url.hostname = row.add
     url.port = row.port.toString()
@@ -279,7 +310,7 @@ export function vmessRowToUri(row: VmessRow, ps: string): string {
     return url.toString()
 }
 
-export function ssRowToUri(row: SsRow, ps: string): string {
+function ssRowToUri(row: SsRow, ps: string): string {
     const url = new URL('ss://')
     url.hostname = row.add
     url.port = row.port.toString()
@@ -288,7 +319,7 @@ export function ssRowToUri(row: SsRow, ps: string): string {
     return url.toString()
 }
 
-export function trojanRowToUri(row: TrojanRow, ps: string): string {
+function trojanRowToUri(row: TrojanRow, ps: string): string {
     const url = new URL('trojan://')
     url.hostname = row.add
     url.port = row.port.toString()
@@ -304,36 +335,71 @@ export function trojanRowToUri(row: TrojanRow, ps: string): string {
     return url.toString()
 }
 
-export function vlessRowToBase64Uri(row: VlessRow, ps: string): string {
+export function serverRowToBase64Uri(row: ServerRow): string {
+    const {type, data, ps} = row
+    try {
+        switch (type) {
+            case 'vless':
+                return vlessRowToBase64Uri(data as VlessRow, ps)
+            case 'vmess':
+                return vmessRowToBase64Uri(data as VmessRow, ps)
+            case 'ss':
+                return ssRowToBase64Uri(data as SsRow, ps)
+            case 'trojan':
+                return trojanRowToBase64Uri(data as TrojanRow, ps)
+            default:
+                log.error("Unknown server type:", type)
+                return ''
+        }
+    } catch (e) {
+        log.error("Error converting server row to Base64 URI:", e)
+        return ''
+    }
+}
+
+function vlessRowToBase64Uri(row: VlessRow, ps: string): string {
     const data = {ps, ...row}
     return `vless://${encodeBase64(JSON.stringify(data))}`
 }
 
-export function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
+function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
     const data = {ps, v: 2, ...row}
     return `vmess://${encodeBase64(JSON.stringify(data))}`
 }
 
-export function ssRowToBase64Uri(row: SsRow, ps: string): string {
+function ssRowToBase64Uri(row: SsRow, ps: string): string {
     const data = {ps, ...row}
     return `ss://${encodeBase64(JSON.stringify(data))}`
 }
 
-export function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
+function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
     const data = {ps, ...row}
     return `trojan://${encodeBase64(JSON.stringify(data))}`
 }
 
-export function isValidUri(uri: string): boolean {
+export function serverRowToConf(row: ServerRow): any {
+    const {type, data} = row
     try {
-        new URL(uri)
-        return true
+        switch (type) {
+            case 'vless':
+                return vlessRowToConf(data as VlessRow)
+            case 'vmess':
+                return vmessRowToConf(data as VmessRow)
+            case 'ss':
+                return ssRowToConf(data as SsRow)
+            case 'trojan':
+                return trojanRowToConf(data as TrojanRow)
+            default:
+                log.error("Unknown server type:", type)
+                return null
+        }
     } catch (e) {
-        return false
+        log.error("Error converting server row to config:", e)
+        return null
     }
 }
 
-export function vlessRowToConf(row: VlessRow): any {
+function vlessRowToConf(row: VlessRow): any {
     return {
         tag: "proxy",
         protocol: "vless",
@@ -364,7 +430,7 @@ export function vlessRowToConf(row: VlessRow): any {
     }
 }
 
-export function vmessRowToConf(row: VmessRow): any {
+function vmessRowToConf(row: VmessRow): any {
     return {
         tag: "proxy",
         protocol: "vmess",
@@ -399,7 +465,7 @@ export function vmessRowToConf(row: VmessRow): any {
     }
 }
 
-export function ssRowToConf(row: SsRow): any {
+function ssRowToConf(row: SsRow): any {
     return {
         tag: "proxy",
         protocol: "shadowsocks",
@@ -416,7 +482,7 @@ export function ssRowToConf(row: SsRow): any {
     }
 }
 
-export function trojanRowToConf(row: TrojanRow): any {
+function trojanRowToConf(row: TrojanRow): any {
     return {
         tag: "proxy",
         protocol: "trojan",
