@@ -53,31 +53,33 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const handleExport = async () => {
+    const handleExportTextFile = async () => {
         const selected = serverList?.filter((_, index) => selectedServers[index])
         if (selected && selected.length > 0) {
-            let s = selected.map(server => {
+            const path = await showSaveDialog()
+            if (!path) return
+
+            let content = selected.map(server => {
                 return isBase64 ? serverRowToBase64Uri(server) : serverRowToUri(server)
             }).join('\n')
-            const ok = await saveExportFile(s)
-            if (!ok) showSnackbar(`导出失败`, 'error')
+            const ok = await saveTextFile(path, content)
+            if (!ok) showSnackbar(`保存文件失败`, 'error')
         } else {
-            showSnackbar(`请选择要导出的服务器`, 'error')
+            showSnackbar(`请选择要导出的服务器`, 'warning')
         }
     }
 
-    const saveExportFile = async (content: string) => {
+    const showSaveDialog = async () => {
         try {
             const path = await save({
                 title: "导出文件",
                 defaultPath: "dray-servers.txt",
                 filters: [{name: 'Text File', extensions: ['txt']}],
             })
-            if (!path) return false
-            return await saveTextFile(path, content)
+            return path || ''
         } catch (e) {
             log.error(`Tauri save dialog error: ${e}`)
-            return false
+            return ''
         }
     }
 
@@ -120,7 +122,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
             </Stack>
             <Stack direction="row" spacing={1} sx={{p: 2, pt: 1}}>
                 <Button variant="contained" color="secondary" onClick={handleExportQRCode}>导出二维码</Button>
-                <Button variant="contained" color="success" onClick={handleExport}>导出备份文件</Button>
+                <Button variant="contained" color="success" onClick={handleExportTextFile}>导出备份文件</Button>
                 <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
             </Stack>
         </Card>
