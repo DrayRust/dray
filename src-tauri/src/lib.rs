@@ -185,6 +185,7 @@ pub fn run() {
     log_startup_info();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(cleanup::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
