@@ -34,18 +34,27 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         for (let uri of arr) {
             uri = uri.trim()
             if (!uri) continue
+
             const row = await uriToServerRow(uri)
             if (!row) {
                 errNum++
-            } else {
-                const isExist = serverList.some(server => server.hash === row.hash)
-                if (isExist) {
-                    existNum++
-                } else {
-                    newNum++
-                    newServerList.push(row)
-                }
+                continue
             }
+
+            let isExist = serverList.some(server => server.hash === row.hash)
+            if (isExist) {
+                existNum++
+                continue
+            }
+
+            isExist = newServerList.some(server => server.hash === row.hash)
+            if (isExist) {
+                existNum++
+                continue
+            }
+
+            newNum++
+            newServerList.push(row)
         }
 
         const errMsg = `解析链接（URI）错误: ${errNum} 条`
