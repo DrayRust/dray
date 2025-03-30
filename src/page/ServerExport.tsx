@@ -111,7 +111,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                 {showQRCodeList?.map((v, i) => (
                     <Card sx={{mt: 2, p: 2, border: '1px solid #ddd', textAlign: 'left'}}>
                         <Typography gutterBottom variant="h5" component="div">{v.ps}</Typography>
-                        <QRCodeSVG id={`qrcode-${i}`} value={v.uri} title={v.ps} size={256}/>
+                        <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
                         <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
                         <Box sx={{mt: 1}}>
                             <Tooltip title="复制 URI">
@@ -124,7 +124,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                             </Tooltip>
                             <Tooltip title="复制二维码 SVG">
                                 <IconButton onClick={async () => {
-                                    const qrCodeHtml = document.getElementById(`qrcode-${i}`)?.outerHTML
+                                    const qrCodeHtml = document.querySelector(`.qrcode-${i}`)?.outerHTML
                                     if (qrCodeHtml) {
                                         await navigator.clipboard.writeText(qrCodeHtml)
                                         showSnackbar('二维码 SVG 已复制', 'success')
