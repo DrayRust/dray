@@ -7,6 +7,7 @@ mod ray;
 mod setting;
 mod setup;
 mod sys_info;
+mod fs;
 mod web;
 use logger::{debug, info};
 
@@ -77,6 +78,11 @@ fn save_conf(filename: String, content: String) -> bool {
 #[tauri::command]
 fn save_proxy_pac(content: String) -> bool {
     web::save_proxy_pac(&content)
+}
+
+#[tauri::command]
+fn save_text_file(path: String, content: String) -> bool {
+    fs::save_text_file(&path, &content)
 }
 
 #[tauri::command]
@@ -210,6 +216,7 @@ pub fn run() {
             read_conf,
             save_conf,
             save_proxy_pac,
+            save_text_file,
             get_dirs_json,
             get_sys_info_json,
             get_config_json,
