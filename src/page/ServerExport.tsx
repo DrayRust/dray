@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, Box, Divider, FormControlLabel, Checkbox, Stack, Button } from '@mui/material'
+import {
+    Card, Box, Divider, Typography, Switch,
+    FormControlLabel, Checkbox,
+    CircularProgress, Stack, Button
+} from '@mui/material'
+
+import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
-import { readServerList } from "../util/invoke.ts"
+import { log, readServerList, saveTextFile } from "../util/invoke.ts"
+import { useSnackbar } from "../component/useSnackbar.tsx"
+import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
 
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -18,6 +26,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
 
     const [selectedAll, setSelectedAll] = useState(true)
     const [selectedServers, setSelectedServers] = useState<boolean[]>([])
+    const [isBase64, setIsBase64] = useState(false)
 
     useEffect(() => {
         if (serverList) setSelectedServers(new Array(serverList.length).fill(true))
@@ -35,17 +44,47 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         setSelectedAll(newSelected.every(Boolean))
     }
 
-    const handleSubmit = () => {
+    const handleExportQRCode = () => {
         const selected = serverList?.filter((_, index) => selectedServers[index])
         if (selected && selected.length > 0) {
-
+            console.log(selected)
         } else {
-            alert(`请选择要导出的服务器`)
+            showSnackbar(`请选择要导出的服务器`, 'error')
         }
     }
 
+    const handleExport = async () => {
+        const selected = serverList?.filter((_, index) => selectedServers[index])
+        if (selected && selected.length > 0) {
+            let s = selected.map(server => {
+                return isBase64 ? serverRowToBase64Uri(server) : serverRowToUri(server)
+            }).join('\n')
+            const ok = await saveExportFile(s)
+            if (!ok) showSnackbar(`导出失败`, 'error')
+        } else {
+            showSnackbar(`请选择要导出的服务器`, 'error')
+        }
+    }
+
+    const saveExportFile = async (content: string) => {
+        try {
+            const path = await save({
+                title: "导出文件",
+                defaultPath: "dray-servers.txt",
+                filters: [{name: 'Text File', extensions: ['txt']}],
+            })
+            if (!path) return false
+            return await saveTextFile(path, content)
+        } catch (e) {
+            log.error(`Tauri save dialog error: ${e}`)
+            return false
+        }
+    }
+
+    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('导出')
     return <>
+        <SnackbarComponent/>
         <AppBarComponent/>
         <Card sx={{mt: 1}}>
             <Box sx={{px: 2, py: 1}}>
@@ -57,7 +96,9 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                     label={`全选`}
                 />
                 <div>
-                    {serverList?.map((server, index) => (
+                    {!serverList ? (
+                        <CircularProgress sx={{m: 3}}/>
+                    ) : serverList?.map((server, index) => (
                         <FormControlLabel
                             key={index}
                             control={
@@ -72,9 +113,14 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                 </div>
             </Box>
             <Divider/>
-            <Stack direction="row" spacing={1} sx={{p: 2}}>
-                <Button variant="contained" color="secondary" onClick={handleSubmit}>导出二维码和链接</Button>
-                <Button variant="contained" color="success" onClick={handleSubmit}>导出备份文件</Button>
+            <Stack direction="row" spacing={1} sx={{p: 2, pt: 1, pb: 0, alignItems: 'center'}}>
+                <Typography>URL 格式</Typography>
+                <Switch checked={isBase64} onChange={(e) => setIsBase64(e.target.checked)}/>
+                <Typography>Base64 URI 格式</Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} sx={{p: 2, pt: 1}}>
+                <Button variant="contained" color="secondary" onClick={handleExportQRCode}>导出二维码</Button>
+                <Button variant="contained" color="success" onClick={handleExport}>导出备份文件</Button>
                 <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
             </Stack>
         </Card>

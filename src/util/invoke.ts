@@ -165,12 +165,22 @@ export async function saveRayConfig(content: any) {
     }
 }
 
-export async function saveProxyPac(content: any) {
+export async function saveProxyPac(content: string) {
     if (!isTauri) return false
     try {
-        return await invoke<Boolean>('save_proxy_pac', {'content': content.trim()})
+        return await invoke<Boolean>('save_proxy_pac', {content})
     } catch (err) {
         log.error('Failed to saveProxyPac:', err)
+        return false
+    }
+}
+
+export async function saveTextFile(path: string, content: string) {
+    if (!isTauri) return false
+    try {
+        return await invoke<Boolean>('save_text_file', {path, content})
+    } catch (err) {
+        log.error('Failed to saveTextFile:', err)
         return false
     }
 }
