@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import {
     Card, Box, Divider, Typography, Switch, Tooltip,
@@ -22,7 +21,6 @@ interface QRCode {
 
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
-    const navigate = useNavigate()
 
     const [showQRCodeList, setShowQRCodeList] = useState<QRCode[]>([])
     const [serverList, setServerList] = useState<ServerList>()
@@ -101,7 +99,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
-    const {AppBarComponent} = useAppBar('导出')
+    const {AppBarComponent} = useAppBar('/server', '导出')
     return <>
         <SnackbarComponent/>
         <AppBarComponent/>
@@ -173,7 +171,6 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                 <Stack direction="row" spacing={1} sx={{p: 2, pt: 1}}>
                     <Button variant="contained" color="secondary" onClick={handleExportQRCode} disabled={isDisabled}>导出二维码</Button>
                     <Button variant="contained" color="success" onClick={handleExportTextFile} disabled={isDisabled}>导出备份文件</Button>
-                    <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
                 </Stack>
             </Card>
         )}

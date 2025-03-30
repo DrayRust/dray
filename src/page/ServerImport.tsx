@@ -88,7 +88,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
-    const {AppBarComponent} = useAppBar('导入')
+    const {AppBarComponent} = useAppBar('/server', '导入')
     return (<>
         <SnackbarComponent/>
         <AppBarComponent/>
@@ -98,7 +98,6 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                        onChange={(e) => setInputValue(e.target.value)}/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
                 <Button variant="contained" onClick={handleSubmit} disabled={!inputValue}>确认</Button>
-                <Button variant="outlined" onClick={() => navigate(`/server`)}>返回</Button>
             </Stack>
         </Card>
     </>)

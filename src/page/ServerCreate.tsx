@@ -5,7 +5,7 @@ import { useAppBar } from "../component/useAppBar.tsx"
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
 
-    const {AppBarComponent} = useAppBar('添加')
+    const {AppBarComponent} = useAppBar('/server', '添加')
     return <>
         <AppBarComponent/>
         <Card sx={{p: 2, mt: 1}}>
