@@ -48,9 +48,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }, [serverList])
 
     const handleSelectAll = (checked: boolean) => {
+        setSelectedServers(new Array(serverList?.length).fill(checked))
         setSelectedAll(checked)
         setShowDeleteBut(checked)
-        setSelectedServers(new Array(serverList?.length).fill(checked))
     }
 
     const handleSelectServer = (index: number, checked: boolean) => {
@@ -97,13 +97,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack direction="row" spacing={1} sx={{mb: 1}}>
                 <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
                 <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
-                <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
+                {Array.isArray(serverList) && serverList.length > 0 && (
+                    <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
+                )}
                 {showDeleteBut && (<Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>)}
             </Stack>
-            <FormControlLabel label="拖拽排序" control={<Checkbox
-                checked={enableDragSort}
-                onChange={(e) => setEnableDragSort(e.target.checked)}/>
-            }/>
+            {Array.isArray(serverList) && serverList.length > 0 && (
+                <FormControlLabel label="拖拽排序" control={<Checkbox
+                    checked={enableDragSort}
+                    onChange={(e) => setEnableDragSort(e.target.checked)}/>
+                }/>
+            )}
         </Stack>
         {!serverList ? (
             <Card sx={cardSx}><CircularProgress/></Card>
@@ -112,7 +116,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
                 <div>暂无服务器</div>
             </Card>
-        ) : (<>
+        ) : (
             <TableContainer component={Card}>
                 <Table size="small">
                     <TableHead>
@@ -174,7 +178,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </>)}
+        )}
     </>)
 }
 
