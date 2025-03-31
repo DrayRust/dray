@@ -36,8 +36,8 @@ export function useDialog() {
                 <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>取消</Button>
-                <Button onClick={handleConfirm} autoFocus>确认</Button>
+                <Button onClick={handleConfirm}>确认</Button>
+                <Button onClick={handleClose} autoFocus>取消</Button>
             </DialogActions>
         </Dialog>
     )
