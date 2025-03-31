@@ -54,11 +54,11 @@ const App: React.FC = () => {
     const isWindowVisible = useWindowFocus()
     useEffect(() => {
         setTimeout(async () => {
-            if (isWindowVisible) {
-                await getCurrentWindow().show()
-                await getCurrentWindow().setFocus()
-            } else {
+            if (!isWindowVisible) {
                 await getCurrentWindow().hide()
+            } else {
+                // await getCurrentWindow().show()
+                // await getCurrentWindow().setFocus()
             }
         })
     }, [isWindowVisible])
