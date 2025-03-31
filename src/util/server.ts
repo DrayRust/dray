@@ -92,7 +92,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
     return {
         ps: ps,
         type: 'vless',
-        host: `${data.add}:${url.port}`,
+        host: `${data.add}:${data.port}`,
         scy: data.scy,
         hash: await hashString(JSON.stringify(data)),
         data
@@ -151,7 +151,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
     return {
         ps,
         type: 'vmess',
-        host: `${data.add}:${url.port}`,
+        host: `${data.add}:${data.port}`,
         scy: data.scy,
         hash: await hashString(JSON.stringify(data)),
         data
@@ -188,7 +188,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
     return {
         ps,
         type: 'ss',
-        host: `${data.add}:${url.port}`,
+        host: `${data.add}:${data.port}`,
         scy: data.scy,
         hash: await hashString(JSON.stringify(data)),
         data
@@ -231,7 +231,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
     return {
         ps,
         type: 'trojan',
-        host: `${data.add}:${url.port}`,
+        host: `${data.add}:${data.port}`,
         scy: data.scy,
         hash: await hashString(JSON.stringify(data)),
         data
