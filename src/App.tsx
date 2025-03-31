@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import {
@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material'
 
 import { ThemeProvider } from './context/ThemeProvider.tsx'
+import { useWindowFocus } from './hook/useWindowFocus.ts'
 
 import Home from "./page/Home.tsx"
 import Server from "./page/Server.tsx"
@@ -32,6 +33,7 @@ import LogDetail from "./page/LogDetail.tsx"
 import Setting from "./page/Setting.tsx"
 
 import { invoke } from "@tauri-apps/api/core"
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
 
 const App: React.FC = () => {
@@ -48,6 +50,18 @@ const App: React.FC = () => {
     const handleNavClick = (index: number) => {
         setNavState(index)
     }
+
+    const isWindowVisible = useWindowFocus()
+    useEffect(() => {
+        setTimeout(async () => {
+            if (isWindowVisible) {
+                await getCurrentWindow().show()
+                await getCurrentWindow().setFocus()
+            } else {
+                await getCurrentWindow().hide()
+            }
+        })
+    }, [isWindowVisible])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
