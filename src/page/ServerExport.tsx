@@ -111,7 +111,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
             <Card sx={{mt: 1, p: 2}}>
                 <Button variant="outlined" onClick={() => setShowQRCodeList([])}>返回</Button>
                 {showQRCodeList?.map((v, i) => (
-                    <Card sx={{mt: 2, p: 2, border: '1px solid #ddd', textAlign: 'left'}}>
+                    <Card key={i} sx={{mt: 2, p: 2, border: '1px solid #ddd', textAlign: 'left'}}>
                         <Typography gutterBottom variant="h5" component="div">{v.ps}</Typography>
                         <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
                         <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
