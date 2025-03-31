@@ -8,6 +8,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit'
 import FmdBadIcon from '@mui/icons-material/FmdBad'
 
+import { useDebounce } from '../hook/useDebounce.ts'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
@@ -81,11 +82,27 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const [enableDragSort, setEnableDragSort] = useState(false)
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
-    const handleSaveServerList = async () => {
+    const [dragIsChange, setDragIsChange] = useState(false)
+    const saveServerListFn = async () => {
         if (!serverList || serverList.length === 0) return
         const ok = await saveServerList(serverList)
         if (!ok) showSnackbar('保存失败', 'error')
     }
+    const handleSaveServerList = useDebounce(saveServerListFn, 300)
+    useEffect(() => {
+        const handleMouseUp = () => {
+            if (!enableDragSort) return
+            setDraggingIndex(null)
+            if (dragIsChange) {
+                setDragIsChange(false)
+                handleSaveServerList()
+            }
+        }
+        window.addEventListener('mouseup', handleMouseUp)
+        return () => {
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [])
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {DialogComponent, confirm} = useDialog()
@@ -93,8 +110,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     return (<>
         <SnackbarComponent/>
         <DialogComponent/>
-        <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
-            <Stack direction="row" spacing={1} sx={{mb: 1}}>
+        <Stack direction="row" sx={{mb: 1, minHeight: '42px', justifyContent: "space-between", alignItems: "center"}}>
+            <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
                 <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
                 {Array.isArray(serverList) && serverList.length > 0 && (
@@ -143,10 +160,14 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     if (!enableDragSort) return
                                     setDraggingIndex(key)
                                 }}
-                                onMouseUp={async () => {
+                                onMouseUp={(e) => {
+                                    e.preventDefault()
                                     if (!enableDragSort) return
                                     setDraggingIndex(null)
-                                    await handleSaveServerList()
+                                    if (dragIsChange) {
+                                        setDragIsChange(false)
+                                        handleSaveServerList()
+                                    }
                                 }}
                                 onMouseEnter={() => {
                                     if (!enableDragSort) return
@@ -156,6 +177,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                         newServerList.splice(key, 0, draggedItem)
                                         setServerList(newServerList)
                                         setDraggingIndex(key)
+                                        setDragIsChange(true)
                                     }
                                 }}
                             >
