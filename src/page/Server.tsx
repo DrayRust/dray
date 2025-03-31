@@ -69,6 +69,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 setServerList(newServerList)
                 setSelectedServers(new Array(newServerList.length).fill(false))
                 setSelectedAll(false)
+                setShowDeleteBut(false)
 
                 const ok = await saveServerList(newServerList)
                 if (!ok) showSnackbar('删除失败', 'error')
