@@ -104,7 +104,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         <SnackbarComponent/>
         <AppBarComponent/>
         {!serverList ? (
-            <Card sx={{mt: 1, p: 2}}><CircularProgress sx={{m: 3}}/></Card>
+            <Card sx={{mt: 1, p: 2, textAlign: 'center'}}><CircularProgress sx={{m: 3}}/></Card>
         ) : serverList.length === 0 ? (
             <Card sx={{mt: 1, p: 3, textAlign: 'center'}}>暂无服务器</Card>
         ) : showQRCodeList.length > 0 ? (
