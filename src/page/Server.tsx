@@ -83,20 +83,24 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [enableDragSort, setEnableDragSort] = useState(false)
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
     const [dragIsChange, setDragIsChange] = useState(false)
-    const saveServerListFn = async () => {
-        if (!serverList || serverList.length === 0) return
-        const ok = await saveServerList(serverList)
-        if (!ok) showSnackbar('保存失败', 'error')
-    }
-    const handleSaveServerList = useDebounce(saveServerListFn, 300)
+    const handleSaveServerList = useDebounce(async (dragIsChange: boolean, serverList: ServerList) => {
+        if (dragIsChange && serverList.length > 0) {
+            setDragIsChange(false)
+            const ok = await saveServerList(serverList)
+            if (!ok) showSnackbar('保存失败', 'error')
+            // console.log('save ok')
+        }
+    }, 300)
     useEffect(() => {
         const handleMouseUp = () => {
-            if (!enableDragSort) return
             setDraggingIndex(null)
-            if (dragIsChange) {
-                setDragIsChange(false)
-                handleSaveServerList()
-            }
+            setDragIsChange(prevIsChange => {
+                setServerList(prevServerList => {
+                    handleSaveServerList(prevIsChange, prevServerList)
+                    return prevServerList
+                })
+                return prevIsChange
+            })
         }
         window.addEventListener('mouseup', handleMouseUp)
         return () => {
@@ -161,13 +165,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     setDraggingIndex(key)
                                 }}
                                 onMouseUp={(e) => {
-                                    e.preventDefault()
+                                    e.stopPropagation()
                                     if (!enableDragSort) return
                                     setDraggingIndex(null)
-                                    if (dragIsChange) {
-                                        setDragIsChange(false)
-                                        handleSaveServerList()
-                                    }
+                                    handleSaveServerList(dragIsChange, serverList)
                                 }}
                                 onMouseEnter={() => {
                                     if (!enableDragSort) return
