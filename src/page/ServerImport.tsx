@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, TextField, Button, Stack } from '@mui/material'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { uriToServerRow } from "../util/server.ts"
+import { useDebounce } from '../hook/useDebounce.ts'
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { useAppBar } from "../component/useAppBar.tsx"
 
@@ -12,13 +13,6 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
 
     const [inputValue, setInputValue] = useState('')
     const [error, setError] = useState(false)
-
-    // 防抖处理，防止频繁提交
-    const timeoutRef = useRef<number>()
-    const handleSubmit = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current)
-        timeoutRef.current = setTimeout(submitFn, 300)
-    }
 
     const submitFn = async () => {
         const s = inputValue.trim()
@@ -86,6 +80,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             showSnackbar(errMsg, 'error')
         }
     }
+    const handleSubmit = useDebounce(submitFn, 300)
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('/server', '导入')
