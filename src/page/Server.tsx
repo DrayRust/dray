@@ -79,6 +79,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
+    const handleSaveServerList = async () => {
+        if (!serverList || serverList.length === 0) return
+        const ok = await saveServerList(serverList)
+        if (!ok) showSnackbar('保存失败', 'error')
+    }
+
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {DialogComponent, confirm} = useDialog()
     const cardSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 64px)`, textAlign: 'center'}
@@ -116,7 +123,30 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                     </TableHead>
                     <TableBody>
                         {serverList.map((row, key) => (
-                            <TableRow hover key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                            <TableRow
+                                key={key}
+                                hover
+                                sx={{
+                                    '&:last-child td, &:last-child th': {border: 0},
+                                    cursor: 'grab',
+                                    opacity: draggingIndex === key ? 0.5 : 1,
+                                    transition: 'background-color 0.2s ease'
+                                }}
+                                onMouseDown={() => setDraggingIndex(key)}
+                                onMouseUp={async () => {
+                                    setDraggingIndex(null)
+                                    await handleSaveServerList()
+                                }}
+                                onMouseEnter={() => {
+                                    if (draggingIndex !== null && draggingIndex !== key) {
+                                        const newServerList = [...serverList]
+                                        const [draggedItem] = newServerList.splice(draggingIndex, 1)
+                                        newServerList.splice(key, 0, draggedItem)
+                                        setServerList(newServerList)
+                                        setDraggingIndex(key)
+                                    }
+                                }}
+                            >
                                 <TableCell>
                                     <Checkbox checked={selectedServers[key] ?? false}
                                               onChange={(e) => handleSelectServer(key, e.target.checked)}/>
