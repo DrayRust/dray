@@ -103,7 +103,11 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     return <>
         <SnackbarComponent/>
         <AppBarComponent/>
-        {showQRCodeList.length > 0 ? (
+        {!serverList ? (
+            <Card sx={{mt: 1, p: 2}}><CircularProgress sx={{m: 3}}/></Card>
+        ) : serverList.length === 0 ? (
+            <Card sx={{mt: 1, p: 3, textAlign: 'center'}}>暂无服务器</Card>
+        ) : showQRCodeList.length > 0 ? (
             <Card sx={{mt: 1, p: 2}}>
                 <Button variant="outlined" onClick={() => setShowQRCodeList([])}>返回</Button>
                 {showQRCodeList?.map((v, i) => (
@@ -138,29 +142,24 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         ) : (
             <Card sx={{mt: 1}}>
                 <Box sx={{px: 2, py: 1}}>
-                    <FormControlLabel
-                        label={`全选`}
-                        control={<Checkbox
+                    <div>
+                        <FormControlLabel label={`全选`} control={<Checkbox
                             checked={selectedAll}
                             onChange={(e) => handleSelectAll(e.target.checked)}
-                        />}
-                    />
-                    <div>
-                        {!serverList ? (
-                            <CircularProgress sx={{m: 3}}/>
-                        ) : serverList?.map((server, index) => (
-                            <FormControlLabel
-                                key={index}
-                                label={`${server.ps}`}
-                                control={
-                                    <Checkbox
-                                        checked={selectedServers[index] ?? false}
-                                        onChange={(e) => handleSelectServer(index, e.target.checked)}
-                                    />
-                                }
-                            />
-                        ))}
+                        />}/>
                     </div>
+                    {serverList?.map((server, index) => (
+                        <FormControlLabel
+                            key={index}
+                            label={`${server.ps}`}
+                            control={
+                                <Checkbox
+                                    checked={selectedServers[index] ?? false}
+                                    onChange={(e) => handleSelectServer(index, e.target.checked)}
+                                />
+                            }
+                        />
+                    ))}
                 </Box>
                 <Divider/>
                 <Stack direction="row" spacing={1} sx={{p: 2, pt: 1, pb: 0, alignItems: 'center'}}>
