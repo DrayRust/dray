@@ -66,13 +66,15 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (selectedKeys.length > 0) {
             confirm('确认删除', `确定要删除这 ${selectedKeys.length} 条记录吗？`, async () => {
                 const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index)) || []
-                setServerList(newServerList)
-                setSelectedServers(new Array(newServerList.length).fill(false))
-                setSelectedAll(false)
-                setShowDeleteBut(false)
-
                 const ok = await saveServerList(newServerList)
-                if (!ok) showSnackbar('删除失败', 'error')
+                if (!ok) {
+                    showSnackbar('删除失败', 'error')
+                } else {
+                    setServerList(newServerList)
+                    setSelectedServers(new Array(newServerList.length).fill(false))
+                    setSelectedAll(false)
+                    setShowDeleteBut(false)
+                }
             })
         }
     }
