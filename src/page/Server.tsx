@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Stack, Checkbox,
+    Card, Stack, Checkbox, FormControlLabel,
     Button, CircularProgress,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material'
@@ -79,6 +79,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    const [enableDragSort, setEnableDragSort] = useState(false)
     const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
     const handleSaveServerList = async () => {
         if (!serverList || serverList.length === 0) return
@@ -92,11 +93,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     return (<>
         <SnackbarComponent/>
         <DialogComponent/>
-        <Stack direction="row" spacing={1} sx={{mb: 1}}>
-            <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
-            <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
-            <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
-            {showDeleteBut && (<Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>)}
+        <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
+            <Stack direction="row" spacing={1} sx={{mb: 1}}>
+                <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
+                <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
+                <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
+                {showDeleteBut && (<Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>)}
+            </Stack>
+            <FormControlLabel label="拖拽排序" control={<Checkbox
+                checked={enableDragSort}
+                onChange={(e) => setEnableDragSort(e.target.checked)}/>
+            }/>
         </Stack>
         {!serverList ? (
             <Card sx={cardSx}><CircularProgress/></Card>
@@ -126,18 +133,19 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             <TableRow
                                 key={key}
                                 hover
-                                sx={{
-                                    '&:last-child td, &:last-child th': {border: 0},
-                                    cursor: 'grab',
-                                    opacity: draggingIndex === key ? 0.5 : 1,
-                                    transition: 'background-color 0.2s ease'
+                                sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                className={enableDragSort ? (draggingIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
+                                onMouseDown={() => {
+                                    if (!enableDragSort) return
+                                    setDraggingIndex(key)
                                 }}
-                                onMouseDown={() => setDraggingIndex(key)}
                                 onMouseUp={async () => {
+                                    if (!enableDragSort) return
                                     setDraggingIndex(null)
                                     await handleSaveServerList()
                                 }}
                                 onMouseEnter={() => {
+                                    if (!enableDragSort) return
                                     if (draggingIndex !== null && draggingIndex !== key) {
                                         const newServerList = [...serverList]
                                         const [draggedItem] = newServerList.splice(draggingIndex, 1)

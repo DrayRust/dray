@@ -73,3 +73,14 @@ body, html {
     width: 4px;
     height: 4px;
 }
+
+.drag-grab {
+    cursor: grab;
+    transition: all 0.2s ease-in-out;
+}
+
+.drag-grabbing {
+    cursor: grabbing;
+    opacity: 0.6;
+    transform: scale(0.999);
+}
