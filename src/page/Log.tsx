@@ -8,6 +8,7 @@ import FmdBadIcon from '@mui/icons-material/FmdBad'
 
 import { clearLogAll, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
+import { useDialog } from "../component/useDialog.tsx"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
@@ -21,13 +22,17 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     }
     useEffect(() => readList(), [])
 
-    const handleClearLogs = async () => {
-        const ok = await clearLogAll()
-        ok && readList()
+    const handleClearLogs = () => {
+        confirm('确认清空', `确定要清空所有日志吗？`, async () => {
+            const ok = await clearLogAll()
+            ok && readList()
+        })
     }
 
+    const {DialogComponent, confirm} = useDialog()
     const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 20px)`, textAlign: 'center'}
     return (<>
+        <DialogComponent/>
         {!logList ? (
             <Card sx={paperSx}><CircularProgress/></Card>
         ) : logList.length === 0 ? (
