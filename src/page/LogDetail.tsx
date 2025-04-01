@@ -13,6 +13,7 @@ import { useWindowFocus } from '../hook/useWindowFocus.ts'
 import { readLogFile, log } from '../util/invoke.ts'
 import { formatLogName } from "../util/util.ts"
 import highlightLog from '../util/highlightLog'
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
@@ -130,37 +131,33 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // 防抖处理，减少滚动时频繁请求日志内容
-    const timeoutRef = useRef<number>(0)
-    const debouncedScroll = (isAtTop: boolean, isAtBottom: boolean) => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current)
-        timeoutRef.current = setTimeout(() => {
-            if (!isAtBottom) {
-                clearInterval(intervalRef.current) // 停止自动刷新日志
-                setAutoRefresh(false)
-            }
-            if (autoRefresh) return
+    const debouncedScroll = useDebounce((isAtTop: boolean, isAtBottom: boolean) => {
+        if (!isAtBottom) {
+            clearInterval(intervalRef.current) // 停止自动刷新日志
+            setAutoRefresh(false)
+        }
+        if (autoRefresh) return
 
-            if (reverse) {
-                // 向上滚动加载更多
-                if (isAtTop) {
-                    if (prevLogContent.fileSize > 0 && prevLogContent.start === 0) {
-                        showSnackbar('已经到最顶部了')
-                    } else if (prevLogContent.start > 0) {
-                        fetchLogContent(reverse, prevLogContent.start - 1)
-                    }
-                }
-            } else {
-                // 向下滚动加载更多
-                if (isAtBottom) {
-                    if (prevLogContent.fileSize > 0 && prevLogContent.end === prevLogContent.fileSize) {
-                        showSnackbar('已经到最底部了')
-                    } else if (prevLogContent.end > 0) {
-                        fetchLogContent(reverse, prevLogContent.end + 1)
-                    }
+        if (reverse) {
+            // 向上滚动加载更多
+            if (isAtTop) {
+                if (prevLogContent.fileSize > 0 && prevLogContent.start === 0) {
+                    showSnackbar('已经到最顶部了')
+                } else if (prevLogContent.start > 0) {
+                    fetchLogContent(reverse, prevLogContent.start - 1)
                 }
             }
-        }, 200)
-    }
+        } else {
+            // 向下滚动加载更多
+            if (isAtBottom) {
+                if (prevLogContent.fileSize > 0 && prevLogContent.end === prevLogContent.fileSize) {
+                    showSnackbar('已经到最底部了')
+                } else if (prevLogContent.end > 0) {
+                    fetchLogContent(reverse, prevLogContent.end + 1)
+                }
+            }
+        }
+    }, 300)
 
     const listRef = useRef<List>(null)
     const handleListScroll = ({scrollOffset}: { scrollOffset: number }) => {
