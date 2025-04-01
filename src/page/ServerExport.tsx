@@ -87,7 +87,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     const showSaveDialog = async () => {
         try {
             const path = await save({
-                title: "导出文件",
+                title: "Export Text File",
                 defaultPath: "dray-servers.txt",
                 filters: [{name: 'Text File', extensions: ['txt']}],
             })
