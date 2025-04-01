@@ -116,7 +116,7 @@ fn run_server() {
     rt::System::new().block_on(async {
         match HttpServer::new(move || {
             App::new()
-                .wrap(Logger::new("%D %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\""))
+                .wrap(Logger::new("%D %a %s \"%r\" %b \"%{Referer}i\" \"%{User-Agent}i\""))
                 .service(Files::new("/dray", dirs::get_dray_web_server_dir().unwrap().to_str().unwrap()).show_files_listing())
                 .route("/", web::get().to(|| async { "This is Dray Web Server!" }))
                 .route("/proxy.pac", web::get().to(handle_proxy_pac))
