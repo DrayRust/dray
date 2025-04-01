@@ -61,7 +61,7 @@ fn set_main_window<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
 }
 
 fn set_tray<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
-    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let quit_i = MenuItem::with_id(app, "quit", "退出 Dray", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&quit_i])?;
     TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
