@@ -123,8 +123,9 @@ interface TrojanRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     pwd: string; // 密码 password
-    net: string; // 网络类型 network 如：ws / grpc
+    net: string; // 传输方式 network 如：ws / grpc
     path: string; // 路径 path
+    sn: string; // 服务名称 serviceName
 }
 
 /*interface Tauri {

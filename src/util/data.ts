@@ -11,6 +11,21 @@ export const ssMethodList = [
     'none',
 ]
 
+export const rayNetworkList = [
+    'tcp',
+    'kcp',
+    'ws',
+    'http',
+    'domainsocket',
+    'quic',
+    'grpc',
+]
+
+export const trojanNetworkList = [
+    'ws',
+    'grpc',
+]
+
 export const headerTypeList = [
     'srtp',
     'utp',
