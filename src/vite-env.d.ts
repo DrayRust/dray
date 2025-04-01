@@ -74,8 +74,8 @@ interface ServerList extends Array<ServerRow> {
 }
 
 interface VlessRow {
-    add: string; // 地址 address
-    port: number; // 端口 port
+    add: string; // 地址 address 如：IP / 域名
+    port: number | ''; // 端口 port
     id: string; // uuid
     flow: string;
     scy: string; // 加密方式 security
@@ -95,8 +95,8 @@ interface VlessRow {
 }
 
 interface VmessRow {
-    add: string; // 地址 address
-    port: number; // 端口 port
+    add: string; // 地址 address 如：IP / 域名
+    port: number | ''; // 端口 port
     id: string; // uuid
     aid: number; // 用户副ID alterId
     scy: string; // 加密方式 security
@@ -113,20 +113,18 @@ interface VmessRow {
 }
 
 interface SsRow {
-    add: string; // 地址 address
-    port: number; // 端口 port
+    add: string; // 地址 address 如：IP / 域名
+    port: number | ''; // 端口 port
     pwd: string; // 密码 password
     scy: string; // 加密方式 method
 }
 
 interface TrojanRow {
-    add: string; // 地址 address
-    port: number; // 端口 port
+    add: string; // 地址 address 如：IP / 域名
+    port: number | ''; // 端口 port
     pwd: string; // 密码 password
-    scy: string; // 加密方式 security
-    flow: string;
-    sni: string;
-    fp: string;
+    net: string; // 网络类型 network 如：ws / grpc
+    path: string; // 路径 path
 }
 
 /*interface Tauri {

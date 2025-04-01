@@ -84,3 +84,7 @@ body, html {
     opacity: 0.6;
     transform: scale(0.999);
 }
+
+.server-type button {
+    text-transform: capitalize !important;
+}
