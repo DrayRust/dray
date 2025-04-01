@@ -51,17 +51,17 @@ const App: React.FC = () => {
         setNavState(index)
     }
 
-    const isWindowVisible = useWindowFocus()
+    const isFocus = useWindowFocus()
     useEffect(() => {
         setTimeout(async () => {
-            if (!isWindowVisible) {
+            if (!isFocus) {
                 await getCurrentWindow().hide()
             } else {
                 // await getCurrentWindow().show()
                 // await getCurrentWindow().setFocus()
             }
-        })
-    }, [isWindowVisible])
+        }, 0)
+    }, [isFocus])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
