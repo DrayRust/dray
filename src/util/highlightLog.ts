@@ -3,7 +3,7 @@ const timestampRegex = /(\d{4}[-\/]\d{2}[-\/]\d{2}[\sT]\d{2}:\d{2}:\d{2}(?:\.\d+
 const ipWithPortRegex = /\b(?:\d{1,3}\.){3}\d{1,3}(:\d{1,5})?\b/g
 const ipv6WithPortRegex = /\b(?:([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|::([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4})(:\d{1,5})?\b/g
 const domainWithPortRegex = /\b(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}:\d{1,5}|localhost|broadcasthost|(?:[a-zA-Z0-9-]+\.)+(?:com|net|org|cn|us|uk|de|jp|fr|ru|info|biz|at))\b/g
-const numberRegex = /(^|\s)(\d+\.\d+|\d+)\b/g
+const numberRegex = /(^|\s)(\d+\.\d+|\d+)($|\s)/g
 
 // 关键词映射
 const keywordMap = [
