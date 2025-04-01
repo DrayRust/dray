@@ -3,10 +3,13 @@ import { QRCodeSVG } from 'qrcode.react'
 import {
     Card, Box, Divider, Typography, Switch, Tooltip,
     FormControlLabel, Checkbox, TextField, IconButton,
-    CircularProgress, Stack, Button
+    Accordion, AccordionSummary, AccordionDetails,
+    CircularProgress, Stack, Button, SpeedDial
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
@@ -108,37 +111,42 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         ) : serverList.length === 0 ? (
             <Card sx={{mt: 1, p: 3, textAlign: 'center'}}>暂无服务器</Card>
         ) : showQRCodeList.length > 0 ? (
-            <Card sx={{mt: 1, p: 2}}>
-                <Button variant="outlined" onClick={() => setShowQRCodeList([])}>返回</Button>
+            <Box sx={{mt: 1}}>
+                <SpeedDial ariaLabel="返回" sx={{position: 'fixed', bottom: 16, right: 16}} icon={<ArrowBackIcon/>}
+                           onClick={() => setShowQRCodeList([])}/>
                 {showQRCodeList?.map((v, i) => (
-                    <Card key={i} sx={{mt: 2, p: 2, border: '1px solid #ddd', textAlign: 'left'}}>
-                        <Typography gutterBottom variant="h5" component="div">{v.ps}</Typography>
-                        <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
-                        <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
-                        <Box sx={{mt: 1}}>
-                            <Tooltip title="复制 URI">
-                                <IconButton title="" onClick={async () => {
-                                    await navigator.clipboard.writeText(v.uri)
-                                    showSnackbar('URI 已复制', 'success')
-                                }}>
-                                    <ContentCopyIcon/>
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="复制二维码 SVG">
-                                <IconButton onClick={async () => {
-                                    const qrCodeHtml = document.querySelector(`.qrcode-${i}`)?.outerHTML
-                                    if (qrCodeHtml) {
-                                        await navigator.clipboard.writeText(qrCodeHtml)
-                                        showSnackbar('二维码 SVG 已复制', 'success')
-                                    }
-                                }}>
-                                    <FileCopyIcon/>
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-                    </Card>
+                    <Accordion key={i} defaultExpanded={i === 0}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                            <Typography component="span">{v.ps}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
+                            <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
+                            <Box sx={{mt: 1}}>
+                                <Tooltip title="复制 URI">
+                                    <IconButton title="" onClick={async () => {
+                                        await navigator.clipboard.writeText(v.uri)
+                                        showSnackbar('URI 已复制', 'success')
+                                    }}>
+                                        <ContentCopyIcon/>
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="复制二维码 SVG">
+                                    <IconButton onClick={async () => {
+                                        const qrCodeHtml = document.querySelector(`.qrcode-${i}`)?.outerHTML
+                                        if (qrCodeHtml) {
+                                            await navigator.clipboard.writeText(qrCodeHtml)
+                                            showSnackbar('二维码 SVG 已复制', 'success')
+                                        }
+                                    }}>
+                                        <FileCopyIcon/>
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
                 ))}
-            </Card>
+            </Box>
         ) : (
             <Card sx={{mt: 1}}>
                 <Box sx={{px: 2, py: 1}}>
