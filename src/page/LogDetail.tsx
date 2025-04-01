@@ -81,7 +81,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }, [])
 
     // 自动刷新日志内容
-    const intervalRef = useRef<number>()
+    const intervalRef = useRef<number>(0)
     useEffect(() => {
         // 只有在查看日志文件末尾时，才开启自动刷新日志
         // 只在窗口可视时才自动刷新日志，以减小资源消耗
@@ -130,7 +130,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // 防抖处理，减少滚动时频繁请求日志内容
-    const timeoutRef = useRef<number>()
+    const timeoutRef = useRef<number>(0)
     const debouncedScroll = (isAtTop: boolean, isAtBottom: boolean) => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
         timeoutRef.current = setTimeout(() => {
