@@ -7,7 +7,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { ssMethodList, trojanNetworkList } from "../util/data.ts"
+import { ssMethodList, trojanNetworkTypeList } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -58,16 +58,18 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         add: '', // 服务器地址
         port: 433, // 服务器端口
         pwd: '', // 密码
-        scy: 'none', // 加密方式
+        scy: '2022-blake3-aes-256-gcm', // 加密方式
     })
 
     const [trojanForm, setTrojanForm] = useState<TrojanRow>({
         add: '', // 服务器地址
-        port: 433, // 服务器端口
+        port: 443, // 服务器端口
         pwd: '', // 密码
         net: 'ws', // 传输方式
-        path: '', // 路径
-        sn: '', // 服务名称
+        scy: 'tls', // 安全类型
+        host: '', // 伪装域名
+        path: '', // (ws) 路径
+        sni: '', // (grpc) 主机名
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +116,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </ToggleButtonGroup>
                 </Grid>
                 <Grid size={12}>
-                    <TextField fullWidth size="small" label="服务器名称" name="ps" onChange={handleChange}/>
+                    <TextField fullWidth size="small" label="服务器名称(postscript)" name="ps" onChange={handleChange}/>
                 </Grid>
 
                 {serverType === 'vless' ? (<>
@@ -201,16 +203,16 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                 </>) : serverType === 'ss' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={ssForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口" name="port" value={ssForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <FormControl fullWidth size="small" variant="outlined">
-                            <InputLabel>密码</InputLabel>
+                            <InputLabel>密码(password)</InputLabel>
                             <OutlinedInput
-                                label="密码"
+                                label="密码(password)"
                                 type={showPassword ? 'text' : 'password'}
                                 name="pwd"
                                 value={ssForm.pwd}
@@ -241,23 +243,25 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                 </>) : serverType === 'trojan' && (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={trojanForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口" name="port" value={trojanForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="密码" name="pwd" value={trojanForm.pwd} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <TextField
-                            select fullWidth size="small"
+                            select fullWidth size="small" label="传输方式(network)"
                             id="trojan-network"
-                            label="传输方式(network)"
                             name="net" value={trojanForm.net}
                             onChange={handleChange}>
-                            {trojanNetworkList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                            {trojanNetworkTypeList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
                         </TextField>
+                    </Grid>
+                    <Grid size={12}>
+                        <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={trojanForm.host} onChange={handleChange}/>
                     </Grid>
                     {trojanForm.net === 'ws' && (
                         <Grid size={12}>
@@ -266,7 +270,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     )}
                     {trojanForm.net === 'grpc' && (
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="服务名称(serviceName)" name="sn" value={trojanForm.sn} onChange={handleChange}/>
+                            <TextField fullWidth size="small" label="服务名称(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
                         </Grid>
                     )}
                 </>)}

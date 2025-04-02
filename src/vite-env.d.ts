@@ -113,7 +113,6 @@ interface VmessRow {
     // 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一，
     // 分别对应 RAW、mKCP、WebSocket、HTTP/2/3、gRPC、HTTPUpgrade、XHTTP 传输方式。
     net: string; // 网络传输方式 network
-
     scy: string; // 安全类型 security = encryption 如：auto / aes-128-gcm / chacha20-poly1305 / none
 
     host: string; // 伪装域名 host
