@@ -102,6 +102,7 @@ interface VlessRow {
     spx: string; // spiderX 爬虫初始路径与参数，建议每个客户端不同
 }
 
+// https://www.v2fly.org/config/protocols/vmess.html
 // https://xtls.github.io/config/outbounds/vmess.html
 interface VmessRow {
     add: string; // 地址 address 如：IP / 域名
