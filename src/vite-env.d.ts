@@ -65,7 +65,7 @@ interface ServerRow {
     ps: string; // 附言 postscript / 服务器备注 remark
     host: string; // 主机名+端口 如：example.com:8080
     type: string; // 类型 vless / vmess / ss / trojan
-    scy: string; // 加密方式 security
+    scy: string; // 安全类型 security
     hash: string; // data JSON 字符串的哈希值，用来排重
     data: VlessRow | VmessRow | SsRow | TrojanRow | null;
 }
@@ -73,59 +73,87 @@ interface ServerRow {
 interface ServerList extends Array<ServerRow> {
 }
 
+// VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
+// https://xtls.github.io/config/transport.html
+
+// https://www.v2fly.org/config/protocols/vless.html
+// https://xtls.github.io/config/outbounds/vless.html
 interface VlessRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
-    id: string; // uuid
-    flow: string;
-    scy: string; // 加密方式 security
-    encryption: string;
-    type: string;
-    host: string;
-    path: string;
-    net: string; // 网络类型 network
-    fp: string;
-    pbk: string; // reality public key
-    sid: string; // reality shortId
-    sni: string;
-    serviceName: string;
-    headerType: string;
-    seed: string;
-    mode: string;
+    id: string; // 用户 ID (uuid)
+
+    net: string; // 网络传输方式 network 如：tcp / ws / grpc / xhttp
+    scy: string; // 安全类型 security 如: tls / reality / none
+
+    host: string; // 伪装域名 host
+    path: string; // (ws / xhttp) 路径 path
+    sni: string; // (grpc / reality) 主机名 Server Name Indication 如：example.com
+
+    // XTLS
+    flow: string; // 流控模式 如：xtls-rprx-vision / xtls-rprx-vision-udp443
+
+    // REALITY
+    // https://xtls.github.io/config/transport.html#realityobject
+    // https://github.com/XTLS/REALITY
+    fp: string; // 伪装指纹 fingerprint
+    pbk: string; // public key 服务端私钥对应的公钥
+    sid: string; // shortId 服务端 shortIds 之一
+    spx: string; // spiderX 爬虫初始路径与参数，建议每个客户端不同
 }
 
+// https://xtls.github.io/config/outbounds/vmess.html
 interface VmessRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
-    id: string; // uuid
-    aid: number; // 用户副ID alterId
-    scy: string; // 加密方式 security
-    alpn: string;
-    sni: string;
-    net: string; // 网络类型 network
-    host: string;
-    path: string;
-    tls: string;
-    fp: string;
-    type: string;
-    seed: string;
-    mode: string;
+    id: string; // 用户 ID (uuid)
+    aid: number; // 用户副 ID (alterId) 默认: 0
+
+    // 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一，
+    // 分别对应 RAW、mKCP、WebSocket、HTTP/2/3、gRPC、HTTPUpgrade、XHTTP 传输方式。
+    net: string; // 网络传输方式 network
+
+    scy: string; // 安全类型 security = encryption 如：auto / aes-128-gcm / chacha20-poly1305 / none
+
+    host: string; // 伪装域名 host
+    path: string; // 路径 path
+    sni: string; // 主机名 Server Name Indication 如：example.com
+
+    type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+
+    // TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
+    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
+
+    // mKCP
+    seed: string; // mKCP 种子。省略时不使用种子，但不可以为空字符串。
+
+    // gRPC
+    authority: string; // 域名 authority 如：example.com
+
+    // XHTTP
+    mode: string; // 对应 gRPC 的传输模式 transport mode 如：gun / multi / guna
+    extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
+
+    // XTLS
+    flow: string; // 流控 如：xtls-rprx-vision
 }
 
 interface SsRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     pwd: string; // 密码 password
-    scy: string; // 加密方式 method
+    scy: string; // 安全类型 security = 加密方式 method
 }
 
 interface TrojanRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     pwd: string; // 密码 password
-    net: string; // 传输方式 network 如：ws / grpc
-    path: string; // 路径 path
-    sn: string; // 服务名称 serviceName
+    net: string; // 网络传输方式 network 如：ws / grpc
+    scy: string; // 安全类型 security 只有：tls = "Transport Layer Security"（传输层安全协议）
+    host: string; // 伪装域名 host
+    path: string; // (ws) 路径 path
+    sni: string; // (grpc) 主机名 Server Name Indication 如：example.com
 }
 
 /*interface Tauri {
