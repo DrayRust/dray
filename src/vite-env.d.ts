@@ -96,7 +96,7 @@ interface VlessRow {
     // REALITY
     // https://xtls.github.io/config/transport.html#realityobject
     // https://github.com/XTLS/REALITY
-    fp: string; // 伪装指纹 fingerprint
+    fp: string; // fingerprint 伪装指纹
     pbk: string; // public key 服务端私钥对应的公钥
     sid: string; // shortId 服务端 shortIds 之一
     spx: string; // spiderX 爬虫初始路径与参数，建议每个客户端不同
@@ -121,11 +121,8 @@ interface VmessRow {
 
     type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
-    // TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
-    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
-
     // mKCP
-    seed: string; // mKCP 种子。省略时不使用种子，但不可以为空字符串。
+    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
 
     // gRPC
     authority: string; // 域名 authority 如：example.com
@@ -133,6 +130,9 @@ interface VmessRow {
     // XHTTP
     mode: string; // 对应 gRPC 的传输模式 transport mode 如：gun / multi / guna
     extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
+
+    // TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
+    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
 
     // XTLS
     flow: string; // 流控 如：xtls-rprx-vision
