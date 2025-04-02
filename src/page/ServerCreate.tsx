@@ -7,7 +7,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { ssMethodList, trojanNetworkTypeList } from "../util/data.ts"
+import { fingerprintList, flowList, ssMethodList, trojanNetworkTypeList, vlessNetworkTypeList, vlessSecurityList } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -16,47 +16,44 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     const [showPassword, setShowPassword] = useState(false)
 
     const [vlessForm, setVlessForm] = useState<VlessRow>({
-        add: '', // 地址
-        port: 0, // 端口
-        id: '', // UUID
-        flow: 'xtls-rprx-vision', // 流控
-        scy: 'none', // 加密方式
-        encryption: '', // 加密
-        type: 'none', // 类型
-        host: '', // 主机
+        add: '', // 服务器地址
+        port: 443, // 服务器端口
+        id: '', // 用户ID
+        net: 'tcp', // 网络传输方式
+        scy: 'reality', // 安全类型
+        host: '', // 伪装域名
         path: '', // 路径
-        net: 'tcp', // 网络类型
-        fp: 'chrome', // 指纹
-        pbk: '', // reality public key
-        sid: '', // reality shortId
-        sni: '', // SNI
-        serviceName: '', // 服务名称
-        headerType: '', // 头部类型
-        seed: '', // 种子
-        mode: 'websocket' // 模式
+        sni: '', // 主机名
+        fp: 'chrome', // 伪装指纹
+        flow: 'xtls-rprx-vision', // 流控模式
+        pbk: '', // REALITY 公钥
+        sid: '', // REALITY shortId
+        spx: '', // REALITY 爬虫初始路径与参数
     })
 
     const [vmessForm, setVmessForm] = useState<VmessRow>({
         add: '', // 服务器地址
-        port: 0, // 服务器端口
+        port: 443, // 服务器端口
         id: '', // 用户ID
         aid: 0, // 额外ID
-        scy: 'auto', // 加密方式
-        alpn: '', // ALPN 协议
-        sni: '', // SNI 域名
-        net: 'tcp', // 传输协议
+        net: 'tcp', // 网络传输方式
+        scy: 'auto', // 安全类型
         host: '', // 伪装域名
         path: '', // 路径
-        tls: '', // TLS 配置
-        fp: 'chrome', // 指纹
-        type: 'none', // 类型
-        seed: '', // 种子
-        mode: 'websocket' // 模式
+        sni: '', // 主机名
+        type: 'none', // 伪装类型
+        seed: '', // mKCP 种子
+        authority: '', // gRPC 域名
+        mode: 'gun', // XHTTP 传输模式
+        extra: '', // 额外参数
+        alpn: '', // TLS ALPN
+        fp: '', // TLS 伪装指纹
+        flow: '', // XTLS 流控
     })
 
     const [ssForm, setSsForm] = useState<SsRow>({
         add: '', // 服务器地址
-        port: 433, // 服务器端口
+        port: 443, // 服务器端口
         pwd: '', // 密码
         scy: '2022-blake3-aes-256-gcm', // 加密方式
     })
@@ -115,91 +112,119 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <ToggleButton value="trojan">Trojan</ToggleButton>
                     </ToggleButtonGroup>
                 </Grid>
-                <Grid size={12}>
+                <Grid size={12} sx={{mb: 2}}>
                     <TextField fullWidth size="small" label="服务器名称(postscript)" name="ps" onChange={handleChange}/>
                 </Grid>
 
                 {serverType === 'vless' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} onChange={(e) => setVlessForm({...vlessForm, add: e.target.value})}/>
+                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口" name="port" value={vlessForm.port}
-                                   onChange={(e) => setVlessForm({...vlessForm, port: Number(e.target.value)})}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="UUID" name="id" value={vlessForm.id} onChange={(e) => setVlessForm({...vlessForm, id: e.target.value})}/>
+                        <TextField fullWidth size="small" label="用户ID" name="id" value={vlessForm.id} onChange={handleChange}/>
+                    </Grid>
+
+                    <Grid size={12} sx={{mt: 3}}>
+                        <TextField
+                            select fullWidth size="small" label="传输方式(network)"
+                            id="vless-network"
+                            name="net" value={vlessForm.net}
+                            onChange={handleChange}>
+                            {vlessNetworkTypeList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                        </TextField>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="加密方式" name="scy" value={vlessForm.scy} onChange={(e) => setVlessForm({...vlessForm, scy: e.target.value})}/>
+                        <TextField
+                            select fullWidth size="small" label="安全类型(security)"
+                            id="vless-security"
+                            name="scy" value={vlessForm.scy}
+                            onChange={handleChange}>
+                            {vlessSecurityList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                        </TextField>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="流控" name="flow" value={vlessForm.flow} onChange={(e) => setVlessForm({...vlessForm, flow: e.target.value})}/>
+                        <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
+                    </Grid>
+                    {['ws', 'xhttp'].includes(vlessForm.net) && (
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
+                        </Grid>
+                    )}
+                    {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') && (
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
+                        </Grid>
+                    )}
+
+                    <Grid size={12} sx={{mt: 3}}>
+                        <TextField
+                            select fullWidth size="small" label="流控(flow)"
+                            id="vless-flow"
+                            name="flow" value={vlessForm.flow}
+                            onChange={handleChange}>
+                            {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                        </TextField>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="网络类型" name="net" value={vlessForm.net} onChange={(e) => setVlessForm({...vlessForm, net: e.target.value})}/>
+                        <TextField
+                            select fullWidth size="small" label="伪装指纹(fingerprint)"
+                            id="vless-fp"
+                            name="fp" value={vlessForm.fp}
+                            onChange={handleChange}>
+                            {fingerprintList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                        </TextField>
                     </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="指纹" name="fp" value={vlessForm.fp} onChange={(e) => setVlessForm({...vlessForm, fp: e.target.value})}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="SNI" name="sni" value={vlessForm.sni} onChange={(e) => setVlessForm({...vlessForm, sni: e.target.value})}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="服务名称" name="serviceName" value={vlessForm.serviceName}
-                                   onChange={(e) => setVlessForm({...vlessForm, serviceName: e.target.value})}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="头部类型" name="headerType" value={vlessForm.headerType}
-                                   onChange={(e) => setVlessForm({...vlessForm, headerType: e.target.value})}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="种子" name="seed" value={vlessForm.seed} onChange={(e) => setVlessForm({...vlessForm, seed: e.target.value})}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="模式" name="mode" value={vlessForm.mode} onChange={(e) => setVlessForm({...vlessForm, mode: e.target.value})}/>
-                    </Grid>
+
+                    {vlessForm.scy === 'reality' && (<>
+                        <Grid size={12} sx={{mt: 3}}>
+                            <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
+                        </Grid>
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={vlessForm.sid} onChange={handleChange}/>
+                        </Grid>
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
+                        </Grid>
+                    </>)}
                 </>) : serverType === 'vmess' ? (<>
-                    <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add} onChange={(e) => setVmessForm({...vmessForm, add: e.target.value})}/>
-                    </Grid>
-                    <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口" name="port" value={vmessForm.port}
-                                   onChange={(e) => setVmessForm({...vmessForm, port: Number(e.target.value)})}/>
+                    <Grid size={12}>
+                        <TextField fullWidth size="small" label="传输协议" name="net" value={vmessForm.net} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户ID" name="id" value={vmessForm.id} onChange={(e) => setVmessForm({...vmessForm, id: e.target.value})}/>
+                        <TextField fullWidth size="small" label="安全类型" name="scy" value={vmessForm.scy} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="加密方式" name="scy" value={vmessForm.scy} onChange={(e) => setVmessForm({...vmessForm, scy: e.target.value})}/>
+                        <TextField fullWidth size="small" label="伪装域名" name="host" value={vmessForm.host} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="额外ID" name="aid" value={vmessForm.aid}
-                                   onChange={(e) => setVmessForm({...vmessForm, aid: Number(e.target.value)})}/>
+                        <TextField fullWidth size="small" label="路径" name="path" value={vmessForm.path} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="传输协议" name="net" value={vmessForm.net} onChange={(e) => setVmessForm({...vmessForm, net: e.target.value})}/>
+                        <TextField fullWidth size="small" label="主机名" name="sni" value={vmessForm.sni} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="伪装域名" name="host" value={vmessForm.host} onChange={(e) => setVmessForm({...vmessForm, host: e.target.value})}/>
+                        <TextField fullWidth size="small" label="伪装类型" name="type" value={vmessForm.type} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="路径" name="path" value={vmessForm.path} onChange={(e) => setVmessForm({...vmessForm, path: e.target.value})}/>
+                        <TextField fullWidth size="small" label="mKCP 种子" name="seed" value={vmessForm.seed} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="TLS 配置" name="tls" value={vmessForm.tls} onChange={(e) => setVmessForm({...vmessForm, tls: e.target.value})}/>
+                        <TextField fullWidth size="small" label="gRPC 域名" name="authority" value={vmessForm.authority} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="指纹" name="fp" value={vmessForm.fp} onChange={(e) => setVmessForm({...vmessForm, fp: e.target.value})}/>
+                        <TextField fullWidth size="small" label="XHTTP 模式" name="mode" value={vmessForm.mode} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="类型" name="type" value={vmessForm.type} onChange={(e) => setVmessForm({...vmessForm, type: e.target.value})}/>
+                        <TextField fullWidth size="small" label="额外参数" name="extra" value={vmessForm.extra} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="种子" name="seed" value={vmessForm.seed} onChange={(e) => setVmessForm({...vmessForm, seed: e.target.value})}/>
+                        <TextField fullWidth size="small" label="ALPN 协议" name="alpn" value={vmessForm.alpn} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="模式" name="mode" value={vmessForm.mode} onChange={(e) => setVmessForm({...vmessForm, mode: e.target.value})}/>
+                        <TextField fullWidth size="small" label="流控" name="flow" value={vmessForm.flow} onChange={handleChange}/>
                     </Grid>
                 </>) : serverType === 'ss' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
@@ -251,7 +276,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     <Grid size={12}>
                         <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} onChange={handleChange}/>
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={12} sx={{mt: 3}}>
                         <TextField
                             select fullWidth size="small" label="传输方式(network)"
                             id="trojan-network"
@@ -270,13 +295,13 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     )}
                     {trojanForm.net === 'grpc' && (
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="服务名称(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
+                            <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
                         </Grid>
                     )}
                 </>)}
 
-                <Grid size={12}>
-                    <Button variant="contained" fullWidth onClick={handleSubmit}>添加</Button>
+                <Grid size={12} sx={{mt: 2}}>
+                    <Button variant="contained" fullWidth onClick={handleSubmit}>添加服务器</Button>
                 </Grid>
             </Grid>
         </Card>

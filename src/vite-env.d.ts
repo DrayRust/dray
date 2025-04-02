@@ -90,13 +90,15 @@ interface VlessRow {
     path: string; // (ws / xhttp) 路径 path
     sni: string; // (grpc / reality) 主机名 Server Name Indication 如：example.com
 
+    // TLS
+    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
+
     // XTLS
     flow: string; // 流控模式 如：xtls-rprx-vision / xtls-rprx-vision-udp443
 
     // REALITY
     // https://xtls.github.io/config/transport.html#realityobject
     // https://github.com/XTLS/REALITY
-    fp: string; // fingerprint 伪装指纹
     pbk: string; // public key 服务端私钥对应的公钥
     sid: string; // shortId 服务端 shortIds 之一
     spx: string; // spiderX 爬虫初始路径与参数，建议每个客户端不同
@@ -133,6 +135,9 @@ interface VmessRow {
 
     // TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
     alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
+
+    // TLS
+    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
 
     // XTLS
     flow: string; // 流控 如：xtls-rprx-vision
