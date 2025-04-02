@@ -129,7 +129,8 @@ export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommo
             if (c.inbounds[i].protocol === "socks") {
                 c.inbounds[i].sniffing = {
                     enabled: value,
-                    destOverride: rayCommonConfig.socks_sniffing_dest_override
+                    destOverride: rayCommonConfig.socks_sniffing_dest_override,
+                    metadataOnly: false
                 }
                 // break
             }
