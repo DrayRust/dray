@@ -145,49 +145,52 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                             {vlessSecurityList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
                         </TextField>
                     </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
-                    </Grid>
-                    {['ws', 'xhttp'].includes(vlessForm.net) && (
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
-                        </Grid>
-                    )}
-                    {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') && (
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
-                        </Grid>
-                    )}
 
-                    <Grid size={12} sx={{mt: 3}}>
-                        <TextField
-                            select fullWidth size="small" label="流控(flow)"
-                            id="vless-flow"
-                            name="flow" value={vlessForm.flow}
-                            onChange={handleChange}>
-                            {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                        </TextField>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField
-                            select fullWidth size="small" label="伪装指纹(fingerprint)"
-                            id="vless-fp"
-                            name="fp" value={vlessForm.fp}
-                            onChange={handleChange}>
-                            {fingerprintList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                        </TextField>
-                    </Grid>
+                    {vlessForm.scy !== 'none' && (<>
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
+                        </Grid>
+                        {['ws', 'xhttp'].includes(vlessForm.net) && (
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
+                            </Grid>
+                        )}
+                        {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') && (
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
+                            </Grid>
+                        )}
 
-                    {vlessForm.scy === 'reality' && (<>
                         <Grid size={12} sx={{mt: 3}}>
-                            <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
+                            <TextField
+                                select fullWidth size="small" label="流控(flow)"
+                                id="vless-flow"
+                                name="flow" value={vlessForm.flow}
+                                onChange={handleChange}>
+                                {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                            </TextField>
                         </Grid>
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={vlessForm.sid} onChange={handleChange}/>
+                            <TextField
+                                select fullWidth size="small" label="伪装指纹(fingerprint)"
+                                id="vless-fp"
+                                name="fp" value={vlessForm.fp}
+                                onChange={handleChange}>
+                                {fingerprintList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                            </TextField>
                         </Grid>
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
-                        </Grid>
+
+                        {vlessForm.scy === 'reality' && (<>
+                            <Grid size={12} sx={{mt: 3}}>
+                                <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
+                            </Grid>
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={vlessForm.sid} onChange={handleChange}/>
+                            </Grid>
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
+                            </Grid>
+                        </>)}
                     </>)}
                 </>) : serverType === 'vmess' ? (<>
                     <Grid size={12}>
