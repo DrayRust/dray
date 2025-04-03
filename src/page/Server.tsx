@@ -112,7 +112,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {DialogComponent, confirm} = useDialog()
-    const cardSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 64px)`, textAlign: 'center'}
+    const cardSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 70px)`, textAlign: 'center'}
     return (<>
         <SnackbarComponent/>
         <DialogComponent/>
