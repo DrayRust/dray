@@ -97,6 +97,15 @@ interface VmessRow {
     // 伪装也可能成为一种强特征
     type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
+    // TLS
+    // https://xtls.github.io/config/transport.html#tlsobject
+    // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
+    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
+    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
+
+    // XTLS
+    flow: string; // 流控 如：xtls-rprx-vision
+
     // mKCP
     // https://xtls.github.io/config/transports/mkcp.html
     seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
@@ -109,15 +118,6 @@ interface VmessRow {
     // https://github.com/XTLS/Xray-core/discussions/4113
     mode: string; // 对应 gRPC 的传输模式 transport mode 如：gun / multi / guna
     extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
-
-    // TLS
-    // https://xtls.github.io/config/transport.html#tlsobject
-    // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
-    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
-    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
-
-    // XTLS
-    flow: string; // 流控 如：xtls-rprx-vision
 }
 
 // https://www.v2fly.org/config/protocols/vless.html
