@@ -18,7 +18,9 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     const readList = () => {
         readLogList().then((d) => {
             setLogList(d as LogList)
-        }).catch(_ => 0)
+        }).catch(_ => {
+            setLogList([])
+        })
     }
     useEffect(() => readList(), [])
 

@@ -24,7 +24,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const readList = () => {
         readServerList().then((d) => {
             setServerList(d as ServerList)
-        }).catch(_ => 0)
+        }).catch(_ => {
+            setServerList([])
+        })
     }
     useEffect(() => readList(), [])
 
