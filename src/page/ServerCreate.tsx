@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import {
-    Autocomplete, ToggleButtonGroup, ToggleButton,
+    ToggleButtonGroup, ToggleButton,
     Card, TextField, Button, Grid
 } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
 import { PasswordInput } from '../component/PasswordInput.tsx'
 import { SelectField } from '../component/SelectField.tsx'
+import { AutoCompleteField } from '../component/AutoCompleteField.tsx'
 import { fingerprintList, flowList, ssMethodList, trojanNetworkTypeList, vlessNetworkTypeList, vlessSecurityList } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
@@ -26,7 +27,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         path: '', // 路径
         sni: '', // 主机名
 
-        fp: 'chrome', // 伪装指纹
+        fp: '', // 伪装指纹
         flow: 'xtls-rprx-vision', // 流控模式
 
         pbk: '', // REALITY 公钥
@@ -154,8 +155,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                             </Grid>
                         )}
                         <Grid size={12} sx={{mt: 3}}>
-                            <SelectField label="伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
-                                         onChange={(value) => setFormData('fp', value)}/>
+                            <AutoCompleteField
+                                label="伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
+                                onChange={(value) => setFormData('fp', value)}/>
                         </Grid>
 
                         {vlessForm.scy === 'reality' && (<>
@@ -222,13 +224,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <PasswordInput label="密码(password)" value={ssForm.pwd} onChange={(value) => setFormData('pwd', value)}/>
                     </Grid>
                     <Grid size={12}>
-                        <Autocomplete
-                            id="ss-method" size="small" fullWidth freeSolo
-                            value={ssForm.scy} onChange={(_, v) => setFormData('scy', v)}
-                            options={ssMethodList.map((v) => v)}
-                            renderInput={(params) => (
-                                <TextField label="加密方式(method)" {...params}/>
-                            )}/>
+                        <AutoCompleteField
+                            label="加密方式(method)" id="ss-method" value={ssForm.scy} options={ssMethodList}
+                            onChange={(value) => setFormData('scy', value)}/>
                     </Grid>
                 </>) : serverType === 'trojan' && (<>
                     <Grid size={{xs: 12, md: 8}}>
