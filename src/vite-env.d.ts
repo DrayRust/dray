@@ -104,6 +104,7 @@ interface VlessRow {
     spx: string; // spiderX 爬虫初始路径与参数，建议每个客户端不同
 }
 
+// 设计宗旨：做减法（挺难的一件事，雷霆的参数是否可以合并？合并后有什么利弊？）
 // https://www.v2fly.org/config/protocols/vmess.html
 // https://xtls.github.io/config/outbounds/vmess.html
 interface VmessRow {
@@ -133,10 +134,10 @@ interface VmessRow {
     mode: string; // 对应 gRPC 的传输模式 transport mode 如：gun / multi / guna
     extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
 
-    // TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
-    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
-
     // TLS
+    // https://xtls.github.io/config/transport.html#tlsobject
+    // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
+    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
     fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
 
     // XTLS
