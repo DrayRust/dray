@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react'
 import {
     Autocomplete, ToggleButtonGroup, ToggleButton, MenuItem,
-    FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton,
     Card, TextField, Button, Grid
 } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
+import { PasswordInput } from '../component/PasswordInput.tsx'
 import { fingerprintList, flowList, ssMethodList, trojanNetworkTypeList, vlessNetworkTypeList, vlessSecurityList } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
 
     const [serverType, setServerType] = useState('vless')
-    const [showPassword, setShowPassword] = useState(false)
 
     const [vlessForm, setVlessForm] = useState<VlessRow>({
         add: '', // 服务器地址
@@ -240,28 +238,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <FormControl fullWidth size="small" variant="outlined">
-                            <InputLabel>密码(password)</InputLabel>
-                            <OutlinedInput
-                                label="密码(password)"
-                                type={showPassword ? 'text' : 'password'}
-                                name="pwd"
-                                value={ssForm.pwd}
-                                onChange={handleChange}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label={showPassword ? 'hide the password' : 'show the password'}
-                                            onClick={() => setShowPassword((show) => !show)}
-                                            onMouseDown={(e) => e.preventDefault()}
-                                            onMouseUp={(e) => e.preventDefault()}
-                                            edge="end">
-                                            {showPassword ? <VisibilityOff/> : <Visibility/>}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                            />
-                        </FormControl>
+                        <PasswordInput label="密码(password)" value={ssForm.pwd} onChange={(value) => setFormData('pwd', value)}/>
                     </Grid>
                     <Grid size={12}>
                         <Autocomplete
