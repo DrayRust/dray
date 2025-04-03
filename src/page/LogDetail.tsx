@@ -186,7 +186,10 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
         <SnackbarComponent/>
         <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
             <Stack direction="row" spacing={2} sx={{justifyContent: "center", alignItems: "center"}}>
-                <Button variant="outlined" startIcon={<ArrowBackIosNewIcon/>} onClick={() => navigate(`/log`)}>返回</Button>
+                <Button variant="outlined" sx={{p: 1, mr: 2, minWidth: 0, borderRadius: '50%', '&:hover': {bgColor: 'action.hover'}}}
+                        onClick={() => navigate('/log')}>
+                    <ArrowBackIosNewIcon fontSize="small"/>
+                </Button>
                 <Typography variant="body1">{formatLogName(filename, true)}</Typography>
             </Stack>
             <Stack direction="row" spacing={2} sx={{justifyContent: "center", alignItems: "center"}}>
@@ -200,7 +203,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
                     label="自动刷新"/>
             </Stack>
         </Stack>
-        <Paper sx={{p: 1, pr: 0, height: 'calc(100vh - 65px)', overflow: 'hidden', position: 'fixed', bottom: 10, left: 140, right: 10}}>
+        <Paper elevation={5} sx={{p: 1, pr: 0, height: 'calc(100vh - 65px)', overflow: 'hidden', position: 'fixed', bottom: 10, left: 140, right: 10}}>
             <List className="log-view" ref={listRef} onScroll={handleListScroll} itemCount={logList.length} itemSize={20}
                   width="100%" height={listHeight}>
                 {Row}

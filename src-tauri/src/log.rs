@@ -77,7 +77,7 @@ fn format_timestamp(modified_time: std::time::SystemTime) -> String {
 }
 
 pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> String {
-    debug!("Reading log file: {}, reverse: {}, start_position: {}", filename, reverse, start_position);
+    debug!("read: {}, reverse: {}, start_position: {}", filename, reverse, start_position);
     const DEFAULT_ERROR_JSON: &str = r#"{"content":"","start":0,"end":0}"#;
     // const DEFAULT_READ_SIZE: u64 = 1024 * 100; // 100KB
     const DEFAULT_READ_SIZE: u64 = 1000 * 100; // 100KB
