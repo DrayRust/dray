@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
-    Autocomplete, ToggleButtonGroup, ToggleButton, MenuItem,
+    Autocomplete, ToggleButtonGroup, ToggleButton,
     Card, TextField, Button, Grid
 } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
 import { PasswordInput } from '../component/PasswordInput.tsx'
+import { SelectField } from '../component/SelectField.tsx'
 import { fingerprintList, flowList, ssMethodList, trojanNetworkTypeList, vlessNetworkTypeList, vlessSecurityList } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
@@ -130,22 +131,12 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
 
                     <Grid size={12} sx={{mt: 3}}>
-                        <TextField
-                            select fullWidth size="small" label="传输方式(network)"
-                            id="vless-network"
-                            name="net" value={vlessForm.net}
-                            onChange={handleChange}>
-                            {vlessNetworkTypeList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                        </TextField>
+                        <SelectField label="传输方式(network)" id="vless-network" value={vlessForm.net} options={vlessNetworkTypeList}
+                                     onChange={(value) => setFormData('net', value)}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField
-                            select fullWidth size="small" label="安全类型(security)"
-                            id="vless-security"
-                            name="scy" value={vlessForm.scy}
-                            onChange={handleChange}>
-                            {vlessSecurityList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                        </TextField>
+                        <SelectField label="安全类型(security)" id="vless-security" value={vlessForm.scy} options={vlessSecurityList}
+                                     onChange={(value) => setFormData('scy', value)}/>
                     </Grid>
 
                     {vlessForm.scy !== 'none' && (<>
@@ -163,24 +154,14 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                             </Grid>
                         )}
                         <Grid size={12} sx={{mt: 3}}>
-                            <TextField
-                                select fullWidth size="small" label="伪装指纹(fingerprint)"
-                                id="vless-fp"
-                                name="fp" value={vlessForm.fp}
-                                onChange={handleChange}>
-                                {fingerprintList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                            </TextField>
+                            <SelectField label="伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
+                                         onChange={(value) => setFormData('fp', value)}/>
                         </Grid>
 
                         {vlessForm.scy === 'reality' && (<>
                             <Grid size={12} sx={{mt: 3}}>
-                                <TextField
-                                    select fullWidth size="small" label="流控(flow)"
-                                    id="vless-flow"
-                                    name="flow" value={vlessForm.flow}
-                                    onChange={handleChange}>
-                                    {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                                </TextField>
+                                <SelectField label="流控(flow)" id="vless-flow" value={vlessForm.flow} options={flowList}
+                                             onChange={(value) => setFormData('flow', value)}/>
                             </Grid>
                             <Grid size={12}>
                                 <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
@@ -260,13 +241,8 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12} sx={{mt: 3}}>
-                        <TextField
-                            select fullWidth size="small" label="传输方式(network)"
-                            id="trojan-network"
-                            name="net" value={trojanForm.net}
-                            onChange={handleChange}>
-                            {trojanNetworkTypeList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                        </TextField>
+                        <SelectField label="传输方式(network)" id="trojan-network" value={trojanForm.net} options={trojanNetworkTypeList}
+                                     onChange={(value) => setFormData('net', value)}/>
                     </Grid>
                     <Grid size={12}>
                         <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={trojanForm.host} onChange={handleChange}/>
