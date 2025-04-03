@@ -164,17 +164,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
                             </Grid>
                         )}
-
                         <Grid size={12} sx={{mt: 3}}>
-                            <TextField
-                                select fullWidth size="small" label="流控(flow)"
-                                id="vless-flow"
-                                name="flow" value={vlessForm.flow}
-                                onChange={handleChange}>
-                                {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
-                            </TextField>
-                        </Grid>
-                        <Grid size={12}>
                             <TextField
                                 select fullWidth size="small" label="伪装指纹(fingerprint)"
                                 id="vless-fp"
@@ -186,6 +176,15 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
                         {vlessForm.scy === 'reality' && (<>
                             <Grid size={12} sx={{mt: 3}}>
+                                <TextField
+                                    select fullWidth size="small" label="流控(flow)"
+                                    id="vless-flow"
+                                    name="flow" value={vlessForm.flow}
+                                    onChange={handleChange}>
+                                    {flowList.map((v) => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+                                </TextField>
+                            </Grid>
+                            <Grid size={12}>
                                 <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
                             </Grid>
                             <Grid size={12}>
