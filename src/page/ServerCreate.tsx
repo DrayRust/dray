@@ -19,13 +19,17 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         add: '', // 服务器地址
         port: 443, // 服务器端口
         id: '', // 用户ID
+
         net: 'tcp', // 网络传输方式
-        scy: 'reality', // 安全类型
+        scy: 'none', // 安全类型
+
         host: '', // 伪装域名
         path: '', // 路径
         sni: '', // 主机名
+
         fp: 'chrome', // 伪装指纹
         flow: 'xtls-rprx-vision', // 流控模式
+
         pbk: '', // REALITY 公钥
         sid: '', // REALITY shortId
         spx: '', // REALITY 爬虫初始路径与参数

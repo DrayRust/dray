@@ -6,9 +6,9 @@ export const vlessNetworkTypeList = [
 ]
 
 export const vlessSecurityList = [
+    'none',
     'tls',
     'reality',
-    'none',
 ]
 
 export const flowList = [
