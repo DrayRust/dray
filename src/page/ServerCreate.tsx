@@ -152,7 +152,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <Grid size={12}>
                             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
                         </Grid>
-                        {['ws', 'xhttp'].includes(vlessForm.net) && (
+                        {['ws', 'xhttp'].includes(vlessForm.net) && vlessForm.scy !== 'reality' && (
                             <Grid size={12}>
                                 <TextField fullWidth size="small" label="路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
                             </Grid>
