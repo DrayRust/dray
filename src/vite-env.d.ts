@@ -73,21 +73,27 @@ interface ServerRow {
 interface ServerList extends Array<ServerRow> {
 }
 
-// VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
-// https://xtls.github.io/config/transport.html
-
-// 设计宗旨：做减法（挺难的一件事，哪些参数可以砍掉？雷同的参数是否可合并？砍掉和合并后有什么利弊？）
-// https://xtls.github.io/config/outbounds/vmess.html
-// https://www.v2fly.org/v5/config/proxy/vmess.html
+/**
+ * 设计宗旨：做减法（挺难的一件事，哪些参数可以砍掉？雷同的参数是否可合并？砍掉和合并后有什么利弊？）
+ *
+ * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
+ * https://xtls.github.io/config/transport.html
+ *
+ * https://xtls.github.io/config/outbounds/vmess.html
+ * https://www.v2fly.org/v5/config/proxy/vmess.html
+ */
 interface VmessRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     id: string; // 用户 ID (uuid)
     aid: string; // 用户副 ID (alterId) 默认: "0"
 
-    // 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一，
-    // 分别对应 RAW、mKCP、WebSocket、HTTP/2/3、gRPC、HTTPUpgrade、XHTTP 传输方式。
-    net: string; // 网络传输方式 network
+    /**
+     * 将 vmess 和 vless 参数进行拆分，精简 vless 配置，xhttp 部分拆离 vmess
+     * 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一
+     * 分别对应 RAW、mKCP、WebSocket、HTTP 2/3、gRPC、HTTPUpgrade、XHTTP 传输方式
+     **/
+    net: string; // 网络传输方式 network 如: tcp、kcp、ws、http、grpc、httpupgrade
     scy: string; // 安全类型 security = encryption 如：none / auto / zero / aes-128-gcm / chacha20-poly1305
 
     host: string; // 伪装域名 host
@@ -104,6 +110,9 @@ interface VmessRow {
     // https://xtls.github.io/config/transports/mkcp.html
     seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
     type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+
+    // gRPC
+    mode: string; // 传输模式 transport mode 如：gun / multi / guna
 }
 
 // https://xtls.github.io/config/outbounds/vless.html
@@ -128,8 +137,10 @@ interface VlessRow {
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113
-    mode: string; // 对应 gRPC 的传输模式 transport mode 如：gun / multi / guna
     extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
+
+    // gRPC
+    mode: string; // 传输模式 transport mode 如：gun / multi / guna
 
     // REALITY
     // https://xtls.github.io/config/transport.html#realityobject
