@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { formatPort, hashString, isValidUUID } from "../util/util.ts"
-import { validateServerRow } from "../util/validate.ts"
+import { hashString } from "../util/util.ts"
+import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { VmessForm } from '../server/VmessForm.tsx'
@@ -97,6 +97,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         setAddError(false)
         setPortError(false)
         setIdError(false)
+        setIdNotUUID(false)
         setPwdError(false)
     }
 
@@ -109,25 +110,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         if (typeof value === 'string') value = value.trim()
         // console.log('setFormData', name, value)
 
-        if (name === 'port') {
-            value = formatPort(value)
-        } else if (name === 'add') {
-            setAddError(!value)
-        } else if (name === 'port') {
-            setPortError(!value)
-        } else if (name === 'id') {
-            let idNotUUID = false
-            let err = !value
-            if (!err) {
-                err = !isValidUUID(value)
-                if (err) idNotUUID = true
-            }
-            setIdNotUUID(idNotUUID)
-            setIdError(err)
-        } else if (name === 'pwd') {
-            setPwdError(!value)
-        }
-
+        value = validateServerField(name, value, setAddError, setPortError, setIdError, setIdNotUUID, setPwdError)
         if (serverType === 'vmess') {
             setVmessForm({...vmessForm, [name]: value})
         } else if (serverType === 'vless') {
