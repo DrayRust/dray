@@ -96,6 +96,19 @@ interface VmessRow {
     net: string; // 网络传输方式 network 如: tcp、kcp、ws、http、grpc、httpupgrade
     scy: string; // 安全类型 security = encryption 如：none / auto / zero / aes-128-gcm / chacha20-poly1305
 
+    host: string; // 伪装域名 host
+    path: string; // 路径 path
+
+    // tcp / mKCP
+    type: string; // (tcp / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+
+    // mKCP
+    // https://xtls.github.io/config/transports/mkcp.html
+    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
+
+    // gRPC
+    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
+
     // TLS
     // https://xtls.github.io/config/transport.html#tlsobject
     tls: boolean; // TLS（Transport Layer Security，传输层安全协议）是否启用
@@ -103,19 +116,6 @@ interface VmessRow {
 
     // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
     alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
-
-    host: string; // 伪装域名 host
-    path: string; // 路径 path
-
-    // tcp / mKCP
-    type: string; // (tcp / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
-
-    // gRPC
-    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
-
-    // mKCP
-    // https://xtls.github.io/config/transports/mkcp.html
-    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
 }
 
 // https://xtls.github.io/config/outbounds/vless.html
@@ -140,7 +140,10 @@ interface VlessRow {
     extra: string; // XHTTP 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
 
     // TLS
-    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
+    fp: string; // TLS 伪装指纹 fingerprint，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
+
+    // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
+    alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
 
     // XTLS
     flow: string; // 流控模式 如：xtls-rprx-vision / xtls-rprx-vision-udp443

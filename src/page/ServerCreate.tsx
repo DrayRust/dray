@@ -35,17 +35,16 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         net: 'tcp', // 网络传输方式 network
         scy: 'auto', // 安全类型 security = encryption
 
+        host: '', // 伪装域名 host
+        path: '', // 路径 path
+        type: 'none', // 伪装类型 headerType
+
+        seed: '', // mKCP 种子
+        mode: '', // gRPC 传输模式
+
         tls: false, // 是否启用 TLS
         fp: '', // TLS 伪装指纹 fingerprint
         alpn: '', // TLS ALPN
-
-        host: '', // 伪装域名 host
-        path: '', // 路径 path
-
-        type: 'none', // 伪装类型 headerType
-
-        mode: '', // gRPC 传输模式
-        seed: '', // mKCP 种子
     })
 
     const [vlessForm, setVlessForm] = useState<VlessRow>({
@@ -64,6 +63,8 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         extra: '', // XHTTP 额外参数 extra
 
         fp: '', // TLS 伪装指纹
+        alpn: '', // TLS ALPN 协议
+
         flow: 'xtls-rprx-vision', // XTLS 流控模式
 
         pbk: '', // REALITY 公钥
@@ -159,23 +160,6 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                                      onChange={(value) => setFormData('scy', value)}/>
                     </Grid>
 
-                    <Grid size={12} sx={{mt: 3}}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                            <Typography variant="body1" sx={{pl: 1}}>TLS 安全协议</Typography>
-                            <Switch checked={vmessForm.tls} onChange={(e) => setFormData('tls', e.target.checked)}/>
-                        </Stack>
-                    </Grid>
-                    {vmessForm.tls && (<>
-                        <Grid size={12}>
-                            <AutoCompleteField
-                                label="伪装指纹(fingerprint)" id="vmess-fp" value={vmessForm.fp} options={fingerprintList}
-                                onChange={(value) => setFormData('fp', value)}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="ALPN 协议" name="alpn" value={vmessForm.alpn} onChange={handleChange}/>
-                        </Grid>
-                    </>)}
-
                     {vmessForm.net !== 'tcp' && (<>
                         <Grid size={12} sx={{mt: 3}}>
                             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vmessForm.host} onChange={handleChange}/>
@@ -196,6 +180,12 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         </Grid>
                     )}
 
+                    {vmessForm.net === 'kcp' && (
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={vmessForm.seed} onChange={handleChange}/>
+                        </Grid>
+                    )}
+
                     {vmessForm.net === 'grpc' && (<>
                         <Grid size={12}>
                             <SelectField label="gRPC 传输模式(mode)" id="vmess-mode" value={vmessForm.mode} options={grpcModeList}
@@ -203,11 +193,22 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         </Grid>
                     </>)}
 
-                    {vmessForm.net === 'kcp' && (
+                    <Grid size={12} sx={{mt: 3}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                            <Typography variant="body1" sx={{pl: 1}}>TLS 安全协议</Typography>
+                            <Switch checked={vmessForm.tls} onChange={(e) => setFormData('tls', e.target.checked)}/>
+                        </Stack>
+                    </Grid>
+                    {vmessForm.tls && (<>
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={vmessForm.seed} onChange={handleChange}/>
+                            <AutoCompleteField
+                                label="伪装指纹(fingerprint)" id="vmess-fp" value={vmessForm.fp} options={fingerprintList}
+                                onChange={(value) => setFormData('fp', value)}/>
                         </Grid>
-                    )}
+                        <Grid size={12}>
+                            <TextField fullWidth size="small" label="ALPN 协议" name="alpn" value={vmessForm.alpn} onChange={handleChange}/>
+                        </Grid>
+                    </>)}
                 </>) : serverType === 'vless' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
                         <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} onChange={handleChange}/>
