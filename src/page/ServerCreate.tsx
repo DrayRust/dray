@@ -18,7 +18,9 @@ import {
     fingerprintList,
     flowList,
     tcpHeaderTypeList,
-    kcpHeaderTypeList, grpcModeList,
+    kcpHeaderTypeList,
+    grpcModeList,
+    alpnList,
 } from "../util/data.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
@@ -36,15 +38,15 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         scy: 'auto', // 安全类型 security = encryption
 
         host: '', // 伪装域名 host
-        path: '', // 路径 path
+        path: '', // 伪装路径 / 主机名 path
         type: 'none', // 伪装类型 headerType
 
         seed: '', // mKCP 种子
         mode: '', // gRPC 传输模式
 
         tls: false, // 是否启用 TLS
+        alpn: 'h2, http/1.1', // TLS ALPN 协议
         fp: '', // TLS 伪装指纹 fingerprint
-        alpn: '', // TLS ALPN
     })
 
     const [vlessForm, setVlessForm] = useState<VlessRow>({
@@ -56,20 +58,20 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         scy: 'none', // 安全类型
 
         host: '', // 伪装域名
-        path: '', // 路径
-        sni: '', // (grpc / reality) 主机名 Server Name Indication
+        path: '', // 伪装路径
+        sni: '', // (grpc / reality) 伪装主机名 Server Name Indication
 
         mode: '', // gRPC 传输模式
         extra: '', // XHTTP 额外参数 extra
 
-        fp: '', // TLS 伪装指纹
         alpn: '', // TLS ALPN 协议
+        fp: '', // TLS 伪装指纹
 
         flow: 'xtls-rprx-vision', // XTLS 流控模式
 
         pbk: '', // REALITY 公钥
         sid: '', // REALITY shortId
-        spx: '', // REALITY 爬虫初始路径与参数
+        spx: '', // REALITY 伪装爬虫初始路径与参数
     })
 
     const [ssForm, setSsForm] = useState<SsRow>({
@@ -166,7 +168,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                label={vmessForm.net === 'grpc' ? '主机名(serviceName)' : '路径(path)'}
+                                label={vmessForm.net === 'grpc' ? '伪装主机名(serviceName)' : '伪装路径(path)'}
                                 fullWidth size="small" name="path" value={vmessForm.path} onChange={handleChange}/>
                         </Grid>
                     </>)}
@@ -201,12 +203,13 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                     {vmessForm.tls && (<>
                         <Grid size={12}>
-                            <AutoCompleteField
-                                label="伪装指纹(fingerprint)" id="vmess-fp" value={vmessForm.fp} options={fingerprintList}
-                                onChange={(value) => setFormData('fp', value)}/>
+                            <SelectField label="TLS ALPN 协议" id="vmess-alpn" value={vmessForm.alpn} options={alpnList}
+                                         onChange={(value) => setFormData('alpn', value)}/>
                         </Grid>
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="ALPN 协议" name="alpn" value={vmessForm.alpn} onChange={handleChange}/>
+                            <AutoCompleteField
+                                label="TLS 伪装指纹(fingerprint)" id="vmess-fp" value={vmessForm.fp} options={fingerprintList}
+                                onChange={(value) => setFormData('fp', value)}/>
                         </Grid>
                     </>)}
                 </>) : serverType === 'vless' ? (<>
@@ -230,54 +233,58 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
 
                     {vlessForm.net !== 'tcp' && (<>
-                        <Grid size={12}>
+                        <Grid size={12} sx={{mt: 3}}>
                             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
                         </Grid>
                         {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') ? (
                             <Grid size={12}>
-                                <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
+                                <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
                             </Grid>
                         ) : (
                             <Grid size={12}>
-                                <TextField fullWidth size="small" label="路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
+                                <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
                             </Grid>
                         )}
                     </>)}
 
                     {vlessForm.net === 'grpc' && (<>
                         <Grid size={12}>
-                            <SelectField label="传输模式(mode)" id="vless-mode" value={vlessForm.mode} options={grpcModeList}
+                            <SelectField label="gRPC 传输模式(mode)" id="vless-mode" value={vlessForm.mode} options={grpcModeList}
                                          onChange={(value) => setFormData('mode', value)}/>
                         </Grid>
                     </>)}
 
                     {vlessForm.net === 'xhttp' && (<>
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="额外参数(extra)" name="extra" value={vlessForm.extra} onChange={handleChange}/>
+                            <TextField fullWidth multiline minRows={2} size="small" label="额外参数(extra)" name="extra" value={vlessForm.extra} onChange={handleChange}/>
                         </Grid>
                     </>)}
 
                     {vlessForm.net !== 'tcp' && (<>
                         <Grid size={12} sx={{mt: 3}}>
+                            <SelectField label="TLS ALPN 协议" id="vless-alpn" value={vlessForm.alpn} options={alpnList}
+                                         onChange={(value) => setFormData('alpn', value)}/>
+                        </Grid>
+                        <Grid size={12}>
                             <AutoCompleteField
-                                label="伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
+                                label="TLS 伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
                                 onChange={(value) => setFormData('fp', value)}/>
                         </Grid>
                         <Grid size={12}>
-                            <SelectField label="流控(flow)" id="vless-flow" value={vlessForm.flow} options={flowList}
+                            <SelectField label="XTLS 流控模式(flow)" id="vless-flow" value={vlessForm.flow} options={flowList}
                                          onChange={(value) => setFormData('flow', value)}/>
                         </Grid>
                     </>)}
 
                     {vlessForm.scy === 'reality' && (<>
-                        <Grid size={12}>
+                        <Grid size={12} sx={{mt: 3}}>
                             <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
                         </Grid>
                         <Grid size={12}>
                             <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={vlessForm.sid} onChange={handleChange}/>
                         </Grid>
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
+                            <TextField fullWidth size="small" label="伪装爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
                         </Grid>
                     </>)}
                 </>) : serverType === 'ss' ? (<>
