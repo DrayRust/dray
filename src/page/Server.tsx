@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Stack, Checkbox, FormControlLabel,
-    Button, CircularProgress,
+    Card, Stack, Checkbox, FormControlLabel, Button,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import FmdBadIcon from '@mui/icons-material/FmdBad'
 
 import { useDebounce } from '../hook/useDebounce.ts'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -21,11 +20,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [selectedServers, setSelectedServers] = useState<boolean[]>([])
     const [selectedAll, setSelectedAll] = useState(false)
     const [showDeleteBut, setShowDeleteBut] = useState(false)
+    const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
         readServerList().then((d) => {
             setServerList(d as ServerList)
         }).catch(_ => {
             setServerList([])
+            setErrorMsg('暂无服务器')
         })
     }
     useEffect(() => readList(), [])
@@ -112,7 +113,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {DialogComponent, confirm} = useDialog()
-    const cardSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 70px)`, textAlign: 'center'}
+    const height = 'calc(100vh - 70px)'
     return (<>
         <SnackbarComponent/>
         <DialogComponent/>
@@ -133,12 +134,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             )}
         </Stack>
         {!serverList ? (
-            <Card sx={cardSx}><CircularProgress/></Card>
+            <LoadingCard height={height}/>
         ) : serverList.length === 0 ? (
-            <Card sx={cardSx}>
-                <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
-                <div>暂无服务器</div>
-            </Card>
+            <ErrorCard errorMsg={errorMsg} height={height}/>
         ) : (
             <TableContainer component={Card}>
                 <Table size="small">

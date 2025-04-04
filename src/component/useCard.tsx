@@ -11,22 +11,21 @@ const centerSx = {
     textAlign: 'center'
 }
 
-interface ErrorCardProps {
+export const ErrorCard = ({errorMsg, height}: {
     errorMsg: string
-}
-
-export const ErrorCard = ({errorMsg}: ErrorCardProps) => {
+    height?: string
+}) => {
     return (
-        <Card sx={centerSx}>
+        <Card sx={height ? {...centerSx, height} : centerSx}>
             <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
             <div>{errorMsg}</div>
         </Card>
     )
 }
 
-export const LoadingCard = () => {
+export const LoadingCard = ({height}: { height?: string }) => {
     return (
-        <Card sx={centerSx}>
+        <Card sx={height ? {...centerSx, height} : centerSx}>
             <CircularProgress/>
         </Card>
     )
