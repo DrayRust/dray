@@ -151,7 +151,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             <TableCell>服务器名称</TableCell>
                             <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
                             <TableCell sx={{width: '150px'}}>协议类型</TableCell>
-                            <TableCell sx={{width: '150px'}}>加密方式</TableCell>
+                            <TableCell sx={{width: '150px'}}>安全类型</TableCell>
                             <TableCell sx={{width: '120px'}}>操作</TableCell>
                         </TableRow>
                     </TableHead>

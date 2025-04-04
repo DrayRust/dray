@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
     ToggleButtonGroup, ToggleButton, Stack, Switch, Typography,
     Card, TextField, Button, Grid
@@ -22,11 +23,16 @@ import {
     grpcModeList,
     alpnList,
 } from "../util/data.ts"
+import { hashString } from "../util/util.ts"
+import { readServerList, saveServerList } from "../util/invoke.ts"
+import { useSnackbar } from "../component/useSnackbar.tsx"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
 
+    const navigate = useNavigate()
     const [serverType, setServerType] = useState('vless')
+    const [ps, setPs] = useState('')
 
     const [vmessForm, setVmessForm] = useState<VmessRow>({
         add: '', // 地址 address 如：IP / 域名
@@ -92,13 +98,28 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         sni: '', // (grpc) 主机名
     })
 
+    const [psError, setPsError] = useState(false)
+    const [addError, setAddError] = useState(false)
+    const [portError, setPortError] = useState(false)
+    const [idError, setIdError] = useState(false)
+    const [pwdError, setPwdError] = useState(false)
+    const handleServerTypeChange = (v: string) => {
+        if (!v) return
+        setServerType(v)
+        setPsError(false)
+        setAddError(false)
+        setPortError(false)
+        setIdError(false)
+        setPwdError(false)
+    }
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(e.target.name, e.target.value)
     }
     const setFormData = (name: string, value: any) => {
         name = name.trim()
         if (typeof value === 'string') value = value.trim()
-        console.log('setFormData', name, value)
+        // console.log('setFormData', name, value)
         if (name === 'port') {
             value = Number(value)
             value = value < 0 ? 0 : value
@@ -106,10 +127,10 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
             value = value || ''
         }
         if (name === 'aid') value = Number(value) || 0
-        if (serverType === 'vless') {
-            setVlessForm({...vlessForm, [name]: value})
-        } else if (serverType === 'vmess') {
+        if (serverType === 'vmess') {
             setVmessForm({...vmessForm, [name]: value})
+        } else if (serverType === 'vless') {
+            setVlessForm({...vlessForm, [name]: value})
         } else if (serverType === 'ss') {
             setSsForm({...ssForm, [name]: value})
         } else if (serverType === 'trojan') {
@@ -117,18 +138,75 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (!ps) {
+            setPsError(true)
+            showSnackbar('服务器名称不能为空', 'error')
+            return
+        }
 
+        let data: VmessRow | VlessRow | SsRow | TrojanRow | null = null
+        if (serverType === 'vmess') {
+            data = vmessForm
+        } else if (serverType === 'vless') {
+            data = vlessForm
+        } else if (serverType === 'ss') {
+            data = ssForm
+        } else if (serverType === 'trojan') {
+            data = trojanForm
+        }
+        if (!data) return
+
+        if ("add" in data && !data.add) {
+            setAddError(true)
+            showSnackbar('IP/域名能为空', 'error')
+            return
+        }
+        if ("port" in data && !data.port) {
+            setPortError(true)
+            showSnackbar('端口不能为空', 'error')
+            return
+        }
+        if ("id" in data && !data.id) {
+            setIdError(true)
+            showSnackbar('用户ID不能为空', 'error')
+            return
+        }
+        if ("pwd" in data && !data.pwd) {
+            setPwdError(true)
+            showSnackbar('密码不能为空', 'error')
+            return
+        }
+
+        let serverList = await readServerList() || []
+        if ("net" in data) data.scy = `${data.scy}+${data.net}`
+        serverList = [{
+            ps: ps,
+            type: serverType,
+            host: `${data.add}:${data.port}`,
+            scy: data.scy,
+            hash: await hashString(JSON.stringify(data)),
+            data
+        }, ...serverList]
+        const ok = await saveServerList(serverList)
+        if (!ok) {
+            showSnackbar('添加失败', 'error')
+        } else {
+            setTimeout(() => navigate(`/server`), 100)
+        }
     }
 
+    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('/server', '添加')
     return <>
+        <SnackbarComponent/>
         <AppBarComponent/>
         <Card sx={{p: 2, mt: 1}}>
             <Grid container spacing={2} sx={{maxWidth: 800, m: 'auto'}}>
                 <Grid size={12}>
-                    <ToggleButtonGroup exclusive value={serverType} className="server-type"
-                                       onChange={(_: any, v: string) => v && setServerType(v)}>
+                    <ToggleButtonGroup
+                        exclusive value={serverType} className="server-type"
+                        onChange={(_, v: string) => handleServerTypeChange(v)}>
                         <ToggleButton value="vmess">Vmess</ToggleButton>
                         <ToggleButton value="vless">Vless</ToggleButton>
                         <ToggleButton value="ss">Shadowsocks</ToggleButton>
@@ -136,24 +214,31 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </ToggleButtonGroup>
                 </Grid>
                 <Grid size={12} sx={{mb: 2}}>
-                    <TextField fullWidth size="small" label="服务器名称(postscript)" name="ps" onChange={handleChange}/>
+                    <TextField
+                        fullWidth required size="small" label="服务器名称(postscript)"
+                        value={ps} error={psError}
+                        onChange={e => {
+                            let v = e.target.value.trim()
+                            setPsError(!v)
+                            setPs(v)
+                        }}/>
                 </Grid>
 
                 {serverType === 'vmess' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add} error={addError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vmessForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vmessForm.port} error={portError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vmessForm.id} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vmessForm.id} error={idError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <TextField fullWidth size="small" label="额外 ID (alterId)" name="aid" value={vmessForm.aid} onChange={handleChange}/>
                     </Grid>
 
-                    <Grid size={12} sx={{mt: 3}}>
+                    <Grid size={12} sx={{mt: 2}}>
                         <SelectField label="传输方式(network)" id="vmess-network" value={vmessForm.net} options={vmessNetworkTypeList}
                                      onChange={(value) => setFormData('net', value)}/>
                     </Grid>
@@ -162,40 +247,42 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                                      onChange={(value) => setFormData('scy', value)}/>
                     </Grid>
 
-                    {vmessForm.net !== 'tcp' && (<>
-                        <Grid size={12} sx={{mt: 3}}>
-                            <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vmessForm.host} onChange={handleChange}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <TextField
-                                label={vmessForm.net === 'grpc' ? '伪装主机名(serviceName)' : '伪装路径(path)'}
-                                fullWidth size="small" name="path" value={vmessForm.path} onChange={handleChange}/>
-                        </Grid>
-                    </>)}
+                    <Grid container spacing={2} size={12} sx={{mt: 2}}>
+                        {vmessForm.net !== 'tcp' && (<>
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vmessForm.host} onChange={handleChange}/>
+                            </Grid>
+                            <Grid size={12}>
+                                <TextField
+                                    label={vmessForm.net === 'grpc' ? '伪装主机名(serviceName)' : '伪装路径(path)'}
+                                    fullWidth size="small" name="path" value={vmessForm.path} onChange={handleChange}/>
+                            </Grid>
+                        </>)}
 
-                    {['tcp', 'kcp'].includes(vmessForm.net) && (
-                        <Grid size={12}>
-                            <SelectField
-                                label="伪装类型(headerType)" id="vmess-type" value={vmessForm.type}
-                                options={vmessForm.net === 'kcp' ? kcpHeaderTypeList : tcpHeaderTypeList}
-                                onChange={(value) => setFormData('type', value)}/>
-                        </Grid>
-                    )}
+                        {['tcp', 'kcp'].includes(vmessForm.net) && (
+                            <Grid size={12}>
+                                <SelectField
+                                    label="伪装类型(headerType)" id="vmess-type" value={vmessForm.type}
+                                    options={vmessForm.net === 'kcp' ? kcpHeaderTypeList : tcpHeaderTypeList}
+                                    onChange={(value) => setFormData('type', value)}/>
+                            </Grid>
+                        )}
 
-                    {vmessForm.net === 'kcp' && (
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={vmessForm.seed} onChange={handleChange}/>
-                        </Grid>
-                    )}
+                        {vmessForm.net === 'kcp' && (
+                            <Grid size={12}>
+                                <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={vmessForm.seed} onChange={handleChange}/>
+                            </Grid>
+                        )}
 
-                    {vmessForm.net === 'grpc' && (<>
-                        <Grid size={12}>
-                            <SelectField label="gRPC 传输模式(mode)" id="vmess-mode" value={vmessForm.mode} options={grpcModeList}
-                                         onChange={(value) => setFormData('mode', value)}/>
-                        </Grid>
-                    </>)}
+                        {vmessForm.net === 'grpc' && (<>
+                            <Grid size={12}>
+                                <SelectField label="gRPC 传输模式(mode)" id="vmess-mode" value={vmessForm.mode} options={grpcModeList}
+                                             onChange={(value) => setFormData('mode', value)}/>
+                            </Grid>
+                        </>)}
+                    </Grid>
 
-                    <Grid size={12} sx={{mt: 3}}>
+                    <Grid size={12} sx={{mt: 2}}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
                             <Typography variant="body1" sx={{pl: 1}}>TLS 安全协议</Typography>
                             <Switch checked={vmessForm.tls} onChange={(e) => setFormData('tls', e.target.checked)}/>
@@ -214,16 +301,16 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                 </>) : serverType === 'vless' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} error={addError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port} error={portError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vlessForm.id} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vlessForm.id} error={idError} onChange={handleChange}/>
                     </Grid>
 
-                    <Grid size={12} sx={{mt: 3}}>
+                    <Grid size={12} sx={{mt: 2}}>
                         <SelectField label="传输方式(network)" id="vless-network" value={vlessForm.net} options={vlessNetworkTypeList}
                                      onChange={(value) => setFormData('net', value)}/>
                     </Grid>
@@ -233,7 +320,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
 
                     {vlessForm.net !== 'tcp' && (<>
-                        <Grid size={12} sx={{mt: 3}}>
+                        <Grid size={12} sx={{mt: 2}}>
                             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
                         </Grid>
                         {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') ? (
@@ -248,20 +335,20 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
 
                     {vlessForm.net === 'grpc' && (<>
-                        <Grid size={12}>
+                        <Grid size={12} sx={{mt: 2}}>
                             <SelectField label="gRPC 传输模式(mode)" id="vless-mode" value={vlessForm.mode} options={grpcModeList}
                                          onChange={(value) => setFormData('mode', value)}/>
                         </Grid>
                     </>)}
 
                     {vlessForm.net === 'xhttp' && (<>
-                        <Grid size={12}>
-                            <TextField fullWidth multiline minRows={2} size="small" label="额外参数(extra)" name="extra" value={vlessForm.extra} onChange={handleChange}/>
+                        <Grid size={12} sx={{mt: 2}}>
+                            <TextField fullWidth multiline minRows={2} size="small" label="XHTTP 额外参数(extra)" name="extra" value={vlessForm.extra} onChange={handleChange}/>
                         </Grid>
                     </>)}
 
-                    {vlessForm.net !== 'tcp' && (<>
-                        <Grid size={12} sx={{mt: 3}}>
+                    {vlessForm.scy !== 'none' && (<>
+                        <Grid size={12} sx={{mt: 2}}>
                             <SelectField label="TLS ALPN 协议" id="vless-alpn" value={vlessForm.alpn} options={alpnList}
                                          onChange={(value) => setFormData('alpn', value)}/>
                         </Grid>
@@ -277,7 +364,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
 
                     {vlessForm.scy === 'reality' && (<>
-                        <Grid size={12} sx={{mt: 3}}>
+                        <Grid size={12} sx={{mt: 2}}>
                             <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
                         </Grid>
                         <Grid size={12}>
@@ -289,10 +376,10 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                 </>) : serverType === 'ss' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add} error={addError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port} error={portError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <PasswordInput label="密码(password)" value={ssForm.pwd} onChange={(value) => setFormData('pwd', value)}/>
@@ -304,15 +391,15 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                 </>) : serverType === 'trojan' && (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add} error={addError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port} error={portError} onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} error={pwdError} onChange={handleChange}/>
                     </Grid>
-                    <Grid size={12} sx={{mt: 3}}>
+                    <Grid size={12} sx={{mt: 2}}>
                         <SelectField label="传输方式(network)" id="trojan-network" value={trojanForm.net} options={trojanNetworkTypeList}
                                      onChange={(value) => setFormData('net', value)}/>
                     </Grid>
@@ -321,12 +408,12 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                     {trojanForm.net === 'ws' && (
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="路径(path)" name="path" value={trojanForm.path} onChange={handleChange}/>
+                            <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={trojanForm.path} onChange={handleChange}/>
                         </Grid>
                     )}
                     {trojanForm.net === 'grpc' && (
                         <Grid size={12}>
-                            <TextField fullWidth size="small" label="主机名(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
+                            <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
                         </Grid>
                     )}
                 </>)}
