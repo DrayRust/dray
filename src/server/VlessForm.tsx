@@ -39,7 +39,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                 onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <Stack direction="row" spacing={1} alignItems="flex-start">
+            <Stack direction="row" spacing={2} alignItems="flex-start">
                 <TextField
                     sx={{flex: 1}}
                     fullWidth size="small"
