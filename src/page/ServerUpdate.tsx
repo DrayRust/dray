@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import {
-    ToggleButtonGroup, ToggleButton, Typography,
-    Card, TextField, Button, Grid
-} from '@mui/material'
+import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { hashString } from "../util/util.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { LoadingCard, ErrorCard } from "../component/useCard.tsx"
 import { VmessForm } from '../server/VmessForm.tsx'
 import { VlessForm } from '../server/VlessForm.tsx'
 import { SsForm } from '../server/SsForm.tsx'
@@ -56,6 +54,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
             }
         }).catch(_ => {
             setServerList([])
+            setErrorMsg('暂无服务器')
         })
     }
     useEffect(() => readList(), [])
@@ -126,7 +125,11 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
 
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('/server', '修改')
-    return errorMsg ? (<Typography variant="h6">{errorMsg}</Typography>) : (<>
+    return !serverList ? (
+        <LoadingCard/>
+    ) : errorMsg ? (
+        <ErrorCard errorMsg={errorMsg}/>
+    ) : (<>
         <SnackbarComponent/>
         <AppBarComponent/>
         <Card sx={{p: 2, mt: 1}}>
