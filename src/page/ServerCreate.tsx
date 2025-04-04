@@ -114,7 +114,17 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData(e.target.name, e.target.value)
+        const {name, value} = e.target
+        if (name === 'add') {
+            setAddError(!value.trim())
+        } else if (name === 'port') {
+            setPortError(!value.trim())
+        } else if (name === 'id') {
+            setIdError(!value.trim())
+        } else if (name === 'pwd') {
+            setPwdError(!value.trim())
+        }
+        setFormData(name, value)
     }
     const setFormData = (name: string, value: any) => {
         name = name.trim()
@@ -139,12 +149,6 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleSubmit = async () => {
-        if (!ps) {
-            setPsError(true)
-            showSnackbar('服务器名称不能为空', 'error')
-            return
-        }
-
         let data: VmessRow | VlessRow | SsRow | TrojanRow | null = null
         if (serverType === 'vmess') {
             data = vmessForm
@@ -157,26 +161,28 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
         if (!data) return
 
+        let err = false
+        if (!ps) {
+            setPsError(true)
+            err = true
+        }
         if ("add" in data && !data.add) {
             setAddError(true)
-            showSnackbar('IP/域名能为空', 'error')
-            return
+            err = true
         }
         if ("port" in data && !data.port) {
             setPortError(true)
-            showSnackbar('端口不能为空', 'error')
-            return
+            err = true
         }
         if ("id" in data && !data.id) {
             setIdError(true)
-            showSnackbar('用户ID不能为空', 'error')
-            return
+            err = true
         }
         if ("pwd" in data && !data.pwd) {
             setPwdError(true)
-            showSnackbar('密码不能为空', 'error')
-            return
+            err = true
         }
+        if (err) return
 
         let serverList = await readServerList() || []
         if ("net" in data) data.scy = `${data.scy}+${data.net}`
@@ -216,7 +222,8 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                 <Grid size={12} sx={{mb: 2}}>
                     <TextField
                         fullWidth required size="small" label="服务器名称(postscript)"
-                        value={ps} error={psError}
+                        value={ps}
+                        error={psError} helperText={addError ? "服务器名称不能为空" : ""}
                         onChange={e => {
                             let v = e.target.value.trim()
                             setPsError(!v)
@@ -226,13 +233,19 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
                 {serverType === 'vmess' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add} error={addError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add}
+                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vmessForm.port} error={portError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vmessForm.port}
+                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vmessForm.id} error={idError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vmessForm.id}
+                                   error={idError} helperText={idError ? "用户ID不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <TextField fullWidth size="small" label="额外 ID (alterId)" name="aid" value={vmessForm.aid} onChange={handleChange}/>
@@ -301,13 +314,19 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                 </>) : serverType === 'vless' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add} error={addError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add}
+                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port} error={portError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port}
+                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vlessForm.id} error={idError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vlessForm.id}
+                                   error={idError} helperText={idError ? "用户ID不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
 
                     <Grid size={12} sx={{mt: 2}}>
@@ -376,10 +395,14 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                 </>) : serverType === 'ss' ? (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add} error={addError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add}
+                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port} error={portError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port}
+                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
                         <PasswordInput label="密码(password)" value={ssForm.pwd} onChange={(value) => setFormData('pwd', value)}/>
@@ -391,13 +414,19 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
                 </>) : serverType === 'trojan' && (<>
                     <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add} error={addError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add}
+                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port} error={portError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port}
+                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd} error={pwdError} onChange={handleChange}/>
+                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd}
+                                   error={pwdError} helperText={pwdError ? "密码不能为空" : ""}
+                                   onChange={handleChange}/>
                     </Grid>
                     <Grid size={12} sx={{mt: 2}}>
                         <SelectField label="传输方式(network)" id="trojan-network" value={trojanForm.net} options={trojanNetworkTypeList}
