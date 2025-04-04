@@ -86,7 +86,7 @@ interface VmessRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     id: string; // 用户 ID (uuid)
-    aid: string; // 用户副 ID (alterId) 默认: "0"
+    aid: string; // 用户副 ID / 额外 ID (alterId) 默认: "0"
 
     /**
      * 精简 vmess & vless 配置，将 vmess 和 vless 参数进行拆分，xhttp 部分拆离 vmess
@@ -96,23 +96,26 @@ interface VmessRow {
     net: string; // 网络传输方式 network 如: tcp、kcp、ws、http、grpc、httpupgrade
     scy: string; // 安全类型 security = encryption 如：none / auto / zero / aes-128-gcm / chacha20-poly1305
 
-    host: string; // 伪装域名 host
-    path: string; // 路径 path
-
     // TLS
     // https://xtls.github.io/config/transport.html#tlsobject
-    tls: boolean; // 是否启用 TLS（Transport Layer Security，传输层安全协议）
+    tls: boolean; // TLS（Transport Layer Security，传输层安全协议）是否启用
+    fp: string; //  TLS 伪装指纹 fingerprint，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
 
     // ALPN = TLS ALPN（Application-Layer Protocol Negotiation，应用层协议协商，TLS 的扩展）
     alpn: string; // 多个 ALPN 之间用英文逗号隔开，中间无空格。
 
-    // mKCP
-    // https://xtls.github.io/config/transports/mkcp.html
-    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
-    type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+    host: string; // 伪装域名 host
+    path: string; // 路径 path
+
+    // tcp / mKCP
+    type: string; // (tcp / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
     // gRPC
     mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
+
+    // mKCP
+    // https://xtls.github.io/config/transports/mkcp.html
+    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
 }
 
 // https://xtls.github.io/config/outbounds/vless.html
@@ -134,7 +137,7 @@ interface VlessRow {
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113
-    extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
+    extra: string; // XHTTP 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
 
     // TLS
     fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
