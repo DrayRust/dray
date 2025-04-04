@@ -80,8 +80,8 @@ export const kcpHeaderTypeList = [
 
 export const grpcModeList = [
     'gun',
-    'multi',
     'guna',
+    'multi',
 ]
 
 export const alpnList = [
