@@ -39,7 +39,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                 onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="flex-start">
                 <TextField
                     sx={{flex: 1}}
                     fullWidth size="small"
@@ -50,7 +50,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                     onChange={(e) => setFormData('id', e.target.value)}
                 />
                 <Button
-                    sx={{whiteSpace: 'nowrap', mt: '10px'}}
+                    sx={{whiteSpace: 'nowrap', height: '40px', alignSelf: 'flex-start'}}
                     variant="contained"
                     onClick={() => setFormData('id', generateUUID())}>
                     生成 UUID
