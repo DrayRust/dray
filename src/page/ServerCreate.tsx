@@ -18,7 +18,7 @@ import {
     trojanNetworkTypeList,
     fingerprintList,
     flowList,
-    tcpHeaderTypeList,
+    rawHeaderTypeList,
     kcpHeaderTypeList,
     grpcModeList,
     alpnList,
@@ -40,7 +40,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         id: '', // 用户 ID (uuid)
         aid: "0", // 用户副 ID (alterId) 默认: "0"
 
-        net: 'tcp', // 网络传输方式 network
+        net: 'raw', // 网络传输方式 network
         scy: 'auto', // 安全类型 security = encryption
 
         host: '', // 伪装域名 host
@@ -60,7 +60,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         port: 443, // 服务器端口
         id: '', // 用户ID
 
-        net: 'tcp', // 网络传输方式
+        net: 'raw', // 网络传输方式
         scy: 'none', // 安全类型
 
         host: '', // 伪装域名
@@ -70,7 +70,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         mode: '', // gRPC 传输模式
         extra: '', // XHTTP 额外参数 extra
 
-        alpn: '', // TLS ALPN 协议
+        alpn: 'h2, http/1.1', // TLS ALPN 协议
         fp: '', // TLS 伪装指纹
 
         flow: 'xtls-rprx-vision', // XTLS 流控模式
@@ -262,7 +262,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     </Grid>
 
                     <Grid container spacing={2} size={12} sx={{mt: 2}}>
-                        {vmessForm.net !== 'tcp' && (<>
+                        {vmessForm.net !== 'raw' && (<>
                             <Grid size={12}>
                                 <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vmessForm.host} onChange={handleChange}/>
                             </Grid>
@@ -273,11 +273,11 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                             </Grid>
                         </>)}
 
-                        {['tcp', 'kcp'].includes(vmessForm.net) && (
+                        {['raw', 'kcp'].includes(vmessForm.net) && (
                             <Grid size={12}>
                                 <SelectField
                                     label="伪装类型(headerType)" id="vmess-type" value={vmessForm.type}
-                                    options={vmessForm.net === 'kcp' ? kcpHeaderTypeList : tcpHeaderTypeList}
+                                    options={vmessForm.net === 'kcp' ? kcpHeaderTypeList : rawHeaderTypeList}
                                     onChange={(value) => setFormData('type', value)}/>
                             </Grid>
                         )}
@@ -339,7 +339,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                                      onChange={(value) => setFormData('scy', value)}/>
                     </Grid>
 
-                    {vlessForm.net !== 'tcp' && (<>
+                    {vlessForm.net !== 'raw' && (<>
                         <Grid size={12} sx={{mt: 2}}>
                             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
                         </Grid>

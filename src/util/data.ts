@@ -1,5 +1,5 @@
 export const vlessNetworkTypeList = [
-    'tcp',
+    'raw',
     'ws',
     'grpc',
     'xhttp',
@@ -12,7 +12,7 @@ export const vlessSecurityList = [
 ]
 
 export const vmessNetworkTypeList = [
-    'tcp',
+    'raw',
     'kcp',
     'ws',
     'http',
@@ -64,7 +64,7 @@ export const fingerprintList = [
     'randomized',
 ]
 
-export const tcpHeaderTypeList = [
+export const rawHeaderTypeList = [
     'none',
     'http',
 ]
