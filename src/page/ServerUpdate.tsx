@@ -106,14 +106,15 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
         let netServerList = serverList ? [...serverList] : []
         if (netServerList[key]) {
             const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
-            netServerList[key] = {
+            netServerList.splice(key, 1)
+            netServerList.unshift({
                 ps: ps,
                 type: serverType,
                 host: `${data.add}:${data.port}`,
                 scy: scy,
                 hash: await hashString(JSON.stringify(data)),
                 data
-            }
+            })
         }
         const ok = await saveServerList(netServerList)
         if (!ok) {
