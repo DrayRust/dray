@@ -161,6 +161,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
         if (!data) return
 
+        if (psError || addError || portError || idError || pwdError) return
         let err = false
         if (!ps) {
             setPsError(true)
@@ -405,7 +406,13 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                                    onChange={handleChange}/>
                     </Grid>
                     <Grid size={12}>
-                        <PasswordInput label="密码(password)" value={ssForm.pwd} onChange={(value) => setFormData('pwd', value)}/>
+                        <PasswordInput
+                            label="密码(password)" value={ssForm.pwd}
+                            error={pwdError} helperText={pwdError ? "密码不能为空" : ""}
+                            onChange={(value) => {
+                                setPwdError(!value.trim())
+                                setFormData('pwd', value)
+                            }}/>
                     </Grid>
                     <Grid size={12}>
                         <AutoCompleteField

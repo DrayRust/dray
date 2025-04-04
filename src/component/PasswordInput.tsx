@@ -4,7 +4,8 @@ import {
     InputLabel,
     OutlinedInput,
     InputAdornment,
-    IconButton
+    IconButton,
+    FormHelperText
 } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
@@ -12,13 +13,15 @@ interface PasswordInputProps {
     label: string;
     value: string;
     onChange: (value: string) => void;
+    error?: boolean;
+    helperText?: string;
 }
 
-export const PasswordInput = ({label, value, onChange}: PasswordInputProps) => {
+export const PasswordInput = ({label, value, onChange, error, helperText}: PasswordInputProps) => {
     const [showPassword, setShowPassword] = useState(false)
 
     return (
-        <FormControl fullWidth size="small" variant="outlined">
+        <FormControl fullWidth size="small" variant="outlined" error={error}>
             <InputLabel>{label}</InputLabel>
             <OutlinedInput
                 label={label}
@@ -39,6 +42,7 @@ export const PasswordInput = ({label, value, onChange}: PasswordInputProps) => {
                     </InputAdornment>
                 }
             />
+            {helperText && <FormHelperText>{helperText}</FormHelperText>}
         </FormControl>
     )
 }
