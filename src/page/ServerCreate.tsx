@@ -23,7 +23,7 @@ import {
     grpcModeList,
     alpnList,
 } from "../util/data.ts"
-import { hashString } from "../util/util.ts"
+import { formatPort, hashString } from "../util/util.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 
@@ -52,7 +52,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
         tls: false, // 是否启用 TLS
         alpn: 'h2, http/1.1', // TLS ALPN 协议
-        fp: '', // TLS 伪装指纹 fingerprint
+        fp: 'chrome', // TLS 伪装指纹 fingerprint
     })
 
     const [vlessForm, setVlessForm] = useState<VlessRow>({
@@ -71,7 +71,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         extra: '', // XHTTP 额外参数 extra
 
         alpn: 'h2, http/1.1', // TLS ALPN 协议
-        fp: '', // TLS 伪装指纹
+        fp: 'chrome', // TLS 伪装指纹
 
         flow: 'xtls-rprx-vision', // XTLS 流控模式
 
@@ -130,13 +130,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         name = name.trim()
         if (typeof value === 'string') value = value.trim()
         // console.log('setFormData', name, value)
-        if (name === 'port') {
-            value = Number(value)
-            value = value < 0 ? 0 : value
-            value = value > 65535 ? 65535 : value
-            value = value || ''
-        }
-        if (name === 'aid') value = Number(value) || 0
+        if (name === 'port') value = formatPort(value)
         if (serverType === 'vmess') {
             setVmessForm({...vmessForm, [name]: value})
         } else if (serverType === 'vless') {
@@ -186,12 +180,12 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         if (err) return
 
         let serverList = await readServerList() || []
-        if ("net" in data) data.scy = `${data.scy}+${data.net}`
+        const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
         serverList = [{
             ps: ps,
             type: serverType,
             host: `${data.add}:${data.port}`,
-            scy: data.scy,
+            scy: scy,
             hash: await hashString(JSON.stringify(data)),
             data
         }, ...serverList]
@@ -224,7 +218,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                     <TextField
                         fullWidth required size="small" label="服务器名称(postscript)"
                         value={ps}
-                        error={psError} helperText={addError ? "服务器名称不能为空" : ""}
+                        error={psError} helperText={psError ? "服务器名称不能为空" : ""}
                         onChange={e => {
                             let v = e.target.value.trim()
                             setPsError(!v)

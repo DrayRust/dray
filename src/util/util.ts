@@ -77,3 +77,8 @@ export function validateIp(value: string) {
 export function validatePort(value: number) {
     return value > 0 && value <= 65535
 }
+
+export function formatPort(value: any): string {
+    const num = Math.min(Math.max(Number(value), 0), 65535)
+    return num ? String(num) : ''
+}
