@@ -89,7 +89,7 @@ interface VmessRow {
     aid: string; // 用户副 ID (alterId) 默认: "0"
 
     /**
-     * 将 vmess 和 vless 参数进行拆分，精简 vless 配置，xhttp 部分拆离 vmess
+     * 精简 vmess & vless 配置，将 vmess 和 vless 参数进行拆分，xhttp 部分拆离 vmess
      * 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一
      * 分别对应 RAW、mKCP、WebSocket、HTTP 2/3、gRPC、HTTPUpgrade、XHTTP 传输方式
      **/
@@ -112,7 +112,7 @@ interface VmessRow {
     type: string; // 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
     // gRPC
-    mode: string; // 传输模式 transport mode 如：gun / multi / guna
+    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
 }
 
 // https://xtls.github.io/config/outbounds/vless.html
@@ -129,18 +129,18 @@ interface VlessRow {
     path: string; // (ws / xhttp) 路径 path
     sni: string; // (grpc / reality) 主机名 Server Name Indication 如：example.com
 
-    // TLS
-    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
-
-    // XTLS
-    flow: string; // 流控模式 如：xtls-rprx-vision / xtls-rprx-vision-udp443
+    // gRPC
+    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113
     extra: string; // 额外参数 extra https://github.com/XTLS/Xray-core/pull/4000
 
-    // gRPC
-    mode: string; // 传输模式 transport mode 如：gun / multi / guna
+    // TLS
+    fp: string; // fingerprint 伪装指纹，TLS Client Hello 指纹 如：chrome / firefox / safari / edge / ios / android / random
+
+    // XTLS
+    flow: string; // 流控模式 如：xtls-rprx-vision / xtls-rprx-vision-udp443
 
     // REALITY
     // https://xtls.github.io/config/transport.html#realityobject

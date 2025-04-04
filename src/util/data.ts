@@ -77,3 +77,9 @@ export const kcpHeaderTypeList = [
     'dtls',
     'wireguard',
 ]
+
+export const grpcModeList = [
+    'gun',
+    'multi',
+    'guna',
+]
