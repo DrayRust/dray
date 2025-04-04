@@ -21,8 +21,8 @@ interface AppConfig {
 interface RayCommonConfig {
     ray_log_level: "debug" | "info" | "warning" | "error" | "none";
 
-    socks_enabled: boolean;
-    http_enabled: boolean;
+    socks_enable: boolean;
+    http_enable: boolean;
 
     socks_udp: boolean;
     socks_sniffing: boolean;

@@ -97,8 +97,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const defaultRayCommonConfig: RayCommonConfig = {
         "ray_log_level": "warning",
 
-        "socks_enabled": true,
-        "http_enabled": true,
+        "socks_enable": true,
+        "http_enable": true,
 
         "socks_udp": false,
         "socks_sniffing": false,
@@ -236,18 +236,18 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
     // ======================================================================================================
     const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['socks_enabled']
+        const value = event.target.checked as RayCommonConfig['socks_enable']
         setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, socks_enabled: value}
+            const updatedConfig = {...prevConfig, socks_enable: value}
             raySocksEnabledChange(value, config, updatedConfig)
             return updatedConfig
         })
     }
 
     const handleRayHttpEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['http_enabled']
+        const value = event.target.checked as RayCommonConfig['http_enable']
         setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, http_enabled: value}
+            const updatedConfig = {...prevConfig, http_enable: value}
             rayHttpEnabledChange(value, config, updatedConfig)
             return updatedConfig
         })
@@ -489,14 +489,14 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
-                            <Switch checked={rayCommonConfig.socks_enabled} onChange={handleRaySocksEnabled}/>
+                            <Switch checked={rayCommonConfig.socks_enable} onChange={handleRaySocksEnabled}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
-                            <Switch checked={rayCommonConfig.http_enabled} onChange={handleRayHttpEnabled}/>
+                            <Switch checked={rayCommonConfig.http_enable} onChange={handleRayHttpEnabled}/>
                         </Stack>
-                        {rayCommonConfig.socks_enabled && (<>
+                        {rayCommonConfig.socks_enable && (<>
                             <Divider/>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                                 <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
