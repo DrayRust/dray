@@ -93,14 +93,14 @@ interface VmessRow {
      * 当前的取值必须为 tcp、kcp、ws、http、grpc、httpupgrade、xhttp 其中之一
      * 分别对应 RAW、mKCP、WebSocket、HTTP 2/3、gRPC、HTTPUpgrade、XHTTP 传输方式
      **/
-    net: string; // 网络传输方式 network 如: tcp、kcp、ws、http、grpc、httpupgrade
+    net: string; // 网络传输方式 network 如: raw、kcp、ws、http、grpc、httpupgrade
     scy: string; // 安全类型 security = encryption 如：none / auto / zero / aes-128-gcm / chacha20-poly1305
 
     host: string; // 伪装域名 host
     path: string; // 伪装路径 / 主机名 path
 
-    // tcp / mKCP
-    type: string; // (tcp / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+    // raw / mKCP
+    type: string; // (raw / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
     // mKCP
     // https://xtls.github.io/config/transports/mkcp.html
@@ -124,7 +124,7 @@ interface VlessRow {
     port: number | ''; // 端口 port
     id: string; // 用户 ID (uuid)
 
-    net: string; // 网络传输方式 network 如：tcp / ws / grpc / xhttp
+    net: string; // 网络传输方式 network 如：raw / ws / grpc / xhttp
     scy: string; // 安全类型 security 如: none / tls / reality
 
     host: string; // 伪装域名 host
