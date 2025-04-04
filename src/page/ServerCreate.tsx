@@ -101,13 +101,21 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let {name, value} = e.target
-        if (name === 'add') {
-            setAddError(!value.trim())
+        setFormData(e.target.name, e.target.value)
+    }
+
+    const setFormData = (name: string, value: any) => {
+        name = name.trim()
+        if (typeof value === 'string') value = value.trim()
+        // console.log('setFormData', name, value)
+
+        if (name === 'port') {
+            value = formatPort(value)
+        } else if (name === 'add') {
+            setAddError(!value)
         } else if (name === 'port') {
-            setPortError(!value.trim())
+            setPortError(!value)
         } else if (name === 'id') {
-            value = value.trim()
             let idNotUUID = false
             let err = !value
             if (!err) {
@@ -117,16 +125,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
             setIdNotUUID(idNotUUID)
             setIdError(err)
         } else if (name === 'pwd') {
-            setPwdError(!value.trim())
+            setPwdError(!value)
         }
-        setFormData(name, value)
-    }
 
-    const setFormData = (name: string, value: any) => {
-        name = name.trim()
-        if (typeof value === 'string') value = value.trim()
-        // console.log('setFormData', name, value)
-        if (name === 'port') value = formatPort(value)
         if (serverType === 'vmess') {
             setVmessForm({...vmessForm, [name]: value})
         } else if (serverType === 'vless') {

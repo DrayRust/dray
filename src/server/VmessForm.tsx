@@ -1,7 +1,7 @@
 import { Grid, Stack, Typography, Switch } from '@mui/material'
 import { SelectField } from '../component/SelectField'
 import { AutoCompleteField } from '../component/AutoCompleteField'
-import { TextField } from '@mui/material'
+import { TextField, Button } from '@mui/material'
 import {
     vmessNetworkTypeList,
     vmessSecurityList,
@@ -11,6 +11,7 @@ import {
     alpnList,
     fingerprintList
 } from "../util/serverOption.ts"
+import { generateUUID } from "../util/util.ts"
 
 interface VmessFormProps {
     form: VmessRow
@@ -39,11 +40,23 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
                 onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <TextField
-                fullWidth size="small" label="用户 ID" name="id" value={form.id}
-                error={errors.idError}
-                helperText={errors.idNotUUID ? "用户ID必须是有效的UUID格式" : errors.idError ? "用户ID不能为空" : ""}
-                onChange={handleChange}/>
+            <Stack direction="row" spacing={1}>
+                <TextField
+                    sx={{flex: 1}}
+                    fullWidth size="small"
+                    label="用户 ID"
+                    error={errors.idError}
+                    helperText={errors.idNotUUID ? "用户ID必须是有效的UUID格式" : errors.idError ? "用户ID不能为空" : ""}
+                    value={form.id}
+                    onChange={(e) => setFormData('id', e.target.value)}
+                />
+                <Button
+                    sx={{whiteSpace: 'nowrap', mt: '10px'}}
+                    variant="contained"
+                    onClick={() => setFormData('id', generateUUID())}>
+                    生成 UUID
+                </Button>
+            </Stack>
         </Grid>
         <Grid size={12}>
             <TextField fullWidth size="small" label="额外 ID (alterId)" name="aid" value={form.aid} onChange={handleChange}/>

@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material'
-import { TextField } from '@mui/material'
+import { TextField, Stack, Button } from '@mui/material'
 import { SelectField } from '../component/SelectField'
 import { AutoCompleteField } from '../component/AutoCompleteField'
 import {
@@ -10,6 +10,7 @@ import {
     fingerprintList,
     flowList
 } from "../util/serverOption.ts"
+import { generateUUID } from "../util/util.ts"
 
 interface VlessFormProps {
     form: VlessRow
@@ -38,11 +39,23 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                 onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <TextField
-                fullWidth size="small" label="用户 ID" name="id" value={form.id}
-                error={errors.idError}
-                helperText={errors.idNotUUID ? "用户ID必须是有效的UUID格式" : errors.idError ? "用户ID不能为空" : ""}
-                onChange={handleChange}/>
+            <Stack direction="row" spacing={1}>
+                <TextField
+                    sx={{flex: 1}}
+                    fullWidth size="small"
+                    label="用户 ID"
+                    error={errors.idError}
+                    helperText={errors.idNotUUID ? "用户ID必须是有效的UUID格式" : errors.idError ? "用户ID不能为空" : ""}
+                    value={form.id}
+                    onChange={(e) => setFormData('id', e.target.value)}
+                />
+                <Button
+                    sx={{whiteSpace: 'nowrap', mt: '10px'}}
+                    variant="contained"
+                    onClick={() => setFormData('id', generateUUID())}>
+                    生成 UUID
+                </Button>
+            </Stack>
         </Grid>
 
         <Grid size={12} sx={{mt: 2}}>
