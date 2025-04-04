@@ -22,7 +22,8 @@ import {
     kcpHeaderTypeList,
     grpcModeList,
     alpnList,
-} from "../util/data.ts"
+    validateServerRow,
+} from "../util/serverOption.ts"
 import { formatPort, hashString } from "../util/util.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
@@ -143,6 +144,8 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleSubmit = async () => {
+        if (psError || addError || portError || idError || pwdError) return
+
         let data: VmessRow | VlessRow | SsRow | TrojanRow | null = null
         if (serverType === 'vmess') {
             data = vmessForm
@@ -155,29 +158,8 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
         if (!data) return
 
-        if (psError || addError || portError || idError || pwdError) return
-        let err = false
-        if (!ps) {
-            setPsError(true)
-            err = true
-        }
-        if ("add" in data && !data.add) {
-            setAddError(true)
-            err = true
-        }
-        if ("port" in data && !data.port) {
-            setPortError(true)
-            err = true
-        }
-        if ("id" in data && !data.id) {
-            setIdError(true)
-            err = true
-        }
-        if ("pwd" in data && !data.pwd) {
-            setPwdError(true)
-            err = true
-        }
-        if (err) return
+        const isValid = validateServerRow(data, ps, setPsError, setAddError, setPortError, setIdError, setPwdError)
+        if (!isValid) return
 
         let serverList = await readServerList() || []
         const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
