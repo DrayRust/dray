@@ -182,7 +182,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
                 )}
 
                 <Grid size={12} sx={{mt: 2}}>
-                    <Button variant="contained" fullWidth onClick={handleSubmit}>修改服务器</Button>
+                    <Button variant="contained" fullWidth onClick={handleSubmit}>修改</Button>
                 </Grid>
             </Grid>
         </Card>
