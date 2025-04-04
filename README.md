@@ -2,6 +2,16 @@
 
 基于 Rust + TypeScript 开发的跨平台 Xray 客户端，采用现代化架构设计，现已支持 MacOS、Windows 和 Linux，未来计划移植至 iOS 和 Android 平台
 
+## 支持协议
+
+- VLESS
+- VMESS
+- Shadowsocks
+- Trojan
+- SOCKS
+- HTTP
+- HTTPS
+
 ## 设计宗旨
 
 - 极简设计：界面简洁直观，操作路径最短化
