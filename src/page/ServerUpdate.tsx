@@ -6,8 +6,8 @@ import {
 } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { validateServerRow } from "../util/validate.ts"
-import { formatPort, hashString } from "../util/util.ts"
+import { validateServerField, validateServerRow } from "../util/validate.ts"
+import { hashString } from "../util/util.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { VmessForm } from '../server/VmessForm.tsx'
@@ -64,26 +64,19 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const [addError, setAddError] = useState(false)
     const [portError, setPortError] = useState(false)
     const [idError, setIdError] = useState(false)
+    const [idNotUUID, setIdNotUUID] = useState(false)
     const [pwdError, setPwdError] = useState(false)
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let {name, value} = e.target
-        if (name === 'add') {
-            setAddError(!value.trim())
-        } else if (name === 'port') {
-            value = formatPort(value.trim())
-            setPortError(!value)
-        } else if (name === 'id') {
-            setIdError(!value.trim())
-        } else if (name === 'pwd') {
-            setPwdError(!value.trim())
-        }
-        setFormData(name, value)
+        setFormData(e.target.name, e.target.value)
     }
+
     const setFormData = (name: string, value: any) => {
         name = name.trim()
         if (typeof value === 'string') value = value.trim()
         // console.log('setFormData', name, value)
-        if (name === 'port') value = formatPort(value)
+
+        value = validateServerField(name, value, setAddError, setPortError, setIdError, setIdNotUUID, setPwdError)
         if (serverType === 'vmess') {
             vmessForm && setVmessForm({...vmessForm, [name]: value})
         } else if (serverType === 'vless') {
@@ -161,14 +154,14 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
                 {serverType === 'vmess' && vmessForm ? (
                     <VmessForm
                         form={vmessForm}
-                        errors={{addError, portError, idError}}
+                        errors={{addError, portError, idError, idNotUUID}}
                         handleChange={handleChange}
                         setFormData={setFormData}
                     />
                 ) : serverType === 'vless' && vlessForm ? (
                     <VlessForm
                         form={vlessForm}
-                        errors={{addError, portError, idError}}
+                        errors={{addError, portError, idError, idNotUUID}}
                         handleChange={handleChange}
                         setFormData={setFormData}
                     />
