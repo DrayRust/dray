@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { formatPort, hashString } from "../util/util.ts"
+import { formatPort, hashString, isValidUUID } from "../util/util.ts"
 import { validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
@@ -87,7 +87,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     const [addError, setAddError] = useState(false)
     const [portError, setPortError] = useState(false)
     const [idError, setIdError] = useState(false)
+    const [idNotUUID, setIdNotUUID] = useState(false)
     const [pwdError, setPwdError] = useState(false)
+
     const handleServerTypeChange = (v: string) => {
         if (!v) return
         setServerType(v)
@@ -99,13 +101,21 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target
+        let {name, value} = e.target
         if (name === 'add') {
             setAddError(!value.trim())
         } else if (name === 'port') {
             setPortError(!value.trim())
         } else if (name === 'id') {
-            setIdError(!value.trim())
+            value = value.trim()
+            let idNotUUID = false
+            let err = !value
+            if (!err) {
+                err = !isValidUUID(value)
+                if (err) idNotUUID = true
+            }
+            setIdNotUUID(idNotUUID)
+            setIdError(err)
         } else if (name === 'pwd') {
             setPwdError(!value.trim())
         }
@@ -196,14 +206,14 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                 {serverType === 'vmess' ? (
                     <VmessForm
                         form={vmessForm}
-                        errors={{addError, portError, idError}}
+                        errors={{addError, portError, idError, idNotUUID}}
                         handleChange={handleChange}
                         setFormData={setFormData}
                     />
                 ) : serverType === 'vless' ? (
                     <VlessForm
                         form={vlessForm}
-                        errors={{addError, portError, idError}}
+                        errors={{addError, portError, idError, idNotUUID}}
                         handleChange={handleChange}
                         setFormData={setFormData}
                     />

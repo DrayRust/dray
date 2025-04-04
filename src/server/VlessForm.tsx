@@ -17,6 +17,7 @@ interface VlessFormProps {
         addError: boolean
         portError: boolean
         idError: boolean
+        idNotUUID: boolean
     }
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     setFormData: (name: string, value: any) => void
@@ -39,7 +40,8 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
         <Grid size={12}>
             <TextField
                 fullWidth size="small" label="用户 ID" name="id" value={form.id}
-                error={errors.idError} helperText={errors.idError ? "用户ID不能为空" : ""}
+                error={errors.idError}
+                helperText={errors.idNotUUID ? "用户ID必须是有效的UUID格式" : errors.idError ? "用户ID不能为空" : ""}
                 onChange={handleChange}/>
         </Grid>
 
