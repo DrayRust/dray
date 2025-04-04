@@ -1,32 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-    ToggleButtonGroup, ToggleButton, Stack, Switch, Typography,
-    Card, TextField, Button, Grid
-} from '@mui/material'
+import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { PasswordInput } from '../component/PasswordInput.tsx'
-import { SelectField } from '../component/SelectField.tsx'
-import { AutoCompleteField } from '../component/AutoCompleteField.tsx'
-import {
-    vlessNetworkTypeList,
-    vlessSecurityList,
-    vmessNetworkTypeList,
-    vmessSecurityList,
-    ssMethodList,
-    trojanNetworkTypeList,
-    fingerprintList,
-    flowList,
-    rawHeaderTypeList,
-    kcpHeaderTypeList,
-    grpcModeList,
-    alpnList,
-    validateServerRow,
-} from "../util/serverOption.ts"
 import { formatPort, hashString } from "../util/util.ts"
+import { validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { VmessForm } from '../server/VmessForm.tsx'
+import { VlessForm } from '../server/VlessForm.tsx'
+import { SsForm } from '../server/SsForm.tsx'
+import { TrojanForm } from '../server/TrojanForm.tsx'
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -127,6 +111,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
         setFormData(name, value)
     }
+
     const setFormData = (name: string, value: any) => {
         name = name.trim()
         if (typeof value === 'string') value = value.trim()
@@ -208,227 +193,35 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         }}/>
                 </Grid>
 
-                {serverType === 'vmess' ? (<>
-                    <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vmessForm.add}
-                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vmessForm.port}
-                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vmessForm.id}
-                                   error={idError} helperText={idError ? "用户ID不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="额外 ID (alterId)" name="aid" value={vmessForm.aid} onChange={handleChange}/>
-                    </Grid>
-
-                    <Grid size={12} sx={{mt: 2}}>
-                        <SelectField label="传输方式(network)" id="vmess-network" value={vmessForm.net} options={vmessNetworkTypeList}
-                                     onChange={(value) => setFormData('net', value)}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <SelectField label="安全类型(security)" id="vmess-security" value={vmessForm.scy} options={vmessSecurityList}
-                                     onChange={(value) => setFormData('scy', value)}/>
-                    </Grid>
-
-                    <Grid container spacing={2} size={12} sx={{mt: 2}}>
-                        {vmessForm.net !== 'raw' && (<>
-                            <Grid size={12}>
-                                <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vmessForm.host} onChange={handleChange}/>
-                            </Grid>
-                            <Grid size={12}>
-                                <TextField
-                                    label={vmessForm.net === 'grpc' ? '伪装主机名(serviceName)' : '伪装路径(path)'}
-                                    fullWidth size="small" name="path" value={vmessForm.path} onChange={handleChange}/>
-                            </Grid>
-                        </>)}
-
-                        {['raw', 'kcp'].includes(vmessForm.net) && (
-                            <Grid size={12}>
-                                <SelectField
-                                    label="伪装类型(headerType)" id="vmess-type" value={vmessForm.type}
-                                    options={vmessForm.net === 'kcp' ? kcpHeaderTypeList : rawHeaderTypeList}
-                                    onChange={(value) => setFormData('type', value)}/>
-                            </Grid>
-                        )}
-
-                        {vmessForm.net === 'kcp' && (
-                            <Grid size={12}>
-                                <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={vmessForm.seed} onChange={handleChange}/>
-                            </Grid>
-                        )}
-
-                        {vmessForm.net === 'grpc' && (<>
-                            <Grid size={12}>
-                                <SelectField label="gRPC 传输模式(mode)" id="vmess-mode" value={vmessForm.mode} options={grpcModeList}
-                                             onChange={(value) => setFormData('mode', value)}/>
-                            </Grid>
-                        </>)}
-                    </Grid>
-
-                    <Grid size={12} sx={{mt: 2}}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
-                            <Typography variant="body1" sx={{pl: 1}}>TLS 安全协议</Typography>
-                            <Switch checked={vmessForm.tls} onChange={(e) => setFormData('tls', e.target.checked)}/>
-                        </Stack>
-                    </Grid>
-                    {vmessForm.tls && (<>
-                        <Grid size={12}>
-                            <SelectField label="TLS ALPN 协议" id="vmess-alpn" value={vmessForm.alpn} options={alpnList}
-                                         onChange={(value) => setFormData('alpn', value)}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <AutoCompleteField
-                                label="TLS 伪装指纹(fingerprint)" id="vmess-fp" value={vmessForm.fp} options={fingerprintList}
-                                onChange={(value) => setFormData('fp', value)}/>
-                        </Grid>
-                    </>)}
-                </>) : serverType === 'vless' ? (<>
-                    <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名" name="add" value={vlessForm.add}
-                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={vlessForm.port}
-                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="用户 ID" name="id" value={vlessForm.id}
-                                   error={idError} helperText={idError ? "用户ID不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-
-                    <Grid size={12} sx={{mt: 2}}>
-                        <SelectField label="传输方式(network)" id="vless-network" value={vlessForm.net} options={vlessNetworkTypeList}
-                                     onChange={(value) => setFormData('net', value)}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <SelectField label="安全类型(security)" id="vless-security" value={vlessForm.scy} options={vlessSecurityList}
-                                     onChange={(value) => setFormData('scy', value)}/>
-                    </Grid>
-
-                    {vlessForm.net !== 'raw' && (<>
-                        <Grid size={12} sx={{mt: 2}}>
-                            <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={vlessForm.host} onChange={handleChange}/>
-                        </Grid>
-                        {(vlessForm.net === 'grpc' || vlessForm.scy === 'reality') ? (
-                            <Grid size={12}>
-                                <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={vlessForm.sni} onChange={handleChange}/>
-                            </Grid>
-                        ) : (
-                            <Grid size={12}>
-                                <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={vlessForm.path} onChange={handleChange}/>
-                            </Grid>
-                        )}
-                    </>)}
-
-                    {vlessForm.net === 'grpc' && (<>
-                        <Grid size={12} sx={{mt: 2}}>
-                            <SelectField label="gRPC 传输模式(mode)" id="vless-mode" value={vlessForm.mode} options={grpcModeList}
-                                         onChange={(value) => setFormData('mode', value)}/>
-                        </Grid>
-                    </>)}
-
-                    {vlessForm.net === 'xhttp' && (<>
-                        <Grid size={12} sx={{mt: 2}}>
-                            <TextField fullWidth multiline minRows={2} size="small" label="XHTTP 额外参数(extra)" name="extra" value={vlessForm.extra} onChange={handleChange}/>
-                        </Grid>
-                    </>)}
-
-                    {vlessForm.scy !== 'none' && (<>
-                        <Grid size={12} sx={{mt: 2}}>
-                            <SelectField label="TLS ALPN 协议" id="vless-alpn" value={vlessForm.alpn} options={alpnList}
-                                         onChange={(value) => setFormData('alpn', value)}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <AutoCompleteField
-                                label="TLS 伪装指纹(fingerprint)" id="vless-fp" value={vlessForm.fp} options={fingerprintList}
-                                onChange={(value) => setFormData('fp', value)}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <SelectField label="XTLS 流控模式(flow)" id="vless-flow" value={vlessForm.flow} options={flowList}
-                                         onChange={(value) => setFormData('flow', value)}/>
-                        </Grid>
-                    </>)}
-
-                    {vlessForm.scy === 'reality' && (<>
-                        <Grid size={12} sx={{mt: 2}}>
-                            <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={vlessForm.pbk} onChange={handleChange}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={vlessForm.sid} onChange={handleChange}/>
-                        </Grid>
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="伪装爬虫(spiderX)" name="spx" value={vlessForm.spx} onChange={handleChange}/>
-                        </Grid>
-                    </>)}
-                </>) : serverType === 'ss' ? (<>
-                    <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={ssForm.add}
-                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={ssForm.port}
-                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <PasswordInput
-                            label="密码(password)" value={ssForm.pwd}
-                            error={pwdError} helperText={pwdError ? "密码不能为空" : ""}
-                            onChange={(value) => {
-                                setPwdError(!value.trim())
-                                setFormData('pwd', value)
-                            }}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <AutoCompleteField
-                            label="加密方式(method)" id="ss-method" value={ssForm.scy} options={ssMethodList}
-                            onChange={(value) => setFormData('scy', value)}/>
-                    </Grid>
-                </>) : serverType === 'trojan' && (<>
-                    <Grid size={{xs: 12, md: 8}}>
-                        <TextField fullWidth size="small" label="IP/域名(address)" name="add" value={trojanForm.add}
-                                   error={addError} helperText={addError ? "服务器地址不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={{xs: 12, md: 4}}>
-                        <TextField fullWidth size="small" label="端口(port)" name="port" value={trojanForm.port}
-                                   error={portError} helperText={portError ? "端口号必须在1-65535之间" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="密码(password)" name="pwd" value={trojanForm.pwd}
-                                   error={pwdError} helperText={pwdError ? "密码不能为空" : ""}
-                                   onChange={handleChange}/>
-                    </Grid>
-                    <Grid size={12} sx={{mt: 2}}>
-                        <SelectField label="传输方式(network)" id="trojan-network" value={trojanForm.net} options={trojanNetworkTypeList}
-                                     onChange={(value) => setFormData('net', value)}/>
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={trojanForm.host} onChange={handleChange}/>
-                    </Grid>
-                    {trojanForm.net === 'ws' && (
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={trojanForm.path} onChange={handleChange}/>
-                        </Grid>
-                    )}
-                    {trojanForm.net === 'grpc' && (
-                        <Grid size={12}>
-                            <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={trojanForm.sni} onChange={handleChange}/>
-                        </Grid>
-                    )}
-                </>)}
+                {serverType === 'vmess' ? (
+                    <VmessForm
+                        form={vmessForm}
+                        errors={{addError, portError, idError}}
+                        handleChange={handleChange}
+                        setFormData={setFormData}
+                    />
+                ) : serverType === 'vless' ? (
+                    <VlessForm
+                        form={vlessForm}
+                        errors={{addError, portError, idError}}
+                        handleChange={handleChange}
+                        setFormData={setFormData}
+                    />
+                ) : serverType === 'ss' ? (
+                    <SsForm
+                        form={ssForm}
+                        errors={{addError, portError, pwdError}}
+                        handleChange={handleChange}
+                        setFormData={setFormData}
+                    />
+                ) : serverType === 'trojan' && (
+                    <TrojanForm
+                        form={trojanForm}
+                        errors={{addError, portError, pwdError}}
+                        handleChange={handleChange}
+                        setFormData={setFormData}
+                    />
+                )}
 
                 <Grid size={12} sx={{mt: 2}}>
                     <Button variant="contained" fullWidth onClick={handleSubmit}>添加服务器</Button>

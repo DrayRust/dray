@@ -26,31 +26,36 @@ interface VmessFormProps {
 export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormProps) => {
     return (<>
         <Grid size={{xs: 12, md: 8}}>
-            <TextField fullWidth size="small" label="IP/域名" name="add" value={form.add}
-                       error={errors.addError} helperText={errors.addError ? "服务器地址不能为空" : ""}
-                       onChange={handleChange}/>
+            <TextField
+                fullWidth size="small" label="IP/域名" name="add" value={form.add}
+                error={errors.addError} helperText={errors.addError ? "服务器地址不能为空" : ""}
+                onChange={handleChange}/>
         </Grid>
         <Grid size={{xs: 12, md: 4}}>
-            <TextField fullWidth size="small" label="端口(port)" name="port" value={form.port}
-                       error={errors.portError} helperText={errors.portError ? "端口号必须在1-65535之间" : ""}
-                       onChange={handleChange}/>
+            <TextField
+                fullWidth size="small" label="端口(port)" name="port" value={form.port}
+                error={errors.portError} helperText={errors.portError ? "端口号必须在1-65535之间" : ""}
+                onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <TextField fullWidth size="small" label="用户 ID" name="id" value={form.id}
-                       error={errors.idError} helperText={errors.idError ? "用户ID不能为空" : ""}
-                       onChange={handleChange}/>
+            <TextField
+                fullWidth size="small" label="用户 ID" name="id" value={form.id}
+                error={errors.idError} helperText={errors.idError ? "用户ID不能为空" : ""}
+                onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
             <TextField fullWidth size="small" label="额外 ID (alterId)" name="aid" value={form.aid} onChange={handleChange}/>
         </Grid>
 
         <Grid size={12} sx={{mt: 2}}>
-            <SelectField label="传输方式(network)" id="vmess-network" value={form.net} options={vmessNetworkTypeList}
-                         onChange={(value) => setFormData('net', value)}/>
+            <SelectField
+                label="传输方式(network)" id="vmess-network" value={form.net} options={vmessNetworkTypeList}
+                onChange={(value) => setFormData('net', value)}/>
         </Grid>
         <Grid size={12}>
-            <SelectField label="安全类型(security)" id="vmess-security" value={form.scy} options={vmessSecurityList}
-                         onChange={(value) => setFormData('scy', value)}/>
+            <SelectField
+                label="安全类型(security)" id="vmess-security" value={form.scy} options={vmessSecurityList}
+                onChange={(value) => setFormData('scy', value)}/>
         </Grid>
 
         <Grid container spacing={2} size={12} sx={{mt: 2}}>
@@ -82,8 +87,9 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
 
             {form.net === 'grpc' && (<>
                 <Grid size={12}>
-                    <SelectField label="gRPC 传输模式(mode)" id="vmess-mode" value={form.mode} options={grpcModeList}
-                                 onChange={(value) => setFormData('mode', value)}/>
+                    <SelectField
+                        label="gRPC 传输模式(mode)" id="vmess-mode" value={form.mode} options={grpcModeList}
+                        onChange={(value) => setFormData('mode', value)}/>
                 </Grid>
             </>)}
         </Grid>
