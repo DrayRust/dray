@@ -144,7 +144,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
                 </Grid>
                 <Grid size={12} sx={{mb: 2}}>
                     <TextField
-                        fullWidth required size="small" label="服务器名称(postscript)"
+                        fullWidth size="small" label="服务器名称(postscript)"
                         value={ps}
                         error={psError} helperText={psError ? "服务器名称不能为空" : ""}
                         onChange={e => {
