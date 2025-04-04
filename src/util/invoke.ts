@@ -115,7 +115,7 @@ export async function readServerList(): Promise<ServerList> {
                 const data = JSON.parse(s) as ServerList
                 resolve(data)
             } else {
-                resolve([])
+                reject()
             }
         } catch (err) {
             log.error('Failed to readServerList:', err)
@@ -215,7 +215,7 @@ export async function readLogList(): Promise<LogList> {
                 const data = JSON.parse(s) as LogList
                 resolve(data)
             } else {
-                resolve([])
+                reject()
             }
         } catch (err) {
             log.error('Failed to readLogList:', err)

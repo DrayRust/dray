@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Box, Button, CircularProgress, Link,
+    Card, Box, Button, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
-import FmdBadIcon from '@mui/icons-material/FmdBad'
 
 import { clearLogAll, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
+import { LoadingCard, ErrorCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
@@ -15,11 +15,13 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     const navigate = useNavigate()
 
     const [logList, setLogList] = useState<LogList>()
+    const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
         readLogList().then((d) => {
             setLogList(d as LogList)
         }).catch(_ => {
             setLogList([])
+            setErrorMsg('暂无日志')
         })
     }
     useEffect(() => readList(), [])
@@ -32,16 +34,12 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {DialogComponent, confirm} = useDialog()
-    const paperSx = {p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: `calc(100vh - 20px)`, textAlign: 'center'}
     return (<>
         <DialogComponent/>
         {!logList ? (
-            <Card sx={paperSx}><CircularProgress/></Card>
-        ) : logList.length === 0 ? (
-            <Card sx={paperSx}>
-                <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
-                <div>暂无日志</div>
-            </Card>
+            <LoadingCard/>
+        ) : errorMsg ? (
+            <ErrorCard errorMsg={errorMsg}/>
         ) : (<>
             <Box sx={{mb: 1}}>
                 <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
