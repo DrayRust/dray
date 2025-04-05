@@ -147,6 +147,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }, [])
 
+    const menuSx = {'& .MuiPaper-root': {boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'}}
+
     const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {DialogComponent, confirm} = useDialog()
     const height = 'calc(100vh - 70px)'
@@ -233,7 +235,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
                                 <TableCell padding="checkbox">
                                     <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
-                                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                                    <Menu sx={menuSx} anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                                         <MenuItem onClick={handleEnable}>启用</MenuItem>
                                         <Divider/>
                                         <MenuItem onClick={handleUpdate}>编辑</MenuItem>
