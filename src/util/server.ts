@@ -172,6 +172,13 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
             sid: p.get('sid') || '',
             spx: p.get('spx') || ''
         }
+        if (data.extra) {
+            try {
+                data.extra = decodeBase64(data.extra)
+            } catch (e) {
+                log.error('Failed to decode extra:', e)
+            }
+        }
     } else {
         const base64 = uri.replace('vless://', '')
         const decoded = decodeBase64(base64)
@@ -340,9 +347,11 @@ function vmessRowToUri(row: VmessRow, ps: string): string {
     if (row.type) p.set('type', row.type)
     if (row.mode) p.set('mode', row.mode)
 
-    if (row.tls) p.set('tls', row.tls.toString())
-    if (row.alpn) p.set('alpn', row.alpn)
-    if (row.fp) p.set('fp', row.fp)
+    if (row.tls) {
+        p.set('tls', 'tls')
+        if (row.alpn) p.set('alpn', row.alpn)
+        if (row.fp) p.set('fp', row.fp)
+    }
 
     url.search = p.toString()
     return url.toString()
@@ -356,14 +365,15 @@ function vlessRowToUri(row: VlessRow, ps: string): string {
     url.hash = ps ? `#${ps}` : ''
 
     const p = new URLSearchParams()
-    if (row.net) p.set('net', row.net)
-    if (row.scy) p.set('scy', row.scy)
+    p.set('encryption', 'none')
+    p.set('security', row.scy || 'none')
+    p.set('type', row.net || 'raw')
 
     if (row.host) p.set('host', row.host)
     if (row.path) p.set('path', row.path)
 
     if (row.mode) p.set('mode', row.mode)
-    if (row.extra) p.set('extra', row.extra)
+    if (row.extra) p.set('extra', encodeBase64(row.extra))
 
     if (row.alpn) p.set('alpn', row.alpn)
     if (row.fp) p.set('fp', row.fp)
@@ -438,6 +448,13 @@ function cleanData(data: any): any {
 
 function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
     const data = cleanData({ps, v: 2, ...row})
+    if ("tls" in data) {
+        data.tls = 'tls'
+    } else {
+        // 如果没开启 TLS，相关参数不分享
+        if ("alpn" in data) delete data.alpn
+        if ("fp" in data) delete data.fp
+    }
     return `vmess://${encodeBase64(JSON.stringify(data))}`
 }
 
