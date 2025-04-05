@@ -64,10 +64,10 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
  * vmess://44efe52b-e143-46b5-a9e7-aadbfd77eb9c@qv2ray.net:6939?type=ws&security=tls&host=qv2ray.net&path=%2Fsomewhere#VMessWebSocketTLS
  */
 async function uriToVmessRow(uri: string): Promise<ServerRow> {
-    const url = new URL(uri)
     let ps = ''
     let data: VmessRow
 
+    const url = new URL(uri)
     if (url.search) {
         if (url.hash) ps = url.hash.slice(1).trim()
         const p = new URLSearchParams(url.search)
@@ -143,9 +143,10 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
  * vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:41971?type=kcp&headerType=wireguard&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeedWG
  */
 async function uriToVlessRow(uri: string): Promise<ServerRow> {
-    const url = new URL(uri)
     let ps = ''
     let data: VlessRow
+
+    const url = new URL(uri)
     if (url.search) {
         if (url.hash) ps = url.hash.slice(1).trim()
         const p = new URLSearchParams(url.search)
@@ -223,10 +224,10 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
 }
 
 async function uriToSsRow(uri: string): Promise<ServerRow> {
-    const url = new URL(uri)
     let ps = ''
     let data: SsRow
 
+    const url = new URL(uri)
     if (url.username) {
         if (url.hash) ps = url.hash.slice(1).trim()
         const [method, password] = decodeBase64(decodeURIComponent(url.username)).split(':')
@@ -260,10 +261,10 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
 }
 
 async function uriToTrojanRow(uri: string): Promise<ServerRow> {
-    const url = new URL(uri)
     let ps = ''
     let data: TrojanRow
 
+    const url = new URL(uri)
     if (url.search) {
         if (url.hash) ps = url.hash.slice(1).trim()
         const p = new URLSearchParams(url.search)
