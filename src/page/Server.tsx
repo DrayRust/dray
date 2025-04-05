@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import {
     Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Menu, MenuItem, IconButton, Divider,
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import { useDebounce } from '../hook/useDebounce.ts'
 import { readServerList, saveServerList } from "../util/invoke.ts"
@@ -44,8 +45,38 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_export`)
     }
 
-    const handleUpdate = (key: number) => {
-        navigate(`/server_update?key=${key}`)
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+    const [selectedKey, setSelectedKey] = useState<number>(-1)
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>, key: number) => {
+        setAnchorEl(event.currentTarget)
+        setSelectedKey(key)
+    }
+
+    const handleMenuClose = () => {
+        setAnchorEl(null)
+        setSelectedKey(-1)
+    }
+
+    const handleUpdate = () => {
+        navigate(`/server_update?key=${selectedKey}`)
+    }
+
+    const handleEnable = () => {
+        handleMenuClose()
+    }
+
+    const handleDelete = () => {
+        confirm('确认删除', `确定要删除这个服务器吗？`, async () => {
+            const newServerList = serverList?.filter((_, index) => index !== selectedKey) || []
+            const ok = await saveServerList(newServerList)
+            if (!ok) {
+                showSnackbar('删除失败', 'error')
+            } else {
+                updateServerList(newServerList)
+            }
+            handleMenuClose()
+        })
     }
 
     useEffect(() => {
@@ -66,19 +97,23 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setShowDeleteBut(newSelected.some(Boolean))
     }
 
+    const updateServerList = (newServerList: ServerList) => {
+        setServerList(newServerList)
+        setSelectedServers(new Array(newServerList.length).fill(false))
+        setSelectedAll(false)
+        setShowDeleteBut(false)
+    }
+
     const handleBatchDelete = () => {
         const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
         if (selectedKeys.length > 0) {
-            confirm('确认删除', `确定要删除这 ${selectedKeys.length} 条记录吗？`, async () => {
+            confirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
                 const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index)) || []
                 const ok = await saveServerList(newServerList)
                 if (!ok) {
                     showSnackbar('删除失败', 'error')
                 } else {
-                    setServerList(newServerList)
-                    setSelectedServers(new Array(newServerList.length).fill(false))
-                    setSelectedAll(false)
-                    setShowDeleteBut(false)
+                    updateServerList(newServerList)
                 }
             })
         }
@@ -140,7 +175,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <ErrorCard errorMsg={errorMsg} height={height}/>
         ) : (
             <TableContainer component={Card}>
-                <Table size="small">
+                <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell padding="checkbox">
@@ -151,7 +186,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
                             {!isMediumScreen && (<TableCell sx={{width: '100px'}}>协议类型</TableCell>)}
                             {!isMediumScreen && (<TableCell sx={{width: '200px'}}>安全类型</TableCell>)}
-                            <TableCell sx={{width: '120px'}}>操作</TableCell>
+                            <TableCell padding="checkbox"/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -196,11 +231,14 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell>{row.host}</TableCell>
                                 {!isMediumScreen && (<TableCell>{row.type}</TableCell>)}
                                 {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
-                                <TableCell>
-                                    <Stack direction="row" spacing={1}>
-                                        <Button variant="contained" color="primary" startIcon={<EditIcon/>}
-                                                onClick={() => handleUpdate(key)}>修改</Button>
-                                    </Stack>
+                                <TableCell padding="checkbox">
+                                    <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
+                                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                                        <MenuItem onClick={handleEnable}>启用</MenuItem>
+                                        <Divider/>
+                                        <MenuItem onClick={handleUpdate}>编辑</MenuItem>
+                                        <MenuItem onClick={handleDelete}>删除</MenuItem>
+                                    </Menu>
                                 </TableCell>
                             </TableRow>
                         ))}
