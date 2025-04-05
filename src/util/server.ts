@@ -437,23 +437,31 @@ export function serverRowToBase64Uri(row: ServerRow): string {
     }
 }
 
+function cleanData(data: any): any {
+    const result: any = {}
+    for (const key in data) {
+        if (data[key]) result[key] = data[key]
+    }
+    return result
+}
+
 function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
-    const data = {ps, v: 2, ...row}
+    const data = cleanData({ps, v: 2, ...row})
     return `vmess://${encodeBase64(JSON.stringify(data))}`
 }
 
 function vlessRowToBase64Uri(row: VlessRow, ps: string): string {
-    const data = {ps, ...row}
+    const data = cleanData({ps, ...row})
     return `vless://${encodeBase64(JSON.stringify(data))}`
 }
 
 function ssRowToBase64Uri(row: SsRow, ps: string): string {
-    const data = {ps, ...row}
+    const data = cleanData({ps, ...row})
     return `ss://${encodeBase64(JSON.stringify(data))}`
 }
 
 function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
-    const data = {ps, ...row}
+    const data = cleanData({ps, ...row})
     return `trojan://${encodeBase64(JSON.stringify(data))}`
 }
 
