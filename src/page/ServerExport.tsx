@@ -107,6 +107,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    const [showKeys, setShowKeys] = useState<number[]>([0])
     const height = 'calc(100vh - 75px)'
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('/server', '导出')
@@ -122,11 +123,13 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                 <SpeedDial ariaLabel="返回" sx={{position: 'fixed', bottom: 16, right: 16}} icon={<ArrowBackIcon/>}
                            onClick={() => setShowQRCodeList([])}/>
                 {showQRCodeList?.map((v, i) => (
-                    <Accordion key={i} defaultExpanded={i === 0}>
+                    <Accordion key={i} defaultExpanded={i === 0} onChange={_ => {
+                        if (!showKeys.includes(i)) setShowKeys([...showKeys, i])
+                    }}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                             <Typography component="span">{v.ps}</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>
+                        <AccordionDetails>{showKeys.includes(i) && (<>
                             <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
                             <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
                             <Box sx={{mt: 1}}>
@@ -150,7 +153,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                                     </IconButton>
                                 </Tooltip>
                             </Box>
-                        </AccordionDetails>
+                        </>)}</AccordionDetails>
                     </Accordion>
                 ))}
             </Box>
