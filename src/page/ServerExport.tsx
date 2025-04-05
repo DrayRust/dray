@@ -4,7 +4,7 @@ import {
     Card, Box, Divider, Typography, Switch, Tooltip,
     FormControlLabel, Checkbox, TextField, IconButton,
     Accordion, AccordionSummary, AccordionDetails,
-    CircularProgress, Stack, Button, SpeedDial
+    Stack, Button, SpeedDial
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
@@ -15,7 +15,9 @@ import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
 import { log, readServerList, saveTextFile } from "../util/invoke.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
+import { getCurrentYMDHIS } from "../util/util.ts"
 
 interface QRCode {
     ps: string;
@@ -27,10 +29,14 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
 
     const [showQRCodeList, setShowQRCodeList] = useState<QRCode[]>([])
     const [serverList, setServerList] = useState<ServerList>()
+    const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
         readServerList().then((d) => {
             setServerList(d as ServerList)
-        }).catch(_ => 0)
+        }).catch(_ => {
+            setServerList([])
+            setErrorMsg('暂无服务器')
+        })
     }
     useEffect(() => readList(), [])
 
@@ -91,7 +97,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         try {
             const path = await save({
                 title: "Export Backup File",
-                defaultPath: "dray-servers.txt",
+                defaultPath: `dray_servers_${getCurrentYMDHIS()}.txt`,
                 filters: [{name: 'Text File', extensions: ['txt']}],
             })
             return path || ''
@@ -101,15 +107,16 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    const height = 'calc(100vh - 75px)'
     const {SnackbarComponent, showSnackbar} = useSnackbar(true)
     const {AppBarComponent} = useAppBar('/server', '导出')
     return <>
         <SnackbarComponent/>
         <AppBarComponent/>
         {!serverList ? (
-            <Card sx={{mt: 1, p: 2, textAlign: 'center'}}><CircularProgress sx={{m: 3}}/></Card>
-        ) : serverList.length === 0 ? (
-            <Card sx={{mt: 1, p: 3, textAlign: 'center'}}>暂无服务器</Card>
+            <LoadingCard height={height}/>
+        ) : errorMsg ? (
+            <ErrorCard errorMsg={errorMsg} height={height}/>
         ) : showQRCodeList.length > 0 ? (
             <Box sx={{mt: 1}}>
                 <SpeedDial ariaLabel="返回" sx={{position: 'fixed', bottom: 16, right: 16}} icon={<ArrowBackIcon/>}
