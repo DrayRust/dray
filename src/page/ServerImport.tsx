@@ -82,7 +82,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     }
     const handleSubmit = useDebounce(submitFn, 300)
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {AppBarComponent} = useAppBar('/server', '导入')
     return (<>
         <SnackbarComponent/>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Snackbar, Alert } from '@mui/material'
 
-export const useSnackbar = (showTop?: boolean) => {
+export const useSnackbar = (position?: 'br' | 'tr' | 'top') => {
     const [open, setOpen] = useState(false)
     const [message, setMessage] = useState('')
     const [autoHideDuration, setAutoHideDuration] = useState<number>(3000)
@@ -21,7 +21,11 @@ export const useSnackbar = (showTop?: boolean) => {
 
     const SnackbarComponent = () => (
         <Snackbar open={open} onClose={handleClose} autoHideDuration={autoHideDuration}
-                  anchorOrigin={showTop ? {vertical: 'top', horizontal: 'center'} : {vertical: 'bottom', horizontal: 'right'}}>
+                  anchorOrigin={
+                      position === 'tr' ? {vertical: 'top', horizontal: 'right'} :
+                          position === 'br' ? {vertical: 'bottom', horizontal: 'right'} :
+                              {vertical: 'top', horizontal: 'center'}
+                  }>
             <Alert variant="filled" severity={severity} onClose={handleClose}>{message}</Alert>
         </Snackbar>
     )

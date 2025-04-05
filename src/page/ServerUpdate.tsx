@@ -124,7 +124,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {AppBarComponent} = useAppBar('/server', '修改')
     return !serverList ? (
         <LoadingCard/>

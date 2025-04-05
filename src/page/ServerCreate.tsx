@@ -29,10 +29,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         scy: 'auto', // 安全类型 security = encryption
 
         host: '', // 伪装域名 host
-        path: '', // 伪装路径 / 主机名 path
+        path: '', // 伪装路径 / 伪装主机名 / mKCP 种子
         type: 'none', // 伪装类型 headerType
 
-        seed: '', // mKCP 种子
         mode: '', // gRPC 传输模式
 
         tls: false, // 是否启用 TLS
@@ -49,8 +48,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         scy: 'none', // 安全类型
 
         host: '', // 伪装域名
-        path: '', // 伪装路径
-        sni: '', // (grpc / reality) 伪装主机名 Server Name Indication
+        path: '', // 伪装路径 / (grpc / reality) 伪装主机名 SNI
 
         mode: '', // gRPC 传输模式
         extra: '', // XHTTP 额外参数 extra
@@ -79,8 +77,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         net: 'ws', // 传输方式
         scy: 'tls', // 安全类型
         host: '', // 伪装域名
-        path: '', // (ws) 路径
-        sni: '', // (grpc) 主机名
+        path: '', // (ws) 伪装路径 / (grpc) 伪装主机名
     })
 
     const [psError, setPsError] = useState(false)
@@ -158,7 +155,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {AppBarComponent} = useAppBar('/server', '添加')
     return <>
         <SnackbarComponent/>

@@ -181,7 +181,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
         <pre style={style} dangerouslySetInnerHTML={{__html: logList[index] + "\n"}}/>
     )
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar()
+    const {SnackbarComponent, showSnackbar} = useSnackbar('br')
     return (<>
         <SnackbarComponent/>
         <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>

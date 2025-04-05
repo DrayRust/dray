@@ -112,7 +112,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }, [])
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {DialogComponent, confirm} = useDialog()
     const height = 'calc(100vh - 70px)'
     return (<>
