@@ -186,7 +186,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
         <SnackbarComponent/>
         <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
             <Stack direction="row" spacing={2} sx={{justifyContent: "center", alignItems: "center"}}>
-                <Button variant="outlined" sx={{p: 1, mr: 2, minWidth: 0, borderRadius: '50%', '&:hover': {bgColor: 'action.hover'}}}
+                <Button sx={{p: 1, mr: 2, minWidth: 0, borderRadius: '50%', '&:hover': {bgColor: 'action.hover'}}}
                         onClick={() => navigate('/log')}>
                     <ArrowBackIosNewIcon fontSize="small"/>
                 </Button>
