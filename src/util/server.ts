@@ -222,7 +222,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
     let ps = ''
     let data: SsRow
 
-    if (url.hostname) {
+    if (url.username) {
         if (url.hash) ps = url.hash.slice(1).trim()
         const [method, password] = decodeBase64(decodeURIComponent(url.username)).split(':')
         data = {
