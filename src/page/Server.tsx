@@ -5,7 +5,10 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Menu, MenuItem, IconButton, Divider,
 } from '@mui/material'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useDebounce } from '../hook/useDebounce.ts'
 import { readServerList, saveServerList } from "../util/invoke.ts"
@@ -185,7 +188,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                           onChange={(e) => handleSelectAll(e.target.checked)}/>
                             </TableCell>
                             <TableCell>服务器名称</TableCell>
-                            <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
+                            <TableCell>服务器地址</TableCell>
                             {!isMediumScreen && (<TableCell sx={{width: '100px'}}>协议类型</TableCell>)}
                             {!isMediumScreen && (<TableCell sx={{width: '200px'}}>安全类型</TableCell>)}
                             <TableCell padding="checkbox"/>
@@ -234,12 +237,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 {!isMediumScreen && (<TableCell>{row.type}</TableCell>)}
                                 {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
                                 <TableCell padding="checkbox">
-                                    <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
+                                    <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreHorizIcon/></IconButton>
                                     <Menu sx={menuSx} anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                                        <MenuItem onClick={handleEnable}>启用</MenuItem>
+                                        <MenuItem onClick={handleEnable}>
+                                            <DoneOutlineIcon sx={{mr: 1}} fontSize="small"/>启用
+                                        </MenuItem>
                                         <Divider/>
-                                        <MenuItem onClick={handleUpdate}>编辑</MenuItem>
-                                        <MenuItem onClick={handleDelete}>删除</MenuItem>
+                                        <MenuItem onClick={handleUpdate}>
+                                            <EditIcon sx={{mr: 1}} fontSize="small"/>编辑
+                                        </MenuItem>
+                                        <MenuItem onClick={handleDelete}>
+                                            <DeleteIcon sx={{mr: 1}} fontSize="small"/>删除
+                                        </MenuItem>
                                     </Menu>
                                 </TableCell>
                             </TableRow>
