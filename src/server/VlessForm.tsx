@@ -73,15 +73,12 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
             <Grid size={12} sx={{mt: 2}}>
                 <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={form.host} onChange={handleChange}/>
             </Grid>
-            {(form.net === 'grpc' || form.scy === 'reality') ? (
-                <Grid size={12}>
-                    <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={form.sni} onChange={handleChange}/>
-                </Grid>
-            ) : (
-                <Grid size={12}>
-                    <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={form.path} onChange={handleChange}/>
-                </Grid>
-            )}
+            <Grid size={12}>
+                <TextField
+                    fullWidth size="small"
+                    label={(form.net === 'grpc' || form.scy === 'reality') ? '伪装主机名(serviceName)' : '伪装路径(path)'}
+                    name="path" value={form.path} onChange={handleChange}/>
+            </Grid>
         </>)}
 
         {form.net === 'grpc' && (<>

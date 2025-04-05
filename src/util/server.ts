@@ -160,8 +160,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
             scy: p.get('scy') || p.get('security') || 'none',
 
             host: p.get('host') || '',
-            path: p.get('path') || '',
-            sni: p.get('sni') || p.get('serverName') || p.get('path') || '',
+            path: p.get('path') || p.get('sni') || p.get('serverName') || '',
 
             mode: p.get('mode') || '',
             extra: p.get('extra') || '',
@@ -190,7 +189,6 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
 
             host: d.host || '',
             path: d.path || '',
-            sni: d.sni || '',
 
             mode: d.mode || '',
             extra: d.extra || '',
@@ -366,7 +364,6 @@ function vlessRowToUri(row: VlessRow, ps: string): string {
 
     if (row.host) p.set('host', row.host)
     if (row.path) p.set('path', row.path)
-    if (row.sni) p.set('sni', row.sni)
 
     if (row.mode) p.set('mode', row.mode)
     if (row.extra) p.set('extra', row.extra)
@@ -542,7 +539,7 @@ function vlessRowToConf(row: VlessRow): any {
             network: row.net || 'tcp',
             security: row.scy || 'none',
             realitySettings: {
-                serverName: row.sni || '',
+                serverName: row.path || '',
                 publicKey: row.pbk || '',
                 fingerprint: row.fp || 'chrome'
             }
