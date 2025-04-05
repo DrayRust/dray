@@ -81,10 +81,9 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
             scy: p.get('scy') || p.get('security') || p.get('enc') || p.get('encryption') || 'auto',
 
             host: p.get('host') || '',
-            path: p.get('path') || p.get('sni') || p.get('serverName') || '',
+            path: p.get('path') || p.get('sni') || p.get('serviceName') || p.get('seed') || '',
             type: p.get('type') || p.get('headerType') || '',
 
-            seed: p.get('seed') || '',
             mode: p.get('mode') || '',
 
             tls: p.get('tls') === 'tls' || p.get('security') === 'tls',
@@ -109,7 +108,6 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
             path: d.path || '',
             type: d.type || '',
 
-            seed: d.seed || '',
             mode: d.mode || '',
 
             tls: d.tls === 'tls',
@@ -124,7 +122,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         ps,
         type: 'vmess',
         host: `${data.add}:${data.port}`,
-        scy: data.scy,
+        scy: data.scy + '+' + data.net,
         hash: await hashString(JSON.stringify(data)),
         data
     }
@@ -160,7 +158,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
             scy: p.get('scy') || p.get('security') || 'none',
 
             host: p.get('host') || '',
-            path: p.get('path') || p.get('sni') || p.get('serverName') || '',
+            path: p.get('path') || p.get('sni') || p.get('serviceName') || '',
 
             mode: p.get('mode') || '',
             extra: p.get('extra') || '',
@@ -211,7 +209,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
         ps: ps,
         type: 'vless',
         host: `${data.add}:${data.port}`,
-        scy: data.scy,
+        scy: data.scy + '+' + data.net,
         hash: await hashString(JSON.stringify(data)),
         data
     }
@@ -295,7 +293,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
         ps,
         type: 'trojan',
         host: `${data.add}:${data.port}`,
-        scy: data.scy,
+        scy: data.scy + '+' + data.net,
         hash: await hashString(JSON.stringify(data)),
         data
     }
@@ -340,7 +338,6 @@ function vmessRowToUri(row: VmessRow, ps: string): string {
     if (row.path) p.set('path', row.path)
 
     if (row.type) p.set('type', row.type)
-    if (row.seed) p.set('seed', row.seed)
     if (row.mode) p.set('mode', row.mode)
 
     if (row.tls) p.set('tls', row.tls.toString())

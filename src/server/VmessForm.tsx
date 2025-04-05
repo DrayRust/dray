@@ -80,7 +80,7 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
                 </Grid>
                 <Grid size={12}>
                     <TextField
-                        label={form.net === 'grpc' ? '伪装主机名(serviceName)' : '伪装路径(path)'}
+                        label={form.net === 'grpc' ? '伪装主机名(serviceName)' : form.net === 'kcp' ? 'mKCP 种子(seed)' : '伪装路径(path)'}
                         fullWidth size="small" name="path" value={form.path} onChange={handleChange}/>
                 </Grid>
             </>)}
@@ -91,12 +91,6 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
                         label="伪装类型(headerType)" id="vmess-type" value={form.type}
                         options={form.net === 'kcp' ? kcpHeaderTypeList : rawHeaderTypeList}
                         onChange={(value) => setFormData('type', value)}/>
-                </Grid>
-            )}
-
-            {form.net === 'kcp' && (
-                <Grid size={12}>
-                    <TextField fullWidth size="small" label="mKCP 种子(seed)" name="seed" value={form.seed} onChange={handleChange}/>
                 </Grid>
             )}
 

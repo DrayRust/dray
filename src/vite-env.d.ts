@@ -97,14 +97,10 @@ interface VmessRow {
     scy: string; // 安全类型 security = encryption 如：none / auto / zero / aes-128-gcm / chacha20-poly1305
 
     host: string; // 伪装域名 host
-    path: string; // 伪装路径 / 主机名 path
+    path: string; // 伪装路径 path / 伪装主机名 serviceName / mKCP 种子 seed
 
     // raw / mKCP
     type: string; // (raw / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
-
-    // mKCP
-    // https://xtls.github.io/config/transports/mkcp.html
-    seed: string; // mKCP 种子，省略时不使用种子，但不可以为空字符串
 
     // gRPC
     mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
