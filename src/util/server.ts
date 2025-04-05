@@ -17,10 +17,10 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
         return null
     }
     try {
-        if (uri.startsWith('vless://')) {
-            return uriToVlessRow(uri)
-        } else if (uri.startsWith('vmess://')) {
+        if (uri.startsWith('vmess://')) {
             return uriToVmessRow(uri)
+        } else if (uri.startsWith('vless://')) {
+            return uriToVlessRow(uri)
         } else if (uri.startsWith('ss://')) {
             return uriToSsRow(uri)
         } else if (uri.startsWith('trojan://')) {
@@ -35,70 +35,31 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
     }
 }
 
-async function uriToVlessRow(uri: string): Promise<ServerRow> {
-    const url = new URL(uri)
-    let ps = ''
-    let data: VlessRow
-    if (url.search) {
-        if (url.hash) ps = url.hash.slice(1).trim()
-        const p = new URLSearchParams(url.search)
-        data = {
-            add: url.hostname,
-            port: Number(url.port) || 0,
-            id: url.username,
-            flow: p.get('flow') || '',
-            scy: p.get('security') || 'none',
-            encryption: p.get('encryption') || 'none',
-            type: p.get('type') || 'tcp',
-            host: p.get('host') || '',
-            path: p.get('path') || '',
-            net: p.get('type') || 'tcp',
-            fp: p.get('fp') || 'chrome',
-            pbk: p.get('pbk') || '',
-            sid: p.get('sid') || '',
-            sni: p.get('sni') || '',
-            serviceName: p.get('serviceName') || '',
-            headerType: p.get('headerType') || '',
-            seed: p.get('seed') || '',
-            mode: p.get('mode') || ''
-        }
-    } else {
-        const base64 = uri.replace('vless://', '')
-        const decoded = decodeBase64(base64)
-        const d = JSON.parse(decoded)
-        ps = d.ps || ''
-        data = {
-            add: d.add,
-            port: Number(d.port) || 0,
-            id: d.id,
-            flow: d.flow || '',
-            scy: d.scy || 'none',
-            encryption: d.encryption || 'none',
-            type: d.type || 'tcp',
-            host: d.host || '',
-            path: d.path || '',
-            net: d.net || 'tcp',
-            fp: d.fp || 'chrome',
-            pbk: d.pbk || '',
-            sid: d.sid || '',
-            sni: d.sni || '',
-            serviceName: d.serviceName || '',
-            headerType: d.headerType || '',
-            seed: d.seed || '',
-            mode: d.mode || ''
-        }
-    }
-
-    return {
-        ps: ps,
-        type: 'vless',
-        host: `${data.add}:${data.port}`,
-        scy: data.scy,
-        hash: await hashString(JSON.stringify(data)),
-        data
-    }
-}
-
+/**
+ * PS: 设计的乱七八糟，人都看懵逼，完全不想兼容，encryption 为什么不简化成 enc ？
+ * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
+ *
+ * # VMess + TCP，不加密（仅作示例，不安全）
+ * vmess://99c80931-f3f1-4f84-bffd-6eed6030f53d@qv2ray.net:31415?encryption=none#VMessTCPNaked
+ *
+ * # VMess + TCP，自动选择加密。编程人员特别注意不是所有的 URL 都有问号，注意处理边缘情况。
+ * vmess://f08a563a-674d-4ffb-9f02-89d28aec96c9@qv2ray.net:9265#VMessTCPAuto
+ *
+ * # VMess + TCP，手动选择加密
+ * vmess://5dc94f3a-ecf0-42d8-ae27-722a68a6456c@qv2ray.net:35897?encryption=aes-128-gcm#VMessTCPAES
+ *
+ * # VMess + TCP + TLS，内层不加密
+ * vmess://136ca332-f855-4b53-a7cc-d9b8bff1a8d7@qv2ray.net:9323?encryption=none&security=tls#VMessTCPTLSNaked
+ *
+ * # VMess + TCP + TLS，内层也自动选择加密
+ * vmess://be5459d9-2dc8-4f47-bf4d-8b479fc4069d@qv2ray.net:8462?security=tls#VMessTCPTLS
+ *
+ * # VMess + TCP + TLS，内层不加密，手动指定 SNI
+ * vmess://c7199cd9-964b-4321-9d33-842b6fcec068@qv2ray.net:64338?encryption=none&security=tls&sni=fastgit.org#VMessTCPTLSSNI
+ *
+ * # VMess + WebSocket + TLS
+ * vmess://44efe52b-e143-46b5-a9e7-aadbfd77eb9c@qv2ray.net:6939?type=ws&security=tls&host=qv2ray.net&path=%2Fsomewhere#VMessWebSocketTLS
+ */
 async function uriToVmessRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
     let ps = ''
@@ -109,20 +70,23 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         const p = new URLSearchParams(url.search)
         data = {
             add: url.hostname,
-            port: Number(url.port) || 0,
+            port: Number(url.port) || '',
             id: url.username,
-            aid: Number(p.get('aid')) || 0,
-            scy: p.get('security') || 'auto',
-            alpn: p.get('alpn') || '',
-            sni: p.get('sni') || '',
-            net: p.get('net') || 'tcp',
+            aid: p.get('aid') || '0',
+
+            net: p.get('net') || p.get('type') || 'raw',
+            scy: p.get('scy') || p.get('security') || p.get('enc') || p.get('encryption') || 'auto',
+
             host: p.get('host') || '',
-            path: p.get('path') || '',
-            tls: p.get('tls') || 'none',
-            fp: p.get('fp') || 'chrome',
-            type: p.get('type') || '',
+            path: p.get('path') || p.get('sni') || p.get('serverName') || '',
+            type: p.get('type') || p.get('headerType') || '',
+
             seed: p.get('seed') || '',
-            mode: p.get('mode') || ''
+            mode: p.get('mode') || '',
+
+            tls: p.get('tls') === 'tls' || p.get('security') === 'tls',
+            alpn: p.get('alpn') || '',
+            fp: p.get('fp') || 'chrome'
         }
     } else {
         const base64 = uri.replace('vmess://', '')
@@ -131,26 +95,120 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         ps = d.ps || ''
         data = {
             add: d.add,
-            port: Number(d.port) || 0,
+            port: Number(d.port) || '',
             id: d.id,
-            aid: d.aid || 0,
+            aid: d.aid || '0',
+
+            net: d.net || 'raw',
             scy: d.scy || 'auto',
-            alpn: d.alpn || '',
-            sni: d.sni || '',
-            net: d.net || 'tcp',
+
             host: d.host || '',
             path: d.path || '',
-            tls: d.tls || 'none',
-            fp: d.fp || 'chrome',
             type: d.type || '',
+
             seed: d.seed || '',
-            mode: d.mode || ''
+            mode: d.mode || '',
+
+            tls: d.tls === 'tls',
+            alpn: d.alpn || '',
+            fp: d.fp || 'chrome'
         }
     }
+
+    if (data.net === 'tcp') data.net = 'raw'
 
     return {
         ps,
         type: 'vmess',
+        host: `${data.add}:${data.port}`,
+        scy: data.scy,
+        hash: await hashString(JSON.stringify(data)),
+        data
+    }
+}
+
+/**
+ * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
+ *
+ * ！！！下面这 3 种设计，一个都不去支持，我已经把这个归类到 vmess，让 vless 保存简洁。 over
+ *
+ * # VLESS + TCP + XTLS
+ * vless://b0dd64e4-0fbd-4038-9139-d1f32a68a0dc@qv2ray.net:3279?security=xtls&flow=rprx-xtls-splice#VLESSTCPXTLSSplice
+ *
+ * # VLESS + mKCP + Seed
+ * vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:50288?type=kcp&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeed
+ *
+ * # VLESS + mKCP + Seed，伪装成 Wireguard
+ * vless://399ce595-894d-4d40-add1-7d87f1a3bd10@qv2ray.net:41971?type=kcp&headerType=wireguard&seed=69f04be3-d64e-45a3-8550-af3172c63055#VLESSmKCPSeedWG
+ */
+async function uriToVlessRow(uri: string): Promise<ServerRow> {
+    const url = new URL(uri)
+    let ps = ''
+    let data: VlessRow
+    if (url.search) {
+        if (url.hash) ps = url.hash.slice(1).trim()
+        const p = new URLSearchParams(url.search)
+        data = {
+            add: url.hostname,
+            port: Number(url.port) || '',
+            id: url.username,
+
+            net: p.get('net') || p.get('type') || 'raw',
+            scy: p.get('scy') || p.get('security') || 'none',
+
+            host: p.get('host') || '',
+            path: p.get('path') || '',
+            sni: p.get('sni') || p.get('serverName') || p.get('path') || '',
+
+            mode: p.get('mode') || '',
+            extra: p.get('extra') || '',
+
+            alpn: p.get('alpn') || '',
+            fp: p.get('fp') || 'chrome',
+
+            flow: p.get('flow') || '',
+
+            pbk: p.get('pbk') || '',
+            sid: p.get('sid') || '',
+            spx: p.get('spx') || ''
+        }
+    } else {
+        const base64 = uri.replace('vless://', '')
+        const decoded = decodeBase64(base64)
+        const d = JSON.parse(decoded)
+        ps = d.ps || ''
+        data = {
+            add: d.add,
+            port: Number(d.port) || '',
+            id: d.id,
+
+            net: d.net || 'raw',
+            scy: d.scy || 'none',
+
+            host: d.host || '',
+            path: d.path || '',
+            sni: d.sni || '',
+
+            mode: d.mode || '',
+            extra: d.extra || '',
+
+            alpn: d.alpn || '',
+            fp: d.fp || '',
+
+            flow: d.flow || '',
+
+            pbk: d.pbk || '',
+            sid: d.sid || '',
+            spx: d.spx || ''
+        }
+    }
+
+    if (data.net === 'tcp') data.net = 'raw'
+    if (data.flow) data.net = 'xhttp'
+
+    return {
+        ps: ps,
+        type: 'vless',
         host: `${data.add}:${data.port}`,
         scy: data.scy,
         hash: await hashString(JSON.stringify(data)),
@@ -207,10 +265,13 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
             add: url.hostname,
             port: Number(url.port) || 0,
             pwd: url.username,
-            flow: p.get('flow') || '',
-            scy: p.get('security') || 'tls',
-            sni: p.get('sni') || url.hostname,
-            fp: p.get('fp') || 'chrome'
+
+            net: p.get('net') || p.get('type') || '',
+            scy: 'tls',
+
+            host: p.get('host') || '',
+            path: p.get('path') || '',
+            sni: p.get('sni') || p.get('serviceName') || '',
         }
     } else {
         const base64 = uri.replace('trojan://', '')
@@ -221,10 +282,13 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
             add: d.add,
             port: Number(d.port) || 0,
             pwd: d.pwd || '',
-            flow: d.flow || '',
+
+            net: d.net || '',
             scy: d.scy || 'tls',
-            sni: d.sni || url.hostname,
-            fp: d.fp || 'chrome'
+
+            host: d.host || '',
+            path: d.path || '',
+            sni: d.sni || '',
         }
     }
 

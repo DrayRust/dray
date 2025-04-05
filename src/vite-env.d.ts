@@ -132,7 +132,7 @@ interface VlessRow {
     sni: string; // (grpc / reality) 伪装主机名 Server Name Indication 如：example.com
 
     // gRPC
-    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
+    mode: string; // gRPC 传输模式 transport mode 如：gun / guna / multi
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113
@@ -165,8 +165,10 @@ interface TrojanRow {
     add: string; // 地址 address 如：IP / 域名
     port: number | ''; // 端口 port
     pwd: string; // 密码 password
+
     net: string; // 网络传输方式 network 如：ws / grpc
     scy: string; // 安全类型 security 只有：tls = "Transport Layer Security"（传输层安全协议）
+
     host: string; // 伪装域名 host
     path: string; // (ws) 伪装域名 path
     sni: string; // (grpc) 伪装主机名 Server Name Indication 如：example.com
