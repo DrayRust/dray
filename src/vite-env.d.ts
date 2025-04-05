@@ -170,8 +170,7 @@ interface TrojanRow {
     scy: string; // 安全类型 security 只有：tls = "Transport Layer Security"（传输层安全协议）
 
     host: string; // 伪装域名 host
-    path: string; // (ws) 伪装域名 path
-    sni: string; // (grpc) 伪装主机名 Server Name Indication 如：example.com
+    path: string; // (ws) 伪装路径 path / (grpc) 伪装主机名 SNI = Server Name Indication 如：example.com
 }
 
 /*interface Tauri {

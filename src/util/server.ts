@@ -273,8 +273,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
             scy: 'tls',
 
             host: p.get('host') || '',
-            path: p.get('path') || '',
-            sni: p.get('sni') || p.get('serviceName') || '',
+            path: p.get('path') || p.get('sni') || p.get('serviceName') || '',
         }
     } else {
         const base64 = uri.replace('trojan://', '')
@@ -291,7 +290,6 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
 
             host: d.host || '',
             path: d.path || '',
-            sni: d.sni || '',
         }
     }
 
@@ -408,8 +406,7 @@ function trojanRowToUri(row: TrojanRow, ps: string): string {
     p.set('type', row.net || 'grpc')
 
     if (row.host) p.set('host', row.host)
-    if (row.path) p.set('path', row.path)
-    if (row.sni) p.set('serviceName', row.sni)
+    if (row.path) row.net !== 'grpc' ? p.set('path', row.path) : p.set('serviceName', row.path)
 
     url.search = p.toString()
     return url.toString()
@@ -587,7 +584,7 @@ function trojanRowToConf(row: TrojanRow): any {
             network: "tcp",
             security: "tls",
             tlsSettings: {
-                serverName: row.sni || row.add,
+                serverName: row.path || row.add,
             }
         }
     }

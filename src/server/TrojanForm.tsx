@@ -34,6 +34,7 @@ export const TrojanForm = ({form, errors, handleChange, setFormData}: TrojanForm
                 error={errors.pwdError} helperText={errors.pwdError ? "密码不能为空" : ""}
                 onChange={handleChange}/>
         </Grid>
+
         <Grid size={12} sx={{mt: 2}}>
             <SelectField
                 label="传输方式(network)" id="trojan-network" value={form.net} options={trojanNetworkTypeList}
@@ -42,15 +43,11 @@ export const TrojanForm = ({form, errors, handleChange, setFormData}: TrojanForm
         <Grid size={12}>
             <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={form.host} onChange={handleChange}/>
         </Grid>
-        {form.net === 'ws' && (
-            <Grid size={12}>
-                <TextField fullWidth size="small" label="伪装路径(path)" name="path" value={form.path} onChange={handleChange}/>
-            </Grid>
-        )}
-        {form.net === 'grpc' && (
-            <Grid size={12}>
-                <TextField fullWidth size="small" label="伪装主机名(serviceName)" name="sni" value={form.sni} onChange={handleChange}/>
-            </Grid>
-        )}
+        <Grid size={12}>
+            <TextField
+                fullWidth size="small"
+                label={form.net !== 'grpc' ? '伪装路径(path)' : '伪装主机名(serviceName)'}
+                name="path" value={form.path} onChange={handleChange}/>
+        </Grid>
     </>)
 }
