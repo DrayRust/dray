@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Stack, Checkbox, FormControlLabel, Button,
+    Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
@@ -15,6 +15,7 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
     const navigate = useNavigate()
+    const isMediumScreen = useMediaQuery('(max-width: 1100px)')
 
     const [serverList, setServerList] = useState<ServerList>()
     const [selectedServers, setSelectedServers] = useState<boolean[]>([])
@@ -148,8 +149,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             </TableCell>
                             <TableCell>服务器名称</TableCell>
                             <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
-                            <TableCell sx={{width: '150px'}}>协议类型</TableCell>
-                            <TableCell sx={{width: '150px'}}>安全类型</TableCell>
+                            {!isMediumScreen && (<TableCell sx={{width: '100px'}}>协议类型</TableCell>)}
+                            {!isMediumScreen && (<TableCell sx={{width: '200px'}}>安全类型</TableCell>)}
                             <TableCell sx={{width: '120px'}}>操作</TableCell>
                         </TableRow>
                     </TableHead>
@@ -186,10 +187,15 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     <Checkbox checked={selectedServers[key] ?? false}
                                               onChange={(e) => handleSelectServer(key, e.target.checked)}/>
                                 </TableCell>
-                                <TableCell component="th" scope="row">{row.ps}</TableCell>
+                                <TableCell component="th" scope="row">
+                                    {row.ps}
+                                    {isMediumScreen && (
+                                        <Typography color="secondary">{row.type} <Typography color="info" component="span">{row.scy}</Typography></Typography>
+                                    )}
+                                </TableCell>
                                 <TableCell>{row.host}</TableCell>
-                                <TableCell>{row.type}</TableCell>
-                                <TableCell>{row.scy}</TableCell>
+                                {!isMediumScreen && (<TableCell>{row.type}</TableCell>)}
+                                {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
                                 <TableCell>
                                     <Stack direction="row" spacing={1}>
                                         <Button variant="contained" color="primary" startIcon={<EditIcon/>}
