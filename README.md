@@ -4,13 +4,7 @@
 
 ### 支持协议
 
-- VLESS
-- VMESS
-- Shadowsocks
-- Trojan
-- SOCKS
-- HTTP
-- HTTPS
+- VLESS / VMESS / Shadowsocks / Trojan / SOCKS / HTTP / HTTPS
 
 ### 设计宗旨
 
