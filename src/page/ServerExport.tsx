@@ -109,7 +109,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
 
     const [showKeys, setShowKeys] = useState<number[]>([0])
     const height = 'calc(100vh - 75px)'
-    const {SnackbarComponent, showSnackbar} = useSnackbar(true)
+    const {SnackbarComponent, showSnackbar} = useSnackbar('tr')
     const {AppBarComponent} = useAppBar('/server', '导出')
     return <>
         <SnackbarComponent/>
@@ -129,7 +129,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                         <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                             <Typography component="span">{v.ps}</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>{showKeys.includes(i) && (<>
+                        <AccordionDetails sx={{textAlign: 'center'}}>{showKeys.includes(i) && (<>
                             <QRCodeSVG className={`qrcode-${i}`} value={v.uri} title={v.ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
                             <Box sx={{mt: 1}}><TextField value={v.uri} variant="outlined" size="small" fullWidth multiline disabled/></Box>
                             <Box sx={{mt: 1}}>
