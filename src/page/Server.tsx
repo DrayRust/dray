@@ -142,7 +142,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{width: '60px'}}>
+                            <TableCell padding="checkbox">
                                 <Checkbox checked={selectedAll}
                                           onChange={(e) => handleSelectAll(e.target.checked)}/>
                             </TableCell>
@@ -182,7 +182,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     }
                                 }}
                             >
-                                <TableCell>
+                                <TableCell padding="checkbox">
                                     <Checkbox checked={selectedServers[key] ?? false}
                                               onChange={(e) => handleSelectServer(key, e.target.checked)}/>
                                 </TableCell>
