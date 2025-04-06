@@ -49,3 +49,18 @@ export function safeDecodeURI(encodedURI: string): string {
         return encodedURI || ''
     }
 }
+
+export function deepSafeDecodeURI(data: any): any {
+    if (typeof data === 'string') {
+        return safeDecodeURI(data)
+    } else if (Array.isArray(data)) {
+        return data.map(item => deepSafeDecodeURI(item))
+    } else if (data && typeof data === 'object') {
+        const result: any = {}
+        for (const key in data) {
+            result[key] = deepSafeDecodeURI(data[key])
+        }
+        return result
+    }
+    return data
+}

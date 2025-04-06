@@ -1,5 +1,5 @@
 import { log } from './invoke.ts'
-import { decodeBase64, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './base64.ts'
+import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './base64.ts'
 import { hashString } from "./util.ts"
 
 export function isValidUri(uri: string): boolean {
@@ -116,6 +116,9 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         }
     }
 
+    ps = safeDecodeURI(ps)
+    data = deepSafeDecodeURI(data)
+
     if (data.net === 'tcp') data.net = 'raw'
 
     return {
@@ -210,6 +213,9 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
         }
     }
 
+    ps = safeDecodeURI(ps)
+    data = deepSafeDecodeURI(data)
+
     if (data.net === 'tcp') data.net = 'raw'
     if (data.flow) data.net = 'xhttp'
 
@@ -249,6 +255,9 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
             scy: d.scy || '',
         }
     }
+
+    ps = safeDecodeURI(ps)
+    data = deepSafeDecodeURI(data)
 
     return {
         ps,
@@ -296,6 +305,9 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
             path: d.path || '',
         }
     }
+
+    ps = safeDecodeURI(ps)
+    data = deepSafeDecodeURI(data)
 
     return {
         ps,
