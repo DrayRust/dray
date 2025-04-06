@@ -116,8 +116,8 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
             }
 
             // 排重
-            let isExist = netServerList.some(server => server.hash === newServer.hash)
-            if (isExist) {
+            const existKey = netServerList.findIndex((server, i) => server.hash === newServer.hash && i !== key)
+            if (existKey !== -1) {
                 showSnackbar('修改的服务器内容已存在', 'error')
                 return
             }
