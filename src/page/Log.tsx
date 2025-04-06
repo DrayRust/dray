@@ -4,9 +4,11 @@ import {
     Card, Box, Button, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
+import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 
-import { clearLogAll, readLogList } from "../util/invoke.ts"
+import { clearLogAll, getDrayAppDir, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
 import { LoadingCard, ErrorCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
@@ -34,6 +36,11 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
+    const handleOpenLogDir = async () => {
+        let dir = await getDrayAppDir()
+        if (dir) await revealItemInDir(`${dir}/logs/`)
+    }
+
     const {DialogComponent, confirm} = useDialog()
     return (<>
         <DialogComponent/>
@@ -43,7 +50,8 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
             <ErrorCard errorMsg={errorMsg}/>
         ) : (<>
             <Box sx={{mb: 1}}>
-                <Button variant="contained" onClick={handleClearLogs} startIcon={<DeleteIcon/>}>清空日志</Button>
+                <Button variant="contained" onClick={handleOpenLogDir} startIcon={<FolderOpenIcon/>}>打开日志目录</Button>
+                <Button variant="contained" color="error" onClick={handleClearLogs} startIcon={<DeleteIcon/>} sx={{ml: 1}}>清空日志</Button>
             </Box>
             <TableContainer component={Card}>
                 <Table sx={{minWidth: 650}}>

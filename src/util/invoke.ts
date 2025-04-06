@@ -28,6 +28,16 @@ function sendLog(content: string) {
     }
 }
 
+export async function getDrayAppDir(): Promise<string> {
+    if (!isTauri) return ''
+    try {
+        return await invoke('get_dray_app_dir')
+    } catch (err) {
+        log.error('Failed to get dray app dir:', err)
+        return ''
+    }
+}
+
 export async function checkPortAvailable(port: number) {
     if (!isTauri) return false
     try {
