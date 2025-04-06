@@ -17,9 +17,7 @@ export const ErrorCard = ({errorMsg, height, mt}: {
     height?: string
     mt?: number
 }) => {
-    let sx = centerSx
-    if (height) sx = {...sx, height}
-    if (mt) sx = {...sx, mt}
+    let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
         <Card sx={sx}>
             <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
@@ -29,9 +27,7 @@ export const ErrorCard = ({errorMsg, height, mt}: {
 }
 
 export const LoadingCard = ({height, mt}: { height?: string, mt?: number }) => {
-    let sx = centerSx
-    if (height) sx = {...sx, height}
-    if (mt) sx = {...sx, mt}
+    let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
         <Card sx={sx}>
             <CircularProgress/>
