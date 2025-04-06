@@ -13,7 +13,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     const [inputValue, setInputValue] = useState('')
     const [error, setError] = useState(false)
     const handleSubmit = useDebounce(async () => {
-        await useServerImport(inputValue, setError, showSnackbar, () => {
+        await useServerImport(inputValue, showSnackbar, setError, () => {
             setTimeout(() => navigate('/server'), 1000)
         })
     }, 300)

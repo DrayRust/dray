@@ -16,6 +16,7 @@
     "core:window:allow-set-focus",
     "core:webview:default",
     "autostart:default",
-    "clipboard-manager:default"
+    "clipboard-manager:default",
+    "clipboard-manager:allow-read-text"
   ]
 }

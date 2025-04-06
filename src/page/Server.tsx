@@ -9,12 +9,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { readText } from '@tauri-apps/plugin-clipboard-manager'
 
 import { useDebounce } from '../hook/useDebounce.ts'
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
+import { useServerImport } from "../component/useServerImport.tsx"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -162,6 +164,19 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
                 <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
+                <Button variant="contained" color="success" onClick={async () => {
+                    try {
+                        const clipboardText = await readText()
+                        if (clipboardText) {
+                            await useServerImport(clipboardText, showSnackbar, null, readList)
+                        } else {
+                            showSnackbar('剪切板没有内容', 'error')
+                        }
+                    } catch (e) {
+                        console.log(e)
+                        showSnackbar('读取剪切板失败', 'error')
+                    }
+                }}>剪切板导入</Button>
                 {Array.isArray(serverList) && serverList.length > 0 && (
                     <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
                 )}

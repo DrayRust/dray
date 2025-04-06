@@ -3,9 +3,9 @@ import { uriToServerRow } from "../util/server.ts"
 
 export const useServerImport = async (
     inputValue: string,
-    setError: (value: boolean) => void,
     showSnackbar: (msg: string, severity?: 'success' | 'info' | 'warning' | 'error') => void,
-    onSuccess?: () => void
+    setError?: ((value: boolean) => void) | null,
+    onSuccess?: () => void,
 ) => {
     const s = inputValue.trim()
     if (!s) return
@@ -45,7 +45,7 @@ export const useServerImport = async (
     const errMsg = `解析链接（URI）错误: ${errNum} 条`
     const okMsg = `导入成功: ${newNum} 条`
     const existMsg = `已存在: ${existNum} 条`
-    setError(existNum > 0)
+    setError && setError(existNum > 0)
     if (newNum) {
         serverList = [...newServerList, ...serverList]
         const ok = await saveServerList(serverList)
