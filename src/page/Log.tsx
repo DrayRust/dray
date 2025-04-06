@@ -4,6 +4,7 @@ import {
     Card, Box, Button, Link,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { clearLogAll, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
@@ -42,7 +43,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
             <ErrorCard errorMsg={errorMsg}/>
         ) : (<>
             <Box sx={{mb: 1}}>
-                <Button variant="contained" onClick={handleClearLogs}>清空日志</Button>
+                <Button variant="contained" onClick={handleClearLogs} startIcon={<DeleteIcon/>}>清空日志</Button>
             </Box>
             <TableContainer component={Card}>
                 <Table sx={{minWidth: 650}}>
