@@ -1,5 +1,5 @@
 import { log } from './invoke.ts'
-import { decodeBase64, encodeBase64 } from './base64.ts'
+import { decodeBase64, encodeBase64, safeJsonParse, safeJsonStringify } from './base64.ts'
 import { hashString } from "./util.ts"
 
 export function isValidUri(uri: string): boolean {
@@ -93,12 +93,12 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
     } else {
         const base64 = uri.replace('vmess://', '')
         const decoded = decodeBase64(base64)
-        const d = JSON.parse(decoded)
+        const d = safeJsonParse(decoded)
         ps = d.ps || ''
         data = {
-            add: d.add,
+            add: d.add || '',
             port: Number(d.port) || '',
-            id: d.id,
+            id: d.id || '',
             aid: d.aid || '0',
 
             net: d.net || 'raw',
@@ -123,7 +123,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         type: 'vmess',
         host: `${data.add}:${data.port}`,
         scy: data.scy + '+' + data.net,
-        hash: await hashString(JSON.stringify(data)),
+        hash: await hashString(safeJsonStringify(data)),
         data
     }
 }
@@ -183,12 +183,12 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
     } else {
         const base64 = uri.replace('vless://', '')
         const decoded = decodeBase64(base64)
-        const d = JSON.parse(decoded)
+        const d = safeJsonParse(decoded)
         ps = d.ps || ''
         data = {
-            add: d.add,
+            add: d.add || '',
             port: Number(d.port) || '',
-            id: d.id,
+            id: d.id || '',
 
             net: d.net || 'raw',
             scy: d.scy || 'none',
@@ -218,7 +218,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
         type: 'vless',
         host: `${data.add}:${data.port}`,
         scy: data.scy + '+' + data.net,
-        hash: await hashString(JSON.stringify(data)),
+        hash: await hashString(safeJsonStringify(data)),
         data
     }
 }
@@ -240,10 +240,10 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
     } else {
         const base64 = uri.replace('ss://', '')
         const decoded = decodeBase64(base64)
-        const d = JSON.parse(decoded)
+        const d = safeJsonParse(decoded)
         ps = d.ps || ''
         data = {
-            add: d.add,
+            add: d.add || '',
             port: Number(d.port) || 0,
             pwd: d.pwd || '',
             scy: d.scy || '',
@@ -255,7 +255,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
         type: 'ss',
         host: `${data.add}:${data.port}`,
         scy: data.scy,
-        hash: await hashString(JSON.stringify(data)),
+        hash: await hashString(safeJsonStringify(data)),
         data
     }
 }
@@ -282,10 +282,10 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
     } else {
         const base64 = uri.replace('trojan://', '')
         const decoded = decodeBase64(base64)
-        const d = JSON.parse(decoded)
+        const d = safeJsonParse(decoded)
         ps = d.ps || ''
         data = {
-            add: d.add,
+            add: d.add || '',
             port: Number(d.port) || 0,
             pwd: d.pwd || '',
 
@@ -302,7 +302,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
         type: 'trojan',
         host: `${data.add}:${data.port}`,
         scy: data.scy + '+' + data.net,
-        hash: await hashString(JSON.stringify(data)),
+        hash: await hashString(safeJsonStringify(data)),
         data
     }
 }
@@ -456,22 +456,22 @@ function vmessRowToBase64Uri(row: VmessRow, ps: string): string {
         if ("alpn" in data) delete data.alpn
         if ("fp" in data) delete data.fp
     }
-    return `vmess://${encodeBase64(JSON.stringify(data))}`
+    return `vmess://${encodeBase64(safeJsonStringify(data))}`
 }
 
 function vlessRowToBase64Uri(row: VlessRow, ps: string): string {
     const data = cleanData({ps, ...row})
-    return `vless://${encodeBase64(JSON.stringify(data))}`
+    return `vless://${encodeBase64(safeJsonStringify(data))}`
 }
 
 function ssRowToBase64Uri(row: SsRow, ps: string): string {
     const data = cleanData({ps, ...row})
-    return `ss://${encodeBase64(JSON.stringify(data))}`
+    return `ss://${encodeBase64(safeJsonStringify(data))}`
 }
 
 function trojanRowToBase64Uri(row: TrojanRow, ps: string): string {
     const data = cleanData({ps, ...row})
-    return `trojan://${encodeBase64(JSON.stringify(data))}`
+    return `trojan://${encodeBase64(safeJsonStringify(data))}`
 }
 
 export function serverRowToConf(row: ServerRow): any {
