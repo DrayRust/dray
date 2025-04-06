@@ -42,6 +42,13 @@ const errorCodes = [404, 500, 403, 502]
  */
 export default (content: string): string[] => {
     return content.split('\n').map(line => {
+        // 转义 HTML 特殊字符，防止 XSS 攻击
+        line = line.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+
         // 关键词匹配
         keywordMap.forEach(({regex, color}) => {
             line = line.replace(regex, `<span style="color: ${color}">$&</span>`)
