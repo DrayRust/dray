@@ -106,6 +106,22 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
+    const handleBatchDelete = () => {
+        const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
+        if (selectedKeys.length > 0) {
+            confirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
+                const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index))
+                if (!newServerList || newServerList.length === 0) return
+                const ok = await saveServerList(newServerList)
+                if (!ok) {
+                    showSnackbar('删除失败', 'error')
+                } else {
+                    updateServerList(newServerList)
+                }
+            })
+        }
+    }
+
     useEffect(() => {
         if (serverList) setSelectedServers(new Array(serverList.length).fill(false))
     }, [serverList])
@@ -129,22 +145,6 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setSelectedServers(new Array(newServerList.length).fill(false))
         setSelectedAll(false)
         setShowAction(false)
-    }
-
-    const handleBatchDelete = () => {
-        const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
-        if (selectedKeys.length > 0) {
-            confirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
-                const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index))
-                if (!newServerList || newServerList.length === 0) return
-                const ok = await saveServerList(newServerList)
-                if (!ok) {
-                    showSnackbar('删除失败', 'error')
-                } else {
-                    updateServerList(newServerList)
-                }
-            })
-        }
     }
 
     const [enableDragSort, setEnableDragSort] = useState(false)
@@ -174,6 +174,30 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             window.removeEventListener('mouseup', handleMouseUp)
         }
     }, [])
+
+    const handleDragStart = (key: number) => {
+        if (!enableDragSort) return
+        setDraggingIndex(key)
+    }
+
+    const handleDragEnd = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (!enableDragSort) return
+        setDraggingIndex(null)
+        handleSaveServerList(dragIsChange, serverList)
+    }
+
+    const handleDragEnter = (key: number) => {
+        if (!enableDragSort) return
+        if (draggingIndex !== null && draggingIndex !== key && serverList) {
+            const newServerList = [...serverList]
+            const [draggedItem] = newServerList.splice(draggingIndex, 1)
+            newServerList.splice(key, 0, draggedItem)
+            setServerList(newServerList)
+            setDraggingIndex(key)
+            setDragIsChange(true)
+        }
+    }
 
     const menuSx = {'& .MuiPaper-root': {boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'}}
 
@@ -223,35 +247,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                     <TableBody>
                         {serverList.map((row, key) => (
                             <TableRow
-                                key={key}
-                                hover
+                                key={key} hover
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 className={enableDragSort ? (draggingIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
-                                onMouseDown={() => {
-                                    if (!enableDragSort) return
-                                    setDraggingIndex(key)
-                                }}
-                                onMouseUp={(e) => {
-                                    e.stopPropagation()
-                                    if (!enableDragSort) return
-                                    setDraggingIndex(null)
-                                    handleSaveServerList(dragIsChange, serverList)
-                                }}
-                                onMouseEnter={() => {
-                                    if (!enableDragSort) return
-                                    if (draggingIndex !== null && draggingIndex !== key) {
-                                        const newServerList = [...serverList]
-                                        const [draggedItem] = newServerList.splice(draggingIndex, 1)
-                                        newServerList.splice(key, 0, draggedItem)
-                                        setServerList(newServerList)
-                                        setDraggingIndex(key)
-                                        setDragIsChange(true)
-                                    }
-                                }}
+                                onMouseDown={() => handleDragStart(key)}
+                                onMouseUp={(e) => handleDragEnd(e)}
+                                onMouseEnter={() => handleDragEnter(key)}
                             >
                                 <TableCell padding="checkbox">
-                                    <Checkbox checked={selectedServers[key] ?? false}
-                                              onChange={(e) => handleSelectServer(key, e.target.checked)}/>
+                                    <Checkbox
+                                        checked={selectedServers[key] ?? false}
+                                        onChange={(e) => handleSelectServer(key, e.target.checked)}/>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {row.ps}
