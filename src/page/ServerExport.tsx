@@ -79,7 +79,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         const path = await showSaveDialog()
         if (!path) return
 
-        let content = ''
+        let content: string
         if (isBase64) {
             initBase64UriList()
             content = base64UriList.join('\n')
@@ -126,16 +126,16 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const [showKeys, setShowKeys] = useState<number[]>([0])
-    const height = 'calc(100vh - 75px)'
+    const height = 'calc(100vh - 85px)'
     const {SnackbarComponent, showSnackbar} = useSnackbar('br')
     const {AppBarComponent} = useAppBar('/server', '导出')
     return <>
         <SnackbarComponent/>
         <AppBarComponent/>
         {!serverList ? (
-            <LoadingCard height={height}/>
+            <LoadingCard height={height} mt={1}/>
         ) : errorMsg ? (
-            <ErrorCard errorMsg={errorMsg} height={height}/>
+            <ErrorCard errorMsg={errorMsg} height={height} mt={1}/>
         ) : (<>
             <Stack direction="row" spacing={1} sx={{py: 1, alignItems: 'center', justifyContent: 'space-between'}}>
                 <ToggleButtonGroup exclusive value={isBase64} onChange={(_, v: boolean) => handleFormatChange(v)}>

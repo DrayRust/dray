@@ -8,24 +8,32 @@ const centerSx = {
     alignItems: 'center',
     justifyContent: 'center',
     height: 'calc(100vh - 20px)',
+    mt: 0,
     textAlign: 'center'
 }
 
-export const ErrorCard = ({errorMsg, height}: {
+export const ErrorCard = ({errorMsg, height, mt}: {
     errorMsg: string
     height?: string
+    mt?: number
 }) => {
+    let sx = centerSx
+    if (height) sx = {...sx, height}
+    if (mt) sx = {...sx, mt}
     return (
-        <Card sx={height ? {...centerSx, height} : centerSx}>
+        <Card sx={sx}>
             <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
             <div>{errorMsg}</div>
         </Card>
     )
 }
 
-export const LoadingCard = ({height}: { height?: string }) => {
+export const LoadingCard = ({height, mt}: { height?: string, mt?: number }) => {
+    let sx = centerSx
+    if (height) sx = {...sx, height}
+    if (mt) sx = {...sx, mt}
     return (
-        <Card sx={height ? {...centerSx, height} : centerSx}>
+        <Card sx={sx}>
             <CircularProgress/>
         </Card>
     )
