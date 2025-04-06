@@ -139,14 +139,23 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
         let serverList = await readServerList() || []
         const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
-        serverList = [{
+        const newServer = {
             ps: ps,
             type: serverType,
             host: `${data.add}:${data.port}`,
             scy: scy,
             hash: await hashString(JSON.stringify(data)),
             data
-        }, ...serverList]
+        }
+
+        // 排重
+        let isExist = serverList.some(server => server.hash === newServer.hash)
+        if (isExist) {
+            showSnackbar('添加的服务器已存在', 'error')
+            return
+        }
+
+        serverList = [newServer, ...serverList]
         const ok = await saveServerList(serverList)
         if (!ok) {
             showSnackbar('添加失败', 'error')

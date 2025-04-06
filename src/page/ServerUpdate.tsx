@@ -21,7 +21,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const key = Number(searchParams.get('key'))
 
     const [serverList, setServerList] = useState<ServerList>()
-    const [serverType, setServerType] = useState('vless')
+    const [serverType, setServerType] = useState('')
     const [ps, setPs] = useState('')
 
     const [vmessForm, setVmessForm] = useState<VmessRow>()
@@ -106,21 +106,30 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
         let netServerList = serverList ? [...serverList] : []
         if (netServerList[key]) {
             const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
-            netServerList.splice(key, 1)
-            netServerList.unshift({
+            const newServer = {
                 ps: ps,
                 type: serverType,
                 host: `${data.add}:${data.port}`,
                 scy: scy,
                 hash: await hashString(JSON.stringify(data)),
                 data
-            })
-        }
-        const ok = await saveServerList(netServerList)
-        if (!ok) {
-            showSnackbar('修改失败', 'error')
-        } else {
-            setTimeout(() => navigate(`/server`), 100)
+            }
+
+            // 排重
+            let isExist = netServerList.some(server => server.hash === newServer.hash)
+            if (isExist) {
+                showSnackbar('修改的服务器内容已存在', 'error')
+                return
+            }
+
+            netServerList.splice(key, 1)
+            netServerList.unshift(newServer)
+            const ok = await saveServerList(netServerList)
+            if (!ok) {
+                showSnackbar('修改失败', 'error')
+            } else {
+                setTimeout(() => navigate(`/server`), 100)
+            }
         }
     }
 
