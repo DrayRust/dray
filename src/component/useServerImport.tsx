@@ -47,8 +47,7 @@ export const useServerImport = async (
     const existMsg = `已存在: ${existNum} 条`
     setError && setError(existNum > 0)
     if (newNum) {
-        serverList = [...newServerList, ...serverList]
-        const ok = await saveServerList(serverList)
+        const ok = await saveServerList([...newServerList, ...serverList])
         if (!ok) {
             showSnackbar('导入失败', 'error')
         } else {

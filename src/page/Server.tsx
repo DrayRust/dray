@@ -46,6 +46,19 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_import`)
     }
 
+    const handleClipboardImport = async () => {
+        try {
+            const clipboardText = await readText()
+            if (clipboardText) {
+                await useServerImport(clipboardText, showSnackbar, null, readList)
+            } else {
+                showSnackbar('剪切板没有内容', 'error')
+            }
+        } catch (e) {
+            showSnackbar('读取剪切板失败', 'error')
+        }
+    }
+
     const handleExport = () => {
         navigate(`/server_export`)
     }
@@ -164,19 +177,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
                 <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
-                <Button variant="contained" color="success" onClick={async () => {
-                    try {
-                        const clipboardText = await readText()
-                        if (clipboardText) {
-                            await useServerImport(clipboardText, showSnackbar, null, readList)
-                        } else {
-                            showSnackbar('剪切板没有内容', 'error')
-                        }
-                    } catch (e) {
-                        console.log(e)
-                        showSnackbar('读取剪切板失败', 'error')
-                    }
-                }}>剪切板导入</Button>
+                <Button variant="contained" color="success" onClick={handleClipboardImport}>剪切板导入</Button>
                 {Array.isArray(serverList) && serverList.length > 0 && (
                     <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
                 )}
