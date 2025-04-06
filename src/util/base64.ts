@@ -40,3 +40,12 @@ export function safeJsonStringify(data: any): string {
         return '{}'
     }
 }
+
+export function safeDecodeURI(encodedURI: string): string {
+    try {
+        return decodeURIComponent(encodedURI)
+    } catch (e) {
+        log.error('Failed to decode URI component:', e)
+        return encodedURI || ''
+    }
+}

@@ -1,5 +1,5 @@
 import { log } from './invoke.ts'
-import { decodeBase64, encodeBase64, safeJsonParse, safeJsonStringify } from './base64.ts'
+import { decodeBase64, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './base64.ts'
 import { hashString } from "./util.ts"
 
 export function isValidUri(uri: string): boolean {
@@ -230,7 +230,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
     const url = new URL(uri)
     if (url.username) {
         if (url.hash) ps = url.hash.slice(1).trim()
-        const [method, password] = decodeBase64(decodeURIComponent(url.username)).split(':')
+        const [method, password] = decodeBase64(safeDecodeURI(url.username)).split(':')
         data = {
             add: url.hostname,
             port: Number(url.port) || 0,
