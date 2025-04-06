@@ -1,17 +1,11 @@
 import { useState } from 'react'
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 
 export function useDialog() {
     const [open, setOpen] = useState(false)
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
-    const [onConfirm, setOnConfirm] = useState<() => void>(() => {
-    })
+    const [onConfirm, setOnConfirm] = useState<() => void>()
 
     const confirm = (title: string, content: string, onConfirm: () => void) => {
         setTitle(title)
@@ -25,7 +19,7 @@ export function useDialog() {
     }
 
     const handleConfirm = () => {
-        onConfirm()
+        onConfirm && onConfirm()
         handleClose()
     }
 
