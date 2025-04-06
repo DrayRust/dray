@@ -26,7 +26,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [serverList, setServerList] = useState<ServerList>()
     const [selectedServers, setSelectedServers] = useState<boolean[]>([])
     const [selectedAll, setSelectedAll] = useState(false)
-    const [showDeleteBut, setShowDeleteBut] = useState(false)
+    const [showAction, setShowAction] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
         readServerList().then((d) => {
@@ -60,7 +60,16 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleExport = () => {
-        navigate(`/server_export`)
+        const selectedKeys = getSelectedKeys()
+        navigate(`/server_export`, {state: {selectedKeys}})
+    }
+
+    const getSelectedKeys = () => {
+        const selectedKeys: number[] = []
+        for (let index = 0; index < selectedServers.length; index++) {
+            if (selectedServers[index]) selectedKeys.push(index)
+        }
+        return selectedKeys
     }
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -104,7 +113,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const handleSelectAll = (checked: boolean) => {
         setSelectedServers(new Array(serverList?.length).fill(checked))
         setSelectedAll(checked)
-        setShowDeleteBut(checked)
+        setShowAction(checked)
     }
 
     const handleSelectServer = (index: number, checked: boolean) => {
@@ -112,21 +121,22 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         newSelected[index] = checked
         setSelectedServers(newSelected)
         setSelectedAll(newSelected.every(Boolean))
-        setShowDeleteBut(newSelected.some(Boolean))
+        setShowAction(newSelected.some(Boolean))
     }
 
     const updateServerList = (newServerList: ServerList) => {
         setServerList(newServerList)
         setSelectedServers(new Array(newServerList.length).fill(false))
         setSelectedAll(false)
-        setShowDeleteBut(false)
+        setShowAction(false)
     }
 
     const handleBatchDelete = () => {
         const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
         if (selectedKeys.length > 0) {
             confirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
-                const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index)) || []
+                const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index))
+                if (!newServerList || newServerList.length === 0) return
                 const ok = await saveServerList(newServerList)
                 if (!ok) {
                     showSnackbar('删除失败', 'error')
@@ -178,10 +188,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 <Button variant="contained" color="secondary" onClick={handleCreate}>添加</Button>
                 <Button variant="contained" color="success" onClick={handleClipboardImport}>剪切板导入</Button>
                 <Button variant="contained" color="warning" onClick={handleImport}>导入</Button>
-                {Array.isArray(serverList) && serverList.length > 0 && (
+                {showAction && (<>
                     <Button variant="contained" color="info" onClick={handleExport}>导出</Button>
-                )}
-                {showDeleteBut && (<Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>)}
+                    <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
+                </>)}
             </Stack>
             {Array.isArray(serverList) && serverList.length > 0 && (
                 <FormControlLabel label="拖拽排序" control={<Checkbox
