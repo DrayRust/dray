@@ -5,7 +5,7 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Menu, MenuItem, IconButton, Divider,
 } from '@mui/material'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -237,7 +237,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 {!isMediumScreen && (<TableCell>{row.type}</TableCell>)}
                                 {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
                                 <TableCell padding="checkbox">
-                                    <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreHorizIcon/></IconButton>
+                                    <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
