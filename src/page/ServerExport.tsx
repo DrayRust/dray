@@ -20,11 +20,6 @@ import { log, readServerList, saveTextFile } from "../util/invoke.ts"
 import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
 import { getCurrentYMDHIS } from "../util/util.ts"
 
-const COPY_BASE64_URI_TEXT = '点击复制 Base64 URI'
-const COPY_URL_TEXT = '点击复制 URL'
-const COPY_QRCODE_SVG_TEXT = '点击复制二维码 SVG'
-const COPIED = '已复制'
-
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
 
@@ -37,10 +32,6 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     const [uriList, setUriList] = useState<string[]>([])
     const [base64UriList, setBase64UriList] = useState<string[]>([])
     const [errorMsg, setErrorMsg] = useState('')
-
-    const [copyURIText, setCopyURIText] = useState(isBase64 ? COPY_BASE64_URI_TEXT : COPY_URL_TEXT)
-    const [copySVGText, setCopySVGText] = useState(COPY_QRCODE_SVG_TEXT)
-
     const readList = () => {
         readServerList().then((d) => {
             let serverList = d as ServerList
@@ -83,7 +74,6 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     const handleFormatChange = (isBase64: boolean) => {
         if (isBase64 !== null) setIsBase64(isBase64)
         isBase64 && initBase64UriList()
-        setCopyURIText(isBase64 ? COPY_BASE64_URI_TEXT : COPY_URL_TEXT)
     }
 
     const handleExportTextFile = async () => {
@@ -123,18 +113,20 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         if (!showKeys.includes(i)) setShowKeys([...showKeys, i])
     }
 
+    const [uriCopied, setUriCopied] = useState('')
     const handleCopyURI = async (i: number) => {
         await navigator.clipboard.writeText(getUri(i))
-        setCopyURIText(COPIED)
-        setTimeout(() => setCopyURIText(isBase64 ? COPY_BASE64_URI_TEXT : COPY_URL_TEXT), 1000)
+        setUriCopied('已复制')
+        setTimeout(() => setUriCopied(''), 1000)
     }
 
+    const [svgCopied, setSvgCopied] = useState('')
     const handleCopyQRCodeSVG = async (i: number) => {
         const qrCodeHtml = document.querySelector(`.qrcode-${i}`)?.outerHTML
         if (qrCodeHtml) {
             await navigator.clipboard.writeText(qrCodeHtml)
-            setCopySVGText(COPIED)
-            setTimeout(() => setCopySVGText(COPY_QRCODE_SVG_TEXT), 1000)
+            setSvgCopied('已复制')
+            setTimeout(() => setSvgCopied(''), 1000)
         }
     }
 
@@ -169,10 +161,10 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/>
                             </Box>
                             <Box sx={{mt: 1}}>
-                                <Tooltip title={copyURIText}>
+                                <Tooltip title={uriCopied || (isBase64 ? '复制 Base64 URI' : '复制 URL')}>
                                     <IconButton onClick={() => handleCopyURI(i)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
-                                <Tooltip title={copySVGText}>
+                                <Tooltip title={svgCopied || '复制二维码 SVG'}>
                                     <IconButton onClick={() => handleCopyQRCodeSVG(i)}><FileCopyIcon/></IconButton>
                                 </Tooltip>
                             </Box>
