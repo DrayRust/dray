@@ -328,6 +328,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (ok) debouncedSetWebServerPort(value)
     }
 
+    const destOverride = rayCommonConfig.socks_sniffing_dest_override
     const sxBox = {p: 2, m: '0 auto', maxWidth: 660}
     return (
         <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
@@ -485,31 +486,31 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <Stack direction="row" spacing={1} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                                         <FormControlLabel
                                             control={<Checkbox
-                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("http")}
+                                                checked={destOverride.includes("http")}
                                                 onChange={() => handleDestOverride("http")}/>}
                                             label="HTTP"
                                         />
                                         <FormControlLabel
                                             control={<Checkbox
-                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("tls")}
+                                                checked={destOverride.includes("tls")}
                                                 onChange={() => handleDestOverride("tls")}/>}
                                             label="TLS"
                                         />
                                         <FormControlLabel
                                             control={<Checkbox
-                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("quic")}
+                                                checked={destOverride.includes("quic")}
                                                 onChange={() => handleDestOverride("quic")}/>}
                                             label="QUIC"
                                         />
                                         <FormControlLabel
                                             control={<Checkbox
-                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns")}
+                                                checked={destOverride.includes("fakedns")}
                                                 onChange={() => handleDestOverride("fakedns")}/>}
                                             label="FakeDNS"
                                         />
                                         <FormControlLabel
                                             control={<Checkbox
-                                                checked={rayCommonConfig.socks_sniffing_dest_override.includes("fakedns+others")}
+                                                checked={destOverride.includes("fakedns+others")}
                                                 onChange={() => handleDestOverride("fakedns+others")}/>}
                                             label="FakeDNS+Others"
                                         />
