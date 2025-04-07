@@ -1,4 +1,5 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
+import { getSocksConf, getHttpConf } from "./serverConf.ts"
 
 export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
@@ -56,19 +57,7 @@ export function raySocksEnabledChange(value: boolean, config: AppConfig, rayComm
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
         if (value) {
-            c.inbounds.push({
-                "tag": "socks-in",
-                "protocol": "socks",
-                "listen": config.ray_host,
-                "port": config.ray_socks_port,
-                "settings": {
-                    "udp": rayCommonConfig.socks_udp,
-                },
-                "sniffing": {
-                    enabled: rayCommonConfig.socks_sniffing,
-                    destOverride: rayCommonConfig.socks_sniffing_dest_override
-                }
-            })
+            c.inbounds.push(getSocksConf(config, rayCommonConfig))
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
         }
@@ -84,12 +73,7 @@ export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommo
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
         if (value) {
-            c.inbounds.push({
-                "tag": "http-in",
-                "protocol": "http",
-                "listen": config.ray_host,
-                "port": config.ray_http_port
-            })
+            c.inbounds.push(getHttpConf(config))
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
         }
