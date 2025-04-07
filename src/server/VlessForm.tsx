@@ -113,7 +113,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                     onChange={(value) => setFormData('fp', value)}/>
             </Grid>
             <Grid size={12}>
-                <SelectField
+                <AutoCompleteField
                     label="XTLS 流控模式(flow)" id="vless-flow" value={form.flow} options={flowList}
                     onChange={(value) => setFormData('flow', value)}/>
             </Grid>
