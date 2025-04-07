@@ -78,6 +78,7 @@ function vlessRowToConf(row: VlessRow): any {
 
     // https://xtls.github.io/config/inbounds/vless.html#clientobject
     // https://www.v2fly.org/config/protocols/vless.html#outboundconfigurationobject
+    // https://www.v2fly.org/v5/config/proxy/vless.html
     return {
         tag: "proxy",
         protocol: "vless",
@@ -183,12 +184,14 @@ function getXhttpSettings(row: { host: string, path: string }) {
 }
 
 // https://xtls.github.io/config/transport.html#tlsobject
-function getTlsSettings(row: { host: string, alpn: string, fp: string }) {
+function getTlsSettings(row: { host: string, alpn: string, fp: string }, allowInsecure?: boolean) {
+    let settings = {}
+    if (row.host) settings = {...settings, serverName: row.host}
+    if (row.alpn) settings = {...settings, alpn: parseAlpn(row.alpn)}
+    if (row.fp) settings = {...settings, fingerprint: row.fp}
     return {
-        allowInsecure: false,
-        serverName: row.host || '',
-        alpn: row.alpn ? parseAlpn(row.alpn) : ["h2", "http/1.1"],
-        fingerprint: row.fp || '',
+        allowInsecure: allowInsecure ?? false,
+        ...settings
     }
 }
 
