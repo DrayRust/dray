@@ -4,20 +4,28 @@ import { getSocksConf, getHttpConf } from "./ray.ts"
 export async function getLogConf() {
     let appDir = await getDrayAppDir()
 
-    let conf: any = {}
-    conf.loglevel = "debug"
+    let obj: any = {}
+    obj.loglevel = "debug"
     if (appDir) {
-        conf.access = `${appDir}/logs/xray_access.log`
-        conf.error = `${appDir}/logs/xray_error.log`
+        obj.access = `${appDir}/logs/xray_access.log`
+        obj.error = `${appDir}/logs/xray_error.log`
     }
-    return conf
+    return obj
 }
 
 export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
-    let conf = []
-    conf.push(getSocksConf(config, rayConfig))
-    if (rayConfig.http_enable) conf.push(getHttpConf(config))
-    return conf
+    let arr = []
+    arr.push(getSocksConf(config, rayConfig))
+    if (rayConfig.http_enable) arr.push(getHttpConf(config))
+    return arr
+}
+
+export function getOutboundsConf(row: ServerRow) {
+    return [
+        serverRowToConf(row),
+        {tag: "direct", protocol: "freedom"},
+        {tag: "block", protocol: "blackhole"}
+    ]
 }
 
 export function serverRowToConf(row: ServerRow): any {
