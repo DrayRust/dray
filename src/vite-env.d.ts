@@ -103,7 +103,7 @@ interface VmessRow {
     type: string; // (raw / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
 
     // gRPC
-    mode: string; // gRPC 传输模式 transport mode 如：gun / multi / guna
+    mode: string; // gRPC 传输模式 transport mode 如：gun / multi
 
     // TLS
     // https://xtls.github.io/config/transport.html#tlsobject
@@ -127,7 +127,7 @@ interface VlessRow {
     path: string; // (ws / xhttp) 伪装路径 path / (grpc / reality) 伪装主机名 SNI = Server Name Indication 如：example.com
 
     // gRPC
-    mode: string; // gRPC 传输模式 transport mode 如：gun / guna / multi
+    mode: string; // gRPC 传输模式 transport mode 如：gun / multi
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113

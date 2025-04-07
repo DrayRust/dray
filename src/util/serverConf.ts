@@ -65,7 +65,7 @@ function vlessRowToConf(row: VlessRow): any {
     if (row.net === 'ws') {
         settings = {...settings, wsSettings: getWsSettings(row)}
     } else if (row.net === 'grpc') {
-        settings = {...settings, grpcSettings: getGrpcSettings(row)}
+        settings = {...settings, grpcSettings: getGrpcSettings(row, row.mode === 'multi')}
     } else if (row.net === 'xhttp') {
         settings = {...settings, xhttpSettings: getXhttpSettings(row)}
     }
@@ -164,10 +164,12 @@ function getWsSettings(row: { add: string, host: string, path: string }) {
 // PS: 设计的真乱，驼峰命名法 混着 蛇形命名法
 // https://xtls.github.io/config/transports/grpc.html
 // https://www.v2fly.org/config/transport/grpc.html
-function getGrpcSettings(row: { host: string, path: string }) {
+// https://www.v2fly.org/v5/config/stream/grpc.html
+function getGrpcSettings(row: { host: string, path: string }, mode?: boolean) {
     return {
         authority: row.host || '',
         serviceName: row.path || '',
+        multiMode: mode || false, // 实验性 选项，可能不会被长期保留。此模式在 测试环境中 能够带来约 20% 的性能提升
         idle_timeout: 60,
         permit_without_stream: false,
         initial_windows_size: 0
@@ -185,10 +187,10 @@ function getXhttpSettings(row: { host: string, path: string }) {
 
 // https://xtls.github.io/config/transport.html#tlsobject
 function getTlsSettings(row: { host: string, alpn: string, fp: string }, allowInsecure?: boolean) {
-    let settings = {}
-    if (row.host) settings = {...settings, serverName: row.host}
-    if (row.alpn) settings = {...settings, alpn: parseAlpn(row.alpn)}
-    if (row.fp) settings = {...settings, fingerprint: row.fp}
+    let settings: any = {}
+    if (row.host) settings.serverName = row.host
+    if (row.alpn) settings.alpn = parseAlpn(row.alpn)
+    if (row.fp) settings.fingerprint = row.fp
     return {
         allowInsecure: allowInsecure ?? false,
         ...settings
