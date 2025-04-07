@@ -90,9 +90,9 @@ function ssRowToConf(row: SsRow): any {
         settings: {
             servers: [
                 {
-                    address: row.add,
-                    port: row.port,
-                    method: row.scy || 'aes-256-gcm',
+                    address: row.add || '',
+                    port: row.port || '',
+                    method: row.scy || '',
                     password: row.pwd || '',
                 }
             ]
