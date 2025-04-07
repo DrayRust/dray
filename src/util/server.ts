@@ -121,11 +121,15 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
 
     if (data.net === 'tcp') data.net = 'raw'
 
+    let scy = data.scy
+    if (data.tls) scy += '+tls'
+    if (data.net) scy += '+' + data.net
+
     return {
         ps,
         type: 'vmess',
         host: `${data.add}:${data.port}`,
-        scy: data.scy + '+' + data.net,
+        scy: scy,
         hash: await hashString(safeJsonStringify(data)),
         data
     }
