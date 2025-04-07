@@ -23,9 +23,30 @@ export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
 export function getOutboundsConf(row: ServerRow) {
     return [
         serverRowToConf(row),
-        {tag: "direct", protocol: "freedom"},
-        {tag: "block", protocol: "blackhole"}
+        {
+            tag: "direct",
+            protocol: "freedom"
+        },
+        {
+            tag: "block",
+            protocol: "blackhole"
+        }
     ]
+}
+
+export function getStatsConf() {
+    return {
+        metrics: {
+            tag: "api"
+        },
+        policy: {
+            system: {
+                statsOutboundUplink: true,
+                statsOutboundDownlink: true
+            }
+        },
+        stats: {}
+    }
 }
 
 export function serverRowToConf(row: ServerRow): any {
