@@ -1,9 +1,15 @@
-import { getDrayAppDir, log } from "./invoke.ts"
+import { log } from "./invoke.ts"
 import { getSocksConf, getHttpConf } from "./ray.ts"
 
-export async function getLogConf() {
-    let appDir = await getDrayAppDir()
+export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayConfig: RayCommonConfig) {
+    let conf: any = {}
+    conf.log = getLogConf(appDir)
+    conf.inbounds = getInboundsConf(config, rayConfig)
+    conf.outbounds = getOutboundsConf(row)
+    return conf
+}
 
+export function getLogConf(appDir: string) {
     let obj: any = {}
     obj.loglevel = "debug"
     if (appDir) {
@@ -36,16 +42,16 @@ export function getOutboundsConf(row: ServerRow) {
 
 export function getStatsConf() {
     return {
-        metrics: {
-            tag: "api"
-        },
         policy: {
             system: {
                 statsOutboundUplink: true,
                 statsOutboundDownlink: true
             }
         },
-        stats: {}
+        metrics: {
+            tag: "api"
+        },
+        stats: {},
     }
 }
 

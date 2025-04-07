@@ -11,12 +11,20 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { readText } from '@tauri-apps/plugin-clipboard-manager'
 
-import { useDebounce } from '../hook/useDebounce.ts'
-import { readServerList, saveServerList } from "../util/invoke.ts"
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useServerImport } from "../component/useServerImport.tsx"
+import { useDebounce } from '../hook/useDebounce.ts'
+import {
+    readAppConfig, loadRayCommonConfig, saveRayConfig, getDrayAppDir,
+    restartRay, readServerList, saveServerList
+} from "../util/invoke.ts"
+import { getConf } from "../util/serverConf.ts"
+
+let appDir: string
+let config: AppConfig
+let rayCommonConfig: RayCommonConfig
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -89,7 +97,25 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_update?key=${selectedKey}`)
     }
 
-    const handleEnable = () => {
+    const initConfig = async () => {
+        if (!appDir) appDir = await getDrayAppDir()
+        if (!config) config = await readAppConfig()
+        if (!rayCommonConfig) rayCommonConfig = await loadRayCommonConfig()
+    }
+
+    const handleEnable = async () => {
+        await initConfig()
+        if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
+            const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
+            if (conf) {
+                const ok = await saveRayConfig(conf)
+                if (ok) restartRay()
+            } else {
+                showSnackbar('生成 conf 失败', 'error')
+            }
+        } else {
+            showSnackbar('获取配置信息失败', 'error')
+        }
         handleMenuClose()
     }
 
