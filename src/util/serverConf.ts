@@ -14,7 +14,10 @@ export async function getLogConf() {
 }
 
 export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
-    return [getSocksConf(config, rayConfig), getHttpConf(config)]
+    let conf = []
+    conf.push(getSocksConf(config, rayConfig))
+    if (rayConfig.http_enable) conf.push(getHttpConf(config))
+    return conf
 }
 
 export function serverRowToConf(row: ServerRow): any {
