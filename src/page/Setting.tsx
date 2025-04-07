@@ -34,6 +34,7 @@ import {
     raySocksSniffingChange, raySocksDestOverrideChange,
     rayOutboundsMuxChange, rayOutboundsConcurrencyChange
 } from "../util/ray.ts"
+import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -76,46 +77,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // 从配置文件中读取配置信息
-    const [config, setConfig] = useState<AppConfig>({
-        "app_log_level": "info",
-
-        "web_server_enable": true,
-        "web_server_host": "127.0.0.1",
-        "web_server_port": 18687,
-
-        "ray_enable": false,
-        "ray_host": "127.0.0.1",
-        "ray_socks_port": 1086,
-        "ray_http_port": 1089,
-
-        "auto_setup_pac": false,
-        "auto_setup_socks": true,
-        "auto_setup_http": false,
-        "auto_setup_https": false
-    })
-
-    const defaultRayCommonConfig: RayCommonConfig = {
-        "ray_log_level": "warning",
-
-        "socks_enable": true,
-        "http_enable": true,
-
-        "socks_udp": false,
-        "socks_sniffing": false,
-        "socks_sniffing_dest_override": ["http", "tls"],
-
-        "outbounds_mux": false,
-        "outbounds_concurrency": 8,
-    }
-    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(defaultRayCommonConfig)
+    const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
+    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
 
     useEffect(() => {
         if (!isTauri) return
         readAppConfig().then(c => setConfig(c))
         readRayCommonConfig().then(c => {
-            setRayCommonConfig({...defaultRayCommonConfig, ...c})
+            setRayCommonConfig({...DEFAULT_RAY_COMMON_CONFIG, ...c})
         }).catch(_ => {
-            saveRayCommonConfig(defaultRayCommonConfig).catch(_ => 0) // 初始化 Ray Common 配置
+            saveRayCommonConfig(DEFAULT_RAY_COMMON_CONFIG).catch(_ => 0) // 初始化 Ray Common 配置
         })
     }, [])
 
