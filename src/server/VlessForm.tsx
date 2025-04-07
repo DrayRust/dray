@@ -6,6 +6,7 @@ import {
     vlessNetworkTypeList,
     vlessSecurityList,
     grpcModeList,
+    xhttpModeList,
     alpnList,
     fingerprintList,
     flowList
@@ -84,13 +85,18 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
         {form.net === 'grpc' && (<>
             <Grid size={12} sx={{mt: 2}}>
                 <SelectField
-                    label="gRPC 传输模式(mode)" id="vless-mode" value={form.mode} options={grpcModeList}
+                    label="gRPC 传输模式(mode)" id="vless-grpc-mode" value={form.mode || 'gun'} options={grpcModeList}
                     onChange={(value) => setFormData('mode', value)}/>
             </Grid>
         </>)}
 
         {form.net === 'xhttp' && (<>
             <Grid size={12} sx={{mt: 2}}>
+                <SelectField
+                    label="XHTTP 传输模式(mode)" id="vless-xhttp-mode" value={form.mode || 'auto'} options={xhttpModeList}
+                    onChange={(value) => setFormData('mode', value)}/>
+            </Grid>
+            <Grid size={12}>
                 <TextField fullWidth multiline minRows={2} size="small" label="XHTTP 额外参数(extra)" name="extra" value={form.extra} onChange={handleChange}/>
             </Grid>
         </>)}

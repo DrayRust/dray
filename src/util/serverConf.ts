@@ -178,10 +178,11 @@ function getGrpcSettings(row: { host: string, path: string }, mode?: boolean) {
 
 // https://xtls.github.io/config/transports/xhttp.html
 // https://github.com/XTLS/Xray-core/discussions/4113
-function getXhttpSettings(row: { host: string, path: string }) {
+function getXhttpSettings(row: VlessRow) {
     return {
         host: row.host || '',
-        path: row.path || ''
+        path: row.path || '',
+        mode: row.mode || 'auto'
     }
 }
 

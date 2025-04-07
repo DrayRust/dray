@@ -83,6 +83,13 @@ export const grpcModeList = [
     'multi',
 ]
 
+export const xhttpModeList = [
+    'auto',
+    'packet-up',
+    'stream-up',
+    'stream-one',
+]
+
 export const alpnList = [
     'http/1.1',
     'h2',

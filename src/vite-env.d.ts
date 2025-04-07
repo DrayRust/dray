@@ -126,8 +126,9 @@ interface VlessRow {
     host: string; // 伪装域名 host
     path: string; // (ws / xhttp) 伪装路径 path / (grpc / reality) 伪装主机名 SNI = Server Name Indication 如：example.com
 
-    // gRPC
-    mode: string; // gRPC 传输模式 transport mode 如：gun / multi
+    // gRPC 传输模式 transport mode 如：gun / multi
+    // XHTTP 传输模式 transport mode 如：auto / packet-up / stream-up / stream-one
+    mode: string;
 
     // XHTTP
     // https://github.com/XTLS/Xray-core/discussions/4113

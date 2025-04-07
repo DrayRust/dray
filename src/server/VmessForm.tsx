@@ -97,7 +97,7 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
             {form.net === 'grpc' && (<>
                 <Grid size={12}>
                     <SelectField
-                        label="gRPC 传输模式(mode)" id="vmess-mode" value={form.mode} options={grpcModeList}
+                        label="gRPC 传输模式(mode)" id="vmess-grpc-mode" value={form.mode || 'gun'} options={grpcModeList}
                         onChange={(value) => setFormData('mode', value)}/>
                 </Grid>
             </>)}
