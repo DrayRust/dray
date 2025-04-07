@@ -191,7 +191,7 @@ fn get_conf_path(filename: &str) -> Result<PathBuf, String> {
 }
 
 pub fn read_conf(filename: &str) -> String {
-    debug!("Reading config file: {}", filename);
+    debug!("Read: {}", filename);
     match get_conf_path(filename) {
         Ok(config_path) => {
             if !config_path.exists() {
