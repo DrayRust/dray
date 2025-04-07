@@ -22,9 +22,10 @@ import {
 import { useTheme } from '../context/ThemeProvider.tsx'
 import { debounce, validateIp, validatePort } from '../util/util.ts'
 import {
-    log, isTauri, checkPortAvailable,
-    readAppConfig, setAppConfig,
-    readRayCommonConfig, saveRayCommonConfig, openWebServerDir,
+    log, isTauri,
+    checkPortAvailable,
+    readAppConfig, setAppConfig, loadRayCommonConfig,
+    openWebServerDir,
 } from '../util/invoke.ts'
 import {
     rayLogLevelChange,
@@ -79,15 +80,14 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     // 从配置文件中读取配置信息
     const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
-
     useEffect(() => {
         if (!isTauri) return
-        readAppConfig().then(c => setConfig(c))
-        readRayCommonConfig().then(c => {
-            setRayCommonConfig({...DEFAULT_RAY_COMMON_CONFIG, ...c})
-        }).catch(_ => {
-            saveRayCommonConfig(DEFAULT_RAY_COMMON_CONFIG).catch(_ => 0) // 初始化 Ray Common 配置
-        })
+        (async () => {
+            const config = await readAppConfig()
+            if (config) setConfig(config)
+            const rayConfig = await loadRayCommonConfig()
+            if (rayConfig) setRayCommonConfig(rayConfig)
+        })()
     }, [])
 
     const handleAppLogLevel = (event: SelectChangeEvent) => {
