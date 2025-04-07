@@ -153,7 +153,10 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                     <AccordionDetails sx={{textAlign: 'center'}}>
                         {showKeys.includes(i) && (<>
                             <QRCodeSVG className={`qrcode-${i}`} value={getUri(i)} title={ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
-                            <Box sx={{mt: 1}}><TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/></Box>
+                            <Box sx={{mt: 1}}>
+                                <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled
+                                           onClick={() => handleCopyURI(i)}/>
+                            </Box>
                             <Box sx={{mt: 1}}>
                                 <Tooltip title={isBase64 ? '复制 Base64 URI' : '复制 URL'}>
                                     <IconButton onClick={() => handleCopyURI(i)}><ContentCopyIcon/></IconButton>
