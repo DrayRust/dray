@@ -23,18 +23,19 @@ function vmessRowToConf(row: VmessRow): any {
         settings = {...settings, tlsSettings: getTlsSettings(row)}
     }
 
+    // https://xtls.github.io/config/transport.html
     if (row.net === 'raw') {
         if (row.type === 'http') settings = {...settings, tcpSettings: getHttpHeader()}
     } else if (row.net === 'kcp') {
         settings = {...settings, kcpSettings: getKcpSettings(row)}
+    } else if (row.net === 'grpc') {
+        settings = {...settings, grpcSettings: getGrpcSettings(row, row.mode === 'multi')}
+    } else if (row.net === 'ws') {
+        settings = {...settings, wsSettings: getWsSettings(row)}
     } else if (row.net === 'http') {
         settings = {...settings, wsSettings: getHttpSettings(row)}
     } else if (row.net === 'httpupgrade') {
         settings = {...settings, httpupgradeSettings: getHttpUpgradeSettings(row)}
-    } else if (row.net === 'ws') {
-        settings = {...settings, wsSettings: getWsSettings(row)}
-    } else if (row.net === 'grpc') {
-        settings = {...settings, grpcSettings: getGrpcSettings(row, row.mode === 'multi')}
     }
 
     // https://xtls.github.io/config/inbounds/vmess.html
