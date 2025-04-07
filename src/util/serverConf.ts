@@ -101,24 +101,46 @@ function ssRowToConf(row: SsRow): any {
 }
 
 function trojanRowToConf(row: TrojanRow): any {
+    let setting = {}
+    if (row.net === 'ws') {
+        // https://xtls.github.io/config/transports/websocket.html
+        setting = {
+            wsSettings: {
+                host: row.add || '',
+                path: row.path || '',
+                headers: {
+                    Host: row.host || ''
+                }
+            }
+        }
+    } else if (row.net === 'grpc') {
+        // https://xtls.github.io/config/transports/grpc.html
+        setting = {
+            grpcSettings: {
+                serviceName: row.path || '',
+                idle_timeout: 60,
+                permit_without_stream: false,
+                initial_windows_size: 0
+            }
+        }
+    }
+
     return {
         tag: "proxy",
         protocol: "trojan",
         settings: {
             servers: [
                 {
-                    address: row.add,
-                    port: row.port,
-                    password: row.pwd || '',
+                    address: row.add || '',
+                    port: row.port || '',
+                    password: row.pwd || ''
                 }
             ]
         },
         streamSettings: {
-            network: "tcp",
+            network: row.net || '',
             security: "tls",
-            tlsSettings: {
-                serverName: row.path || row.add,
-            }
+            ...setting
         }
     }
 }

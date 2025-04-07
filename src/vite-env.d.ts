@@ -77,7 +77,7 @@ interface ServerList extends Array<ServerRow> {
  * 设计宗旨：做减法（挺难的一件事，哪些参数可以砍掉？雷同的参数是否可合并？砍掉和合并后有什么利弊？）
  *
  * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
- * https://xtls.github.io/config/transport.html
+ * 传输方式（配置总汇） https://xtls.github.io/config/transport.html
  *
  * https://xtls.github.io/config/outbounds/vmess.html
  * https://www.v2fly.org/v5/config/proxy/vmess.html
