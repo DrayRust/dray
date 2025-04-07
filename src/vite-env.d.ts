@@ -99,8 +99,9 @@ interface VmessRow {
     host: string; // 伪装域名 host
     path: string; // 伪装路径 path / 伪装主机名 serviceName / mKCP 种子 seed
 
-    // raw / mKCP
-    type: string; // (raw / mKCP) 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+    // raw 伪装类型 headerType 如：none / http
+    // mKCP 伪装类型 headerType 如：none / srtp / utp / wechat-video / dtls / wireguard
+    type: string;
 
     // gRPC
     mode: string; // gRPC 传输模式 transport mode 如：gun / multi

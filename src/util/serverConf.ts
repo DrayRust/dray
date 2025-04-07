@@ -18,18 +18,40 @@ export function serverRowToConf(row: ServerRow): any {
 }
 
 function vmessRowToConf(row: VmessRow): any {
+    let settings = {}
+    if (row.tls) {
+        settings = {...settings, tlsSettings: getTlsSettings(row)}
+    }
+
+    if (row.net === 'raw') {
+        if (row.type === 'http') settings = {...settings, tcpSettings: getHttpHeader()}
+    } else if (row.net === 'kcp') {
+        settings = {...settings, kcpSettings: getKcpSettings(row)}
+    } else if (row.net === 'http') {
+        settings = {...settings, wsSettings: getHttpSettings(row)}
+    } else if (row.net === 'httpupgrade') {
+        settings = {...settings, httpupgradeSettings: getHttpUpgradeSettings(row)}
+    } else if (row.net === 'ws') {
+        settings = {...settings, wsSettings: getWsSettings(row)}
+    } else if (row.net === 'grpc') {
+        settings = {...settings, grpcSettings: getGrpcSettings(row, row.mode === 'multi')}
+    }
+
+    // https://xtls.github.io/config/inbounds/vmess.html
+    // https://www.v2fly.org/config/protocols/vmess.html#outboundconfigurationobject
+    // https://www.v2fly.org/v5/config/proxy/vmess.html#vmess-%E5%87%BA%E7%AB%99
     return {
         tag: "proxy",
         protocol: "vmess",
         settings: {
             vnext: [
                 {
-                    address: row.add,
-                    port: row.port,
+                    address: row.add || '',
+                    port: row.port || '',
                     users: [
                         {
-                            id: row.id,
-                            alterId: row.aid || 0,
+                            id: row.id || '',
+                            alterId: row.aid || '0',
                             security: row.scy || 'auto'
                         }
                     ]
@@ -37,17 +59,8 @@ function vmessRowToConf(row: VmessRow): any {
             ]
         },
         streamSettings: {
-            network: row.net || 'tcp',
-            security: row.tls || 'none',
-            tlsSettings: {
-                serverName: row.path || '',
-            },
-            wsSettings: {
-                path: row.path || '',
-                headers: {
-                    Host: row.host || ''
-                }
-            }
+            network: row.net || '',
+            ...settings
         }
     }
 }
@@ -150,8 +163,65 @@ function trojanRowToConf(row: TrojanRow): any {
     }
 }
 
+// https://xtls.github.io/config/transports/raw.html#httpheaderobject
+function getHttpHeader() {
+    return {
+        "header": {
+            "type": "http",
+            "request": {
+                "version": "1.1",
+                "method": "GET",
+                "path": ["/"],
+                "headers": {
+                    "Host": ["www.baidu.com", "www.bing.com"],
+                    "User-Agent": ["Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"],
+                    "Accept-Encoding": ["gzip, deflate"],
+                    "Connection": ["keep-alive"],
+                    "Pragma": "no-cache"
+                }
+            }
+        }
+    }
+}
+
+// https://xtls.github.io/config/transports/mkcp.html
+function getKcpSettings(row: VmessRow) {
+    return {
+        mtu: 1350,
+        tti: 50,
+        uplinkCapacity: 20,
+        downlinkCapacity: 100,
+        congestion: false,
+        readBufferSize: 2,
+        writeBufferSize: 2,
+        header: {
+            type: row.type || 'none',
+            domain: row.host || '',
+        },
+        seed: row.path || '',
+    }
+}
+
+// https://www.v2fly.org/config/transport/h2.html
+function getHttpSettings(row: VmessRow) {
+    return {
+        path: row.path || '',
+        host: [
+            row.host || '',
+        ]
+    }
+}
+
+// https://xtls.github.io/config/transports/httpupgrade.html
+function getHttpUpgradeSettings(row: VmessRow) {
+    return {
+        path: row.path || '',
+        host: row.host || '',
+    }
+}
+
 // https://xtls.github.io/config/transports/websocket.html
-function getWsSettings(row: { add: string, host: string, path: string }) {
+function getWsSettings(row: VmessRow | VlessRow | TrojanRow) {
     return {
         host: row.add || '',
         path: row.path || '',
@@ -193,7 +263,7 @@ function getTlsSettings(row: { host: string, alpn: string, fp: string }, allowIn
     if (row.alpn) settings.alpn = parseAlpn(row.alpn)
     if (row.fp) settings.fingerprint = row.fp
     return {
-        allowInsecure: allowInsecure ?? false,
+        allowInsecure: allowInsecure ?? false, // 关闭证书检测非常危险，不建议开启，所以不考虑实现，实在有需求，直接修改配置文件即可
         ...settings
     }
 }
