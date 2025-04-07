@@ -460,7 +460,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
-                            <Switch checked={rayCommonConfig.socks_enable} onChange={handleRaySocksEnabled}/>
+                            <Switch checked={rayCommonConfig.socks_enable} onChange={handleRaySocksEnabled} disabled/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>

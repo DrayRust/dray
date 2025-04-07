@@ -1,4 +1,5 @@
 import { getDrayAppDir, log } from "./invoke.ts"
+import { getSocksConf, getHttpConf } from "./ray.ts"
 
 export async function getLogConf() {
     let appDir = await getDrayAppDir()
@@ -14,31 +15,6 @@ export async function getLogConf() {
 
 export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
     return [getSocksConf(config, rayConfig), getHttpConf(config)]
-}
-
-export function getSocksConf(config: AppConfig, rayConfig: RayCommonConfig) {
-    return {
-        tag: "socks-in",
-        protocol: "socks",
-        listen: config.ray_host,
-        port: config.ray_socks_port,
-        settings: {
-            udp: rayConfig.socks_udp,
-        },
-        sniffing: {
-            enabled: rayConfig.socks_sniffing,
-            destOverride: rayConfig.socks_sniffing_dest_override
-        }
-    }
-}
-
-export function getHttpConf(config: AppConfig) {
-    return {
-        tag: "http-in",
-        protocol: "http",
-        listen: config.ray_host,
-        port: config.ray_http_port
-    }
 }
 
 export function serverRowToConf(row: ServerRow): any {

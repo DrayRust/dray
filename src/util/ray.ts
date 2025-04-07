@@ -1,5 +1,29 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
-import { getSocksConf, getHttpConf } from "./serverConf.ts"
+
+export function getSocksConf(config: AppConfig, rayCommonConfig: RayCommonConfig) {
+    return {
+        tag: "socks-in",
+        protocol: "socks",
+        listen: config.ray_host,
+        port: config.ray_socks_port,
+        settings: {
+            udp: rayCommonConfig.socks_udp,
+        },
+        sniffing: {
+            enabled: rayCommonConfig.socks_sniffing,
+            destOverride: rayCommonConfig.socks_sniffing_dest_override
+        }
+    }
+}
+
+export function getHttpConf(config: AppConfig) {
+    return {
+        tag: "http-in",
+        protocol: "http",
+        listen: config.ray_host,
+        port: config.ray_http_port
+    }
+}
 
 export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
