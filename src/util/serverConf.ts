@@ -3,15 +3,15 @@ import { getSocksConf, getHttpConf } from "./ray.ts"
 
 export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayConfig: RayCommonConfig) {
     let conf: any = {}
-    conf.log = getLogConf(appDir)
+    conf.log = getLogConf(appDir, rayConfig)
     conf.inbounds = getInboundsConf(config, rayConfig)
     conf.outbounds = getOutboundsConf(row)
     return conf
 }
 
-export function getLogConf(appDir: string) {
+export function getLogConf(appDir: string, rayConfig: RayCommonConfig) {
     let obj: any = {}
-    obj.loglevel = "debug"
+    obj.loglevel = rayConfig.ray_log_level || "warning"
     if (appDir) {
         obj.access = `${appDir}/logs/xray_access.log`
         obj.error = `${appDir}/logs/xray_error.log`
