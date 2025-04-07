@@ -10,6 +10,7 @@ import {
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import FileCopyIcon from '@mui/icons-material/FileCopy'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import SaveAltIcon from '@mui/icons-material/SaveAlt'
 
 import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
@@ -114,7 +115,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
 
     const handleCopyURI = async (i: number) => {
         await navigator.clipboard.writeText(getUri(i))
-        showSnackbar('URI 已复制', 'success')
+        showSnackbar(isBase64 ? 'Base64 URI 已复制' : 'URL 已复制', 'success')
     }
 
     const handleCopyQRCodeSVG = async (i: number) => {
@@ -142,7 +143,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                     <ToggleButton value={false}>URL 格式</ToggleButton>
                     <ToggleButton value={true}>Base64 URI 格式</ToggleButton>
                 </ToggleButtonGroup>
-                <Button variant="contained" onClick={handleExportTextFile}>导出备份文件</Button>
+                <Button variant="contained" onClick={handleExportTextFile} startIcon={<SaveAltIcon/>}>导出备份文件</Button>
             </Stack>
             {psList.map((ps, i) => (
                 <Accordion key={i} defaultExpanded={i === 0} onChange={() => handleAccordion(i)}>
@@ -154,7 +155,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                             <QRCodeSVG className={`qrcode-${i}`} value={getUri(i)} title={ps} size={256} xmlns="http://www.w3.org/2000/svg"/>
                             <Box sx={{mt: 1}}><TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/></Box>
                             <Box sx={{mt: 1}}>
-                                <Tooltip title="复制 URI">
+                                <Tooltip title={isBase64 ? '复制 Base64 URI' : '复制 URL'}>
                                     <IconButton onClick={() => handleCopyURI(i)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                                 <Tooltip title="复制二维码 SVG">

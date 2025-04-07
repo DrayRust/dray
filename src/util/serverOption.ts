@@ -1,16 +1,3 @@
-export const vlessNetworkTypeList = [
-    'raw',
-    'ws',
-    'grpc',
-    'xhttp',
-]
-
-export const vlessSecurityList = [
-    'none',
-    'tls',
-    'reality',
-]
-
 export const vmessNetworkTypeList = [
     'raw',
     'kcp',
@@ -26,6 +13,19 @@ export const vmessSecurityList = [
     'zero',
     'aes-128-gcm',
     'chacha20-poly1305',
+]
+
+export const vlessNetworkTypeList = [
+    'raw',
+    'ws',
+    'grpc',
+    'xhttp',
+]
+
+export const vlessSecurityList = [
+    'none',
+    'tls',
+    'reality',
 ]
 
 export const ssMethodList = [
