@@ -29,7 +29,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Config {
-            app_log_level: "debug".to_string(),
+            app_log_level: "info".to_string(),
 
             web_server_enable: true,
             web_server_host: "127.0.0.1".to_string(),
