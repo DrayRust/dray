@@ -28,7 +28,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
     return (<>
         <Grid size={{xs: 12, md: 8}}>
             <TextField
-                fullWidth size="small" label="IP/域名" name="add" value={form.add}
+                fullWidth size="small" label="IP/域名(address)" name="add" value={form.add}
                 error={errors.addError} helperText={errors.addError ? "服务器地址不能为空" : ""}
                 onChange={handleChange}/>
         </Grid>
@@ -118,7 +118,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                 <TextField fullWidth size="small" label="公钥(public key)" name="pbk" value={form.pbk} onChange={handleChange}/>
             </Grid>
             <Grid size={12}>
-                <TextField fullWidth size="small" label="验证(shortId)" name="sid" value={form.sid} onChange={handleChange}/>
+                <TextField fullWidth size="small" label="验证 ID(shortId)" name="sid" value={form.sid} onChange={handleChange}/>
             </Grid>
             <Grid size={12}>
                 <TextField fullWidth size="small" label="伪装爬虫(spiderX)" name="spx" value={form.spx} onChange={handleChange}/>

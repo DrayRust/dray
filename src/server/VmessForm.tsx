@@ -29,7 +29,7 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
     return (<>
         <Grid size={{xs: 12, md: 8}}>
             <TextField
-                fullWidth size="small" label="IP/域名" name="add" value={form.add}
+                fullWidth size="small" label="IP/域名(address)" name="add" value={form.add}
                 error={errors.addError} helperText={errors.addError ? "服务器地址不能为空" : ""}
                 onChange={handleChange}/>
         </Grid>
