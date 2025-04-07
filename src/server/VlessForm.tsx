@@ -104,7 +104,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
         {form.scy !== 'none' && (<>
             <Grid size={12} sx={{mt: 2}}>
                 <SelectField
-                    label="TLS ALPN 协议" id="vless-alpn" value={form.alpn} options={alpnList}
+                    label="TLS ALPN 协议" id="vless-alpn" value={form.alpn || 'h2, http/1.1'} options={alpnList}
                     onChange={(value) => setFormData('alpn', value)}/>
             </Grid>
             <Grid size={12}>

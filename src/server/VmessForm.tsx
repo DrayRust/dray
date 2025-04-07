@@ -111,7 +111,7 @@ export const VmessForm = ({form, errors, handleChange, setFormData}: VmessFormPr
         </Grid>
         {form.tls && (<>
             <Grid size={12}>
-                <SelectField label="TLS ALPN 协议" id="vmess-alpn" value={form.alpn} options={alpnList}
+                <SelectField label="TLS ALPN 协议" id="vmess-alpn" value={form.alpn || 'h2, http/1.1'} options={alpnList}
                              onChange={(value) => setFormData('alpn', value)}/>
             </Grid>
             <Grid size={12}>
