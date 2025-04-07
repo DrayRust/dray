@@ -181,7 +181,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
                         <ToggleButton value="trojan">Trojan</ToggleButton>
                     </ToggleButtonGroup>
                 </Grid>
-                <Grid size={12} sx={{mb: 2}}>
+                <Grid size={12} sx={{mt: 1, mb: 2}}>
                     <TextField
                         fullWidth size="small" label="服务器名称(postscript)"
                         value={ps}
