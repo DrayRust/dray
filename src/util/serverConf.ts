@@ -53,32 +53,53 @@ function vmessRowToConf(row: VmessRow): any {
 }
 
 function vlessRowToConf(row: VlessRow): any {
+    let settings = {}
+    if (row.scy && row.scy !== 'none') {
+        settings = {...settings, tlsSettings: getTlsSettings(row)}
+    }
+
+    if (row.scy === 'reality') {
+        settings = {...settings, realitySettings: getRealitySettings(row)}
+    }
+
+    if (row.net === 'ws') {
+        settings = {...settings, wsSettings: getWsSettings(row)}
+    } else if (row.net === 'grpc') {
+        settings = {...settings, grpcSettings: getGrpcSettings(row)}
+    } else if (row.net === 'xhttp') {
+        settings = {...settings, xhttpSettings: getXhttpSettings(row)}
+    }
+
+    // PS: 这个配置设计真的乱，单独设计一个 xtlsSettings 不含义更明确？
+    let flowSettings = {}
+    if (row.flow) {
+        flowSettings = {flow: row.flow}
+    }
+
+    // https://xtls.github.io/config/inbounds/vless.html#clientobject
+    // https://www.v2fly.org/config/protocols/vless.html#outboundconfigurationobject
     return {
         tag: "proxy",
         protocol: "vless",
         settings: {
             vnext: [
                 {
-                    address: row.add,
-                    port: row.port,
+                    address: row.add || '',
+                    port: row.port || '',
                     users: [
                         {
-                            id: row.id,
-                            encryption: 'none',
-                            flow: row.flow || ''
+                            id: row.id || '',
+                            encryption: "none",
+                            ...flowSettings
                         }
                     ]
                 }
             ]
         },
         streamSettings: {
-            network: row.net || 'tcp',
+            network: row.net || '',
             security: row.scy || 'none',
-            realitySettings: {
-                serverName: row.path || '',
-                publicKey: row.pbk || '',
-                fingerprint: row.fp || 'chrome'
-            }
+            ...settings
         }
     }
 }
@@ -101,28 +122,11 @@ function ssRowToConf(row: SsRow): any {
 }
 
 function trojanRowToConf(row: TrojanRow): any {
-    let setting = {}
+    let settings = {}
     if (row.net === 'ws') {
-        // https://xtls.github.io/config/transports/websocket.html
-        setting = {
-            wsSettings: {
-                host: row.add || '',
-                path: row.path || '',
-                headers: {
-                    Host: row.host || ''
-                }
-            }
-        }
+        settings = {wsSettings: getWsSettings(row)}
     } else if (row.net === 'grpc') {
-        // https://xtls.github.io/config/transports/grpc.html
-        setting = {
-            grpcSettings: {
-                serviceName: row.path || '',
-                idle_timeout: 60,
-                permit_without_stream: false,
-                initial_windows_size: 0
-            }
-        }
+        settings = {grpcSettings: getGrpcSettings(row)}
     }
 
     return {
@@ -140,7 +144,67 @@ function trojanRowToConf(row: TrojanRow): any {
         streamSettings: {
             network: row.net || '',
             security: "tls",
-            ...setting
+            ...settings
         }
+    }
+}
+
+// https://xtls.github.io/config/transports/websocket.html
+function getWsSettings(row: { add: string, host: string, path: string }) {
+    return {
+        host: row.add || '',
+        path: row.path || '',
+        headers: {
+            Host: row.host || row.add || ''
+        }
+    }
+}
+
+// PS: 设计的真乱，驼峰命名法 混着 蛇形命名法
+// https://xtls.github.io/config/transports/grpc.html
+// https://www.v2fly.org/config/transport/grpc.html
+function getGrpcSettings(row: { host: string, path: string }) {
+    return {
+        authority: row.host || '',
+        serviceName: row.path || '',
+        idle_timeout: 60,
+        permit_without_stream: false,
+        initial_windows_size: 0
+    }
+}
+
+// https://xtls.github.io/config/transports/xhttp.html
+// https://github.com/XTLS/Xray-core/discussions/4113
+function getXhttpSettings(row: { host: string, path: string }) {
+    return {
+        host: row.host || '',
+        path: row.path || ''
+    }
+}
+
+// https://xtls.github.io/config/transport.html#tlsobject
+function getTlsSettings(row: { host: string, alpn: string, fp: string }) {
+    return {
+        allowInsecure: false,
+        serverName: row.host || '',
+        alpn: row.alpn ? parseAlpn(row.alpn) : ["h2", "http/1.1"],
+        fingerprint: row.fp || '',
+    }
+}
+
+function parseAlpn(alpn: string): string[] {
+    return alpn.split(',').map(item => item.trim())
+}
+
+// https://xtls.github.io/config/transport.html#realityobject
+// https://github.com/XTLS/REALITY
+function getRealitySettings(row: VlessRow) {
+    return {
+        show: false,
+        serverName: row.path || '',
+        fingerprint: row.fp || '',
+        publicKey: row.pbk || '',
+        shortId: row.sid || '',
+        spiderX: row.spx || ''
     }
 }
