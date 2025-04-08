@@ -39,13 +39,12 @@ export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfi
 
 export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
-        const conf = getStatsConf()
         if (!value) {
             delete c.policy
             delete c.metrics
             delete c.stats
         } else {
-            c = {...c, ...conf}
+            c = {...c, ...getStatsConf()}
         }
         const ok = await saveRayConfig(c) // 保存 Ray 配置
         if (ok) {

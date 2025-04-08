@@ -6,6 +6,7 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     conf.log = getLogConf(appDir, rayConfig)
     conf.inbounds = getInboundsConf(config, rayConfig)
     conf.outbounds = getOutboundsConf(row, rayConfig)
+    if (rayConfig.stats_enable) conf = {...conf, ...getStatsConf()}
     return conf
 }
 
