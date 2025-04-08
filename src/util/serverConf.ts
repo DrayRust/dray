@@ -5,7 +5,7 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     let conf: any = {}
     conf.log = getLogConf(appDir, rayConfig)
     conf.inbounds = getInboundsConf(config, rayConfig)
-    conf.outbounds = getOutboundsConf(row)
+    conf.outbounds = getOutboundsConf(row, rayConfig)
     return conf
 }
 
@@ -26,9 +26,14 @@ export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
     return arr
 }
 
-export function getOutboundsConf(row: ServerRow) {
+export function getOutboundsConf(row: ServerRow, rayConfig: RayCommonConfig) {
+    const proxy = serverRowToConf(row)
+    proxy.mux = {
+        enabled: rayConfig.outbounds_mux,
+        concurrency: rayConfig.outbounds_concurrency
+    }
     return [
-        serverRowToConf(row),
+        proxy,
         {
             tag: "direct",
             protocol: "freedom"
