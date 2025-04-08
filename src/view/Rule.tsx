@@ -39,7 +39,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                     </BottomNavigation>
                     {ruleType === 0 ? (
                         <Stack spacing={2}>
-                            <Alert variant="filled" severity="success">
+                            <Alert variant="filled" severity="warning">
                                 通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。比如访问 Google、YouTube 等。
                             </Alert>
                             <TextField
@@ -63,7 +63,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                         </Stack>
                     ) : ruleType === 2 && (
                         <Stack spacing={2}>
-                            <Alert variant="filled" severity="success">
+                            <Alert variant="filled" severity="error">
                                 阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
                             </Alert>
                             <TextField
