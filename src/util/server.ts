@@ -35,6 +35,13 @@ export async function uriToServerRow(uri: string): Promise<ServerRow | null> {
     }
 }
 
+export function getScy(row: { scy: string, net?: string, tls?: boolean }): string {
+    let scy = row.scy
+    if (row.tls) scy += '+tls'
+    if (row.net) scy += '+' + row.net
+    return scy
+}
+
 /**
  * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
  *
@@ -121,16 +128,12 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
 
     if (data.net === 'tcp') data.net = 'raw'
 
-    let scy = data.scy
-    if (data.tls) scy += '+tls'
-    if (data.net) scy += '+' + data.net
-
     return {
         ps,
         on: 0,
         type: 'vmess',
         host: `${data.add}:${data.port}`,
-        scy: scy,
+        scy: getScy(data),
         hash: await hashString(safeJsonStringify(data)),
         data
     }
@@ -229,7 +232,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
         on: 0,
         type: 'vless',
         host: `${data.add}:${data.port}`,
-        scy: data.scy + '+' + data.net,
+        scy: getScy(data),
         hash: await hashString(safeJsonStringify(data)),
         data
     }
@@ -321,7 +324,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
         on: 0,
         type: 'trojan',
         host: `${data.add}:${data.port}`,
-        scy: data.scy + '+' + data.net,
+        scy: getScy(data),
         hash: await hashString(safeJsonStringify(data)),
         data
     }

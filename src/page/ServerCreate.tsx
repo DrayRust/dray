@@ -6,6 +6,7 @@ import { useAppBar } from "../component/useAppBar.tsx"
 import { hashString } from "../util/util.ts"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
+import { getScy } from "../util/server.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { VmessForm } from '../server/VmessForm.tsx'
 import { VlessForm } from '../server/VlessForm.tsx'
@@ -138,13 +139,12 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
         if (!isValid) return
 
         let serverList = await readServerList() || []
-        const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
         const newServer: ServerRow = {
             ps: ps,
             on: 0,
             type: serverType,
             host: `${data.add}:${data.port}`,
-            scy: scy,
+            scy: getScy(data),
             hash: await hashString(JSON.stringify(data)),
             data
         }
