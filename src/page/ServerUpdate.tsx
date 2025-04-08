@@ -23,6 +23,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const [serverList, setServerList] = useState<ServerList>()
     const [serverType, setServerType] = useState('')
     const [ps, setPs] = useState('')
+    const [itemOn, setItemOn] = useState<0 | 1>(0)
 
     const [vmessForm, setVmessForm] = useState<VmessRow>()
     const [vlessForm, setVlessForm] = useState<VlessRow>()
@@ -39,6 +40,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
                 let item = serverList[key]
                 setServerType(item.type)
                 setPs(item.ps)
+                setItemOn(item.on)
 
                 if (item.type === 'vmess') {
                     setVmessForm(item.data as VmessRow)
@@ -106,8 +108,9 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
         let netServerList = serverList ? [...serverList] : []
         if (netServerList[key]) {
             const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
-            const newServer = {
+            const newServer: ServerRow = {
                 ps: ps,
+                on: itemOn,
                 type: serverType,
                 host: `${data.add}:${data.port}`,
                 scy: scy,
