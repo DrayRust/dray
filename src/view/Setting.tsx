@@ -572,7 +572,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 sx={{width: '210px'}}
                             />
                         </Stack>
-                        <Stack direction="row" spacing={2} sx={{p: 2}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2, pt: 0}}>
                             <Button startIcon={<FolderOpenIcon/>} variant="contained" onClick={openWebServerDir}>打开目录</Button>
                             <Button startIcon={<OpenInNewIcon/>} variant="contained" target="_blank"
                                     href={`http://${config.web_server_host}:${config.web_server_port}/dray/`}>打开网站</Button>
