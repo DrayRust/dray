@@ -26,7 +26,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                     <ToggleButton value="dns"><DnsIcon sx={{mr: 1}}/>DNS 规则</ToggleButton>
                 </ToggleButtonGroup>
             </div>
-            <Paper elevation={1} sx={{p: 2, maxWidth: '800px', m: 'auto', overflow: 'auto'}}>
+            <Paper elevation={3} sx={{p: 2, maxWidth: '800px', m: 'auto', overflow: 'auto'}}>
                 {ruleMode === 'route' && (<>
                     <BottomNavigation
                         sx={{mb: 2}}
