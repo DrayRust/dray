@@ -51,6 +51,8 @@ export function getStatsConf() {
         // https://xtls.github.io/config/stats.html
         "stats": {},
 
+        // 这种设计适合 API 调用，但包含冗余数据。建议 xray 官方，通过参数控制返回的数据，减少不必要的信息。
+        // 空了看一下 xray 源码，这种需求比较容易实现
         // 命令行 curl http://127.0.0.1:11111/debug/vars
         // https://xtls.github.io/config/metrics.html
         "metrics": {
@@ -69,11 +71,12 @@ export function getStatsConf() {
             }
         },
 
+        // 这种设计，适合命令行查看，不太适合 API 调用后使用，里面的 name 设计的太长
         // 命令行 ./dray-xray api statsquery --server=127.0.0.1:11112
         // https://xtls.github.io/config/api.html#%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE
         // https://xtls.github.io/config/api.html#%E6%94%AF%E6%8C%81%E7%9A%84-api-%E5%88%97%E8%A1%A8
         // https://www.v2fly.org/config/api.html#%E6%94%AF%E6%8C%81%E7%9A%84-api-%E5%88%97%E8%A1%A8
-        "api": {
+        /*"api": {
             "tag": "api",
             "listen": "127.0.0.1:11112",
             "services": [
@@ -82,7 +85,7 @@ export function getStatsConf() {
                 "LoggerService",
                 "StatsService"
             ]
-        },
+        },*/
     }
 }
 
