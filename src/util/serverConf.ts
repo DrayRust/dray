@@ -51,9 +51,11 @@ export function getStatsConf() {
         // https://xtls.github.io/config/stats.html
         "stats": {},
 
+        // 命令行 curl http://127.0.0.1:11111/debug/vars
         // https://xtls.github.io/config/metrics.html
         "metrics": {
-            "tag": "Metrics",
+            // "tag": "api",
+            // "tag": "Metrics",
             "listen": "127.0.0.1:11111"
         },
 
@@ -67,6 +69,7 @@ export function getStatsConf() {
             }
         },
 
+        // 命令行 ./dray-xray api statsquery --server=127.0.0.1:11112
         // https://xtls.github.io/config/api.html#%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE
         // https://xtls.github.io/config/api.html#%E6%94%AF%E6%8C%81%E7%9A%84-api-%E5%88%97%E8%A1%A8
         // https://www.v2fly.org/config/api.html#%E6%94%AF%E6%8C%81%E7%9A%84-api-%E5%88%97%E8%A1%A8
