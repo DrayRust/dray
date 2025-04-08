@@ -139,8 +139,9 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
         let serverList = await readServerList() || []
         const scy = "net" in data ? `${data.scy}+${data.net}` : data.scy
-        const newServer = {
+        const newServer: ServerRow = {
             ps: ps,
+            on: 0,
             type: serverType,
             host: `${data.add}:${data.port}`,
             scy: scy,
