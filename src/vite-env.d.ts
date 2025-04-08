@@ -63,6 +63,7 @@ interface PrevLogContent {
 // ============= server ============
 interface ServerRow {
     ps: string; // 附言 postscript / 服务器备注 remark
+    on: 0 | 1; // 是否启用 0: 未启用 1: 启用
     host: string; // 主机名+端口 如：example.com:8080
     type: string; // 类型 vless / vmess / ss / trojan
     scy: string; // 安全类型 security
