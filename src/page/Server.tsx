@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
     Menu, MenuItem, IconButton, Divider,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { readText } from '@tauri-apps/plugin-clipboard-manager'
 
+import { readText } from '@tauri-apps/plugin-clipboard-manager'
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
@@ -103,13 +103,28 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!rayCommonConfig) rayCommonConfig = await loadRayCommonConfig()
     }
 
+    const setEnable = async (selectedKey: number) => {
+        if (!serverList) return
+        const newServerList = serverList.map((server, index) => {
+            server.on = index === selectedKey ? 1 : 0
+            return server
+        })
+        const ok = await saveServerList(newServerList)
+        if (!ok) {
+            showSnackbar('设置启用失败', 'error')
+        }
+    }
+
     const handleEnable = async () => {
         await initConfig()
         if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
             const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
             if (conf) {
                 const ok = await saveRayConfig(conf)
-                if (ok) restartRay()
+                if (ok) {
+                    await setEnable(selectedKey)
+                    restartRay()
+                }
             } else {
                 showSnackbar('生成 conf 失败', 'error')
             }
@@ -286,8 +301,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {row.ps}
+                                    {row.on && <Chip label="启用" color="success" size="small" sx={{ml: 1}}/>}
                                     {isMediumScreen && (
-                                        <Typography color="secondary">{row.type} <Typography color="info" component="span">{row.scy}</Typography></Typography>
+                                        <Typography color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography></Typography>
                                     )}
                                 </TableCell>
                                 <TableCell>{row.host}</TableCell>
