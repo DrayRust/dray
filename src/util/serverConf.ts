@@ -28,9 +28,11 @@ export function getInboundsConf(config: AppConfig, rayConfig: RayCommonConfig) {
 
 export function getOutboundsConf(row: ServerRow, rayConfig: RayCommonConfig) {
     const proxy = serverRowToConf(row)
-    proxy.mux = {
-        enabled: rayConfig.outbounds_mux,
-        concurrency: rayConfig.outbounds_concurrency
+    if (rayConfig.outbounds_mux) {
+        proxy.mux = {
+            enabled: rayConfig.outbounds_mux,
+            concurrency: rayConfig.outbounds_concurrency
+        }
     }
     return [
         proxy,

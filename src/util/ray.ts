@@ -11,7 +11,8 @@ export function getSocksConf(config: AppConfig, rayCommonConfig: RayCommonConfig
         },
         sniffing: {
             enabled: rayCommonConfig.socks_sniffing,
-            destOverride: rayCommonConfig.socks_sniffing_dest_override
+            destOverride: rayCommonConfig.socks_sniffing_dest_override,
+            // metadataOnly: false
         }
     }
 }
@@ -134,12 +135,11 @@ export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommo
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
         for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].protocol === "socks") {
-                c.inbounds[i].sniffing = {
-                    enabled: value,
-                    destOverride: rayCommonConfig.socks_sniffing_dest_override,
-                    metadataOnly: false
-                }
+            const inbounds = c.inbounds[i]
+            if (inbounds.protocol === "socks") {
+                if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {}
+                inbounds.sniffing.enabled = value
+                inbounds.sniffing.destOverride = rayCommonConfig.socks_sniffing_dest_override
                 // break
             }
         }
@@ -155,8 +155,10 @@ export function raySocksDestOverrideChange(value: string[], rayCommonConfig: Ray
     readRayConfig().then(async c => {
         if (!c.inbounds || !Array.isArray(c.inbounds)) return
         for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].protocol === "socks" && c.inbounds[i].sniffing) {
-                c.inbounds[i].sniffing.destOverride = value
+            const inbounds = c.inbounds[i]
+            if (inbounds.protocol === "socks") {
+                if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {enabled: rayCommonConfig.socks_sniffing}
+                inbounds.sniffing.destOverride = value
                 // break
             }
         }
