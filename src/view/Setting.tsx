@@ -351,21 +351,21 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
             <Box className="scrollbar-none" sx={{p: 2, m: '0 auto', maxWidth: 660, height: 'calc(100% - 48px)', overflow: 'auto'}}>
                 {activeTab === 0 ? (
                     <Card>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                        <div className="flex-between p2">
                             <Typography variant="body1">外观</Typography>
                             <ButtonGroup variant="contained">
                                 <Button onClick={() => handleTheme('light')} variant={mode === 'light' ? 'contained' : 'outlined'}>亮色</Button>
                                 <Button onClick={() => handleTheme('dark')} variant={mode === 'dark' ? 'contained' : 'outlined'}>暗色</Button>
                                 <Button onClick={() => handleTheme('system')} variant={mode === 'system' ? 'contained' : 'outlined'}>跟随系统</Button>
                             </ButtonGroup>
-                        </Stack>
+                        </div>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                        <div className="flex-between p2">
                             <Typography variant="body1">开机启动</Typography>
                             <Switch checked={autoStart} onChange={handleAutoStart}/>
-                        </Stack>
+                        </div>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                        <div className="flex-between p2">
                             <Typography variant="body1">日志级别</Typography>
                             <FormControl sx={{minWidth: 120}} size="small">
                                 <Select value={config.app_log_level} onChange={handleAppLogLevel}>
@@ -377,7 +377,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <MenuItem value="trace">追踪日志</MenuItem>
                                 </Select>
                             </FormControl>
-                        </Stack>
+                        </div>
                     </Card>
                 ) : activeTab === 1 ? (
                     <Card>
@@ -385,40 +385,40 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>PAC 自动配置代理</Typography>
                                     <Switch checked={config.auto_setup_pac} onChange={handleAutoSetupPac}/>
-                                </Stack>
+                                </div>
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
                                     <Switch checked={config.auto_setup_socks} onChange={handleAutoSetupSocks}/>
-                                </Stack>
+                                </div>
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
                                     <Switch checked={config.auto_setup_http} onChange={handleAutoSetupHttp}/>
-                                </Stack>
+                                </div>
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{width: '100%'}}>
+                                <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>HTTPS 代理</Typography>
                                     <Switch checked={config.auto_setup_https} onChange={handleAutoSetupHttps}/>
-                                </Stack>
+                                </div>
                             </ListItemButton>
                         </ListItem>
                     </Card>
                 ) : activeTab === 2 ? (
                     <Card>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                        <div className="flex-between p2">
                             <Typography variant="body1">Ray 日志级别</Typography>
                             <FormControl sx={{minWidth: 120}} size="small">
                                 <Select value={rayCommonConfig.ray_log_level} onChange={handleRayLogLevel}>
@@ -429,12 +429,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <MenuItem value="debug">调试日志</MenuItem>
                                 </Select>
                             </FormControl>
-                        </Stack>
+                        </div>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                        <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>流量统计</Typography>
                             <Switch checked={rayCommonConfig.stats_enable} onChange={handleRayStatsEnabled}/>
-                        </Stack>
+                        </div>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
@@ -468,26 +468,26 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             />
                         </Stack>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                        <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
                             <Switch checked={rayCommonConfig.socks_enable} onChange={handleRaySocksEnabled} disabled/>
-                        </Stack>
+                        </div>
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                        <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
                             <Switch checked={rayCommonConfig.http_enable} onChange={handleRayHttpEnabled}/>
-                        </Stack>
+                        </div>
                         {rayCommonConfig.socks_enable && (<>
                             <Divider/>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <div className="flex-between p1">
                                 <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
                                 <Switch checked={rayCommonConfig.socks_udp} onChange={handleRaySocksUdp}/>
-                            </Stack>
+                            </div>
                             <Divider/>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <div className="flex-between p1">
                                 <Typography variant="body1" sx={{pl: 1}}>Sniffing 探测</Typography>
                                 <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
-                            </Stack>
+                            </div>
                             {rayCommonConfig.socks_sniffing && (<>
                                 <Divider/>
                                 <Stack spacing={2} sx={{p: 2}}>
@@ -529,12 +529,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </>)}
 
                         <Divider/>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                        <div className="flex-between p1">
                             <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢。" placement="right">
                                 <Typography variant="body1" sx={{pl: 1}}>Mux 协议</Typography>
                             </Tooltip>
                             <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayOutboundsMux}/>
-                        </Stack>
+                        </div>
                         {rayCommonConfig.outbounds_mux && (<>
                             <Divider/>
                             <Stack sx={{p: 2}}>
@@ -549,10 +549,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 ) : activeTab === 3 && (
                     <Card>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
+                        <div className="flex-between p2">
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
                             <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
-                        </Stack>
+                        </div>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField

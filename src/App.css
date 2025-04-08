@@ -99,6 +99,18 @@ body, html {
     align-items: center;
 }
 
+.flex-between.p1 {
+    padding: 8px;
+}
+
+.flex-between.p2 {
+    padding: 16px;
+}
+
+.flex-between.w100 {
+    width: 100%;
+}
+
 .flex-center {
     display: flex;
     justify-content: center;
