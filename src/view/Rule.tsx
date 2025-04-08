@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Box, Button, Alert, Typography, Switch,
+    Stack, Box, Button, Alert, Typography, Switch, MenuItem,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -18,9 +18,14 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
     const [globalProxy, setGlobalProxy] = useState(false)
+    const [domainStrategy, setDomainStrategy] = useState('IPIfNonMatch')
 
     const handleGlobalProxy = () => {
         setGlobalProxy(!globalProxy)
+    }
+
+    const handleDomainStrategy = (e: any) => {
+        setDomainStrategy(e.target.value)
     }
 
     return (
@@ -36,6 +41,17 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
                         <Switch checked={globalProxy} onChange={handleGlobalProxy}/>
+                    </div>
+                    <div className="flex-between p1">
+                        <TextField
+                            select fullWidth size="small"
+                            label="域名匹配策略"
+                            value={domainStrategy}
+                            onChange={handleDomainStrategy}>
+                            <MenuItem value="AsIs">仅使用域名匹配</MenuItem>
+                            <MenuItem value="IPIfNonMatch">优先域名匹配，IP次选</MenuItem>
+                            <MenuItem value="IPOnDemand">优先解析IP匹配，域名次选</MenuItem>
+                        </TextField>
                     </div>
                     {!globalProxy && (<>
                         <BottomNavigation
