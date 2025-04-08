@@ -338,9 +338,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const destOverride = rayCommonConfig.socks_sniffing_dest_override
-    const sxBox = {p: 2, m: '0 auto', maxWidth: 660}
     return (
-        <Paper elevation={3} sx={{borderRadius: 2, overflow: 'visible'}}>
+        <Paper elevation={3} sx={{borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
             <Paper elevation={1} sx={{display: 'flex', justifyContent: 'center', borderRadius: '8px 8px 0 0'}}>
                 <Tabs value={activeTab} onChange={handleTab} aria-label="设置导航">
                     <Tab label="基本设置"/>
@@ -349,8 +348,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Tab label="Web 设置"/>
                 </Tabs>
             </Paper>
-            {activeTab === 0 ? (
-                <Box sx={sxBox}>
+            <Box className="scrollbar-none" sx={{p: 2, m: '0 auto', maxWidth: 660, height: 'calc(100% - 48px)', overflow: 'auto'}}>
+                {activeTab === 0 ? (
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">外观</Typography>
@@ -380,9 +379,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </FormControl>
                         </Stack>
                     </Card>
-                </Box>
-            ) : activeTab === 1 ? (
-                <Box sx={sxBox}>
+                ) : activeTab === 1 ? (
                     <Card>
                         <Typography variant="body1" sx={{p: 2}}>自动设置</Typography>
                         <Divider/>
@@ -419,9 +416,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </ListItemButton>
                         </ListItem>
                     </Card>
-                </Box>
-            ) : activeTab === 2 ? (
-                <Box sx={sxBox}>
+                ) : activeTab === 2 ? (
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1">Ray 日志级别</Typography>
@@ -552,9 +547,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             </Stack>
                         </>)}
                     </Card>
-                </Box>
-            ) : activeTab === 3 && (
-                <Box sx={sxBox}>
+                ) : activeTab === 3 && (
                     <Card>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 2}}>
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
@@ -585,8 +578,8 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     href={`http://${config.web_server_host}:${config.web_server_port}/dray/`}>打开网站</Button>
                         </Stack>
                     </Card>
-                </Box>
-            )}
+                )}
+            </Box>
         </Paper>
     )
 }

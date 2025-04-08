@@ -64,6 +64,10 @@ body, html {
     overflow-y: auto;
 }
 
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
 .log-view {
     -webkit-user-select: auto;
     user-select: auto;
@@ -93,4 +97,10 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
 }
