@@ -175,14 +175,17 @@ export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommon
         if (!c.outbounds || !Array.isArray(c.outbounds)) return
         for (let i = 0; i < c.outbounds.length; i++) {
             const outbound = c.outbounds[i]
-            if (outbound.mux) {
-                outbound.mux.enabled = value
-                outbound.mux.concurrency = rayCommonConfig.outbounds_concurrency
-            } else if (outbound.tag === "proxy") {
-                outbound.mux = {
-                    enabled: value,
-                    concurrency: rayCommonConfig.outbounds_concurrency
+            if (outbound.tag === "proxy") {
+                if (typeof outbound.mux === 'object') {
+                    outbound.mux.enabled = value
+                    outbound.mux.concurrency = rayCommonConfig.outbounds_concurrency
+                } else {
+                    outbound.mux = {
+                        enabled: value,
+                        concurrency: rayCommonConfig.outbounds_concurrency
+                    }
                 }
+                c.outbounds[i] = outbound
             }
         }
         const ok = await saveRayConfig(c)
@@ -198,8 +201,13 @@ export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: Ra
         if (!c.outbounds || !Array.isArray(c.outbounds)) return
         for (let i = 0; i < c.outbounds.length; i++) {
             const outbound = c.outbounds[i]
-            if (outbound.mux?.enabled) {
-                outbound.mux.concurrency = value
+            if (outbound.tag === "proxy") {
+                if (typeof outbound.mux === 'object') {
+                    outbound.mux.concurrency = value
+                } else {
+                    outbound.mux = {enabled: rayCommonConfig.outbounds_mux, concurrency: value}
+                }
+                c.outbounds[i] = outbound
             }
         }
         const ok = await saveRayConfig(c)
