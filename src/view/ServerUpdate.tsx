@@ -9,10 +9,10 @@ import { readServerList, saveServerList } from "../util/invoke.ts"
 import { getScy } from "../util/server.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { LoadingCard, ErrorCard } from "../component/useCard.tsx"
-import { VmessForm } from '../server/VmessForm.tsx'
-import { VlessForm } from '../server/VlessForm.tsx'
-import { SsForm } from '../server/SsForm.tsx'
-import { TrojanForm } from '../server/TrojanForm.tsx'
+import { VmessForm } from './ServerFormVmess.tsx'
+import { VlessForm } from './ServerFormVless.tsx'
+import { SsForm } from './ServerFormSs.tsx'
+import { TrojanForm } from './ServerFormTrojan.tsx'
 
 const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
