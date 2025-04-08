@@ -135,7 +135,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['stats_enable']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, stats_enable: value}
-            rayStatsEnabledChange(value, config, updatedConfig)
+            rayStatsEnabledChange(value, updatedConfig)
             return updatedConfig
         })
     }

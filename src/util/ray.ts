@@ -1,4 +1,5 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
+import { getStatsConf } from "./serverConf.ts"
 
 export function getSocksConf(config: AppConfig, rayCommonConfig: RayCommonConfig) {
     return {
@@ -32,6 +33,24 @@ export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfi
             c.log.loglevel = value
             const ok = await saveRayConfig(c) // 保存 Ray 配置
             ok && await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+        }
+    }).catch(_ => 0)
+}
+
+export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommonConfig) {
+    readRayConfig().then(async c => {
+        const conf = getStatsConf()
+        if (!value) {
+            delete c.policy
+            delete c.metrics
+            delete c.stats
+        } else {
+            c = {...c, ...conf}
+        }
+        const ok = await saveRayConfig(c) // 保存 Ray 配置
+        if (ok) {
+            await saveRayCommonConfig(rayCommonConfig).catch(_ => 0) // 保存 Ray Common 配置
+            restartRay() // 重启 Ray 服务
         }
     }).catch(_ => 0)
 }
