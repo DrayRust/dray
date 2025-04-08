@@ -22,10 +22,6 @@ import {
 } from "../util/invoke.ts"
 import { getConf } from "../util/serverConf.ts"
 
-let appDir: string
-let config: AppConfig
-let rayCommonConfig: RayCommonConfig
-
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
     const navigate = useNavigate()
@@ -97,6 +93,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_update?key=${selectedKey}`)
     }
 
+    // 必须放内部，否则不会读取最新配置文件
+    let appDir: string
+    let config: AppConfig
+    let rayCommonConfig: RayCommonConfig
     const initConfig = async () => {
         if (!appDir) appDir = await getDrayAppDir()
         if (!config) config = await readAppConfig()
