@@ -1,11 +1,10 @@
 import { Grid } from '@mui/material'
 import { TextField } from '@mui/material'
-import { AutoCompleteField } from '../component/AutoCompleteField'
-import { PasswordInput } from '../component/PasswordInput'
-import { ssMethodList } from "../util/serverOption.ts"
+import { SelectField } from '../../component/SelectField.tsx'
+import { trojanNetworkTypeList } from "../../util/serverOption.ts"
 
-interface SsFormProps {
-    form: SsRow
+interface TrojanFormProps {
+    form: TrojanRow
     errors: {
         addError: boolean
         portError: boolean
@@ -15,7 +14,7 @@ interface SsFormProps {
     setFormData: (name: string, value: any) => void
 }
 
-export const SsForm = ({form, errors, handleChange, setFormData}: SsFormProps) => {
+export const TrojanForm = ({form, errors, handleChange, setFormData}: TrojanFormProps) => {
     return (<>
         <Grid size={{xs: 12, md: 8}}>
             <TextField
@@ -30,17 +29,25 @@ export const SsForm = ({form, errors, handleChange, setFormData}: SsFormProps) =
                 onChange={handleChange}/>
         </Grid>
         <Grid size={12}>
-            <PasswordInput
-                label="密码(password)" value={form.pwd}
+            <TextField
+                fullWidth size="small" label="密码(password)" name="pwd" value={form.pwd}
                 error={errors.pwdError} helperText={errors.pwdError ? "密码不能为空" : ""}
-                onChange={(value) => {
-                    setFormData('pwd', value)
-                }}/>
+                onChange={handleChange}/>
+        </Grid>
+
+        <Grid size={12} sx={{mt: 2}}>
+            <SelectField
+                label="传输方式(network)" id="trojan-network" value={form.net} options={trojanNetworkTypeList}
+                onChange={(value) => setFormData('net', value)}/>
         </Grid>
         <Grid size={12}>
-            <AutoCompleteField
-                label="加密方式(method)" id="ss-method" value={form.scy} options={ssMethodList}
-                onChange={(value) => setFormData('scy', value)}/>
+            <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={form.host} onChange={handleChange}/>
+        </Grid>
+        <Grid size={12}>
+            <TextField
+                fullWidth size="small"
+                label={form.net !== 'grpc' ? '伪装路径(path)' : '伪装主机名(serviceName)'}
+                name="path" value={form.path} onChange={handleChange}/>
         </Grid>
     </>)
 }

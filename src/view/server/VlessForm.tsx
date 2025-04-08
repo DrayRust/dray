@@ -1,17 +1,12 @@
 import { Grid } from '@mui/material'
 import { TextField, Stack, Button } from '@mui/material'
-import { SelectField } from '../component/SelectField'
-import { AutoCompleteField } from '../component/AutoCompleteField'
+import { SelectField } from '../../component/SelectField.tsx'
+import { AutoCompleteField } from '../../component/AutoCompleteField.tsx'
 import {
-    vlessNetworkTypeList,
-    vlessSecurityList,
-    grpcModeList,
-    xhttpModeList,
-    alpnList,
-    fingerprintList,
-    flowList
-} from "../util/serverOption.ts"
-import { generateUUID } from "../util/util.ts"
+    vlessNetworkTypeList, vlessSecurityList,
+    grpcModeList, xhttpModeList, alpnList, fingerprintList, flowList
+} from "../../util/serverOption.ts"
+import { generateUUID } from "../../util/util.ts"
 
 interface VlessFormProps {
     form: VlessRow

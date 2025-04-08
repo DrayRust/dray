@@ -1,17 +1,11 @@
-import { Grid, Stack, Typography, Switch } from '@mui/material'
-import { SelectField } from '../component/SelectField'
-import { AutoCompleteField } from '../component/AutoCompleteField'
-import { TextField, Button } from '@mui/material'
+import { Grid, Stack, Typography, Switch, TextField, Button } from '@mui/material'
+import { SelectField } from '../../component/SelectField.tsx'
+import { AutoCompleteField } from '../../component/AutoCompleteField.tsx'
 import {
-    vmessNetworkTypeList,
-    vmessSecurityList,
-    kcpHeaderTypeList,
-    rawHeaderTypeList,
-    grpcModeList,
-    alpnList,
-    fingerprintList
-} from "../util/serverOption.ts"
-import { generateUUID } from "../util/util.ts"
+    vmessNetworkTypeList, vmessSecurityList,
+    kcpHeaderTypeList, rawHeaderTypeList, grpcModeList, alpnList, fingerprintList
+} from "../../util/serverOption.ts"
+import { generateUUID } from "../../util/util.ts"
 
 interface VmessFormProps {
     form: VmessRow
