@@ -1,29 +1,25 @@
 import { useState, useEffect } from 'react'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
-import RestoreIcon from '@mui/icons-material/Restore'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
+import SendIcon from '@mui/icons-material/Send'
+import FlightIcon from '@mui/icons-material/Flight'
+import BlockIcon from '@mui/icons-material/Block'
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         setNavState(3)
     }, [setNavState])
 
-    const [value, setValue] = useState(0)
-    return <div>
+    const [ruleType, setRuleType] = useState(0)
+    return <>
         <BottomNavigation
-            showLabels
-            value={value}
-            onChange={(_event, newValue) => {
-                setValue(newValue)
-            }}
-        >
-            <BottomNavigationAction label="Recents" icon={<RestoreIcon/>}/>
-            <BottomNavigationAction label="Favorites" icon={<FavoriteIcon/>}/>
-            <BottomNavigationAction label="Nearby" icon={<LocationOnIcon/>}/>
+            showLabels value={ruleType}
+            onChange={(_, v) => setRuleType(v)}>
+            <BottomNavigationAction label="代理" icon={<SendIcon/>}/>
+            <BottomNavigationAction label="直连" icon={<FlightIcon/>}/>
+            <BottomNavigationAction label="拒绝" icon={<BlockIcon/>}/>
         </BottomNavigation>
-    </div>
+    </>
 }
 
 export default Rule
