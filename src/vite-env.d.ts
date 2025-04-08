@@ -20,6 +20,7 @@ interface AppConfig {
 
 interface RayCommonConfig {
     ray_log_level: "debug" | "info" | "warning" | "error" | "none";
+    stats_enable: boolean; // 是否启用流量统计功能
 
     socks_enable: boolean;
     http_enable: boolean;

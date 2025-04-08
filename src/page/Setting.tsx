@@ -28,7 +28,7 @@ import {
     openWebServerDir,
 } from '../util/invoke.ts'
 import {
-    rayLogLevelChange,
+    rayLogLevelChange, rayStatsEnabledChange,
     rayHostChange, raySocksPortChange, rayHttpPortChange,
     raySocksEnabledChange, rayHttpEnabledChange,
     raySocksUdpChange,
@@ -127,6 +127,15 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, ray_log_level: value}
             rayLogLevelChange(value, updatedConfig)
+            return updatedConfig
+        })
+    }
+
+    const handleRayStatsEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.checked as RayCommonConfig['stats_enable']
+        setRayCommonConfig(prevConfig => {
+            const updatedConfig = {...prevConfig, stats_enable: value}
+            rayStatsEnabledChange(value, config, updatedConfig)
             return updatedConfig
         })
     }
@@ -425,6 +434,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <MenuItem value="debug">调试日志</MenuItem>
                                 </Select>
                             </FormControl>
+                        </Stack>
+                        <Divider/>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{p: 1}}>
+                            <Typography variant="body1" sx={{pl: 1}}>流量统计</Typography>
+                            <Switch checked={rayCommonConfig.stats_enable} onChange={handleRayStatsEnabled}/>
                         </Stack>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
