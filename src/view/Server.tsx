@@ -305,10 +305,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
+                                    <div className="flex-between">
                                         {row.host}
                                         {Boolean(row.on) && (<Chip label="启用" color="success" size="small"/>)}
-                                    </Stack>
+                                    </div>
                                 </TableCell>
                                 {!isMediumScreen && (<><TableCell>{row.type}</TableCell><TableCell>{row.scy}</TableCell></>)}
                                 <TableCell padding="checkbox">
