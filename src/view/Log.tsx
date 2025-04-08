@@ -58,7 +58,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>日志名称</TableCell>
-                            <TableCell align="right" sx={{width: '120px'}}>日志大小</TableCell>
+                            <TableCell align="right" sx={{width: '150px'}}>日志大小</TableCell>
                             <TableCell align="right" sx={{width: '180px'}}>最近更新</TableCell>
                         </TableRow>
                     </TableHead>
