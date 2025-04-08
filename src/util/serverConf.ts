@@ -72,6 +72,7 @@ export function getStatsConf() {
         // https://www.v2fly.org/config/api.html#%E6%94%AF%E6%8C%81%E7%9A%84-api-%E5%88%97%E8%A1%A8
         "api": {
             "tag": "api",
+            "listen": "127.0.0.1:11112",
             "services": [
                 "HandlerService",
                 // "RoutingService",
