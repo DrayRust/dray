@@ -278,9 +278,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                           onChange={(e) => handleSelectAll(e.target.checked)}/>
                             </TableCell>
                             <TableCell>服务器名称</TableCell>
-                            <TableCell>服务器地址</TableCell>
-                            {!isMediumScreen && (<TableCell sx={{width: '100px'}}>协议类型</TableCell>)}
-                            {!isMediumScreen && (<TableCell sx={{width: '200px'}}>安全类型</TableCell>)}
+                            <TableCell sx={{width: '280px'}}>服务器地址</TableCell>
+                            {!isMediumScreen && (<><TableCell sx={{width: '100px'}}>协议类型</TableCell><TableCell sx={{width: '200px'}}>安全类型</TableCell></>)}
                             <TableCell padding="checkbox"/>
                         </TableRow>
                     </TableHead>
@@ -301,14 +300,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {row.ps}
-                                    {row.on && <Chip label="启用" color="success" size="small" sx={{ml: 1}}/>}
                                     {isMediumScreen && (
                                         <Typography color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography></Typography>
                                     )}
                                 </TableCell>
-                                <TableCell>{row.host}</TableCell>
-                                {!isMediumScreen && (<TableCell>{row.type}</TableCell>)}
-                                {!isMediumScreen && (<TableCell>{row.scy}</TableCell>)}
+                                <TableCell>
+                                    <Stack direction="row" sx={{justifyContent: "space-between", alignItems: "center"}}>
+                                        {row.host}
+                                        {Boolean(row.on) && (<Chip label="启用" color="success" size="small"/>)}
+                                    </Stack>
+                                </TableCell>
+                                {!isMediumScreen && (<><TableCell>{row.type}</TableCell><TableCell>{row.scy}</TableCell></>)}
                                 <TableCell padding="checkbox">
                                     <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
                                 </TableCell>
