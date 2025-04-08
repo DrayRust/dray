@@ -20,17 +20,17 @@ import {
 import { ThemeProvider } from './context/ThemeProvider.tsx'
 import { useWindowFocus } from './hook/useWindowFocus.ts'
 
-import Home from "./page/Home.tsx"
-import Server from "./page/Server.tsx"
-import ServerCreate from "./page/ServerCreate.tsx"
-import ServerExport from "./page/ServerExport.tsx"
-import ServerImport from "./page/ServerImport.tsx"
-import ServerUpdate from "./page/ServerUpdate.tsx"
-import Subscription from "./page/Subscription.tsx"
-import Rule from "./page/Rule.tsx"
-import Log from "./page/Log.tsx"
-import LogDetail from "./page/LogDetail.tsx"
-import Setting from "./page/Setting.tsx"
+import Home from "./view/Home.tsx"
+import Server from "./view/Server.tsx"
+import ServerCreate from "./view/ServerCreate.tsx"
+import ServerExport from "./view/ServerExport.tsx"
+import ServerImport from "./view/ServerImport.tsx"
+import ServerUpdate from "./view/ServerUpdate.tsx"
+import Subscription from "./view/Subscription.tsx"
+import Rule from "./view/Rule.tsx"
+import Log from "./view/Log.tsx"
+import LogDetail from "./view/LogDetail.tsx"
+import Setting from "./view/Setting.tsx"
 
 import { invoke } from "@tauri-apps/api/core"
 import { getCurrentWindow } from '@tauri-apps/api/window'
