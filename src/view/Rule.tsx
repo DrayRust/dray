@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Box, Button, Alert, Typography, Switch, MenuItem,
+    Stack, Button, Alert, Typography, Switch,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -9,6 +9,9 @@ import DnsIcon from '@mui/icons-material/Dns'
 import SendIcon from '@mui/icons-material/Send'
 import FlightIcon from '@mui/icons-material/Flight'
 import BlockIcon from '@mui/icons-material/Block'
+import SettingsIcon from '@mui/icons-material/Settings'
+
+import { RuleAdvanced } from './RuleAdvanced.tsx'
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -18,19 +21,19 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
     const [globalProxy, setGlobalProxy] = useState(false)
-    const [domainStrategy, setDomainStrategy] = useState('IPIfNonMatch')
 
     const handleGlobalProxy = () => {
         setGlobalProxy(!globalProxy)
     }
 
-    const handleDomainStrategy = (e: any) => {
-        setDomainStrategy(e.target.value)
+    const [open, setOpen] = useState(false)
+    const handleOpenAdvanced = () => {
+        setOpen(true)
     }
 
-    return (
+    return (<>
         <Paper elevation={5} sx={{p: 1, borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
-            <div className="flex-center">
+            <div className="flex-center p1">
                 <ToggleButtonGroup exclusive value={ruleMode} onChange={(_, v) => v && setRuleMode(v)}>
                     <ToggleButton value="route"><RouteIcon sx={{mr: 1}}/>访问规则</ToggleButton>
                     <ToggleButton value="dns"><DnsIcon sx={{mr: 1}}/>DNS 规则</ToggleButton>
@@ -41,17 +44,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
                         <Switch checked={globalProxy} onChange={handleGlobalProxy}/>
-                    </div>
-                    <div className="flex-between p1">
-                        <TextField
-                            select fullWidth size="small"
-                            label="域名匹配策略"
-                            value={domainStrategy}
-                            onChange={handleDomainStrategy}>
-                            <MenuItem value="AsIs">仅使用域名匹配</MenuItem>
-                            <MenuItem value="IPIfNonMatch">优先域名匹配，IP次选</MenuItem>
-                            <MenuItem value="IPOnDemand">优先解析IP匹配，域名次选</MenuItem>
-                        </TextField>
                     </div>
                     {!globalProxy && (<>
                         <BottomNavigation
@@ -71,9 +63,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField
                                     variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
                                     placeholder="每行一条，例如：google.com" autoFocus={true}/>
-                                <Box>
-                                    <Button variant="contained" fullWidth>确认</Button>
-                                </Box>
                             </Stack>
                         ) : ruleType === 1 ? (
                             <Stack spacing={2}>
@@ -83,9 +72,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField
                                     variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
                                     placeholder="每行一条，例如：baidu.com" autoFocus={true}/>
-                                <Box>
-                                    <Button variant="contained" fullWidth>确认</Button>
-                                </Box>
                             </Stack>
                         ) : ruleType === 2 && (
                             <Stack spacing={2}>
@@ -95,11 +81,12 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField
                                     variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
                                     placeholder="每行一条，例如：360.cn" autoFocus={true}/>
-                                <Box>
-                                    <Button variant="contained" fullWidth>确认</Button>
-                                </Box>
                             </Stack>
                         )}
+                        <div className="flex-between mt2">
+                            <Button variant="contained" color="info">确认</Button>
+                            <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
+                        </div>
                     </>)}
                 </>)}
 
@@ -107,7 +94,8 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 </>)}
             </Paper>
         </Paper>
-    )
+        <RuleAdvanced open={open} setOpen={setOpen}/>
+    </>)
 }
 
 export default Rule

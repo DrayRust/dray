@@ -99,6 +99,14 @@ body, html {
     align-items: center;
 }
 
+.flex-between.mt1 {
+    margin-top: 8px;
+}
+
+.flex-between.mt2 {
+    margin-top: 16px;
+}
+
 .flex-between.p1 {
     padding: 8px;
 }
