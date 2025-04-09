@@ -118,22 +118,28 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const handleEnable = async () => {
+    const getServerConf = async (callback: (conf: any) => void) => {
         await initConfig()
         if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
             const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
             if (conf) {
-                const ok = await saveRayConfig(conf)
-                if (ok) {
-                    await setEnable(selectedKey)
-                    restartRay()
-                }
+                callback(conf)
             } else {
                 showSnackbar('生成 conf 失败', 'error')
             }
         } else {
             showSnackbar('获取配置信息失败', 'error')
         }
+    }
+
+    const handleEnable = async () => {
+        await getServerConf(async (conf) => {
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                await setEnable(selectedKey)
+                restartRay()
+            }
+        })
         handleMenuClose()
     }
 
@@ -142,17 +148,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const handleCloseDrawer = () => setOpenDrawer(false)
     const handleViewConfig = async () => {
         setOpenDrawer(true)
-        await initConfig()
-        if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
-            const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
-            if (conf) {
-                setRayConfigJson(JSON.stringify(conf, null, 2))
-            } else {
-                showSnackbar('生成 conf 失败', 'error')
-            }
-        } else {
-            showSnackbar('获取配置信息失败', 'error')
-        }
+        await getServerConf(async (conf) => {
+            setRayConfigJson(JSON.stringify(conf, null, 2))
+        })
         handleMenuClose()
     }
 
