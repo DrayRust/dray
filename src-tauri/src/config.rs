@@ -181,7 +181,7 @@ pub fn set_auto_setup_https(value: bool) -> bool {
     set_config(|config| config.auto_setup_https = value)
 }
 
-const ALLOWED_CONFIG_FILES: [&str; 5] = ["ray_common_config.json", "server.json", "rule_config.json", "rule_domain.json", "rule_mode_data.json"];
+const ALLOWED_CONFIG_FILES: [&str; 5] = ["ray_common_config.json", "server.json", "rule_config.json", "rule_domain.json", "rule_mode_list.json"];
 
 fn get_conf_path(filename: &str) -> Result<PathBuf, String> {
     if !ALLOWED_CONFIG_FILES.contains(&filename) {

@@ -159,6 +159,99 @@ export async function saveServerList(serverList: ServerList) {
     }
 }
 
+export async function readRuleConfig(): Promise<RuleConfig> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            let s = await invoke('read_conf', {'filename': 'rule_config.json'}) as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s) as RuleConfig
+                resolve(data)
+            } else {
+                reject()
+            }
+        } catch (err) {
+            log.error('Failed to readRuleConfig:', err)
+            reject(err)
+        }
+    })
+}
+
+export async function saveRuleConfig(ruleConfig: RuleConfig) {
+    if (!isTauri) return false
+    try {
+        return invoke<Boolean>('save_conf',
+            {'filename': 'rule_config.json', 'content': JSON.stringify(ruleConfig, null, 2)}
+        )
+    } catch (err) {
+        log.error('Failed to saveRuleConfig:', err)
+        return false
+    }
+}
+
+export async function readRuleDomain(): Promise<RuleDomain> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            let s = await invoke('read_conf', {'filename': 'rule_domain.json'}) as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s) as RuleDomain
+                resolve(data)
+            } else {
+                reject()
+            }
+        } catch (err) {
+            log.error('Failed to readRuleDomain:', err)
+            reject(err)
+        }
+    })
+}
+
+export async function saveRuleDomain(ruleDomain: RuleDomain) {
+    if (!isTauri) return false
+    try {
+        return invoke<Boolean>('save_conf',
+            {'filename': 'rule_domain.json', 'content': JSON.stringify(ruleDomain, null, 2)}
+        )
+    } catch (err) {
+        log.error('Failed to saveRuleDomain:', err)
+        return false
+    }
+}
+
+export async function readRuleModeList(): Promise<RuleModeList> {
+    return new Promise(async (resolve, reject) => {
+        if (!isTauri) return reject()
+        try {
+            let s = await invoke('read_conf', {'filename': 'rule_mode_list.json'}) as string
+            s = s.trim()
+            if (s) {
+                const data = JSON.parse(s) as RuleModeList
+                resolve(data)
+            } else {
+                reject()
+            }
+        } catch (err) {
+            log.error('Failed to readRuleModeList:', err)
+            reject(err)
+        }
+    })
+}
+
+export async function saveRuleModeList(ruleModeList: RuleModeList) {
+    if (!isTauri) return false
+    try {
+        return invoke<Boolean>('save_conf',
+            {'filename': 'rule_mode_list.json', 'content': JSON.stringify(ruleModeList, null, 2)}
+        )
+    } catch (err) {
+        log.error('Failed to saveRuleModeList:', err)
+        return false
+    }
+}
+
 export async function readRayConfig(): Promise<any> {
     return new Promise(async (resolve, reject) => {
         if (!isTauri) return reject()
