@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Button, Alert, Typography, Switch,
+    Stack, Button, Alert, Typography, Switch, MenuItem,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -21,9 +21,14 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
     const [globalProxy, setGlobalProxy] = useState(false)
+    const [unmatchedStrategy, setUnmatchedStrategy] = useState('direct')
 
     const handleGlobalProxy = () => {
         setGlobalProxy(!globalProxy)
+    }
+
+    const handleUnmatchedStrategy = (e: any) => {
+        setUnmatchedStrategy(e.target.value)
     }
 
     const [open, setOpen] = useState(false)
@@ -83,10 +88,20 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                     placeholder="每行一条，例如：360.cn" autoFocus={true}/>
                             </Stack>
                         )}
-                        <div className="flex-between mt2">
-                            <Button variant="contained" color="info">确认</Button>
-                            <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
-                        </div>
+                        <Stack spacing={2} sx={{mt: 2}}>
+                            <TextField
+                                select fullWidth size="small"
+                                label="未匹配上的域名访问策略"
+                                value={unmatchedStrategy}
+                                onChange={handleUnmatchedStrategy}>
+                                <MenuItem value="direct">直接访问</MenuItem>
+                                <MenuItem value="proxy">代理访问</MenuItem>
+                            </TextField>
+                            <div className="flex-between">
+                                <Button variant="contained" color="info">确认</Button>
+                                <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
+                            </div>
+                        </Stack>
                     </>)}
                 </>)}
 
