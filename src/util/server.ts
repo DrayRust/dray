@@ -225,7 +225,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
     data = deepSafeDecodeURI(data)
 
     if (data.net === 'tcp') data.net = 'raw'
-    if (data.flow) data.net = 'xhttp'
+    // if (data.flow) data.net = 'xhttp'
 
     return {
         ps: ps,
