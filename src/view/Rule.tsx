@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Button, Alert, Typography, Switch,
+    Stack, Button, Alert, Typography, Switch, Chip,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -12,7 +12,8 @@ import BlockIcon from '@mui/icons-material/Block'
 import SettingsIcon from '@mui/icons-material/Settings'
 
 import { RuleAdvanced } from './RuleAdvanced.tsx'
-import { readRuleConfig, readRuleDomain } from "../util/invoke.ts"
+import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -44,6 +45,14 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const handleGlobalProxy = () => {
         setRuleConfig(prev => ({...prev, globalProxy: !prev.globalProxy}))
     }
+
+    const [showSuccess, setShowSuccess] = useState(false)
+    const handleSaveRuleDomain = useDebounce(() => {
+        saveRuleDomain(ruleDomain).then(() => {
+            setShowSuccess(true)
+            setTimeout(() => setShowSuccess(false), 1000)
+        }).catch(_ => 0)
+    }, 300)
 
     const [open, setOpen] = useState(false)
     const handleOpenAdvanced = () => {
@@ -80,7 +89,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。比如访问 Google、YouTube 等。
                             </Alert>
                             <TextField
-                                variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                variant="outlined" label="请输入域名" fullWidth multiline rows={10}
                                 value={ruleDomain.proxy} onChange={(e) => setRuleDomain({...ruleDomain, proxy: e.target.value})}
                                 placeholder="每行一条，例如：google.com"/>
                         </>) : ruleType === 1 ? (<>
@@ -88,7 +97,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 直接连接网络，不经过任何代理服务器，适合访问国内网站或不需要加速的场景。比如访问百度、淘宝等。
                             </Alert>
                             <TextField
-                                variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                variant="outlined" label="请输入域名" fullWidth multiline rows={10}
                                 value={ruleDomain.direct} onChange={(e) => setRuleDomain({...ruleDomain, direct: e.target.value})}
                                 placeholder="每行一条，例如：baidu.com"/>
                         </>) : ruleType === 2 && (<>
@@ -96,12 +105,15 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
                             </Alert>
                             <TextField
-                                variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                variant="outlined" label="请输入域名" fullWidth multiline rows={10}
                                 value={ruleDomain.block} onChange={(e) => setRuleDomain({...ruleDomain, block: e.target.value})}
                                 placeholder="每行一条，例如：360.cn"/>
                         </>)}
                         <div className="flex-between">
-                            <Button variant="contained" color="info">确认</Button>
+                            <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                                <Button variant="contained" color="info" onClick={handleSaveRuleDomain}>确认</Button>
+                                {showSuccess && <Chip label="保存成功" color="success" size="small"/>}
+                            </Stack>
                             <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
                         </div>
                     </>)}
