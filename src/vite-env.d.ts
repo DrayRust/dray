@@ -172,6 +172,39 @@ interface TrojanRow {
     path: string; // (ws) 伪装路径 path / (grpc) 伪装主机名 SNI = Server Name Indication 如：example.com
 }
 
+// ============= rule ============
+interface RuleConfig {
+    globalProxy: false; // 是否全局代理
+    domainStrategy: string; // 域名匹配策略 如：AsIs / IPIfNonMatch / IPOnDemand
+    unmatchedStrategy: string; // 未匹配到的域名访问方式 如：direct / proxy
+    mode: number; // 采用模式 如: 0 / 1 / 2
+}
+
+interface RuleDomain {
+    proxy: string; // 通过代理访问的域名，每行一条
+    direct: string; // 直接访问的域名，每行一条
+    block: string; // 阻止访问的域名，每行一条
+}
+
+// https://xtls.github.io/config/routing.html#ruleobject
+// https://www.v2fly.org/config/routing.html#ruleobject
+interface RuleRow {
+    name: string; // 规则名称
+    note: string; // 规则备注
+    outboundTag: string; // 对应出站连接配置的标识 如: proxy / direct / block
+    ruleType: string; // 路由类型 如: domain / ip / port / sourcePort / network / source / user / protocol / attrs
+    rule: any; // 路由规则具体内容
+}
+
+interface RuleModeRow {
+    name: string; // 模式名称
+    note: string; // 模式备注
+    rules: RuleRow[]; // 路由规则具体内容
+}
+
+interface RuleModeList extends Array<RuleModeRow> {
+}
+
 /*interface Tauri {
     app: {
         defaultWindowIcon(): Promise<Image | null>;
