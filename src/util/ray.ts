@@ -42,8 +42,8 @@ export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommon
         if (!value) {
             delete c.stats
             delete c.metrics
-            // delete c.policy
-            delete c?.policy?.system
+            delete c.policy
+            // delete c?.policy?.system
         } else {
             c = {...c, ...getStatsConf()}
         }
