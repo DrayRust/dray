@@ -63,9 +63,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
                                 placeholder="每行一条，例如：google.com"/>
-                            <TextField
-                                variant="outlined" label="请输入IP" fullWidth multiline minRows={5} maxRows={20}
-                                placeholder="每行一条，例如：123.123.123.123"/>
                         </>) : ruleType === 1 ? (<>
                             <Alert variant="filled" severity="success">
                                 直接连接网络，不经过任何代理服务器，适合访问国内网站或不需要加速的场景。比如访问百度、淘宝等。
@@ -73,9 +70,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
                                 placeholder="每行一条，例如：baidu.com"/>
-                            <TextField
-                                variant="outlined" label="请输入IP" fullWidth multiline minRows={5} maxRows={20}
-                                placeholder="每行一条，例如：123.123.123.123"/>
                         </>) : ruleType === 2 && (<>
                             <Alert variant="filled" severity="error">
                                 阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
@@ -83,9 +77,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
                                 placeholder="每行一条，例如：360.cn"/>
-                            <TextField
-                                variant="outlined" label="请输入IP" fullWidth multiline minRows={5} maxRows={20}
-                                placeholder="每行一条，例如：123.123.123.123"/>
                         </>)}
                         <div className="flex-between">
                             <Button variant="contained" color="info">确认</Button>

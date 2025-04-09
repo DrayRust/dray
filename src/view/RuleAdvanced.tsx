@@ -42,14 +42,14 @@ export const RuleAdvanced = ({open, setOpen}: {
                         component={Card}
                         showLabels value={tab}
                         onChange={(_, v) => setTab(v)}>
-                        <BottomNavigationAction label="策略" icon={<ForkRightIcon/>}/>
-                        <BottomNavigationAction label="模式" icon={<ModeIcon/>}/>
+                        <BottomNavigationAction label="访问策略" icon={<ForkRightIcon/>}/>
+                        <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
                     </BottomNavigation>
                     {tab === 0 && (<>
                         <div className="flex-between">
                             <TextField
                                 select fullWidth size="small"
-                                label="域名匹配策略"
+                                label="域名匹配"
                                 value={domainStrategy}
                                 onChange={handleDomainStrategy}>
                                 <MenuItem value="AsIs">仅域名匹配</MenuItem>
@@ -59,12 +59,20 @@ export const RuleAdvanced = ({open, setOpen}: {
                         </div>
                         <TextField
                             select fullWidth size="small"
-                            label="未匹配上的域名访问策略"
+                            label="未匹配上的域名"
                             value={unmatchedStrategy}
                             onChange={handleUnmatchedStrategy}>
                             <MenuItem value="direct">直接访问</MenuItem>
                             <MenuItem value="proxy">代理访问</MenuItem>
-                            <MenuItem value="block">阻止访问</MenuItem>
+                        </TextField>
+                        <TextField
+                            select fullWidth size="small"
+                            label="采用模式"
+                            value={mode}
+                            onChange={handleMode}>
+                            <MenuItem value={0}>大陆模式</MenuItem>
+                            <MenuItem value={1}>俄罗斯模式</MenuItem>
+                            <MenuItem value={2}>伊朗模式</MenuItem>
                         </TextField>
                         <Button variant="contained" color="info">确认</Button>
                     </>)}
