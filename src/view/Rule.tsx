@@ -12,6 +12,7 @@ import BlockIcon from '@mui/icons-material/Block'
 import SettingsIcon from '@mui/icons-material/Settings'
 
 import { RuleAdvanced } from './RuleAdvanced.tsx'
+import { readRuleConfig, readRuleDomain } from "../util/invoke.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -20,10 +21,28 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
-    const [globalProxy, setGlobalProxy] = useState(false)
+    const [ruleConfig, setRuleConfig] = useState<RuleConfig>({
+        globalProxy: false,
+        domainStrategy: 'AsIs',
+        unmatchedStrategy: 'direct',
+        mode: 0
+    })
+    const [ruleDomain, setRuleDomain] = useState<RuleDomain>({
+        proxy: '',
+        direct: '',
+        block: ''
+    })
+    useEffect(() => {
+        readRuleConfig().then((d) => {
+            setRuleConfig(d as RuleConfig)
+        }).catch(_ => 0)
+        readRuleDomain().then((d) => {
+            setRuleDomain(d as RuleDomain)
+        }).catch(_ => 0)
+    }, [])
 
     const handleGlobalProxy = () => {
-        setGlobalProxy(!globalProxy)
+        setRuleConfig(prev => ({...prev, globalProxy: !prev.globalProxy}))
     }
 
     const [open, setOpen] = useState(false)
@@ -43,9 +62,9 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 {ruleMode === 'route' && (<Stack spacing={2}>
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
-                        <Switch checked={globalProxy} onChange={handleGlobalProxy}/>
+                        <Switch checked={ruleConfig.globalProxy} onChange={handleGlobalProxy}/>
                     </div>
-                    {!globalProxy && (<>
+                    {!ruleConfig.globalProxy && (<>
                         <BottomNavigation
                             sx={{mb: 2}}
                             showLabels
@@ -62,6 +81,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             </Alert>
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                value={ruleDomain.proxy} onChange={(e) => setRuleDomain({...ruleDomain, proxy: e.target.value})}
                                 placeholder="每行一条，例如：google.com"/>
                         </>) : ruleType === 1 ? (<>
                             <Alert variant="filled" severity="success">
@@ -69,6 +89,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             </Alert>
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                value={ruleDomain.direct} onChange={(e) => setRuleDomain({...ruleDomain, direct: e.target.value})}
                                 placeholder="每行一条，例如：baidu.com"/>
                         </>) : ruleType === 2 && (<>
                             <Alert variant="filled" severity="error">
@@ -76,6 +97,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             </Alert>
                             <TextField
                                 variant="outlined" label="请输入域名" fullWidth multiline minRows={5} maxRows={20}
+                                value={ruleDomain.block} onChange={(e) => setRuleDomain({...ruleDomain, block: e.target.value})}
                                 placeholder="每行一条，例如：360.cn"/>
                         </>)}
                         <div className="flex-between">

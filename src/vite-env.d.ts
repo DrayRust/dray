@@ -174,7 +174,7 @@ interface TrojanRow {
 
 // ============= rule ============
 interface RuleConfig {
-    globalProxy: false; // 是否全局代理
+    globalProxy: boolean; // 是否全局代理
     domainStrategy: string; // 域名匹配策略 如：AsIs / IPIfNonMatch / IPOnDemand
     unmatchedStrategy: string; // 未匹配到的域名访问方式 如：direct / proxy
     mode: number; // 采用模式 如: 0 / 1 / 2
