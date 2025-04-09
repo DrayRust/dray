@@ -40,9 +40,10 @@ export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfi
 export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     readRayConfig().then(async c => {
         if (!value) {
-            delete c.policy
-            delete c.metrics
             delete c.stats
+            delete c.metrics
+            delete c.policy
+            // delete c?.policy?.system
         } else {
             c = {...c, ...getStatsConf()}
         }
