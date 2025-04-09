@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import {
     Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
-    Menu, MenuItem, IconButton, Divider,
+    Menu, MenuItem, IconButton, Divider, Drawer, TextField,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { readText } from '@tauri-apps/plugin-clipboard-manager'
@@ -134,6 +135,24 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         handleMenuClose()
     }
 
+    const [openDrawer, setOpenDrawer] = useState(false)
+    const [rayConfigJson, setRayConfigJson] = useState('')
+    const handleViewConfig = async () => {
+        setOpenDrawer(true)
+        await initConfig()
+        if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
+            const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
+            if (conf) {
+                setRayConfigJson(JSON.stringify(conf, null, 2))
+            } else {
+                showSnackbar('生成 conf 失败', 'error')
+            }
+        } else {
+            showSnackbar('获取配置信息失败', 'error')
+        }
+        handleMenuClose()
+    }
+
     const handleDelete = () => {
         confirm('确认删除', `确定要删除这个服务器吗？`, async () => {
             const newServerList = serverList?.filter((_, index) => index !== selectedKey) || []
@@ -239,8 +258,6 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const menuSx = {'& .MuiPaper-root': {boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'}}
-
     const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {DialogComponent, confirm} = useDialog()
     const height = 'calc(100vh - 70px)'
@@ -318,20 +335,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                         ))}
                     </TableBody>
                 </Table>
-                <Menu sx={menuSx} anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                    <MenuItem onClick={handleEnable}>
-                        <DoneOutlineIcon sx={{mr: 1}} fontSize="small"/>启用
-                    </MenuItem>
-                    <Divider/>
-                    <MenuItem onClick={handleUpdate}>
-                        <EditIcon sx={{mr: 1}} fontSize="small"/>编辑
-                    </MenuItem>
-                    <MenuItem onClick={handleDelete}>
-                        <DeleteIcon sx={{mr: 1}} fontSize="small"/>删除
-                    </MenuItem>
-                </Menu>
             </TableContainer>
         )}
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+            <MenuItem onClick={handleEnable}><DoneOutlineIcon sx={{mr: 1}} fontSize="small"/>启用</MenuItem>
+            <Divider/>
+            <MenuItem onClick={handleUpdate}><EditIcon sx={{mr: 1}} fontSize="small"/>编辑</MenuItem>
+            <MenuItem onClick={handleViewConfig}><VisibilityIcon sx={{mr: 1}} fontSize="small"/>配置</MenuItem>
+            <MenuItem onClick={handleDelete}><DeleteIcon sx={{mr: 1}} fontSize="small"/>删除</MenuItem>
+        </Menu>
+        <Drawer open={openDrawer} anchor="right" onClose={() => setOpenDrawer(false)}>
+            <TextField sx={{m: 1, mt: 2, width: 650}} variant="outlined" label="配置详情" value={rayConfigJson} fullWidth multiline disabled/>
+        </Drawer>
     </>)
 }
 
