@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Button, Alert, Typography, Switch, MenuItem,
+    Stack, Button, Alert, Typography, Switch,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -21,14 +21,9 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
     const [globalProxy, setGlobalProxy] = useState(false)
-    const [unmatchedStrategy, setUnmatchedStrategy] = useState('direct')
 
     const handleGlobalProxy = () => {
         setGlobalProxy(!globalProxy)
-    }
-
-    const handleUnmatchedStrategy = (e: any) => {
-        setUnmatchedStrategy(e.target.value)
     }
 
     const [open, setOpen] = useState(false)
@@ -45,65 +40,50 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 </ToggleButtonGroup>
             </div>
             <Paper elevation={3} sx={{p: 2, maxWidth: '800px', m: 'auto', overflow: 'auto'}}>
-                {ruleMode === 'route' && (<>
+                {ruleMode === 'route' && (<Stack spacing={2}>
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
                         <Switch checked={globalProxy} onChange={handleGlobalProxy}/>
                     </div>
                     {!globalProxy && (<>
                         <BottomNavigation
-                            sx={{mb: 2, mt: 1}}
+                            sx={{mb: 2}}
+                            showLabels
                             component={Card}
-                            showLabels value={ruleType}
+                            value={ruleType}
                             onChange={(_, v) => setRuleType(v)}>
                             <BottomNavigationAction label="代理" icon={<SendIcon/>}/>
                             <BottomNavigationAction label="直连" icon={<FlightIcon/>}/>
                             <BottomNavigationAction label="阻止" icon={<BlockIcon/>}/>
                         </BottomNavigation>
-                        {ruleType === 0 ? (
-                            <Stack spacing={2}>
-                                <Alert variant="filled" severity="warning">
-                                    通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。比如访问 Google、YouTube 等。
-                                </Alert>
-                                <TextField
-                                    variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
-                                    placeholder="每行一条，例如：google.com" autoFocus={true}/>
-                            </Stack>
-                        ) : ruleType === 1 ? (
-                            <Stack spacing={2}>
-                                <Alert variant="filled" severity="success">
-                                    直接连接网络，不经过任何代理服务器，适合访问国内网站或不需要加速的场景。比如访问百度、淘宝等。
-                                </Alert>
-                                <TextField
-                                    variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
-                                    placeholder="每行一条，例如：baidu.com" autoFocus={true}/>
-                            </Stack>
-                        ) : ruleType === 2 && (
-                            <Stack spacing={2}>
-                                <Alert variant="filled" severity="error">
-                                    阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
-                                </Alert>
-                                <TextField
-                                    variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
-                                    placeholder="每行一条，例如：360.cn" autoFocus={true}/>
-                            </Stack>
-                        )}
-                        <Stack spacing={2} sx={{mt: 2}}>
+                        {ruleType === 0 ? (<>
+                            <Alert variant="filled" severity="warning">
+                                通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。比如访问 Google、YouTube 等。
+                            </Alert>
                             <TextField
-                                select fullWidth size="small"
-                                label="未匹配上的域名访问策略"
-                                value={unmatchedStrategy}
-                                onChange={handleUnmatchedStrategy}>
-                                <MenuItem value="direct">直接访问</MenuItem>
-                                <MenuItem value="proxy">代理访问</MenuItem>
-                            </TextField>
-                            <div className="flex-between">
-                                <Button variant="contained" color="info">确认</Button>
-                                <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
-                            </div>
-                        </Stack>
+                                variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
+                                placeholder="每行一条，例如：google.com" autoFocus={true}/>
+                        </>) : ruleType === 1 ? (<>
+                            <Alert variant="filled" severity="success">
+                                直接连接网络，不经过任何代理服务器，适合访问国内网站或不需要加速的场景。比如访问百度、淘宝等。
+                            </Alert>
+                            <TextField
+                                variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
+                                placeholder="每行一条，例如：baidu.com" autoFocus={true}/>
+                        </>) : ruleType === 2 && (<>
+                            <Alert variant="filled" severity="error">
+                                阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
+                            </Alert>
+                            <TextField
+                                variant="outlined" label="请输入域名" fullWidth multiline minRows={6} maxRows={20}
+                                placeholder="每行一条，例如：360.cn" autoFocus={true}/>
+                        </>)}
+                        <div className="flex-between">
+                            <Button variant="contained" color="info">确认</Button>
+                            <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
+                        </div>
                     </>)}
-                </>)}
+                </Stack>)}
 
                 {ruleMode === 'dns' && (<>
                 </>)}
