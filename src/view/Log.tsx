@@ -54,7 +54,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
                 <Button variant="contained" color="error" onClick={handleClearLogs} startIcon={<DeleteIcon/>} sx={{ml: 1}}>清空日志</Button>
             </Box>
             <TableContainer component={Card}>
-                <Table sx={{minWidth: 650}}>
+                <Table sx={{minWidth: 600}}>
                     <TableHead>
                         <TableRow>
                             <TableCell>日志名称</TableCell>
