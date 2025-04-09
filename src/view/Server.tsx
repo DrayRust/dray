@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import {
     Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
-    Menu, MenuItem, IconButton, Divider, Drawer, TextField,
+    Menu, MenuItem, IconButton, Divider, Drawer, TextField, Tooltip,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
 import { readText } from '@tauri-apps/plugin-clipboard-manager'
 import { useDialog } from "../component/useDialog.tsx"
@@ -137,6 +139,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const [openDrawer, setOpenDrawer] = useState(false)
     const [rayConfigJson, setRayConfigJson] = useState('')
+    const handleCloseDrawer = () => setOpenDrawer(false)
     const handleViewConfig = async () => {
         setOpenDrawer(true)
         await initConfig()
@@ -151,6 +154,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             showSnackbar('获取配置信息失败', 'error')
         }
         handleMenuClose()
+    }
+
+    const [jsonCopied, setJsonCopied] = useState('')
+    const handleCopyJson = async () => {
+        await navigator.clipboard.writeText(rayConfigJson)
+        setJsonCopied('已复制')
+        setTimeout(() => setJsonCopied(''), 1000)
     }
 
     const handleDelete = () => {
@@ -344,8 +354,16 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <MenuItem onClick={handleViewConfig}><VisibilityIcon sx={{mr: 1}} fontSize="small"/>配置</MenuItem>
             <MenuItem onClick={handleDelete}><DeleteIcon sx={{mr: 1}} fontSize="small"/>删除</MenuItem>
         </Menu>
-        <Drawer open={openDrawer} anchor="right" onClose={() => setOpenDrawer(false)}>
-            <TextField sx={{m: 1, mt: 2, width: 650}} variant="outlined" label="配置详情" value={rayConfigJson} fullWidth multiline disabled/>
+        <Drawer open={openDrawer} anchor="right" onClose={handleCloseDrawer}>
+            <Stack sx={{p: 1, width: 660}} spacing={2}>
+                <div className="flex-between">
+                    <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
+                    <Tooltip title={jsonCopied || '点击复制'}>
+                        <IconButton onClick={handleCopyJson}><ContentCopyIcon/></IconButton>
+                    </Tooltip>
+                </div>
+                <TextField variant="outlined" label="配置详情" value={rayConfigJson} fullWidth multiline disabled/>
+            </Stack>
         </Drawer>
     </>)
 }
