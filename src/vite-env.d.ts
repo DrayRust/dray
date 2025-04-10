@@ -190,7 +190,7 @@ interface RuleDomain {
 // https://www.v2fly.org/config/routing.html#ruleobject
 interface RuleRow {
     name: string; // 规则名称
-    note: string; // 规则备注
+    note: string; // 规则描述
     outboundTag: string; // 对应出站连接配置的标识 如: proxy / direct / block
     ruleType: string; // 路由类型 如: domain / ip / port / sourcePort / network / source / user / protocol / attrs
     rule: any; // 路由规则具体内容
@@ -198,7 +198,7 @@ interface RuleRow {
 
 interface RuleModeRow {
     name: string; // 模式名称
-    note: string; // 模式备注
+    note: string; // 模式描述
     hash: string; // rules JSON 字符串的哈希值，用来排重
     rules: RuleRow[]; // 路由规则具体内容
 }

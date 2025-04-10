@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Box, Card, Drawer, Stack, TextField, MenuItem, Button, Typography,
-    Table, TableBody, TableRow, TableCell, IconButton,
+    TableContainer, Table, TableBody, TableRow, TableCell, IconButton,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
@@ -13,6 +13,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { readRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 
@@ -24,6 +25,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 }) => {
     const [tab, setTab] = useState(0)
     const [ruleModeList, setRuleModeList] = useState<RuleModeList>(DEFAULT_RULE_MODE_LIST)
+    const [ruleModeKey, setRuleModeKey] = useState(-1)
 
     useEffect(() => {
         readRuleModeList().then((d) => {
@@ -45,6 +47,14 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleMode = (e: any) => {
         setRuleConfig(prev => ({...prev, mode: e.target.value}))
+    }
+
+    const handleRuleModeUpdate = (key: number) => {
+        setRuleModeKey(key)
+    }
+
+    const handleRuleModeDelete = (key: number) => {
+        console.log('handleRuleModeDelete:', key)
     }
 
     return (
@@ -93,33 +103,33 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                     </>)}
 
                     {tab === 1 && (<>
-                        <Stack direction="row" spacing={1}>
-                            <Button variant="contained" color="secondary" startIcon={<AddIcon/>}>添加</Button>
-                            <Button variant="contained" color="success" startIcon={<FileUploadIcon/>}>导入</Button>
-                            <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>}>导出</Button>
-                        </Stack>
-                        <Card>
-                            <Table>
-                                <TableBody>
-                                    {ruleModeList.map((row, key) => (
-                                        <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                            <TableCell component="th" scope="row">
-                                                <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
-                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <IconButton color="primary" title="编辑" onClick={() => console.log('编辑')}>
-                                                    <EditIcon/>
-                                                </IconButton>
-                                                <IconButton color="error" title="删除" onClick={() => console.log('删除')}>
-                                                    <DeleteIcon/>
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </Card>
+                        {ruleModeKey > -1 ? (<>
+                            <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
+                        </>) : (<>
+                            <Stack direction="row" spacing={1}>
+                                <Button variant="contained" color="secondary" startIcon={<AddIcon/>}>添加</Button>
+                                <Button variant="contained" color="success" startIcon={<FileUploadIcon/>}>导入</Button>
+                                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>}>导出</Button>
+                            </Stack>
+                            <TableContainer component={Card}>
+                                <Table>
+                                    <TableBody>
+                                        {ruleModeList.map((row, key) => (
+                                            <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                                <TableCell component="th" scope="row">
+                                                    <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
+                                                    <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <IconButton color="primary" title="编辑" onClick={() => handleRuleModeUpdate(key)}><EditIcon/></IconButton>
+                                                    <IconButton color="error" title="删除" onClick={() => handleRuleModeDelete(key)}><DeleteIcon/></IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </>)}
                     </>)}
                 </Stack>
             </Box>
