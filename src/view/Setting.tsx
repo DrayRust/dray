@@ -10,6 +10,7 @@ import {
     FormControl, FormControlLabel, Checkbox,
     Select, MenuItem, SelectChangeEvent
 } from '@mui/material'
+import HelpIcon from '@mui/icons-material/Help'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
@@ -530,9 +531,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
                         <Divider/>
                         <div className="flex-between p1">
-                            <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢。" placement="right">
+                            <Box sx={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                                 <Typography variant="body1" sx={{pl: 1}}>Mux 协议</Typography>
-                            </Tooltip>
+                                <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢" placement="right">
+                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                </Tooltip>
+                            </Box>
                             <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayOutboundsMux}/>
                         </div>
                         {rayCommonConfig.outbounds_mux && (<>
