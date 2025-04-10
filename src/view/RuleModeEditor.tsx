@@ -29,8 +29,16 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         setRuleModeRow(prev => ({...prev, [type]: e.target.value}))
     }
 
-    const handleModeUpdate = (key: number) => {
-        console.log('handleModeUpdate', key)
+    const handleRuleCreate = () => {
+        console.log('handleRuleCreate')
+    }
+
+    const handleRuleUpdate = (key: number) => {
+        console.log('handleRuleUpdate', key)
+    }
+
+    const handleRuleDelete = (key: number) => {
+        console.log('handleRuleDelete', key)
     }
 
     const handleBack = () => {
@@ -45,23 +53,16 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
         </Stack>
+
         <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-            <TextField
-                size="small"
-                label="模式名称"
-                value={ruleModeRow.name}
-                onChange={handleRuleModeRowChange('name')}
-            />
-            <TextField
-                size="small"
-                label="模式描述"
-                value={ruleModeRow.note}
-                onChange={handleRuleModeRowChange('note')}
-                multiline
-                rows={2}
-            />
+            <TextField size="small" label="模式名称" value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
+            <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeRowChange('note')} multiline rows={2}/>
         </Stack>
-        <Button variant="contained" color="secondary" startIcon={<AddIcon/>}></Button>
+
+        <Stack direction="row" spacing={1}>
+            <IconButton color="primary" title="添加" onClick={handleRuleCreate}><AddIcon/></IconButton>
+        </Stack>
+
         <TableContainer component={Card}>
             <Table>
                 <TableBody>
@@ -72,12 +73,8 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                 <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                             </TableCell>
                             <TableCell align="right">
-                                <IconButton color="primary" title="编辑" onClick={() => handleModeUpdate(key)}>
-                                    <EditIcon/>
-                                </IconButton>
-                                <IconButton color="error" title="删除" onClick={() => console.log('删除')}>
-                                    <DeleteIcon/>
-                                </IconButton>
+                                <IconButton color="primary" title="编辑" onClick={() => handleRuleUpdate(key)}><EditIcon/></IconButton>
+                                <IconButton color="error" title="删除" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
                             </TableCell>
                         </TableRow>
                     ))}
