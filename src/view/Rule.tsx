@@ -142,7 +142,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 </>)}
             </Card>
         </Paper>
-        <RuleAdvanced open={open} setOpen={setOpen}/>
+        <RuleAdvanced open={open} setOpen={setOpen} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig}/>
     </>)
 }
 
