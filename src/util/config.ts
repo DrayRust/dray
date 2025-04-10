@@ -30,3 +30,24 @@ export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
     outbounds_mux: false,
     outbounds_concurrency: 8,
 }
+
+export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
+    {
+        name: "大陆模式",
+        note: "专为大陆网络环境优化的访问规则",
+        hash: "",
+        rules: []
+    },
+    {
+        name: "俄罗斯模式",
+        note: "专为俄罗斯网络环境优化的访问规则",
+        hash: "",
+        rules: []
+    },
+    {
+        name: "伊朗模式",
+        note: "专为伊朗网络环境优化的访问规则",
+        hash: "",
+        rules: []
+    },
+]

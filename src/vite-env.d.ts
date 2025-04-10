@@ -199,6 +199,7 @@ interface RuleRow {
 interface RuleModeRow {
     name: string; // 模式名称
     note: string; // 模式备注
+    hash: string; // rules JSON 字符串的哈希值，用来排重
     rules: RuleRow[]; // 路由规则具体内容
 }
 

@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react'
 import {
-    Box, Card, Drawer, Stack, TextField, MenuItem, Button,
+    Box, Card, Drawer, Stack, TextField, MenuItem, Button, Typography,
+    Table, TableBody, TableRow, TableCell, IconButton,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import ForkRightIcon from '@mui/icons-material/ForkRight'
 import ModeIcon from '@mui/icons-material/Tune'
+import AddIcon from '@mui/icons-material/Add'
+import FileUploadIcon from '@mui/icons-material/FileUpload'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
+
 import { readRuleModeList } from "../util/invoke.ts"
+import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 
 export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     open: boolean,
@@ -15,7 +23,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     setRuleConfig: React.Dispatch<React.SetStateAction<RuleConfig>>
 }) => {
     const [tab, setTab] = useState(0)
-    const [ruleModeList, setRuleModeList] = useState<RuleModeList>([])
+    const [ruleModeList, setRuleModeList] = useState<RuleModeList>(DEFAULT_RULE_MODE_LIST)
 
     useEffect(() => {
         readRuleModeList().then((d) => {
@@ -42,7 +50,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     return (
         <Drawer anchor="right" open={open} onClose={handleClose}>
             <Box sx={{p: 2}}>
-                <Stack spacing={2} sx={{minWidth: '600px'}}>
+                <Stack spacing={2} sx={{minWidth: '650px'}}>
                     <DoubleArrowIcon onClick={handleClose}/>
                     <BottomNavigation
                         sx={{mb: 2, mt: 1}}
@@ -85,15 +93,33 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                     </>)}
 
                     {tab === 1 && (<>
-                        <TextField
-                            select fullWidth size="small"
-                            label="采用模式"
-                            value={ruleConfig.mode}
-                            onChange={handleMode}>
-                            {ruleModeList.map((item, index) => (
-                                <MenuItem key={index} value={index}>{item.name}</MenuItem>
-                            ))}
-                        </TextField>
+                        <Stack direction="row" spacing={1}>
+                            <Button variant="contained" color="secondary" startIcon={<AddIcon/>}>添加</Button>
+                            <Button variant="contained" color="success" startIcon={<FileUploadIcon/>}>导入</Button>
+                            <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>}>导出</Button>
+                        </Stack>
+                        <Card>
+                            <Table>
+                                <TableBody>
+                                    {ruleModeList.map((row, key) => (
+                                        <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                            <TableCell component="th" scope="row">
+                                                <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
+                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <IconButton color="primary" title="编辑" onClick={() => console.log('编辑')}>
+                                                    <EditIcon/>
+                                                </IconButton>
+                                                <IconButton color="error" title="删除" onClick={() => console.log('删除')}>
+                                                    <DeleteIcon/>
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Card>
                     </>)}
                 </Stack>
             </Box>
