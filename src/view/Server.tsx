@@ -215,7 +215,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const [enableDragSort, setEnableDragSort] = useState(false)
-    const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
+    const [dragIndex, setDragIndex] = useState<number | null>(null)
     const [dragIsChange, setDragIsChange] = useState(false)
     const handleSaveServerList = useDebounce(async (dragIsChange: boolean, serverList: ServerList) => {
         if (dragIsChange && serverList.length > 0) {
@@ -227,7 +227,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }, 300)
     useEffect(() => {
         const handleMouseUp = () => {
-            setDraggingIndex(null)
+            setDragIndex(null)
             setDragIsChange(prevIsChange => {
                 setServerList(prevServerList => {
                     handleSaveServerList(prevIsChange, prevServerList)
@@ -244,24 +244,24 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const handleDragStart = (key: number) => {
         if (!enableDragSort) return
-        setDraggingIndex(key)
+        setDragIndex(key)
     }
 
     const handleDragEnd = (e: React.MouseEvent) => {
         e.stopPropagation()
         if (!enableDragSort) return
-        setDraggingIndex(null)
+        setDragIndex(null)
         handleSaveServerList(dragIsChange, serverList)
     }
 
     const handleDragEnter = (key: number) => {
         if (!enableDragSort) return
-        if (draggingIndex !== null && draggingIndex !== key && serverList) {
+        if (dragIndex !== null && dragIndex !== key && serverList) {
             const newServerList = [...serverList]
-            const [draggedItem] = newServerList.splice(draggingIndex, 1)
+            const [draggedItem] = newServerList.splice(dragIndex, 1)
             newServerList.splice(key, 0, draggedItem)
             setServerList(newServerList)
-            setDraggingIndex(key)
+            setDragIndex(key)
             setDragIsChange(true)
         }
     }
@@ -313,7 +313,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             <TableRow
                                 key={key} hover
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                className={enableDragSort ? (draggingIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
+                                className={enableDragSort ? (dragIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
                                 onMouseDown={() => handleDragStart(key)}
                                 onMouseUp={(e) => handleDragEnd(e)}
                                 onMouseEnter={() => handleDragEnter(key)}
