@@ -118,14 +118,25 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                 ))}
             </TextField>
             {ruleRow.ruleType === 'domain' ? (
-                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6} value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
+                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="如：x.com"
+                           value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
             ) : ruleRow.ruleType === 'ip' ? (
-                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6} value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
+                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="支持 CIDR 格式: 10.0.0.0/8"
+                           value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
             ) : ruleRow.ruleType === 'multi' && (<>
-                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6} value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
-                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6} value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
-                <TextField fullWidth size="small" label="目标端口(每行一条)" multiline minRows={2} maxRows={6} value={ruleRow.port} onChange={handleRuleChange('port')}/>
+                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="如：x.com"
+                           value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
+                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="支持 CIDR 格式: 10.0.0.0/8"
+                           value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
+                <TextField fullWidth size="small" label="目标端口(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="支持范围端口 如: 1000-2000"
+                           value={ruleRow.port} onChange={handleRuleChange('port')}/>
                 <TextField fullWidth size="small" label="来源端口(每行一条)" multiline minRows={2} maxRows={6}
+                           placeholder="支持范围端口 如: 1000-2000"
                            value={ruleRow.sourcePort} onChange={handleRuleChange('sourcePort')}/>
 
                 <FormControl>
