@@ -152,7 +152,12 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             }
         }
 
-        ruleModeList[ruleModeKey].rules.push(item)
+        if (ruleUpdateKey > -1) {
+            ruleModeList[ruleModeKey].rules[ruleUpdateKey] = item
+        } else {
+            ruleModeList[ruleModeKey].rules.push(item)
+        }
+
         setRuleModeList(ruleModeList)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
@@ -162,8 +167,12 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         handleRuleBack()
     }
 
+    const [ruleUpdateKey, setRuleUpdateKey] = useState(-1)
     const handleRuleUpdate = (key: number) => {
-        console.log('handleRuleUpdate', key)
+        setAction('update')
+        setRuleUpdateKey(key)
+        const item = ruleModeList[ruleModeKey].rules[key]
+        if (item) setRuleRow(item)
     }
 
     const handleRuleDelete = (key: number) => {
