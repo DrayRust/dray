@@ -188,12 +188,40 @@ interface RuleDomain {
 
 // https://xtls.github.io/config/routing.html#ruleobject
 // https://www.v2fly.org/config/routing.html#ruleobject
+/**
+ * {
+ *   "domainMatcher": "hybrid",
+ *   "type": "field",
+ *   "domain": ["baidu.com", "qq.com", "geosite:cn"],
+ *   "ip": ["0.0.0.0/8", "10.0.0.0/8", "fc00::/7", "fe80::/10", "geoip:cn"],
+ *   "port": "53,443,1000-2000",
+ *   "sourcePort": "53,443,1000-2000",
+ *   "network": "tcp",
+ *   "source": ["10.0.0.1"],
+ *   "user": ["love@xray.com"],
+ *   "inboundTag": ["tag-vmess"],
+ *   "protocol": ["http", "tls", "quic", "bittorrent"],
+ *   "attrs": { ":method": "GET" },
+ *   "outboundTag": "direct",
+ *   "balancerTag": "balancer",
+ *   "ruleTag": "rule name"
+ * }
+ */
 interface RuleRow {
     name: string; // 规则名称
     note: string; // 规则描述
     outboundTag: string; // 访问方式，对应出站连接配置的标识 如: proxy / direct / block
-    ruleType: string; // 规则类型 如: domain / ip / port / sourcePort / network / source / user / protocol / attrs
-    rule: any; // 路由规则具体内容
+    ruleType: string; // 规则类型 如: domain / ip / multi (多维规则)
+    domain: string; // 域名
+    ip: string; // IP
+    port: string; // 目标端口
+    sourcePort: string; // 来源端口
+    network: string; // 传输协议
+    // source: string; // 来源 IP （雷同参数，不实现）
+    // user: string; // 用户邮箱地址（无聊的设计，砍掉）
+    // inboundTag: string; // 入站连接标识（需求少，不实现）
+    protocol: string; // 请求协议
+    // attrs: string; // 请求流量属性（需求少，不实现）
 }
 
 interface RuleModeRow {
