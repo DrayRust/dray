@@ -33,8 +33,8 @@ export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
 
 export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
-        name: "大陆模式",
-        note: "专为大陆网络环境优化的访问规则",
+        name: "中国大陆模式",
+        note: "专为中国大陆网络环境优化的访问规则",
         hash: "",
         rules: []
     },

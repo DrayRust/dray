@@ -191,8 +191,8 @@ interface RuleDomain {
 interface RuleRow {
     name: string; // 规则名称
     note: string; // 规则描述
-    outboundTag: string; // 对应出站连接配置的标识 如: proxy / direct / block
-    ruleType: string; // 路由类型 如: domain / ip / port / sourcePort / network / source / user / protocol / attrs
+    outboundTag: string; // 访问方式，对应出站连接配置的标识 如: proxy / direct / block
+    ruleType: string; // 规则类型 如: domain / ip / port / sourcePort / network / source / user / protocol / attrs
     rule: any; // 路由规则具体内容
 }
 
