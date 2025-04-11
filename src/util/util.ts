@@ -139,3 +139,35 @@ export function processIP(ip: string): string {
     // 重新用 \n 连接
     return uniqueIPs.join('\n')
 }
+
+export function processPort(port: string): string {
+    port = port.trim()
+    if (port.length === 0) return ''
+
+    // 清理每行字符串的两端空格，排除空字符串行
+    const cleanedPorts = port.split('\n')
+        .map(p => p.trim())
+        .filter(p => {
+            if (p.length === 0) return false
+
+            // 验证单个端口（如 "123"）
+            if (/^\d+$/.test(p)) {
+                const portNum = Number(p)
+                return portNum > 0 && portNum <= 65535
+            }
+
+            // 验证端口范围（如 "1000-2000"）
+            if (/^\d+-\d+$/.test(p)) {
+                const [start, end] = p.split('-').map(Number)
+                return start > 0 && start <= 65535 && end > 0 && end <= 65535 && start <= end
+            }
+
+            return false // 其他格式无效
+        })
+
+    // 去重，并排序
+    const uniquePorts = [...new Set(cleanedPorts)].sort()
+
+    // 重新用 \n 连接
+    return uniquePorts.join('\n')
+}

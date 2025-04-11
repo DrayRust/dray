@@ -12,7 +12,7 @@ import HelpIcon from '@mui/icons-material/Help'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
-import { processDomain, processIP } from "../util/util.ts"
+import { processDomain, processIP, processPort } from "../util/util.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
@@ -144,6 +144,8 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         }
 
         if (item.ruleType === 'multi') {
+            item.port = processPort(item.port)
+            item.sourcePort = processPort(item.sourcePort)
             if (!item.domain && !item.port && !item.sourcePort && !item.network && !item.protocol) {
                 showSnackbar('请至少填写一项内容', 'error', 2000)
                 return
@@ -240,17 +242,21 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                 <FormControl>
                     <FormLabel id="rule-protocol">请求协议(protocol)</FormLabel>
                     <FormGroup row aria-labelledby="rule-protocol">
-                        <FormControlLabel label="HTTP 1.1"
-                                          control={<Checkbox checked={ruleRow.protocol.includes('http')} value="http" onChange={handleProtocolChange}/>}
+                        <FormControlLabel
+                            label="HTTP 1.1"
+                            control={<Checkbox checked={ruleRow.protocol.includes('http')} value="http" onChange={handleProtocolChange}/>}
                         />
-                        <FormControlLabel label="TLS"
-                                          control={<Checkbox checked={ruleRow.protocol.includes('tls')} value="tls" onChange={handleProtocolChange}/>}
+                        <FormControlLabel
+                            label="TLS"
+                            control={<Checkbox checked={ruleRow.protocol.includes('tls')} value="tls" onChange={handleProtocolChange}/>}
                         />
-                        <FormControlLabel label="QUIC"
-                                          control={<Checkbox checked={ruleRow.protocol.includes('quic')} value="quic" onChange={handleProtocolChange}/>}
+                        <FormControlLabel
+                            label="QUIC"
+                            control={<Checkbox checked={ruleRow.protocol.includes('quic')} value="quic" onChange={handleProtocolChange}/>}
                         />
-                        <FormControlLabel label="BitTorrent"
-                                          control={<Checkbox checked={ruleRow.protocol.includes('bittorrent')} value="bittorrent" onChange={handleProtocolChange}/>}
+                        <FormControlLabel
+                            label="BitTorrent"
+                            control={<Checkbox checked={ruleRow.protocol.includes('bittorrent')} value="bittorrent" onChange={handleProtocolChange}/>}
                         />
                     </FormGroup>
                 </FormControl>
