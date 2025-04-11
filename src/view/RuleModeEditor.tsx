@@ -1,8 +1,24 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-    Stack, Button, TextField, MenuItem, Typography, IconButton, Card,
-    TableContainer, Table, TableBody, TableRow, TableCell,
-    FormControl, FormLabel, FormControlLabel, RadioGroup, Radio, FormGroup, Checkbox,
+    Button,
+    Card,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    IconButton,
+    MenuItem,
+    Radio,
+    RadioGroup,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    TextField,
+    Typography,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import AddIcon from '@mui/icons-material/Add'
@@ -11,6 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useSnackbar } from "../component/useSnackbar.tsx"
+import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
 
@@ -72,6 +89,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
     const handleRuleBack = () => {
         setAction('')
+        setRuleUpdateKey(-1)
     }
 
     const [nameError, setNameError] = useState(false)
@@ -114,6 +132,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             setNameError(true)
             return
         }
+        setNameError(false)
 
         // 域名规则
         if (item.ruleType === 'domain') {
@@ -121,6 +140,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                 setDomainError(true)
                 return
             }
+            setDomainError(false)
             item.domain = processDomain(item.domain)
             item.ip = ''
         }
@@ -131,6 +151,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                 setIpError(true)
                 return
             }
+            setIpError(false)
             item.domain = ''
             item.ip = processIP(item.ip)
         }
@@ -158,12 +179,12 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             ruleModeList[ruleModeKey].rules.push(item)
         }
 
-        setRuleModeList(ruleModeList)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
             showSnackbar('保存失败', 'error')
             return
         }
+        setRuleModeList(ruleModeList)
         handleRuleBack()
     }
 
@@ -176,7 +197,15 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     }
 
     const handleRuleDelete = (key: number) => {
-        console.log('handleRuleDelete', key)
+        confirm('确认删除', `确定要删除这条规则吗？`, async () => {
+            ruleModeList[ruleModeKey].rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
+            const ok = await saveRuleModeList(ruleModeList)
+            if (!ok) {
+                showSnackbar('删除失败', 'error')
+                return
+            }
+            setRuleModeList(ruleModeList)
+        })
     }
 
     const handleBack = () => {
@@ -188,8 +217,10 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar('br')
+    const {DialogComponent, confirm} = useDialog()
     return (<>
         <SnackbarComponent/>
+        <DialogComponent/>
         <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
         </Stack>
