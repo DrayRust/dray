@@ -107,3 +107,35 @@ export function formatPort(value: any): string {
     const num = Math.min(Math.max(Number(value), 0), 65535)
     return num ? String(num) : ''
 }
+
+export function processDomain(domain: string): string {
+    domain = domain.trim()
+    if (domain.length === 0) return ''
+
+    // 清理每行字符串的两端空格，排除空字符串行
+    const cleanedDomains = domain.split('\n')
+        .map(d => d.trim())
+        .filter(d => d.length > 0)
+
+    // 去重，并排序
+    const uniqueDomains = [...new Set(cleanedDomains)].sort()
+
+    // 重新用 \n 连接
+    return uniqueDomains.join('\n')
+}
+
+export function processIP(ip: string): string {
+    ip = ip.trim()
+    if (ip.length === 0) return ''
+
+    // 清理每行字符串的两端空格，排除空字符串行
+    const cleanedIPs = ip.split('\n')
+        .map(i => i.trim())
+        .filter(i => i.length > 0)
+
+    // 去重，并排序
+    const uniqueIPs = [...new Set(cleanedIPs)].sort()
+
+    // 重新用 \n 连接
+    return uniqueIPs.join('\n')
+}
