@@ -191,76 +191,78 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         </Stack>
 
         {action ? (<>
-            <TextField fullWidth size="small" label="规则名称"
-                       error={nameError} helperText={nameError ? "规则名称不能为空" : ""}
-                       value={ruleRow.name} onChange={handleRuleChange('name')}/>
-            <TextField fullWidth size="small" label="规则描述" value={ruleRow.note} multiline rows={2} onChange={handleRuleChange('note')}/>
-            <TextField fullWidth size="small" label="访问方式" value={ruleRow.outboundTag} select onChange={handleRuleChange('outboundTag')}>
-                {Object.entries(outboundTagList).map(([key, value]) => (
-                    <MenuItem key={key} value={key}>{value}</MenuItem>
-                ))}
-            </TextField>
-            <TextField fullWidth size="small" label="规则类型" value={ruleRow.ruleType} select onChange={handleRuleChange('ruleType')}>
-                {Object.entries(ruleTypeList).map(([key, value]) => (
-                    <MenuItem key={key} value={key}>{value}</MenuItem>
-                ))}
-            </TextField>
-            {ruleRow.ruleType === 'domain' ? (
-                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="如：x.com"
-                           error={domainError} helperText={domainError ? "域名不能为空" : ""}
-                           value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
-            ) : ruleRow.ruleType === 'ip' ? (
-                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="支持 CIDR 格式 如: 10.0.0.0/8"
-                           error={ipError} helperText={ipError ? "IP 地址不能为空" : ""}
-                           value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
-            ) : ruleRow.ruleType === 'multi' && (<>
-                <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="如：x.com"
-                           value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
-                <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="支持 CIDR 格式 如: 10.0.0.0/8"
-                           value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
-                <TextField fullWidth size="small" label="目标端口(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="支持范围端口 如: 1000-2000"
-                           value={ruleRow.port} onChange={handleRuleChange('port')}/>
-                <TextField fullWidth size="small" label="来源端口(每行一条)" multiline minRows={2} maxRows={6}
-                           placeholder="支持范围端口 如: 1000-2000"
-                           value={ruleRow.sourcePort} onChange={handleRuleChange('sourcePort')}/>
+            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                <TextField fullWidth size="small" label="规则名称"
+                           error={nameError} helperText={nameError ? "规则名称不能为空" : ""}
+                           value={ruleRow.name} onChange={handleRuleChange('name')}/>
+                <TextField fullWidth size="small" label="规则描述" value={ruleRow.note} multiline rows={2} onChange={handleRuleChange('note')}/>
+                <TextField fullWidth size="small" label="访问方式" value={ruleRow.outboundTag} select onChange={handleRuleChange('outboundTag')}>
+                    {Object.entries(outboundTagList).map(([key, value]) => (
+                        <MenuItem key={key} value={key}>{value}</MenuItem>
+                    ))}
+                </TextField>
+                <TextField fullWidth size="small" label="规则类型" value={ruleRow.ruleType} select onChange={handleRuleChange('ruleType')}>
+                    {Object.entries(ruleTypeList).map(([key, value]) => (
+                        <MenuItem key={key} value={key}>{value}</MenuItem>
+                    ))}
+                </TextField>
+                {ruleRow.ruleType === 'domain' ? (
+                    <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="如：x.com"
+                               error={domainError} helperText={domainError ? "域名不能为空" : ""}
+                               value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
+                ) : ruleRow.ruleType === 'ip' ? (
+                    <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="支持 CIDR 格式 如: 10.0.0.0/8"
+                               error={ipError} helperText={ipError ? "IP 地址不能为空" : ""}
+                               value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
+                ) : ruleRow.ruleType === 'multi' && (<>
+                    <TextField fullWidth size="small" label="域名(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="如：x.com"
+                               value={ruleRow.domain} onChange={handleRuleChange('domain')}/>
+                    <TextField fullWidth size="small" label="IP 地址(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="支持 CIDR 格式 如: 10.0.0.0/8"
+                               value={ruleRow.ip} onChange={handleRuleChange('ip')}/>
+                    <TextField fullWidth size="small" label="目标端口(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="支持范围端口 如: 1000-2000"
+                               value={ruleRow.port} onChange={handleRuleChange('port')}/>
+                    <TextField fullWidth size="small" label="来源端口(每行一条)" multiline minRows={2} maxRows={6}
+                               placeholder="支持范围端口 如: 1000-2000"
+                               value={ruleRow.sourcePort} onChange={handleRuleChange('sourcePort')}/>
 
-                <FormControl>
-                    <FormLabel id="rule-network">传输协议(network)</FormLabel>
-                    <RadioGroup row aria-labelledby="rule-network" value={ruleRow.network} onChange={handleRuleChange('network')}>
-                        <FormControlLabel value="" control={<Radio/>} label="None"/>
-                        <FormControlLabel value="tcp" control={<Radio/>} label="TCP"/>
-                        <FormControlLabel value="udp" control={<Radio/>} label="UDP"/>
-                        <FormControlLabel value="tcp,udp" control={<Radio/>} label="TCP, UDP"/>
-                    </RadioGroup>
-                </FormControl>
+                    <FormControl>
+                        <FormLabel id="rule-network">传输协议(network)</FormLabel>
+                        <RadioGroup row aria-labelledby="rule-network" value={ruleRow.network} onChange={handleRuleChange('network')}>
+                            <FormControlLabel value="" control={<Radio/>} label="None"/>
+                            <FormControlLabel value="tcp" control={<Radio/>} label="TCP"/>
+                            <FormControlLabel value="udp" control={<Radio/>} label="UDP"/>
+                            <FormControlLabel value="tcp,udp" control={<Radio/>} label="TCP, UDP"/>
+                        </RadioGroup>
+                    </FormControl>
 
-                <FormControl>
-                    <FormLabel id="rule-protocol">请求协议(protocol)</FormLabel>
-                    <FormGroup row aria-labelledby="rule-protocol">
-                        <FormControlLabel
-                            label="HTTP 1.1"
-                            control={<Checkbox checked={ruleRow.protocol.includes('http')} value="http" onChange={handleProtocolChange}/>}
-                        />
-                        <FormControlLabel
-                            label="TLS"
-                            control={<Checkbox checked={ruleRow.protocol.includes('tls')} value="tls" onChange={handleProtocolChange}/>}
-                        />
-                        <FormControlLabel
-                            label="QUIC"
-                            control={<Checkbox checked={ruleRow.protocol.includes('quic')} value="quic" onChange={handleProtocolChange}/>}
-                        />
-                        <FormControlLabel
-                            label="BitTorrent"
-                            control={<Checkbox checked={ruleRow.protocol.includes('bittorrent')} value="bittorrent" onChange={handleProtocolChange}/>}
-                        />
-                    </FormGroup>
-                </FormControl>
-            </>)}
+                    <FormControl>
+                        <FormLabel id="rule-protocol">请求协议(protocol)</FormLabel>
+                        <FormGroup row aria-labelledby="rule-protocol">
+                            <FormControlLabel
+                                label="HTTP 1.1"
+                                control={<Checkbox checked={ruleRow.protocol.includes('http')} value="http" onChange={handleProtocolChange}/>}
+                            />
+                            <FormControlLabel
+                                label="TLS"
+                                control={<Checkbox checked={ruleRow.protocol.includes('tls')} value="tls" onChange={handleProtocolChange}/>}
+                            />
+                            <FormControlLabel
+                                label="QUIC"
+                                control={<Checkbox checked={ruleRow.protocol.includes('quic')} value="quic" onChange={handleProtocolChange}/>}
+                            />
+                            <FormControlLabel
+                                label="BitTorrent"
+                                control={<Checkbox checked={ruleRow.protocol.includes('bittorrent')} value="bittorrent" onChange={handleProtocolChange}/>}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </>)}
+            </Stack>
 
             <div className="flex-between">
                 <Stack direction="row" spacing={1}>
