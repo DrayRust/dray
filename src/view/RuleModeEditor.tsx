@@ -17,6 +17,7 @@ import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
 import { ErrorCard } from "../component/useCard.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
+import { hashJson } from "../util/crypto.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
@@ -185,6 +186,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             ruleModeList[ruleModeKey].rules.push(item)
         }
 
+        ruleModeList[ruleModeKey].hash = await hashJson(ruleModeList[ruleModeKey].rules)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
             showAlertDialog('保存失败')
@@ -204,7 +206,9 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
     const handleRuleDelete = (key: number) => {
         confirm('确认删除', `确定要删除这条规则吗？`, async () => {
-            ruleModeList[ruleModeKey].rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
+            const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
+            ruleModeList[ruleModeKey].rules = rules
+            ruleModeList[ruleModeKey].hash = await hashJson(rules)
             const ok = await saveRuleModeList(ruleModeList)
             if (!ok) {
                 showAlertDialog('删除失败')
