@@ -20,7 +20,7 @@ import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { decodeBase64, encodeBase64, safeJsonParse } from "../util/crypto.ts"
+import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -102,12 +102,14 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     const handleRuleModeSubmit = useDebounce(async () => {
         const newRuleModeRow = {...ruleModeRow}
         newRuleModeRow.name = newRuleModeRow.name.trim()
-        newRuleModeRow.note = newRuleModeRow.note.trim()
         if (newRuleModeRow.name === '') {
             setErrorName(true)
             return
         }
         setErrorName(false)
+
+        newRuleModeRow.note = newRuleModeRow.note.trim()
+        newRuleModeRow.hash = await hashJson(newRuleModeRow.rules)
 
         const newRuleModeList = [...ruleModeList]
         newRuleModeList.push(newRuleModeRow)
