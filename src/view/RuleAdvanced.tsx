@@ -147,7 +147,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
             if (v.length < 20) continue
 
             if (v.startsWith('drayRule://')) {
-                const ruleMode = safeJsonParse(decodeBase64(v.substring(11)))
+                const decoded = decodeBase64(v.substring(11))
+                const ruleMode = safeJsonParse(decoded)
                 if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
                     if (newRuleModeList.some(item => item.hash === ruleMode.hash)) {
                         repeatNum++ // 存在重复
