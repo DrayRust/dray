@@ -38,7 +38,11 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     useEffect(() => {
         readRuleModeList().then((d) => {
-            setRuleModeList(d as RuleModeList)
+            const mergedList = (d as RuleModeList).map(item => ({
+                ...DEFAULT_RULE_MODE_ROW,
+                ...item
+            }))
+            setRuleModeList(mergedList)
         }).catch(_ => 0)
     }, [])
 
@@ -93,14 +97,30 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleModeKey(key)
     }
 
-    const handleRuleModeDelete = (key: number) => {
-        console.log('handleRuleModeDelete:', key)
+    const handleRuleModeDelete = async (key: number) => {
+        if (ruleConfig.mode === key) {
+            showSnackbar('正在使用的模式，不允许删除', 'error')
+            return
+        }
+
+        if (ruleModeList.length < 2) {
+            showSnackbar('不允许删除所有模式，至少保留一个', 'error')
+            return
+        }
+
+        ruleModeList.splice(key, 1)
+        const ok = await saveRuleModeList(ruleModeList)
+        if (!ok) {
+            showSnackbar('保存失败', 'error')
+            return
+        }
+        setRuleModeList([...ruleModeList])
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar('br')
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
     return (<>
-        <SnackbarComponent/>
         <Drawer anchor="right" open={open} onClose={handleClose}>
+            <SnackbarComponent/>
             <Box sx={{p: 2}}>
                 <Stack spacing={2} sx={{minWidth: '650px'}}>
                     <DoubleArrowIcon onClick={handleClose}/>

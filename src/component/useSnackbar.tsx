@@ -20,12 +20,17 @@ export const useSnackbar = (position?: 'br' | 'tr' | 'top') => {
     }
 
     const SnackbarComponent = () => (
-        <Snackbar open={open} onClose={handleClose} autoHideDuration={autoHideDuration}
-                  anchorOrigin={
-                      position === 'tr' ? {vertical: 'top', horizontal: 'right'} :
-                          position === 'br' ? {vertical: 'bottom', horizontal: 'right'} :
-                              {vertical: 'top', horizontal: 'center'}
-                  }>
+        <Snackbar
+            open={open}
+            onClose={handleClose}
+            autoHideDuration={autoHideDuration}
+            anchorOrigin={
+                position === 'tr' ? {vertical: 'top', horizontal: 'right'} :
+                    position === 'br' ? {vertical: 'bottom', horizontal: 'right'} :
+                        {vertical: 'top', horizontal: 'center'}
+            }
+            sx={{zIndex: 9999}}
+        >
             <Alert variant="filled" severity={severity} onClose={handleClose}>{message}</Alert>
         </Snackbar>
     )
