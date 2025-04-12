@@ -16,6 +16,19 @@ import { RuleAdvanced } from './RuleAdvanced.tsx'
 import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 
+const DEFAULT_RULE_CONFIG: RuleConfig = {
+    globalProxy: false,
+    domainStrategy: 'AsIs',
+    unmatchedStrategy: 'direct',
+    mode: 0
+}
+
+const DEFAULT_RULE_DOMAIN: RuleDomain = {
+    proxy: '',
+    direct: '',
+    block: ''
+}
+
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         setNavState(3)
@@ -23,23 +36,14 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
-    const [ruleConfig, setRuleConfig] = useState<RuleConfig>({
-        globalProxy: false,
-        domainStrategy: 'AsIs',
-        unmatchedStrategy: 'direct',
-        mode: 0
-    })
-    const [ruleDomain, setRuleDomain] = useState<RuleDomain>({
-        proxy: '',
-        direct: '',
-        block: ''
-    })
+    const [ruleConfig, setRuleConfig] = useState<RuleConfig>(DEFAULT_RULE_CONFIG)
+    const [ruleDomain, setRuleDomain] = useState<RuleDomain>(DEFAULT_RULE_DOMAIN)
     useEffect(() => {
-        readRuleConfig().then((d) => {
-            setRuleConfig(d as RuleConfig)
+        readRuleConfig().then((data) => {
+            setRuleConfig({...DEFAULT_RULE_CONFIG, ...data})
         }).catch(_ => 0)
-        readRuleDomain().then((d) => {
-            setRuleDomain(d as RuleDomain)
+        readRuleDomain().then((data) => {
+            setRuleDomain({...DEFAULT_RULE_DOMAIN, ...data})
         }).catch(_ => 0)
     }, [])
 
