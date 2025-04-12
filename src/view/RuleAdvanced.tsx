@@ -11,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
@@ -333,6 +334,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                                 </TableCell>
                                                 <TableCell align="right">
                                                     <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
+                                                    <IconButton color="info" onClick={() => handleRuleModeUpdate(key)}><VisibilityIcon/></IconButton>
                                                     <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
                                                 </TableCell>
                                             </TableRow>
