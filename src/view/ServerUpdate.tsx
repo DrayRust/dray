@@ -4,7 +4,7 @@ import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '
 
 import { useAppBar } from "../component/useAppBar.tsx"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
-import { hashString } from "../util/util.ts"
+import { hashJson } from "../util/crypto.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { getScy } from "../util/server.ts"
 import { useSnackbar } from "../component/useSnackbar.tsx"
@@ -114,7 +114,7 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
                 type: serverType,
                 host: `${data.add}:${data.port}`,
                 scy: getScy(data),
-                hash: await hashString(JSON.stringify(data)),
+                hash: await hashJson(data),
                 data
             }
 

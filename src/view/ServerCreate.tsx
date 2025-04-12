@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
 import { useAppBar } from "../component/useAppBar.tsx"
-import { hashString } from "../util/util.ts"
+import { hashJson } from "../util/crypto.ts"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
 import { getScy } from "../util/server.ts"
@@ -145,7 +145,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
             type: serverType,
             host: `${data.add}:${data.port}`,
             scy: getScy(data),
-            hash: await hashString(JSON.stringify(data)),
+            hash: await hashJson(data),
             data
         }
 
