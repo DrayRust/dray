@@ -192,13 +192,14 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                 return
             }
 
-            ruleModeList.splice(key, 1)
-            const ok = await saveRuleModeList(ruleModeList)
+            const newRuleModeList = [...ruleModeList]
+            newRuleModeList.splice(key, 1)
+            const ok = await saveRuleModeList(newRuleModeList)
             if (!ok) {
                 showAlertDialog('删除失败')
                 return
             }
-            setRuleModeList([...ruleModeList])
+            setRuleModeList(newRuleModeList)
             setRuleModeChecked([])
         })
     }
