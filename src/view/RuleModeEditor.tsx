@@ -16,6 +16,7 @@ import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
 import { ErrorCard } from "../component/useCard.tsx"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
@@ -68,8 +69,21 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         if (item) setRuleModeRow(item)
     }, [])
 
+    const saveRuleModeRow = useDebounce(async (newRuleMode: RuleModeRow) => {
+        ruleModeList[ruleModeKey] = newRuleMode
+        const ok = await saveRuleModeList(ruleModeList)
+        if (!ok) {
+            showSnackbar('保存失败', 'error')
+            return
+        }
+    }, 600)
+
     const handleRuleModeRowChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRuleModeRow(prev => ({...prev, [type]: e.target.value}))
+        setRuleModeRow(prev => {
+            const newRuleMode = {...prev, [type]: e.target.value}
+            saveRuleModeRow(newRuleMode)
+            return newRuleMode
+        })
     }
 
     const [action, setAction] = useState('')
