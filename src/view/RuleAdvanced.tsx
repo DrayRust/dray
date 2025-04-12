@@ -63,15 +63,17 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleConfig(prev => ({...prev, mode: e.target.value}))
     }
 
-    const [showSuccess, setShowSuccess] = useState(false)
+    const [successMsg, setSuccessMsg] = useState('')
+    const [errorMsg, setErrorMsg] = useState('')
     const handleSubmit = async () => {
         const ok = await saveRuleConfig(ruleConfig)
         if (!ok) {
-            showErrorDialog('保存失败')
+            setErrorMsg('保存失败')
+            setTimeout(() => setErrorMsg(''), 2000)
             return
         }
-        setShowSuccess(true)
-        setTimeout(() => setShowSuccess(false), 1000)
+        setSuccessMsg('保存成功')
+        setTimeout(() => setSuccessMsg(''), 1000)
     }
 
     const [action, setAction] = useState('')
@@ -179,7 +181,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                         </TextField>
                         <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                             <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
-                            {showSuccess && <Chip label="保存成功" color="success" size="small"/>}
+                            {errorMsg && <Chip label={errorMsg} color="error" size="small"/>}
+                            {successMsg && <Chip label={successMsg} color="success" size="small"/>}
                         </Stack>
                     </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
