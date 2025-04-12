@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Box, Card, Chip, Drawer, Stack, TextField, MenuItem, Button, Typography,
+    Box, Card, Drawer, Stack, TextField, MenuItem, Button, Typography,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -15,6 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useErrorDialog } from "../component/useErrorDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
+import { useChip } from "../component/useChip.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
@@ -63,17 +64,13 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleConfig(prev => ({...prev, mode: e.target.value}))
     }
 
-    const [successMsg, setSuccessMsg] = useState('')
-    const [errorMsg, setErrorMsg] = useState('')
     const handleSubmit = async () => {
         const ok = await saveRuleConfig(ruleConfig)
         if (!ok) {
-            setErrorMsg('保存失败')
-            setTimeout(() => setErrorMsg(''), 2000)
+            showChip('保存失败', 'error')
             return
         }
-        setSuccessMsg('保存成功')
-        setTimeout(() => setSuccessMsg(''), 1000)
+        showChip('保存成功', 'success')
     }
 
     const [action, setAction] = useState('')
@@ -135,6 +132,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const {ErrorDialog, showErrorDialog} = useErrorDialog()
     const {DialogComponent, confirm} = useDialog()
+    const {ChipComponent, showChip} = useChip()
     return (<>
         <ErrorDialog/>
         <DialogComponent/>
@@ -181,8 +179,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                         </TextField>
                         <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                             <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
-                            {errorMsg && <Chip label={errorMsg} color="error" size="small"/>}
-                            {successMsg && <Chip label={successMsg} color="success" size="small"/>}
+                            <ChipComponent/>
                         </Stack>
                     </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
