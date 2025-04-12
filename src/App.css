@@ -124,3 +124,20 @@ body, html {
     justify-content: center;
     margin-bottom: 8px;
 }
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-column > :not(style):not(style) {
+    margin: 0;
+}
+
+.flex-column.gap1 > :not(style) ~ :not(style) {
+    margin-top: 8px;
+}
+
+.flex-column.gap2 > :not(style) ~ :not(style) {
+    margin-top: 16px;
+}

@@ -81,7 +81,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 </ToggleButtonGroup>
             </div>
             <Card sx={{p: 2, maxWidth: '800px', maxHeight: 'calc(100% - 56px)', m: 'auto', overflow: 'auto'}}>
-                {ruleMode === 'route' && (<Stack spacing={2}>
+                {ruleMode === 'route' && (<div className="flex-column gap2">
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
                         <Switch checked={ruleConfig.globalProxy} onChange={handleGlobalProxy}/>
@@ -139,7 +139,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                             <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
                         </div>
                     </>)}
-                </Stack>)}
+                </div>)}
 
                 {ruleMode === 'dns' && (<>
                 </>)}
