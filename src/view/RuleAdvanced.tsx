@@ -20,7 +20,7 @@ import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { decodeBase64, encodeBase64, safeJsonParse } from "../util/base64.ts"
+import { decodeBase64, encodeBase64, safeJsonParse } from "../util/crypto.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',

@@ -1,5 +1,5 @@
 import { log } from './invoke.ts'
-import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './base64.ts'
+import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './crypto.ts'
 import { hashString } from "./util.ts"
 
 export function isValidUri(uri: string): boolean {
