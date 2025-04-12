@@ -111,7 +111,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 placeholder="例如：google.com"/>
                         </>) : ruleType === 1 ? (<>
                             <Alert variant="filled" severity="success">
-                                直接连接网络，不经过任何代理服务器，适合访问国内网站或不需要加速的场景。比如访问百度、淘宝等。
+                                直接连接网络，不经过任何代理服务器，适合访问国内网站。比如访问百度、淘宝等。
                             </Alert>
                             <TextField
                                 variant="outlined" fullWidth multiline rows={6}

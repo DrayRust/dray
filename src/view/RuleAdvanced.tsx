@@ -67,20 +67,34 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     const handleSubmit = async () => {
         const ok = await saveRuleConfig(ruleConfig)
         if (!ok) {
-            showChip('保存失败', 'error')
+            showChip('设置失败', 'error')
             return
         }
-        showChip('保存成功', 'success')
+        showChip('设置成功', 'success')
     }
 
     const [action, setAction] = useState('')
+    const [errorName, setErrorName] = useState(false)
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>(DEFAULT_RULE_MODE_ROW)
     const handleRuleModeRowChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRuleModeRow(prev => ({...prev, [type]: e.target.value}))
+        setRuleModeRow(prev => {
+            const value = e.target.value
+            if (type === 'name') setErrorName(value === '')
+            return {...prev, [type]: value}
+        })
     }
 
     const handleRuleModeRowSubmit = useDebounce(async () => {
-        ruleModeList.push(ruleModeRow)
+        const newRuleModeRow = {...ruleModeRow}
+        newRuleModeRow.name = newRuleModeRow.name.trim()
+        newRuleModeRow.note = newRuleModeRow.note.trim()
+        if (newRuleModeRow.name === '') {
+            setErrorName(true)
+            return
+        }
+        setErrorName(false)
+
+        ruleModeList.push(newRuleModeRow)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
             showErrorDialog('添加失败')
@@ -99,9 +113,11 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     }
 
     const handleRuleModeImport = () => {
+        setAction('import')
     }
 
     const handleRuleModeExport = () => {
+        setAction('export')
     }
 
     const handleRuleModeUpdate = (key: number) => {
@@ -111,7 +127,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     const handleRuleModeDelete = async (key: number, name: string) => {
         confirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
             if (ruleConfig.mode === key) {
-                showErrorDialog('正在使用的模式，不允许删除')
+                showErrorDialog('不允许删除正在使用的模式')
                 return
             }
 
@@ -186,11 +202,34 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
                         </>) : action === 'create' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" label="模式名称" value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
+                                <TextField size="small" label="模式名称"
+                                           error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
+                                           value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
                                 <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeRowChange('note')} multiline rows={2}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>添加</Button>
+                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                            </Stack>
+                        </>) : action === 'import' ? (<>
+                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                <TextField
+                                    size="small" multiline rows={10}
+                                    label="导入内容（URI）"
+                                    placeholder="每行一条，例如：dray-rule://xxxxxx"
+                                    value={ruleModeRow.name}/>
+                            </Stack>
+                            <Stack direction="row" spacing={1}>
+                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>确定</Button>
+                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                            </Stack>
+                        </>) : action === 'export' ? (<>
+                            <TextField
+                                size="small" multiline rows={10}
+                                label="导出内容（URI）"
+                                value={ruleModeRow.name}/>
+                            <Stack direction="row" spacing={1}>
+                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>复制</Button>
                                 <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
                             </Stack>
                         </>) : (<>
