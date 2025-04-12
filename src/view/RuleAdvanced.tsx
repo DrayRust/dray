@@ -10,7 +10,7 @@ import ModeIcon from '@mui/icons-material/Tune'
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import EditIcon from '@mui/icons-material/Edit'
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
@@ -121,8 +121,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                                     <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                                 </TableCell>
                                                 <TableCell align="right">
-                                                    <IconButton color="primary" title="编辑" onClick={() => handleRuleModeUpdate(key)}><EditIcon/></IconButton>
-                                                    <IconButton color="error" title="删除" onClick={() => handleRuleModeDelete(key)}><DeleteIcon/></IconButton>
+                                                    <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
+                                                    <IconButton color="error" onClick={() => handleRuleModeDelete(key)}><DeleteIcon/></IconButton>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

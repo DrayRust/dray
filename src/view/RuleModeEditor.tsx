@@ -1,28 +1,13 @@
 import { useEffect, useState } from 'react'
 import {
-    Button,
-    Card,
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormGroup,
-    FormLabel,
-    IconButton,
-    MenuItem,
-    Radio,
-    RadioGroup,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableRow,
-    TextField,
-    Typography,
+    Button, Card, Chip, Checkbox,
+    FormControl, FormControlLabel, FormGroup, FormLabel,
+    IconButton, MenuItem, Radio, RadioGroup, Stack,
+    Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
+import EditSquareIcon from '@mui/icons-material/EditSquare'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -30,11 +15,18 @@ import { useSnackbar } from "../component/useSnackbar.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
+import { ErrorCard } from "../component/useCard.tsx"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
     direct: '直接访问',
     block: '阻止访问'
+}
+
+const oTagColors: Record<string, string> = {
+    proxy: 'warning',
+    direct: 'success',
+    block: 'error'
 }
 
 const ruleTypeList: Record<string, string> = {
@@ -306,27 +298,31 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
             <div className="flex-between">
                 <Stack direction="row" spacing={1}>
-                    <Button variant="contained" onClick={handleSubmit}>确定</Button>
-                    <Button variant="contained" size="small" onClick={handleRuleBack}>取消</Button>
+                    <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
+                    <Button variant="contained" onClick={handleRuleBack}>取消</Button>
                 </Stack>
                 <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}
                           onClick={() => openUrl("https://xtls.github.io/config/routing.html#ruleobject")}/>
             </div>
         </>) : (<>
             <Stack direction="row" spacing={1}>
-                <Button variant="contained" size="small" color="success" onClick={handleRuleCreate}><AddIcon/></Button>
+                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleCreate}>添加</Button>
             </Stack>
+            {ruleModeRow.rules.length === 0 && <ErrorCard errorMsg="规则为空" height="160px"/>}
             <TableContainer component={Card}>
-                <Table>
+                <Table size="small">
                     <TableBody>
                         {ruleModeRow.rules.map((row, key) => (
                             <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                <TableCell component="th" scope="row">
-                                    <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
+                                <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                    <Typography variant="body1" component="div">{row.name}</Typography>
                                     <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                 </TableCell>
-                                <TableCell align="right">
-                                    <IconButton color="primary" title="编辑" onClick={() => handleRuleUpdate(key)}><EditIcon/></IconButton>
+                                <TableCell sx={{p: '4px 8px'}} align="right">
+                                    <Chip size="small" label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
+                                </TableCell>
+                                <TableCell sx={{p: '4px 8px'}} align="right" width="100">
+                                    <IconButton color="primary" title="编辑" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
                                     <IconButton color="error" title="删除" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
                                 </TableCell>
                             </TableRow>
