@@ -13,9 +13,18 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { useSnackbar } from "../component/useSnackbar.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
-import { readRuleModeList } from "../util/invoke.ts"
+import { readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
+
+const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
+    name: '',
+    note: '',
+    hash: '',
+    rules: []
+}
 
 export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     open: boolean,
@@ -49,6 +58,37 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleConfig(prev => ({...prev, mode: e.target.value}))
     }
 
+    const [action, setAction] = useState('')
+    const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>(DEFAULT_RULE_MODE_ROW)
+    const handleRuleModeRowChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRuleModeRow(prev => ({...prev, [type]: e.target.value}))
+    }
+
+    const handleRuleModeRowSubmit = useDebounce(async () => {
+        ruleModeList.push(ruleModeRow)
+        const ok = await saveRuleModeList(ruleModeList)
+        if (!ok) {
+            showSnackbar('保存失败', 'error')
+            return
+        }
+        setAction('')
+    }, 50)
+
+    const handleRuleModeRowCancel = () => {
+        setAction('')
+    }
+
+    const handleRuleModeCreate = () => {
+        setAction('create')
+        setRuleModeRow(DEFAULT_RULE_MODE_ROW)
+    }
+
+    const handleRuleModeImport = () => {
+    }
+
+    const handleRuleModeExport = () => {
+    }
+
     const handleRuleModeUpdate = (key: number) => {
         setRuleModeKey(key)
     }
@@ -57,7 +97,9 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         console.log('handleRuleModeDelete:', key)
     }
 
-    return (
+    const {SnackbarComponent, showSnackbar} = useSnackbar('br')
+    return (<>
+        <SnackbarComponent/>
         <Drawer anchor="right" open={open} onClose={handleClose}>
             <Box sx={{p: 2}}>
                 <Stack spacing={2} sx={{minWidth: '650px'}}>
@@ -70,7 +112,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                         <BottomNavigationAction label="访问策略" icon={<ForkRightIcon/>}/>
                         <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
                     </BottomNavigation>
-                    {tab === 0 && (<>
+                    {tab === 0 ? (<>
                         <div className="flex-between">
                             <TextField
                                 select fullWidth size="small"
@@ -100,16 +142,23 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             ))}
                         </TextField>
                         <Button variant="contained" color="info">确认</Button>
-                    </>)}
-
-                    {tab === 1 && (<>
+                    </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
+                        </>) : action === 'create' ? (<>
+                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                <TextField size="small" label="模式名称" value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
+                                <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeRowChange('note')} multiline rows={2}/>
+                            </Stack>
+                            <Stack direction="row" spacing={1}>
+                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>添加</Button>
+                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                            </Stack>
                         </>) : (<>
                             <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="secondary" startIcon={<AddIcon/>}>添加</Button>
-                                <Button variant="contained" color="success" startIcon={<FileUploadIcon/>}>导入</Button>
-                                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>}>导出</Button>
+                                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleModeCreate}>添加</Button>
+                                <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleRuleModeImport}>导入</Button>
+                                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleRuleModeExport}>导出</Button>
                             </Stack>
                             <TableContainer component={Card}>
                                 <Table>
@@ -134,5 +183,5 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                 </Stack>
             </Box>
         </Drawer>
-    )
+    </>)
 }
