@@ -11,7 +11,7 @@ import EditSquareIcon from '@mui/icons-material/EditSquare'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { useSnackbar } from "../component/useSnackbar.tsx"
+import { useErrorDialog } from '../component/useErrorDialog.tsx'
 import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
@@ -73,7 +73,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         ruleModeList[ruleModeKey] = newRuleMode
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showSnackbar('保存失败', 'error')
+            showErrorDialog('保存失败')
             return
         }
     }, 600)
@@ -174,7 +174,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             item.port = processPort(item.port)
             item.sourcePort = processPort(item.sourcePort)
             if (!item.domain && !item.port && !item.sourcePort && !item.network && !item.protocol) {
-                showSnackbar('请至少填写一项内容', 'error', 2000)
+                showErrorDialog('请至少填写一项内容')
                 return
             }
         }
@@ -187,7 +187,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showSnackbar('保存失败', 'error')
+            showErrorDialog('保存失败')
             return
         }
         setRuleModeList(ruleModeList)
@@ -207,7 +207,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             ruleModeList[ruleModeKey].rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
             const ok = await saveRuleModeList(ruleModeList)
             if (!ok) {
-                showSnackbar('删除失败', 'error')
+                showErrorDialog('删除失败')
                 return
             }
             setRuleModeList(ruleModeList)
@@ -222,10 +222,10 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar('br')
+    const {ErrorDialog, showErrorDialog} = useErrorDialog()
     const {DialogComponent, confirm} = useDialog()
     return (<>
-        <SnackbarComponent/>
+        <ErrorDialog/>
         <DialogComponent/>
         <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
