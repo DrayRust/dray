@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
-    Stack, Button, Alert, Typography, Switch, Chip,
+    Stack, Button, Alert, Typography, Switch,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
 import RouteIcon from '@mui/icons-material/Route'
@@ -11,6 +11,7 @@ import FlightIcon from '@mui/icons-material/Flight'
 import BlockIcon from '@mui/icons-material/Block'
 import SettingsIcon from '@mui/icons-material/Settings'
 
+import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
 import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
@@ -50,25 +51,27 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         setRuleDomain(prev => ({...prev, [type]: e.target.value}))
     }
 
-    const [showSuccess, setShowSuccess] = useState(false)
-    const handleSaveRuleDomain = useDebounce(() => {
+    const handleSaveRuleDomain = useDebounce(async () => {
         const newRuleDomain = {
             proxy: ruleDomain.proxy.trim(),
             direct: ruleDomain.direct.trim(),
             block: ruleDomain.block.trim()
         }
         setRuleDomain(newRuleDomain)
-        saveRuleDomain(newRuleDomain).then(() => {
-            setShowSuccess(true)
-            setTimeout(() => setShowSuccess(false), 1000)
-        }).catch(_ => 0)
-    }, 300)
+        const ok = await saveRuleDomain(newRuleDomain)
+        if (!ok) {
+            showChip('保存失败', 'error')
+            return
+        }
+        showChip('保存成功', 'success')
+    }, 50)
 
     const [open, setOpen] = useState(false)
     const handleOpenAdvanced = () => {
         setOpen(true)
     }
 
+    const {ChipComponent, showChip} = useChip()
     return (<>
         <Paper elevation={5} sx={{p: 1, borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
             <div className="flex-center p1">
@@ -131,7 +134,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                         <div className="flex-between">
                             <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                                 <Button variant="contained" color="info" onClick={handleSaveRuleDomain}>确认</Button>
-                                {showSuccess && <Chip label="保存成功" color="success" size="small"/>}
+                                <ChipComponent/>
                             </Stack>
                             <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>
                         </div>
