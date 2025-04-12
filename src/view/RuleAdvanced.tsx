@@ -14,6 +14,7 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useErrorDialog } from "../component/useErrorDialog.tsx"
+import { useDialog } from "../component/useDialog.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
@@ -72,7 +73,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         ruleModeList.push(ruleModeRow)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showErrorDialog('保存失败')
+            showErrorDialog('添加失败')
             return
         }
         setAction('')
@@ -97,29 +98,33 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleModeKey(key)
     }
 
-    const handleRuleModeDelete = async (key: number) => {
-        if (ruleConfig.mode === key) {
-            showErrorDialog('正在使用的模式，不允许删除')
-            return
-        }
+    const handleRuleModeDelete = async (key: number, name: string) => {
+        confirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
+            if (ruleConfig.mode === key) {
+                showErrorDialog('正在使用的模式，不允许删除')
+                return
+            }
 
-        if (ruleModeList.length < 2) {
-            showErrorDialog('不允许删除所有模式，至少保留一个')
-            return
-        }
+            if (ruleModeList.length < 2) {
+                showErrorDialog('不允许删除所有模式，至少保留一个')
+                return
+            }
 
-        ruleModeList.splice(key, 1)
-        const ok = await saveRuleModeList(ruleModeList)
-        if (!ok) {
-            showErrorDialog('保存失败')
-            return
-        }
-        setRuleModeList([...ruleModeList])
+            ruleModeList.splice(key, 1)
+            const ok = await saveRuleModeList(ruleModeList)
+            if (!ok) {
+                showErrorDialog('删除失败')
+                return
+            }
+            setRuleModeList([...ruleModeList])
+        })
     }
 
     const {ErrorDialog, showErrorDialog} = useErrorDialog()
+    const {DialogComponent, confirm} = useDialog()
     return (<>
         <ErrorDialog/>
+        <DialogComponent/>
         <Drawer anchor="right" open={open} onClose={handleClose}>
             <Box sx={{p: 2}}>
                 <Stack spacing={2} sx={{minWidth: '650px'}}>
@@ -191,7 +196,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                                 </TableCell>
                                                 <TableCell align="right">
                                                     <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
-                                                    <IconButton color="error" onClick={() => handleRuleModeDelete(key)}><DeleteIcon/></IconButton>
+                                                    <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
