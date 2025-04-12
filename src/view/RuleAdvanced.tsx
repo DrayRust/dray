@@ -199,6 +199,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                 return
             }
             setRuleModeList([...ruleModeList])
+            setRuleModeChecked([])
         })
     }
 
