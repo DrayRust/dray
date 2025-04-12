@@ -1,24 +1,20 @@
 import { useState } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
+import { Alert, Dialog, } from '@mui/material'
 
 export const useErrorDialog = () => {
     const [open, setOpen] = useState(false)
     const [message, setMessage] = useState('')
+    const [severity, setSeverity] = useState<'warning' | 'error'>('error')
 
-    const showErrorDialog = (msg: string) => {
-        setMessage(msg)
+    const showErrorDialog = (msg: string, severity?: 'warning' | 'error') => {
         setOpen(true)
+        setMessage(msg)
+        setSeverity(severity || 'error')
     }
 
     const ErrorDialog = () => (
         <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>错误提示</DialogTitle>
-            <DialogContent>
-                <DialogContentText>{message}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={() => setOpen(false)}>关闭</Button>
-            </DialogActions>
+            <Alert variant="filled" severity={severity} onClose={() => setOpen(false)}>{message}</Alert>
         </Dialog>
     )
 

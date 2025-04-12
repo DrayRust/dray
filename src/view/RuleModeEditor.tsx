@@ -174,7 +174,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             item.port = processPort(item.port)
             item.sourcePort = processPort(item.sourcePort)
             if (!item.domain && !item.port && !item.sourcePort && !item.network && !item.protocol) {
-                showErrorDialog('请至少填写一项内容')
+                showErrorDialog('请至少填写一项内容', 'warning')
                 return
             }
         }
