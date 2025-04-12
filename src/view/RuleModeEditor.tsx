@@ -11,7 +11,7 @@ import EditSquareIcon from '@mui/icons-material/EditSquare'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { useErrorDialog } from '../component/useErrorDialog.tsx'
+import { useAlertDialog } from '../component/useAlertDialog.tsx'
 import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
@@ -73,7 +73,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         ruleModeList[ruleModeKey] = newRuleMode
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showErrorDialog('保存失败')
+            showAlertDialog('保存失败')
             return
         }
     }, 600)
@@ -174,7 +174,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             item.port = processPort(item.port)
             item.sourcePort = processPort(item.sourcePort)
             if (!item.domain && !item.port && !item.sourcePort && !item.network && !item.protocol) {
-                showErrorDialog('请至少填写一项内容', 'warning')
+                showAlertDialog('请至少填写一项内容', 'warning')
                 return
             }
         }
@@ -187,7 +187,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showErrorDialog('保存失败')
+            showAlertDialog('保存失败')
             return
         }
         setRuleModeList(ruleModeList)
@@ -207,7 +207,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             ruleModeList[ruleModeKey].rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
             const ok = await saveRuleModeList(ruleModeList)
             if (!ok) {
-                showErrorDialog('删除失败')
+                showAlertDialog('删除失败')
                 return
             }
             setRuleModeList(ruleModeList)
@@ -222,10 +222,10 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
-    const {ErrorDialog, showErrorDialog} = useErrorDialog()
+    const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
     const {DialogComponent, confirm} = useDialog()
     return (<>
-        <ErrorDialog/>
+        <AlertDialogComponent/>
         <DialogComponent/>
         <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>

@@ -13,7 +13,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import { useErrorDialog } from "../component/useErrorDialog.tsx"
+import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useChip } from "../component/useChip.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
@@ -111,7 +111,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         ruleModeList.push(newRuleModeRow)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showErrorDialog('添加失败')
+            showAlertDialog('添加失败')
             return
         }
         setAction('')
@@ -145,9 +145,9 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeCopy = () => {
         navigator.clipboard.writeText(ruleModeExportData).then(() => {
-            showErrorDialog('复制成功', 'warning', 2000)
+            showAlertDialog('复制成功', 'warning', 2000)
         }).catch(() => {
-            showErrorDialog('复制失败', 'error')
+            showAlertDialog('复制失败', 'error')
         })
     }
 
@@ -158,30 +158,30 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     const handleRuleModeDelete = async (key: number, name: string) => {
         confirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
             if (ruleConfig.mode === key) {
-                showErrorDialog('不允许删除正在使用的模式')
+                showAlertDialog('不允许删除正在使用的模式')
                 return
             }
 
             if (ruleModeList.length < 2) {
-                showErrorDialog('不允许删除所有模式，至少保留一个')
+                showAlertDialog('不允许删除所有模式，至少保留一个')
                 return
             }
 
             ruleModeList.splice(key, 1)
             const ok = await saveRuleModeList(ruleModeList)
             if (!ok) {
-                showErrorDialog('删除失败')
+                showAlertDialog('删除失败')
                 return
             }
             setRuleModeList([...ruleModeList])
         })
     }
 
-    const {ErrorDialog, showErrorDialog} = useErrorDialog()
+    const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
     const {DialogComponent, confirm} = useDialog()
     const {ChipComponent, showChip} = useChip()
     return (<>
-        <ErrorDialog/>
+        <AlertDialogComponent/>
         <DialogComponent/>
         <Drawer anchor="right" open={open} onClose={handleClose}>
             <Box sx={{p: 2}}>
