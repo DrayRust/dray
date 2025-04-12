@@ -38,20 +38,6 @@ export function isValidUUID(uuid: string): boolean {
     return regex.test(uuid)
 }
 
-/**
- * 计算字符串的哈希值
- * @param input 输入字符串
- * @param algorithm 哈希算法，默认为 'SHA-256', 可选 'MD5', 'SHA-1', 'SHA-384', 'SHA-512' 等
- * @returns 哈希值的十六进制字符串
- */
-export async function hashString(input: string, algorithm: string = 'SHA-256'): Promise<string> {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(input)
-    const hashBuffer = await crypto.subtle.digest(algorithm, data)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
-}
-
 export function getCurrentYMDHIS(): string {
     const now = new Date()
     const year = now.getFullYear()

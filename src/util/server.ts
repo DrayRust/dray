@@ -1,6 +1,5 @@
 import { log } from './invoke.ts'
-import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify } from './crypto.ts'
-import { hashString } from "./util.ts"
+import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify, hashJson } from './crypto.ts'
 
 export function isValidUri(uri: string): boolean {
     try {
@@ -134,7 +133,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
         type: 'vmess',
         host: `${data.add}:${data.port}`,
         scy: getScy(data),
-        hash: await hashString(safeJsonStringify(data)),
+        hash: await hashJson(data),
         data
     }
 }
@@ -233,7 +232,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
         type: 'vless',
         host: `${data.add}:${data.port}`,
         scy: getScy(data),
-        hash: await hashString(safeJsonStringify(data)),
+        hash: await hashJson(data),
         data
     }
 }
@@ -274,7 +273,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
         type: 'ss',
         host: `${data.add}:${data.port}`,
         scy: data.scy,
-        hash: await hashString(safeJsonStringify(data)),
+        hash: await hashJson(data),
         data
     }
 }
@@ -325,7 +324,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
         type: 'trojan',
         host: `${data.add}:${data.port}`,
         scy: getScy(data),
-        hash: await hashString(safeJsonStringify(data)),
+        hash: await hashJson(data),
         data
     }
 }
