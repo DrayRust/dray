@@ -23,21 +23,21 @@ export function decodeBase64(base64: string): string {
     }
 }
 
-export function safeJsonParse(jsonString: string): any {
-    try {
-        return JSON.parse(jsonString)
-    } catch (e) {
-        log.error('JSON.parse failed:', e)
-        return null
-    }
-}
-
 export function safeJsonStringify(data: any): string {
     try {
         return JSON.stringify(data)
     } catch (e) {
         log.error('JSON.stringify failed:', e)
         return '{}'
+    }
+}
+
+export function safeJsonParse(jsonString: string): any {
+    try {
+        return JSON.parse(jsonString)
+    } catch (e) {
+        log.error('JSON.parse failed:', e)
+        return null
     }
 }
 

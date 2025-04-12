@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Box, Card, Drawer, Stack, TextField, MenuItem, Button, Typography,
+    Box, Card, Checkbox, Drawer, Stack, TextField, MenuItem, Button, Typography,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -20,6 +20,7 @@ import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
+import { encodeBase64 } from "../util/base64.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -74,13 +75,26 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     }
 
     const [action, setAction] = useState('')
+    const [ruleModeExportData, setRuleModeExportData] = useState('')
     const [errorName, setErrorName] = useState(false)
+    const [ruleModeChecked, setRuleModeChecked] = useState<number[]>([])
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>(DEFAULT_RULE_MODE_ROW)
     const handleRuleModeRowChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRuleModeRow(prev => {
             const value = e.target.value
             if (type === 'name') setErrorName(value === '')
             return {...prev, [type]: value}
+        })
+    }
+
+    const handleRuleModeCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRuleModeChecked(prev => {
+            const value = Number(e.target.value)
+            if (e.target.checked) {
+                return [...prev, value]
+            } else {
+                return prev.filter(item => item !== value)
+            }
         })
     }
 
@@ -105,6 +119,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeRowCancel = () => {
         setAction('')
+        setRuleModeExportData('')
+        setRuleModeChecked([])
     }
 
     const handleRuleModeCreate = () => {
@@ -118,6 +134,21 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeExport = () => {
         setAction('export')
+
+        let arr = []
+        for (let i = 0; i < ruleModeChecked.length; i++) {
+            const ruleMode = ruleModeList[i]
+            if (ruleMode) arr.push('drayRule://' + encodeBase64(JSON.stringify(ruleMode)))
+        }
+        setRuleModeExportData(arr.join('\n'))
+    }
+
+    const handleRuleModeCopy = () => {
+        navigator.clipboard.writeText(ruleModeExportData).then(() => {
+            showErrorDialog('复制成功', 'warning', 2000)
+        }).catch(() => {
+            showErrorDialog('复制失败', 'error')
+        })
     }
 
     const handleRuleModeUpdate = (key: number) => {
@@ -216,7 +247,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 <TextField
                                     size="small" multiline rows={10}
                                     label="导入内容（URI）"
-                                    placeholder="每行一条，例如：dray-rule://xxxxxx"
+                                    placeholder="每行一条，例如：drayRule://xxxxxx"
                                     value={ruleModeRow.name}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
@@ -224,25 +255,27 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
                             </Stack>
                         </>) : action === 'export' ? (<>
-                            <TextField
-                                size="small" multiline rows={10}
-                                label="导出内容（URI）"
-                                value={ruleModeRow.name}/>
+                            <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
                             <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>复制</Button>
+                                <Button variant="contained" color="info" onClick={handleRuleModeCopy}>复制</Button>
                                 <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
                             </Stack>
                         </>) : (<>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleModeCreate}>添加</Button>
                                 <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleRuleModeImport}>导入</Button>
-                                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleRuleModeExport}>导出</Button>
+                                {ruleModeChecked.length > 0 && (
+                                    <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleRuleModeExport}>导出</Button>
+                                )}
                             </Stack>
                             <TableContainer component={Card}>
                                 <Table>
                                     <TableBody>
                                         {ruleModeList.map((row, key) => (
                                             <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox value={key} checked={ruleModeChecked.includes(key)} onChange={handleRuleModeCheckedChange}/>
+                                                </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
                                                     <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
