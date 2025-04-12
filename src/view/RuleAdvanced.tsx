@@ -13,7 +13,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import { useSnackbar } from "../component/useSnackbar.tsx"
+import { useErrorDialog } from "../component/useErrorDialog.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
@@ -72,7 +72,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         ruleModeList.push(ruleModeRow)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showSnackbar('保存失败', 'error')
+            showErrorDialog('保存失败')
             return
         }
         setAction('')
@@ -99,28 +99,28 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeDelete = async (key: number) => {
         if (ruleConfig.mode === key) {
-            showSnackbar('正在使用的模式，不允许删除', 'error')
+            showErrorDialog('正在使用的模式，不允许删除')
             return
         }
 
         if (ruleModeList.length < 2) {
-            showSnackbar('不允许删除所有模式，至少保留一个', 'error')
+            showErrorDialog('不允许删除所有模式，至少保留一个')
             return
         }
 
         ruleModeList.splice(key, 1)
         const ok = await saveRuleModeList(ruleModeList)
         if (!ok) {
-            showSnackbar('保存失败', 'error')
+            showErrorDialog('保存失败')
             return
         }
         setRuleModeList([...ruleModeList])
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar()
+    const {ErrorDialog, showErrorDialog} = useErrorDialog()
     return (<>
+        <ErrorDialog/>
         <Drawer anchor="right" open={open} onClose={handleClose}>
-            <SnackbarComponent/>
             <Box sx={{p: 2}}>
                 <Stack spacing={2} sx={{minWidth: '650px'}}>
                     <DoubleArrowIcon onClick={handleClose}/>
