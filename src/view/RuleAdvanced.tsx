@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Box, Card, Drawer, Stack, TextField, MenuItem, Button, Typography,
+    Box, Card, Chip, Drawer, Stack, TextField, MenuItem, Button, Typography,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -16,7 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useErrorDialog } from "../component/useErrorDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
-import { readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
+import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 
@@ -61,6 +61,17 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleMode = (e: any) => {
         setRuleConfig(prev => ({...prev, mode: e.target.value}))
+    }
+
+    const [showSuccess, setShowSuccess] = useState(false)
+    const handleSubmit = async () => {
+        const ok = await saveRuleConfig(ruleConfig)
+        if (!ok) {
+            showErrorDialog('保存失败')
+            return
+        }
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 1000)
     }
 
     const [action, setAction] = useState('')
@@ -166,7 +177,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 <MenuItem key={index} value={index}>{item.name}</MenuItem>
                             ))}
                         </TextField>
-                        <Button variant="contained" color="info">确认</Button>
+                        <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                            <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
+                            {showSuccess && <Chip label="保存成功" color="success" size="small"/>}
+                        </Stack>
                     </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
