@@ -145,9 +145,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         const arr = ruleModeImportData.split('\n')
         for (let v of arr) {
             if (v.length < 20) continue
+
             if (v.startsWith('drayRule://')) {
                 const ruleMode = safeJsonParse(decodeBase64(v.substring(11)))
-                if (ruleMode) {
+                if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
                     if (newRuleModeList.some(item => item.hash === ruleMode.hash)) {
                         repeatNum++ // 存在重复
                     } else {
@@ -155,12 +156,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                         okNum++
                     }
                 } else {
-                    // 解析失败
-                    errNum++
+                    errNum++ // 解析失败，或数据不正确
                 }
             } else {
-                // 格式不正确，前缀不是 drayRule://
-                errNum++
+                errNum++ // 格式不正确，前缀不是 drayRule://
             }
         }
 
@@ -169,9 +168,11 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
             showAlertDialog('导入保存失败')
             return
         }
+
         setRuleModeList(newRuleModeList)
         setRuleModeImportData('')
         setAction('')
+
         if (errNum > 0 || repeatNum > 0) {
             showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
