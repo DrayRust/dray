@@ -140,14 +140,20 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     const handleRuleModeImportSubmit = async () => {
         const newRuleModeList = [...ruleModeList]
         let okNum = 0
+        let repeatNum = 0
         let errNum = 0
         const arr = ruleModeImportData.split('\n')
         for (let v of arr) {
+            if (v.length < 20) continue
             if (v.startsWith('drayRule://')) {
                 const ruleMode = safeJsonParse(decodeBase64(v.substring(11)))
                 if (ruleMode) {
-                    newRuleModeList.push(ruleMode)
-                    okNum++
+                    if (newRuleModeList.some(item => item.hash === ruleMode.hash)) {
+                        repeatNum++ // 存在重复
+                    } else {
+                        newRuleModeList.push(ruleMode)
+                        okNum++
+                    }
                 } else {
                     // 解析失败
                     errNum++
@@ -166,8 +172,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleModeList(newRuleModeList)
         setRuleModeImportData('')
         setAction('')
-        if (errNum > 0) {
-            showAlertDialog(`导入成功 ${okNum} 个模式，导入失败 ${errNum} 个模式`, 'warning')
+        if (errNum > 0 || repeatNum > 0) {
+            showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
     }
 
