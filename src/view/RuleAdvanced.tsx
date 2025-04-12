@@ -20,7 +20,7 @@ import { RuleModeEditor } from "./RuleModeEditor.tsx"
 import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { encodeBase64 } from "../util/base64.ts"
+import { decodeBase64, encodeBase64, safeJsonParse } from "../util/base64.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -75,11 +75,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
     }
 
     const [action, setAction] = useState('')
+    const [ruleModeImportData, setRuleModeImportData] = useState('')
     const [ruleModeExportData, setRuleModeExportData] = useState('')
     const [errorName, setErrorName] = useState(false)
     const [ruleModeChecked, setRuleModeChecked] = useState<number[]>([])
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>(DEFAULT_RULE_MODE_ROW)
-    const handleRuleModeRowChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRuleModeChange = (type: keyof RuleModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRuleModeRow(prev => {
             const value = e.target.value
             if (type === 'name') setErrorName(value === '')
@@ -98,7 +99,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         })
     }
 
-    const handleRuleModeRowSubmit = useDebounce(async () => {
+    const handleRuleModeSubmit = useDebounce(async () => {
         const newRuleModeRow = {...ruleModeRow}
         newRuleModeRow.name = newRuleModeRow.name.trim()
         newRuleModeRow.note = newRuleModeRow.note.trim()
@@ -108,16 +109,18 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         }
         setErrorName(false)
 
-        ruleModeList.push(newRuleModeRow)
-        const ok = await saveRuleModeList(ruleModeList)
+        const newRuleModeList = [...ruleModeList]
+        newRuleModeList.push(newRuleModeRow)
+        const ok = await saveRuleModeList(newRuleModeList)
         if (!ok) {
             showAlertDialog('添加失败')
             return
         }
+        setRuleModeList(newRuleModeList)
         setAction('')
     }, 50)
 
-    const handleRuleModeRowCancel = () => {
+    const handleRuleModeCancel = () => {
         setAction('')
         setRuleModeExportData('')
         setRuleModeChecked([])
@@ -130,6 +133,28 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeImport = () => {
         setAction('import')
+    }
+
+    const handleRuleModeImportSubmit = async () => {
+        const newRuleModeList = [...ruleModeList]
+        const arr = ruleModeImportData.split('\n')
+        for (let v of arr) {
+            if (v.startsWith('drayRule://')) {
+                const ruleMode = safeJsonParse(decodeBase64(v.substring(11)))
+                if (ruleMode) {
+                    newRuleModeList.push(ruleMode)
+                }
+            }
+        }
+
+        const ok = await saveRuleModeList(newRuleModeList)
+        if (!ok) {
+            showAlertDialog('导入保存失败')
+            return
+        }
+        setRuleModeList(newRuleModeList)
+        setRuleModeImportData('')
+        setAction('')
     }
 
     const handleRuleModeExport = () => {
@@ -235,12 +260,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                                 <TextField size="small" label="模式名称"
                                            error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
-                                           value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
-                                <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeRowChange('note')} multiline rows={2}/>
+                                           value={ruleModeRow.name} onChange={handleRuleModeChange('name')}/>
+                                <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeChange('note')} multiline rows={2}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>添加</Button>
-                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                                <Button variant="contained" color="info" onClick={handleRuleModeSubmit}>添加</Button>
+                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : action === 'import' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
@@ -248,17 +273,19 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                     size="small" multiline rows={10}
                                     label="导入内容（URI）"
                                     placeholder="每行一条，例如：drayRule://xxxxxx"
-                                    value={ruleModeRow.name}/>
+                                    value={ruleModeImportData}
+                                    onChange={(e) => setRuleModeImportData(e.target.value)}
+                                />
                             </Stack>
                             <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={handleRuleModeRowSubmit}>确定</Button>
-                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                                <Button variant="contained" color="info" onClick={handleRuleModeImportSubmit}>确定</Button>
+                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : action === 'export' ? (<>
                             <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="info" onClick={handleRuleModeCopy}>复制</Button>
-                                <Button variant="contained" onClick={handleRuleModeRowCancel}>取消</Button>
+                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : (<>
                             <Stack direction="row" spacing={1}>
