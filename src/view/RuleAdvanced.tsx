@@ -139,13 +139,22 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeImportSubmit = async () => {
         const newRuleModeList = [...ruleModeList]
+        let okNum = 0
+        let errNum = 0
         const arr = ruleModeImportData.split('\n')
         for (let v of arr) {
             if (v.startsWith('drayRule://')) {
                 const ruleMode = safeJsonParse(decodeBase64(v.substring(11)))
                 if (ruleMode) {
                     newRuleModeList.push(ruleMode)
+                    okNum++
+                } else {
+                    // 解析失败
+                    errNum++
                 }
+            } else {
+                // 格式不正确，前缀不是 drayRule://
+                errNum++
             }
         }
 
@@ -157,6 +166,9 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleModeList(newRuleModeList)
         setRuleModeImportData('')
         setAction('')
+        if (errNum > 0) {
+            showAlertDialog(`导入成功 ${okNum} 个模式，导入失败 ${errNum} 个模式`, 'warning')
+        }
     }
 
     const handleRuleModeExport = () => {
