@@ -142,17 +142,18 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         setNameError(false)
 
         // 域名规则
+        if (item.domain) item.domain = processDomain(item.domain)
         if (item.ruleType === 'domain') {
             if (item.domain === '') {
                 setDomainError(true)
                 return
             }
             setDomainError(false)
-            item.domain = processDomain(item.domain)
             item.ip = ''
         }
 
         // IP 规则
+        if (item.ip) item.ip = processIP(item.ip)
         if (item.ruleType === 'ip') {
             if (item.ip === '') {
                 setIpError(true)
@@ -160,7 +161,6 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             }
             setIpError(false)
             item.domain = ''
-            item.ip = processIP(item.ip)
         }
 
         // 清空可能存在的多余数据
