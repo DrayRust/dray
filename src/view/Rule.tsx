@@ -13,16 +13,11 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
-import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
+import { readRayConfig, readRuleConfig, readRuleDomain, readRuleModeList, restartRay, saveRayConfig, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { DEFAULT_RULE_CONFIG } from "../util/config.ts"
+import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
-
-const DEFAULT_RULE_DOMAIN: RuleDomain = {
-    proxy: '',
-    direct: '',
-    block: ''
-}
+import { ruleToConf } from "../util/rule.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -37,6 +32,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         readRuleConfig().then((data) => {
             setRuleConfig({...DEFAULT_RULE_CONFIG, ...data})
         }).catch(_ => 0)
+
         readRuleDomain().then((data) => {
             setRuleDomain({...DEFAULT_RULE_DOMAIN, ...data})
         }).catch(_ => 0)
@@ -62,7 +58,24 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
             showChip('保存失败', 'error')
             return
         }
-        showChip('保存成功', 'success')
+
+        // 读取 ray 配置文件是否存在，如果不存在则不生成规则
+        const rayConfig = await readRayConfig()
+        if (rayConfig) {
+            // 读取模式数据 ruleModeList
+            let ruleModeList = await readRuleModeList()
+            if (!ruleModeList) ruleModeList = DEFAULT_RULE_MODE_LIST
+
+            // 生成配置文件
+            const routing = ruleToConf(ruleConfig, newRuleDomain, ruleModeList)
+            const conf = {rayConfig, routing}
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                restartRay()
+            }
+        }
+
+        showChip('设置成功', 'success')
     }, 50)
 
     const [open, setOpen] = useState(false)

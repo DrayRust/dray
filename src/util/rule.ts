@@ -1,14 +1,17 @@
 import { processLines } from "./util.ts"
 
-export function RuleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, modeRules: RuleRow[]) {
+export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList): any {
     let rules: any[]
     if (ruleConfig.globalProxy) {
         rules = getGlobalProxyConf()
     } else {
-        rules = [...RuleDomainToConf(ruleDomain)]
+        rules = [...ruleDomainToConf(ruleDomain)]
 
-        if (modeRules.length > 0) {
-            rules = [...rules, ...modeRulesToConf(modeRules)]
+        if (Array.isArray(ruleModeList) && ruleModeList.length > 0) {
+            const ruleMode = ruleModeList[ruleConfig.mode]
+            if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
+                rules = [...rules, ...modeRulesToConf(ruleMode.rules)]
+            }
         }
 
         // 当未匹配策略为直连时，添加直连规则
@@ -57,7 +60,7 @@ export function modeRulesToConf(modeRules: RuleRow[]): any[] {
     return rules
 }
 
-export function RuleDomainToConf(ruleDomain: RuleDomain): any[] {
+export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
     let rules = []
 
     if (ruleDomain.proxy) {
@@ -90,8 +93,7 @@ export function RuleDomainToConf(ruleDomain: RuleDomain): any[] {
     return rules
 }
 
-// 获取全局代理配置
-// 考虑用户体验，默认全局代理，排除代理服务器无法访问的 私有域名 和 私有IP
+// 考虑用户体验，全局代理，排除代理服务器无法访问的 私有域名 和 私有IP
 export function getGlobalProxyConf(): any[] {
     return [{
         type: 'field',

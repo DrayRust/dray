@@ -38,6 +38,12 @@ export const DEFAULT_RULE_CONFIG: RuleConfig = {
     mode: 0
 }
 
+export const DEFAULT_RULE_DOMAIN: RuleDomain = {
+    proxy: '',
+    direct: '',
+    block: ''
+}
+
 // https://xtls.github.io/config/routing.html#ruleobject
 // https://www.v2fly.org/config/routing.html#ruleobject
 export const DEFAULT_RULE: RuleRow = {
