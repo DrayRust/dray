@@ -22,7 +22,7 @@ import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invo
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
-import { processLines } from "../util/util.ts"
+import { modeRulesToConf } from "../util/rule.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -225,28 +225,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setAction('viewConf')
         const ruleMode = ruleModeList[key]
         if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
-            let rules = []
-            for (let i = 0; i < ruleMode.rules.length; i++) {
-                const v = ruleMode.rules[i]
-                let rule: any = {
-                    type: 'field',
-                    ruleTag: `${i}-dray-${v.outboundTag}`,
-                    outboundTag: v.outboundTag
-                }
-                if (v.ruleType === 'domain') {
-                    rules.push({...rule, domain: processLines(v.domain)})
-                } else if (v.ruleType === 'ip') {
-                    rules.push({...rule, ip: processLines(v.ip)})
-                } else if (v.ruleType === 'multi') {
-                    if (v.domain) rule.domain = processLines(v.domain)
-                    if (v.ip) rule.ip = processLines(v.ip)
-                    if (v.port) rule.port = processLines(v.port)
-                    if (v.sourcePort) rule.sourcePort = processLines(v.sourcePort)
-                    if (v.network) rule.network = v.network
-                    if (v.protocol) rule.protocol = processLines(v.protocol, ',')
-                    rules.push(rule)
-                }
-            }
+            const rules = modeRulesToConf(ruleMode.rules)
             setRuleModeConf(JSON.stringify(rules, null, 2))
         } else {
             showAlertDialog('该模式下无规则')
