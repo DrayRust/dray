@@ -3,7 +3,7 @@ import {
     Button, Card, Chip, Checkbox,
     FormControl, FormControlLabel, FormGroup, FormLabel,
     IconButton, MenuItem, Radio, RadioGroup, Stack,
-    Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography,
+    Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography, Tooltip,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import AddIcon from '@mui/icons-material/Add'
@@ -370,9 +370,15 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                 </TableCell>
                                 <TableCell sx={{p: '4px 8px'}} align="right">
                                     <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
-                                    <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                    <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
-                                    <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
+                                    <Tooltip title="排序" placement="top">
+                                        <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="修改" placement="top">
+                                        <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="删除" placement="top">
+                                        <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
+                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
                         ))}
