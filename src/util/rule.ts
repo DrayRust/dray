@@ -50,8 +50,8 @@ export function modeRulesToConf(modeRules: RuleRow[]): any[] {
         } else if (v.ruleType === 'multi') {
             if (v.domain) rule.domain = processLines(v.domain)
             if (v.ip) rule.ip = processLines(v.ip)
-            if (v.port) rule.port = processLines(v.port)
-            if (v.sourcePort) rule.sourcePort = processLines(v.sourcePort)
+            if (v.port) rule.port = processLines(v.port).join(',')
+            if (v.sourcePort) rule.sourcePort = processLines(v.sourcePort).join(',')
             if (v.network) rule.network = v.network
             if (v.protocol) rule.protocol = processLines(v.protocol, ',')
             rules.push(rule)
@@ -66,7 +66,7 @@ export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
     if (ruleDomain.proxy) {
         rules.push({
             type: 'field',
-            ruleTag: 'dray-proxy-domain',
+            ruleTag: 'dray-domain-proxy',
             outboundTag: 'proxy',
             domain: processLines(ruleDomain.proxy),
         })
@@ -75,7 +75,7 @@ export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
     if (ruleDomain.direct) {
         rules.push({
             type: 'field',
-            ruleTag: 'dray-direct-domain',
+            ruleTag: 'dray-domain-direct',
             outboundTag: 'direct',
             domain: processLines(ruleDomain.direct),
         })
@@ -84,7 +84,7 @@ export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
     if (ruleDomain.block) {
         rules.push({
             type: 'field',
-            ruleTag: 'dray-block-domain',
+            ruleTag: 'dray-domain-block',
             outboundTag: 'block',
             domain: processLines(ruleDomain.block),
         })
