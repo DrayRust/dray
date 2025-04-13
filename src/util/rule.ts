@@ -25,3 +25,36 @@ export function modeRulesToConf(modeRules: RuleRow[]) {
     }
     return rules
 }
+
+export function RuleDomainToConf(ruleDomain: RuleDomain) {
+    let rules = []
+
+    if (ruleDomain.proxy) {
+        rules.push({
+            type: 'field',
+            ruleTag: 'dray-proxy-domain',
+            outboundTag: 'proxy',
+            domain: processLines(ruleDomain.proxy),
+        })
+    }
+
+    if (ruleDomain.direct) {
+        rules.push({
+            type: 'field',
+            ruleTag: 'dray-direct-domain',
+            outboundTag: 'direct',
+            domain: processLines(ruleDomain.direct),
+        })
+    }
+
+    if (ruleDomain.block) {
+        rules.push({
+            type: 'field',
+            ruleTag: 'dray-block-domain',
+            outboundTag: 'block',
+            domain: processLines(ruleDomain.block),
+        })
+    }
+
+    return rules
+}
