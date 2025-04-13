@@ -68,7 +68,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
             // 生成配置文件
             const routing = ruleToConf(ruleConfig, newRuleDomain, ruleModeList)
-            const conf = {rayConfig, routing}
+            const conf = {...rayConfig, ...routing}
             const ok = await saveRayConfig(conf)
             if (ok) {
                 restartRay()
