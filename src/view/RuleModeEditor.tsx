@@ -182,20 +182,28 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             }
         }
 
+        const rules = [...ruleModeList[ruleModeKey].rules]
         if (ruleUpdateKey > -1) {
-            ruleModeList[ruleModeKey].rules[ruleUpdateKey] = item
+            rules[ruleUpdateKey] = item
         } else {
-            ruleModeList[ruleModeKey].rules.push(item)
+            rules.push(item)
         }
 
-        ruleModeList[ruleModeKey].hash = await hashJson(ruleModeList[ruleModeKey].rules)
-        const ok = await saveRuleModeList(ruleModeList)
+        const ok = await updateHashAndRule(rules)
         if (!ok) {
             showAlertDialog('保存失败')
             return
         }
         setRuleModeList(ruleModeList)
         handleRuleBack()
+    }
+
+    const updateHashAndRule = async (rules: RuleRow[]) => {
+        ruleModeList[ruleModeKey].rules = rules
+        ruleModeList[ruleModeKey].hash = await hashJson(rules)
+        const ok = await saveRuleModeList(ruleModeList)
+        if (ok) setRuleModeList([...ruleModeList])
+        return ok
     }
 
     const [ruleUpdateKey, setRuleUpdateKey] = useState(-1)
@@ -209,14 +217,11 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     const handleRuleDelete = (key: number) => {
         confirm('确认删除', `确定要删除这条规则吗？`, async () => {
             const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
-            ruleModeList[ruleModeKey].rules = rules
-            ruleModeList[ruleModeKey].hash = await hashJson(rules)
-            const ok = await saveRuleModeList(ruleModeList)
+            const ok = await updateHashAndRule(rules)
             if (!ok) {
                 showAlertDialog('删除失败')
                 return
             }
-            setRuleModeList(ruleModeList)
         })
     }
 
@@ -228,9 +233,9 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
-    // 在 MacOS 上测试，tauri 内置浏览器，支持原生 HTML 5 拖拽事件非常差，测试结果，仅支持 onDragStart onDragEnd
-    // 本想通过 onDragStart onDragEnd 结合传统判断坐标位置实现拖拽排序，但是测试发现，clientX 和 clientY 参数在不同浏览器环境表现不一致，放弃使用 HTML 5 原生拖拽实现排序功能
-    // 不想通过 mouse move 事件来实现，主要实现后，要么难用，要么复杂，所以设计一个《点击排序的功能》来简化排序
+    // 在 MacOS 上测试，tauri 内置浏览器支持原生 HTML 5 拖拽事件非常差，测试结果，仅支持 onDragStart onDragEnd
+    // 本想通过 onDragStart onDragEnd 结合传统判断坐标位置实现拖拽排序，但是测试发现，clientX 和 clientY 参数在不同浏览器环境表现不一致，最终放弃使用 HTML 5 原生拖拽实现排序功能
+    // 又不想通过 mouse move 事件来实现。主要实现后，要么难用，要么复杂，所以设计一个《点击排序的功能》来简化排序
     const [sortKey, setSortKey] = useState<number>(-1)
     const handleSortStart = (e: React.MouseEvent, key: number) => {
         e.stopPropagation()
@@ -250,9 +255,14 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             return
         }
 
-        const [temp] = ruleModeRow.rules.splice(sortKey, 1)
-        ruleModeRow.rules.splice(key, 0, temp)
+        let rules = [...ruleModeRow.rules]
+        let [temp] = rules.splice(sortKey, 1)
+        rules.splice(key, 0, temp)
         setSortKey(-1)
+
+        updateHashAndRule(rules).catch(_ => {
+            showAlertDialog('删除失败')
+        })
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
@@ -370,7 +380,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                 </TableCell>
                                 <TableCell sx={{p: '4px 8px'}} align="right">
                                     <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
-                                    <Tooltip title="排序" placement="top">
+                                    <Tooltip title="排序" placement="left">
                                         <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
                                     </Tooltip>
                                     <Tooltip title="修改" placement="top">
