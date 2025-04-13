@@ -63,7 +63,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         name: "中国大陆模式",
         note: "专为中国大陆网络环境优化的访问规则",
-        hash: "143d49c6897e4fa33917ed5a2eca63d38966aaa2658294462af20568b321c7a9",
+        hash: "e42ee3190977752faf1bbf79001e4d7abbe8ac8ef44bb980b0a68a521b889517",
         rules: [
             {
                 "name": "中国大陆 DNS 服务器",
@@ -78,8 +78,8 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
-                "name": "中国大陆 DNS 域名服务器",
-                "note": "排除中国大陆常用 DNS 域名服务器",
+                "name": "中国大陆 DNS 服务器（域名）",
+                "note": "排除中国大陆常用 DNS 服务器（域名）",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "domain:114dns.com\ndomain:360.cn\ndomain:alidns.com\ndomain:chinamobile.com\ndomain:chinatelecom.com.cn\ndomain:chinaunicom.com\ndomain:cnnic.cn\ndomain:dns.360.cn\ndomain:dns.alidns.com\ndomain:dns.baidu.com\ndomain:dnspod.cn\ndomain:dnspod.com\ndomain:doh.360.cn\ndomain:doh.pub\ndomain:dot.360.cn\ndomain:dot.pub\ndomain:onedns.net\ndomain:tsinghua.edu.cn",
@@ -87,18 +87,6 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "port": "",
                 "sourcePort": "",
                 "network": "",
-                "protocol": ""
-            },
-            {
-                "name": "UDP 443 流量",
-                "note": "排除 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
-                "outboundTag": "direct",
-                "ruleType": "multi",
-                "domain": "",
-                "ip": "",
-                "port": "443",
-                "sourcePort": "",
-                "network": "udp",
                 "protocol": ""
             },
             {
@@ -111,6 +99,18 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "port": "",
                 "sourcePort": "",
                 "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "UDP 443 流量",
+                "note": "排除 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
+                "outboundTag": "block",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "443",
+                "sourcePort": "",
+                "network": "udp",
                 "protocol": ""
             },
             {
