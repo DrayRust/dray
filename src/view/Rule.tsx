@@ -15,13 +15,7 @@ import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
 import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-
-const DEFAULT_RULE_CONFIG: RuleConfig = {
-    globalProxy: false,
-    domainStrategy: 'AsIs',
-    unmatchedStrategy: 'direct',
-    mode: 0
-}
+import { DEFAULT_RULE_CONFIG } from "../util/config.ts"
 
 const DEFAULT_RULE_DOMAIN: RuleDomain = {
     proxy: '',

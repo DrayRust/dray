@@ -31,6 +31,13 @@ export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
     outbounds_concurrency: 8,
 }
 
+export const DEFAULT_RULE_CONFIG: RuleConfig = {
+    globalProxy: false,
+    domainStrategy: 'AsIs',
+    unmatchedStrategy: 'proxy',
+    mode: 0
+}
+
 // https://xtls.github.io/config/routing.html#ruleobject
 // https://www.v2fly.org/config/routing.html#ruleobject
 export const DEFAULT_RULE: RuleRow = {

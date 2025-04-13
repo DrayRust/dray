@@ -292,8 +292,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             label="未匹配上的域名"
                             value={ruleConfig.unmatchedStrategy}
                             onChange={handleRuleConfigChange('unmatchedStrategy')}>
-                            <MenuItem value="direct">直接访问</MenuItem>
                             <MenuItem value="proxy">代理访问</MenuItem>
+                            <MenuItem value="direct">直接访问</MenuItem>
                         </TextField>
                         <TextField
                             select fullWidth size="small"
