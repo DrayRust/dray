@@ -31,6 +31,21 @@ export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
     outbounds_concurrency: 8,
 }
 
+// https://xtls.github.io/config/routing.html#ruleobject
+// https://www.v2fly.org/config/routing.html#ruleobject
+export const DEFAULT_RULE: RuleRow = {
+    name: '',
+    note: '',
+    outboundTag: 'proxy',
+    ruleType: 'domain',
+    domain: '',
+    ip: '',
+    port: '',
+    sourcePort: '',
+    network: '',
+    protocol: '',
+}
+
 export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         name: "中国大陆模式",

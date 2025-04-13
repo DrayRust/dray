@@ -20,6 +20,7 @@ import { processDomain, processIP, processPort } from "../util/util.ts"
 import { ErrorCard } from "../component/useCard.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { hashJson } from "../util/crypto.ts"
+import { DEFAULT_RULE } from "../util/config.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
@@ -37,21 +38,6 @@ const ruleTypeList: Record<string, string> = {
     domain: '域名',
     ip: 'IP 地址',
     multi: '多维规则',
-}
-
-// https://xtls.github.io/config/routing.html#ruleobject
-// https://www.v2fly.org/config/routing.html#ruleobject
-const DEFAULT_RULE: RuleRow = {
-    name: '',
-    note: '',
-    outboundTag: 'proxy',
-    ruleType: 'domain',
-    domain: '',
-    ip: '',
-    port: '',
-    sourcePort: '',
-    network: '',
-    protocol: '',
 }
 
 export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setRuleModeKey}: {
