@@ -218,16 +218,16 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [dragIndex, setDragIndex] = useState<number>(-1)
     const [dragIsChange, setDragIsChange] = useState(false)
     const handleSaveServerList = useDebounce(async (dragIsChange: boolean, serverList: ServerList) => {
-        if (dragIsChange && serverList.length > 0) {
+        if (dragIsChange && serverList && serverList.length > 0) {
             setDragIsChange(false)
             const ok = await saveServerList(serverList)
             if (!ok) showSnackbar('保存失败', 'error')
             // console.log('save ok')
         }
     }, 300)
+
     useEffect(() => {
         const handleMouseUp = () => {
-            if (!enableDragSort) return
             setDragIndex(-1)
             setDragIsChange(prevIsChange => {
                 setServerList(prevServerList => {
