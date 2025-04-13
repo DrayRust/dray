@@ -101,7 +101,7 @@ export const processLines = (input: string, delimiter: string = '\n'): string[] 
         .filter(line => line.length > 0) // 过滤掉空行
 }
 
-export function processDomain(domain: string): string {
+export function processDomain(domain: string, sort: boolean = true): string {
     domain = domain.trim()
     if (domain.length === 0) return ''
 
@@ -110,8 +110,11 @@ export function processDomain(domain: string): string {
         .map(d => d.trim())
         .filter(d => d.length > 0)
 
-    // 去重，并排序
-    const uniqueDomains = [...new Set(cleanedDomains)].sort()
+    // 去重
+    const uniqueDomains = [...new Set(cleanedDomains)]
+
+    // 根据 sort 参数决定是否排序
+    if (sort) uniqueDomains.sort()
 
     // 重新用 \n 连接
     return uniqueDomains.join('\n')

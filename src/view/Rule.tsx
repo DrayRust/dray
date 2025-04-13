@@ -16,6 +16,7 @@ import { RuleAdvanced } from './RuleAdvanced.tsx'
 import { readRuleConfig, readRuleDomain, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG } from "../util/config.ts"
+import { processDomain } from "../util/util.ts"
 
 const DEFAULT_RULE_DOMAIN: RuleDomain = {
     proxy: '',
@@ -51,9 +52,9 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
     const handleSaveRuleDomain = useDebounce(async () => {
         const newRuleDomain = {
-            proxy: ruleDomain.proxy.trim(),
-            direct: ruleDomain.direct.trim(),
-            block: ruleDomain.block.trim()
+            proxy: processDomain(ruleDomain.proxy),
+            direct: processDomain(ruleDomain.direct),
+            block: processDomain(ruleDomain.block),
         }
         setRuleDomain(newRuleDomain)
         const ok = await saveRuleDomain(newRuleDomain)
