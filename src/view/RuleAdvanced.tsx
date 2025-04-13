@@ -138,14 +138,30 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setAction('import')
     }
 
+    const [errorImportData, setErrorImportData] = useState(false)
+    const handleRuleModeImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value
+        setRuleModeImportData(value)
+        setErrorImportData(value === '')
+    }
+
     const handleRuleModeImportSubmit = async () => {
+        let s = ruleModeImportData.trim()
+        if (!s) {
+            setErrorImportData(true)
+            return
+        }
+        setErrorImportData(false)
+
         const newRuleModeList = [...ruleModeList]
         let okNum = 0
         let repeatNum = 0
         let errNum = 0
-        const arr = ruleModeImportData.split('\n')
+        let errMsg = ''
+        const arr = s.split('\n')
         for (let v of arr) {
-            if (v.length < 20) continue
+            v = v.trim()
+            if (v.length === 0) continue
 
             if (v.startsWith('drayRule://')) {
                 const decoded = decodeBase64(v.substring(11))
@@ -158,24 +174,30 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                         okNum++
                     }
                 } else {
-                    errNum++ // 解析失败，或数据不正确
+                    errNum++
+                    errMsg = '解析失败，或数据不正确'
                 }
             } else {
-                errNum++ // 格式不正确，前缀不是 drayRule://
+                errNum++
+                errMsg = '格式不正确，前缀非 drayRule:// 开头'
             }
         }
 
-        const ok = await saveRuleModeList(newRuleModeList)
-        if (!ok) {
-            showAlertDialog('导入保存失败')
-            return
+        if (okNum > 0) {
+            const ok = await saveRuleModeList(newRuleModeList)
+            if (!ok) {
+                showAlertDialog('导入保存失败')
+                return
+            }
+
+            setRuleModeList(newRuleModeList)
+            setRuleModeImportData('')
+            setAction('')
         }
 
-        setRuleModeList(newRuleModeList)
-        setRuleModeImportData('')
-        setAction('')
-
-        if (errNum > 0 || repeatNum > 0) {
+        if (okNum === 0 && errMsg) {
+            showAlertDialog(errMsg, 'error')
+        } else if (errNum > 0 || repeatNum > 0) {
             showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
     }
@@ -283,9 +305,13 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
                         </>) : action === 'create' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" label="模式名称"
-                                           error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
-                                           value={ruleModeRow.name} onChange={handleRuleModeChange('name')}/>
+                                <TextField
+                                    size="small"
+                                    label="模式名称"
+                                    error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
+                                    value={ruleModeRow.name}
+                                    onChange={handleRuleModeChange('name')}
+                                />
                                 <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeChange('note')} multiline rows={2}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
@@ -298,8 +324,9 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                     size="small" multiline rows={10}
                                     label="导入内容（URI）"
                                     placeholder="每行一条，例如：drayRule://xxxxxx"
+                                    error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
                                     value={ruleModeImportData}
-                                    onChange={(e) => setRuleModeImportData(e.target.value)}
+                                    onChange={handleRuleModeImportDataChange}
                                 />
                             </Stack>
                             <Stack direction="row" spacing={1}>
