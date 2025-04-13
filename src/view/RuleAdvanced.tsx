@@ -22,6 +22,7 @@ import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invo
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
+import { processLines } from "../util/util.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -206,8 +207,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setRuleModeExportData(arr.join('\n'))
     }
 
-    const handleRuleModeCopy = () => {
-        navigator.clipboard.writeText(ruleModeExportData).then(() => {
+    const handleRuleModeCopy = (content: string) => {
+        navigator.clipboard.writeText(content).then(() => {
             showAlertDialog('复制成功', 'warning', 2000)
         }).catch(() => {
             showAlertDialog('复制失败', 'error')
@@ -216,6 +217,40 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeUpdate = (key: number) => {
         setRuleModeKey(key)
+    }
+
+    const [ruleModeConf, setRuleModeConf] = useState('')
+    const handleRuleModeViewConf = (key: number) => {
+        setAction('viewConf')
+        const ruleMode = ruleModeList[key]
+        if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
+            let rules = []
+            for (let i = 0; i < ruleMode.rules.length; i++) {
+                const v = ruleMode.rules[i]
+                let rule: any = {
+                    type: 'field',
+                    ruleTag: `${i}-dray-${v.outboundTag}`,
+                    outboundTag: v.outboundTag
+                }
+                if (v.ruleType === 'domain') {
+                    rules.push({...rule, domain: processLines(v.domain)})
+                } else if (v.ruleType === 'ip') {
+                    rules.push({...rule, ip: processLines(v.ip)})
+                } else if (v.ruleType === 'multi') {
+                    if (v.domain) rule.domain = processLines(v.domain)
+                    if (v.ip) rule.ip = processLines(v.ip)
+                    if (v.port) rule.port = processLines(v.port)
+                    if (v.sourcePort) rule.sourcePort = processLines(v.sourcePort)
+                    if (v.network) rule.network = v.network
+                    if (v.protocol) rule.protocol = processLines(v.protocol, ',')
+                    rules.push(rule)
+                }
+            }
+            setRuleModeConf(JSON.stringify(rules, null, 2))
+        } else {
+            showAlertDialog('该模式下无规则')
+            return
+        }
     }
 
     const handleRuleModeDelete = async (key: number, name: string) => {
@@ -296,6 +331,14 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                     </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
+                        </>) : action === 'viewConf' ? (<>
+                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                <TextField size="small" multiline disabled rows={10} label="规则配置" value={ruleModeConf}/>
+                            </Stack>
+                            <Stack direction="row" spacing={1}>
+                                <Button variant="contained" color="info" onClick={() => handleRuleModeCopy(ruleModeConf)}>复制</Button>
+                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
+                            </Stack>
                         </>) : action === 'create' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                                 <TextField
@@ -331,7 +374,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={handleRuleModeCopy}>复制</Button>
+                                <Button variant="contained" color="info" onClick={() => handleRuleModeCopy(ruleModeExportData)}>复制</Button>
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : (<>
@@ -356,7 +399,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                                 </TableCell>
                                                 <TableCell align="right">
                                                     <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
-                                                    <IconButton color="info" onClick={() => handleRuleModeUpdate(key)}><VisibilityIcon/></IconButton>
+                                                    <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
                                                     <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
                                                 </TableCell>
                                             </TableRow>

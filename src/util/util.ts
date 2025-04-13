@@ -94,6 +94,13 @@ export function formatPort(value: any): string {
     return num ? String(num) : ''
 }
 
+export const processLines = (input: string, delimiter: string = '\n'): string[] => {
+    return input
+        .split(delimiter) // 按指定分隔符分割
+        .map(line => line.trim()) // 清理每行的前后空格
+        .filter(line => line.length > 0) // 过滤掉空行
+}
+
 export function processDomain(domain: string): string {
     domain = domain.trim()
     if (domain.length === 0) return ''
