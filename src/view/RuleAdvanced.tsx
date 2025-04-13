@@ -118,6 +118,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeCancel = () => {
         setAction('')
+        setRuleModeConf('')
         setRuleModeImportData('')
         setRuleModeExportData('')
         setRuleModeChecked([])
@@ -333,7 +334,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
                         </>) : action === 'viewConf' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" multiline disabled rows={10} label="规则配置" value={ruleModeConf}/>
+                                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
                             </Stack>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="info" onClick={() => handleRuleModeCopy(ruleModeConf)}>复制</Button>
