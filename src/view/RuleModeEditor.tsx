@@ -8,8 +8,10 @@ import {
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import AddIcon from '@mui/icons-material/Add'
 import EditSquareIcon from '@mui/icons-material/EditSquare'
+import OpenWithIcon from '@mui/icons-material/OpenWith'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
+
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useAlertDialog } from '../component/useAlertDialog.tsx'
 import { useDialog } from "../component/useDialog.tsx"
@@ -226,6 +228,33 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
+    // 在 MacOS 上测试，tauri 内置浏览器，支持原生 HTML 5 拖拽事件非常差，测试结果，仅支持 onDragStart onDragEnd
+    // 本想通过 onDragStart onDragEnd 结合传统判断坐标位置实现拖拽排序，但是测试发现，clientX 和 clientY 参数在不同浏览器环境表现不一致，放弃使用 HTML 5 原生拖拽实现排序功能
+    // 不想通过 mouse move 事件来实现，主要实现后，要么难用，要么复杂，所以设计一个《点击排序的功能》来简化排序
+    const [sortKey, setSortKey] = useState<number>(-1)
+    const handleSortStart = (e: React.MouseEvent, key: number) => {
+        e.stopPropagation()
+        if (sortKey === -1) {
+            setSortKey(key)
+        } else if (sortKey === key) {
+            setSortKey(-1)
+        } else {
+            handleSortEnd(key)
+        }
+    }
+
+    const handleSortEnd = (key: number) => {
+        if (sortKey === -1) return
+        if (sortKey === key) {
+            setSortKey(-1)
+            return
+        }
+
+        const [temp] = ruleModeRow.rules.splice(sortKey, 1)
+        ruleModeRow.rules.splice(key, 0, temp)
+        setSortKey(-1)
+    }
+
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
     const {DialogComponent, confirm} = useDialog()
     return (<>
@@ -331,17 +360,19 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                 <Table size="small">
                     <TableBody>
                         {ruleModeRow.rules.map((row, key) => (
-                            <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                            <TableRow
+                                key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                onClick={() => handleSortEnd(key)}>
                                 <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
                                     <Typography variant="body1" component="div">{row.name}</Typography>
                                     <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                 </TableCell>
                                 <TableCell sx={{p: '4px 8px'}} align="right">
-                                    <Chip size="small" label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
-                                </TableCell>
-                                <TableCell sx={{p: '4px 8px'}} align="right" width="100">
-                                    <IconButton color="primary" title="编辑" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
-                                    <IconButton color="error" title="删除" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
+                                    <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
+                                    <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                    <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
+                                    <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}

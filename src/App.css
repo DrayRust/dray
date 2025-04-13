@@ -141,3 +141,13 @@ body, html {
 .flex-column.gap2 > :not(style) ~ :not(style) {
     margin-top: 16px;
 }
+
+.sort-current {
+    filter: contrast(150%);
+}
+
+.sort-target {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: move;
+}
