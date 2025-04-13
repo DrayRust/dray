@@ -215,7 +215,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const [enableDragSort, setEnableDragSort] = useState(false)
-    const [dragIndex, setDragIndex] = useState<number | null>(null)
+    const [dragIndex, setDragIndex] = useState<number>(-1)
     const [dragIsChange, setDragIsChange] = useState(false)
     const handleSaveServerList = useDebounce(async (dragIsChange: boolean, serverList: ServerList) => {
         if (dragIsChange && serverList.length > 0) {
@@ -227,7 +227,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }, 300)
     useEffect(() => {
         const handleMouseUp = () => {
-            setDragIndex(null)
+            if (!enableDragSort) return
+            setDragIndex(-1)
             setDragIsChange(prevIsChange => {
                 setServerList(prevServerList => {
                     handleSaveServerList(prevIsChange, prevServerList)
@@ -242,21 +243,21 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }, [])
 
-    const handleDragStart = (key: number) => {
+    const handleMouseStart = (key: number) => {
         if (!enableDragSort) return
         setDragIndex(key)
     }
 
-    const handleDragEnd = (e: React.MouseEvent) => {
-        e.stopPropagation()
+    const handleMouseEnd = (e: React.MouseEvent) => {
         if (!enableDragSort) return
-        setDragIndex(null)
+        e.stopPropagation()
+        setDragIndex(-1)
         handleSaveServerList(dragIsChange, serverList)
     }
 
-    const handleDragEnter = (key: number) => {
+    const handleMouseEnter = (key: number) => {
         if (!enableDragSort) return
-        if (dragIndex !== null && dragIndex !== key && serverList) {
+        if (dragIndex > -1 && dragIndex !== key && serverList) {
             const newServerList = [...serverList]
             const [draggedItem] = newServerList.splice(dragIndex, 1)
             newServerList.splice(key, 0, draggedItem)
@@ -314,9 +315,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 key={key} hover
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                 className={enableDragSort ? (dragIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
-                                onMouseDown={() => handleDragStart(key)}
-                                onMouseUp={(e) => handleDragEnd(e)}
-                                onMouseEnter={() => handleDragEnter(key)}
+                                onMouseDown={() => handleMouseStart(key)}
+                                onMouseUp={(e) => handleMouseEnd(e)}
+                                onMouseEnter={() => handleMouseEnter(key)}
                             >
                                 <TableCell padding="checkbox">
                                     <Checkbox
