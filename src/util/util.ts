@@ -101,14 +101,22 @@ export const processLines = (input: string, delimiter: string = '\n'): string[] 
         .filter(line => line.length > 0) // 过滤掉空行
 }
 
-export function processDomain(domain: string, sort: boolean = true): string {
+export function processDomain(domain: string, validate: boolean = false, sort: boolean = true): string {
     domain = domain.trim()
     if (domain.length === 0) return ''
 
     // 清理每行字符串的两端空格，排除空字符串行
     const cleanedDomains = domain.split('\n')
         .map(d => d.trim())
-        .filter(d => d.length > 0)
+        .filter(d => {
+            if (d.length === 0) return false
+            // 验证域名合法性
+            if (validate) {
+                const domainPattern = /^(?!:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
+                return domainPattern.test(d)
+            }
+            return true
+        })
 
     // 去重
     const uniqueDomains = [...new Set(cleanedDomains)]

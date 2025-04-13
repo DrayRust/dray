@@ -48,9 +48,9 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
     const handleSaveRuleDomain = useDebounce(async () => {
         const newRuleDomain = {
-            proxy: processDomain(ruleDomain.proxy),
-            direct: processDomain(ruleDomain.direct),
-            block: processDomain(ruleDomain.block),
+            proxy: processDomain(ruleDomain.proxy, true),
+            direct: processDomain(ruleDomain.direct, true),
+            block: processDomain(ruleDomain.block, true),
         }
         setRuleDomain(newRuleDomain)
         const ok = await saveRuleDomain(newRuleDomain)
