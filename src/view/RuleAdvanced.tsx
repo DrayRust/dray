@@ -54,16 +54,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
         setOpen(false)
     }
 
-    const handleDomainStrategy = (e: any) => {
-        setRuleConfig(prev => ({...prev, domainStrategy: e.target.value}))
-    }
-
-    const handleUnmatchedStrategy = (e: any) => {
-        setRuleConfig(prev => ({...prev, unmatchedStrategy: e.target.value}))
-    }
-
-    const handleMode = (e: any) => {
-        setRuleConfig(prev => ({...prev, mode: e.target.value}))
+    const handleRuleConfigChange = (name: keyof RuleConfig) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRuleConfig(prev => ({...prev, [name]: e.target.value}))
     }
 
     const handleSubmit = async () => {
@@ -125,6 +117,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
 
     const handleRuleModeCancel = () => {
         setAction('')
+        setRuleModeImportData('')
         setRuleModeExportData('')
         setRuleModeChecked([])
     }
@@ -273,7 +266,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 select fullWidth size="small"
                                 label="域名匹配"
                                 value={ruleConfig.domainStrategy}
-                                onChange={handleDomainStrategy}>
+                                onChange={handleRuleConfigChange('domainStrategy')}>
                                 <MenuItem value="AsIs">仅域名匹配</MenuItem>
                                 <MenuItem value="IPIfNonMatch">优先域名匹配，未匹配上则解析为IP再次匹配</MenuItem>
                                 <MenuItem value="IPOnDemand">优先解析为IP匹配</MenuItem>
@@ -283,7 +276,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             select fullWidth size="small"
                             label="未匹配上的域名"
                             value={ruleConfig.unmatchedStrategy}
-                            onChange={handleUnmatchedStrategy}>
+                            onChange={handleRuleConfigChange('unmatchedStrategy')}>
                             <MenuItem value="direct">直接访问</MenuItem>
                             <MenuItem value="proxy">代理访问</MenuItem>
                         </TextField>
@@ -291,7 +284,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                             select fullWidth size="small"
                             label="采用模式"
                             value={ruleConfig.mode}
-                            onChange={handleMode}>
+                            onChange={handleRuleConfigChange('mode')}>
                             {ruleModeList.map((item, index) => (
                                 <MenuItem key={index} value={index}>{item.name}</MenuItem>
                             ))}
