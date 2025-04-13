@@ -1,12 +1,43 @@
 import { processLines } from "./util.ts"
 
-export function modeRulesToConf(modeRules: RuleRow[]) {
+export function RuleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, modeRules: RuleRow[]) {
+    let rules: any[]
+    if (ruleConfig.globalProxy) {
+        rules = getGlobalProxyConf()
+    } else {
+        rules = [...RuleDomainToConf(ruleDomain)]
+
+        if (modeRules.length > 0) {
+            rules = [...rules, ...modeRulesToConf(modeRules)]
+        }
+
+        // 当未匹配策略为直连时，添加直连规则
+        if (ruleConfig.unmatchedStrategy === 'direct') {
+            rules.push({
+                type: 'field',
+                ruleTag: 'dray-unmatched',
+                outboundTag: 'direct',
+                // network: 'tcp,udp',
+                port: '1-65535',
+            })
+        }
+    }
+
+    return {
+        "routing": {
+            "domainStrategy": ruleConfig.domainStrategy,
+            "rules": rules
+        }
+    }
+}
+
+export function modeRulesToConf(modeRules: RuleRow[]): any[] {
     let rules = []
     for (let i = 0; i < modeRules.length; i++) {
         const v = modeRules[i]
         let rule: any = {
             type: 'field',
-            ruleTag: `${i}-dray-${v.outboundTag}`,
+            ruleTag: `${i}-dray-mode-${v.outboundTag}`,
             outboundTag: v.outboundTag
         }
         if (v.ruleType === 'domain') {
@@ -26,7 +57,7 @@ export function modeRulesToConf(modeRules: RuleRow[]) {
     return rules
 }
 
-export function RuleDomainToConf(ruleDomain: RuleDomain) {
+export function RuleDomainToConf(ruleDomain: RuleDomain): any[] {
     let rules = []
 
     if (ruleDomain.proxy) {
@@ -57,4 +88,16 @@ export function RuleDomainToConf(ruleDomain: RuleDomain) {
     }
 
     return rules
+}
+
+// 获取全局代理配置
+// 考虑用户体验，默认全局代理，排除代理服务器无法访问的 私有域名 和 私有IP
+export function getGlobalProxyConf(): any[] {
+    return [{
+        type: 'field',
+        ruleTag: 'dray-global-proxy',
+        outboundTag: 'direct',
+        domain: ['geosite:private'],
+        ip: ['geoip:private'],
+    }]
 }
