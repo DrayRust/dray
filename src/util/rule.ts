@@ -40,7 +40,7 @@ export function modeRulesToConf(modeRules: RuleRow[]): any[] {
         const v = modeRules[i]
         let rule: any = {
             type: 'field',
-            ruleTag: `${i}-dray-mode-${v.outboundTag}`,
+            ruleTag: `${i+1}-dray-mode-${v.outboundTag}`,
             outboundTag: v.outboundTag
         }
         if (v.ruleType === 'domain') {
