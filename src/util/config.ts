@@ -63,7 +63,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         name: "中国大陆模式",
         note: "专为中国大陆网络环境优化的访问规则",
-        hash: "e42ee3190977752faf1bbf79001e4d7abbe8ac8ef44bb980b0a68a521b889517",
+        hash: "81bd1c09da6b7d0ff43055b0adc4585f607a17c258cae4c32952c1099fa09025",
         rules: [
             {
                 "name": "中国大陆 DNS 服务器",
@@ -103,7 +103,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "UDP 443 流量",
-                "note": "排除 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
+                "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
                 "outboundTag": "block",
                 "ruleType": "multi",
                 "domain": "",
