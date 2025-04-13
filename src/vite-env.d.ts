@@ -222,6 +222,8 @@ interface RuleRow {
     // inboundTag: string; // 入站连接标识（需求少，不实现）
     protocol: string; // 请求协议
     // attrs: string; // 请求流量属性（需求少，不实现）
+    // balancerTag: string; // 负载均衡器标识（需求少，不实现）
+    // ruleTag: string;
 }
 
 interface RuleModeRow {

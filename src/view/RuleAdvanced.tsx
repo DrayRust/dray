@@ -307,7 +307,9 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : action === 'export' ? (<>
-                            <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
+                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
+                            </Stack>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="info" onClick={handleRuleModeCopy}>复制</Button>
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
