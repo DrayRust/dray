@@ -58,18 +58,14 @@ export function restartRay() {
     }
 }
 
-export async function readAppConfig(): Promise<AppConfig> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            const s = await invoke('get_config_json') as string
-            const data = JSON.parse(s) as AppConfig
-            resolve(data)
-        } catch (err) {
-            log.error('Failed to readConfig:', err)
-            reject(err)
-        }
-    })
+export async function readAppConfig(): Promise<AppConfig | undefined> {
+    if (!isTauri) return
+    try {
+        const s = await invoke('get_config_json') as string
+        return JSON.parse(s) as AppConfig
+    } catch (err) {
+        log.error('Failed to readConfig:', err)
+    }
 }
 
 export function setAppConfig(cmd: string, value: string | number | boolean) {
@@ -85,34 +81,19 @@ export function setAppConfig(cmd: string, value: string | number | boolean) {
 }
 
 export async function loadRayCommonConfig(): Promise<RayCommonConfig> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        readRayCommonConfig().then(c => {
-            resolve({...DEFAULT_RAY_COMMON_CONFIG, ...c})
-        }).catch(_ => {
-            saveRayCommonConfig(DEFAULT_RAY_COMMON_CONFIG).catch(_ => 0)
-            resolve(DEFAULT_RAY_COMMON_CONFIG)
-        })
-    })
+    if (!isTauri) return DEFAULT_RAY_COMMON_CONFIG
+    return await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
 }
 
-export async function readRayCommonConfig(): Promise<RayCommonConfig> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as RayCommonConfig
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readRayCommonConfig:', err)
-            reject(err)
-        }
-    })
+export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as RayCommonConfig
+    } catch (err) {
+        log.error('Failed to readRayCommonConfig:', err)
+    }
 }
 
 export async function saveRayCommonConfig(content: RayCommonConfig) {
@@ -128,23 +109,15 @@ export async function saveRayCommonConfig(content: RayCommonConfig) {
     }
 }
 
-export async function readServerList(): Promise<ServerList> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_conf', {'filename': 'server.json'}) as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as ServerList
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readServerList:', err)
-            reject(err)
-        }
-    })
+export async function readServerList(): Promise<ServerList | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {'filename': 'server.json'}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as ServerList
+    } catch (err) {
+        log.error('Failed to readServerList:', err)
+    }
 }
 
 export async function saveServerList(serverList: ServerList) {
@@ -159,23 +132,15 @@ export async function saveServerList(serverList: ServerList) {
     }
 }
 
-export async function readRuleConfig(): Promise<RuleConfig> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_conf', {'filename': 'rule_config.json'}) as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as RuleConfig
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readRuleConfig:', err)
-            reject(err)
-        }
-    })
+export async function readRuleConfig(): Promise<RuleConfig | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {'filename': 'rule_config.json'}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as RuleConfig
+    } catch (err) {
+        log.error('Failed to readRuleConfig:', err)
+    }
 }
 
 export async function saveRuleConfig(ruleConfig: RuleConfig) {
@@ -190,23 +155,15 @@ export async function saveRuleConfig(ruleConfig: RuleConfig) {
     }
 }
 
-export async function readRuleDomain(): Promise<RuleDomain> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_conf', {'filename': 'rule_domain.json'}) as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as RuleDomain
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readRuleDomain:', err)
-            reject(err)
-        }
-    })
+export async function readRuleDomain(): Promise<RuleDomain | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {'filename': 'rule_domain.json'}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as RuleDomain
+    } catch (err) {
+        log.error('Failed to readRuleDomain:', err)
+    }
 }
 
 export async function saveRuleDomain(ruleDomain: RuleDomain) {
@@ -221,23 +178,15 @@ export async function saveRuleDomain(ruleDomain: RuleDomain) {
     }
 }
 
-export async function readRuleModeList(): Promise<RuleModeList> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_conf', {'filename': 'rule_mode_list.json'}) as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as RuleModeList
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readRuleModeList:', err)
-            reject(err)
-        }
-    })
+export async function readRuleModeList(): Promise<RuleModeList | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {'filename': 'rule_mode_list.json'}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as RuleModeList
+    } catch (err) {
+        log.error('Failed to readRuleModeList:', err)
+    }
 }
 
 export async function saveRuleModeList(ruleModeList: RuleModeList) {
@@ -253,22 +202,14 @@ export async function saveRuleModeList(ruleModeList: RuleModeList) {
 }
 
 export async function readRayConfig(): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_ray_config') as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s)
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readRayConfig:', err)
-            reject(err)
-        }
-    })
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_ray_config') as string
+        s = s.trim()
+        if (s) return JSON.parse(s)
+    } catch (err) {
+        log.error('Failed to readRayConfig:', err)
+    }
 }
 
 export async function saveRayConfig(content: any) {
@@ -321,35 +262,23 @@ export async function clearLogAll() {
     }
 }
 
-export async function readLogList(): Promise<LogList> {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            let s = await invoke('read_log_list') as string
-            s = s.trim()
-            if (s) {
-                const data = JSON.parse(s) as LogList
-                resolve(data)
-            } else {
-                reject()
-            }
-        } catch (err) {
-            log.error('Failed to readLogList:', err)
-            reject(err)
-        }
-    })
+export async function readLogList(): Promise<LogList | undefined> {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_log_list') as string
+        s = s.trim()
+        if (s) return JSON.parse(s) as LogList
+    } catch (err) {
+        log.error('Failed to readLogList:', err)
+    }
 }
 
 export async function readLogFile(filename: string, reverse: boolean = true, start: number = -1) {
-    return new Promise(async (resolve, reject) => {
-        if (!isTauri) return reject()
-        try {
-            const s = await invoke('read_log_file', {filename, reverse, start}) as string
-            const data = JSON.parse(s) as LogContent
-            resolve(data)
-        } catch (err) {
-            log.error('Failed to readLogFile:', err)
-            reject(err)
-        }
-    })
+    if (!isTauri) return
+    try {
+        const s = await invoke('read_log_file', {filename, reverse, start}) as string
+        return JSON.parse(s) as LogContent
+    } catch (err) {
+        log.error('Failed to readLogFile:', err)
+    }
 }
