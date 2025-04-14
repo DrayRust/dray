@@ -135,7 +135,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 placeholder="例如：baidu.com"/>
                         </>) : ruleType === 2 && (<>
                             <Alert variant="filled" severity="error">
-                                阻止访问某些网站或服务，适合屏蔽广告、恶意网站或不希望访问的内容。
+                                阻止访问某些网站或服务，适合屏蔽广告、恶意网站、病毒网站、钓鱼网站或不希望访问的内容。
                             </Alert>
                             <TextField
                                 variant="outlined" fullWidth multiline rows={6}
