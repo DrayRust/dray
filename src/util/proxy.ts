@@ -1,4 +1,20 @@
-export function generateProxyPAC(proxy: string, proxyDomains: string, directDomains: string, blockDomains: string) {
+import { readAppConfig, saveProxyPac } from "./invoke.ts"
+import { processLines } from "./util.ts"
+
+// 更新 proxy.js 文件
+export async function updateProxyPAC(ruleDomain: RuleDomain) {
+    const config = await readAppConfig()
+    if (config) {
+        const proxy = config.ray_host + ":" + config.ray_socks_port
+        const proxyDomains = ruleDomain.proxy ? JSON.stringify(processLines(ruleDomain.proxy), null, '\t') : '[]'
+        const directDomains = ruleDomain.direct ? JSON.stringify(processLines(ruleDomain.direct), null, '\t') : '[]'
+        const blockDomains = ruleDomain.block ? JSON.stringify(processLines(ruleDomain.block), null, '\t') : '[]'
+        const s = generateProxyPAC(proxy, proxyDomains, directDomains, blockDomains)
+        await saveProxyPac(s)
+    }
+}
+
+function generateProxyPAC(proxy: string, proxyDomains: string, directDomains: string, blockDomains: string) {
     return `
 var proxy = 'SOCKS5 ${proxy}';
 

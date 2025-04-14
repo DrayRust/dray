@@ -18,6 +18,7 @@ import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
 import { ruleToConf } from "../util/rule.ts"
+import { updateProxyPAC } from "../util/proxy.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -77,6 +78,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         }
 
         await updateRayConfig(ruleConfig, newRuleDomain)
+        await updateProxyPAC(newRuleDomain)
         showChip('设置成功', 'success')
     }, 50)
 
