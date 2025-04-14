@@ -20,11 +20,11 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useServerImport } from "../component/useServerImport.tsx"
 import { useDebounce } from '../hook/useDebounce.ts'
 import {
-    readAppConfig, loadRayCommonConfig, saveRayConfig, getDrayAppDir,
+    readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
     restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList
 } from "../util/invoke.ts"
 import { getConf } from "../util/serverConf.ts"
-import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
+import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG, DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { ruleToConf } from "../util/rule.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
@@ -107,8 +107,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     let ruleModeList: RuleModeList
     const initConfig = async () => {
         if (!appDir) appDir = await getDrayAppDir()
-        if (!config) config = await readAppConfig()
-        if (!rayCommonConfig) rayCommonConfig = await loadRayCommonConfig()
+        if (!config) config = await readAppConfig() || DEFAULT_APP_CONFIG
+        if (!rayCommonConfig) rayCommonConfig = await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
 
         if (!ruleConfig) ruleConfig = await readRuleConfig() || DEFAULT_RULE_CONFIG
         if (!ruleDomain) ruleDomain = await readRuleDomain() || DEFAULT_RULE_DOMAIN
