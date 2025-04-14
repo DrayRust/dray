@@ -3,12 +3,12 @@ import { processLines } from "./util.ts"
 
 // 更新 proxy.js 文件
 export async function updateProxyPAC(ruleDomain: RuleDomain) {
-    const config = await readAppConfig()
+    const config = await readAppConfig() as AppConfig
     if (config) {
         const proxy = config.ray_host + ":" + config.ray_socks_port
-        const proxyDomains = ruleDomain.proxy ? JSON.stringify(processLines(ruleDomain.proxy), null, '\t') : '[]'
-        const directDomains = ruleDomain.direct ? JSON.stringify(processLines(ruleDomain.direct), null, '\t') : '[]'
-        const blockDomains = ruleDomain.block ? JSON.stringify(processLines(ruleDomain.block), null, '\t') : '[]'
+        const proxyDomains = ruleDomain.proxy ? JSON.stringify(processLines(ruleDomain.proxy.toLowerCase()), null, '\t') : '[]'
+        const directDomains = ruleDomain.direct ? JSON.stringify(processLines(ruleDomain.direct.toLowerCase()), null, '\t') : '[]'
+        const blockDomains = ruleDomain.block ? JSON.stringify(processLines(ruleDomain.block.toLowerCase()), null, '\t') : '[]'
         const s = generateProxyPAC(proxy, proxyDomains, directDomains, blockDomains)
         await saveProxyPac(s)
     }
