@@ -332,22 +332,6 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                     </>) : tab === 1 && (<>
                         {ruleModeKey > -1 ? (<>
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
-                        </>) : action === 'viewConf' ? (<>
-                            <div className="flex-between">
-                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                                {ruleModeConf && (
-                                    <Tooltip placement="left" title={contentCopied || '点击复制'}>
-                                        <IconButton onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
-                                    </Tooltip>
-                                )}
-                            </div>
-                            {ruleModeConf ? (
-                                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                    <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
-                                </Stack>
-                            ) : (
-                                <ErrorCard errorMsg="没有任何规则" height="160px"/>
-                            )}
                         </>) : action === 'create' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                                 <TextField
@@ -379,13 +363,31 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
                             </Stack>
                         </>) : action === 'export' ? (<>
+                            <div className="flex-between">
+                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
+                                <Tooltip placement="left" title={contentCopied || '点击复制'}>
+                                    <IconButton onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
+                                </Tooltip>
+                            </div>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" multiline disabled rows={10} label="导出内容（URI）" value={ruleModeExportData}/>
+                                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={ruleModeExportData}/>
                             </Stack>
-                            <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={() => handleRuleModeCopy(ruleModeExportData)}>复制</Button>
-                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </Stack>
+                        </>) : action === 'viewConf' ? (<>
+                            <div className="flex-between">
+                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
+                                {ruleModeConf && (
+                                    <Tooltip placement="left" title={contentCopied || '点击复制'}>
+                                        <IconButton onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                                    </Tooltip>
+                                )}
+                            </div>
+                            {ruleModeConf ? (
+                                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                    <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
+                                </Stack>
+                            ) : (
+                                <ErrorCard errorMsg="没有规则" height="160px"/>
+                            )}
                         </>) : (<>
                             <Stack direction="row" spacing={1}>
                                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleModeCreate}>添加</Button>
