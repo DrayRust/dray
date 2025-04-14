@@ -116,7 +116,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const setServerEnable = async (selectedKey: number) => {
-        if (!serverList) return
+        if (!serverList) return false
         const newServerList = serverList.map((server, index) => {
             server.on = index === selectedKey ? 1 : 0
             return server
@@ -145,6 +145,11 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleEnable = async () => {
+        if (serverList?.[selectedKey]?.on) {
+            handleMenuClose()
+            return
+        }
+
         await getServerConf(async (conf) => {
             const ok = await saveRayConfig(conf)
             if (ok) {
