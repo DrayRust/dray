@@ -10,9 +10,10 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     useEffect(() => {
-        readAppConfig().then((c) => {
-            setRayEnable(c.ray_enable)
-        }).catch(_ => 0)
+        (async () => {
+            const c = await readAppConfig()
+            if (c) setRayEnable(c.ray_enable)
+        })()
     }, [])
 
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
