@@ -234,7 +234,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         }
     }
 
-    const handleSortEnd = (key: number) => {
+    const handleSortEnd = async (key: number) => {
         if (sortKey === -1) return
         if (sortKey === key) {
             setSortKey(-1)
@@ -246,9 +246,8 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         rules.splice(key, 0, temp)
         setSortKey(-1)
 
-        updateHashAndRule(rules).catch(_ => {
-            showAlertDialog('删除失败')
-        })
+        const ok = await updateHashAndRule(rules)
+        if (!ok) showAlertDialog('保存排序失败', 'error')
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()

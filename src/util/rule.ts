@@ -14,7 +14,7 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
             }
         }
 
-        // 当未匹配策略，方便观察域名匹配都走哪个规则
+        // 未匹配策略，方便观察匹配上的哪个规则
         if (ruleConfig.unmatchedStrategy) {
             rules.push({
                 type: 'field',
