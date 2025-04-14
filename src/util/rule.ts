@@ -1,30 +1,27 @@
 import { processLines } from "./util.ts"
 
 export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList): any {
-    let rules: any[]
-    if (ruleConfig.globalProxy) {
-        rules = getGlobalProxyConf()
-    } else {
-        rules = [...ruleDomainToConf(ruleDomain)]
+    if (ruleConfig.globalProxy) return getGlobalProxyConf()
 
-        // 采用的哪个模式
-        if (Array.isArray(ruleModeList) && ruleModeList.length > 0) {
-            const ruleMode = ruleModeList[ruleConfig.mode]
-            if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
-                rules = [...rules, ...modeRulesToConf(ruleMode.rules)]
-            }
-        }
+    let rules = [...ruleDomainToConf(ruleDomain)]
 
-        // 未匹配策略，方便观察匹配上的哪个规则
-        if (ruleConfig.unmatchedStrategy) {
-            rules.push({
-                type: 'field',
-                ruleTag: 'dray-unmatched',
-                outboundTag: ruleConfig.unmatchedStrategy,
-                // network: 'tcp,udp',
-                port: '1-65535',
-            })
+    // 采用的哪个模式
+    if (Array.isArray(ruleModeList) && ruleModeList.length > 0) {
+        const ruleMode = ruleModeList[ruleConfig.mode]
+        if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
+            rules = [...rules, ...modeRulesToConf(ruleMode.rules)]
         }
+    }
+
+    // 未匹配策略，方便观察匹配上的哪个规则
+    if (ruleConfig.unmatchedStrategy) {
+        rules.push({
+            type: 'field',
+            ruleTag: 'dray-unmatched',
+            outboundTag: ruleConfig.unmatchedStrategy,
+            // network: 'tcp,udp',
+            port: '1-65535',
+        })
     }
 
     return {
@@ -95,12 +92,17 @@ export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
 }
 
 // 考虑用户体验，全局代理，排除代理服务器无法访问的 私有域名 和 私有IP
-export function getGlobalProxyConf(): any[] {
-    return [{
-        type: 'field',
-        ruleTag: 'dray-global-proxy',
-        outboundTag: 'direct',
-        domain: ['geosite:private'],
-        ip: ['geoip:private'],
-    }]
+export function getGlobalProxyConf(): any {
+    return {
+        routing: {
+            domainStrategy: "AsIs",
+            rules: [{
+                type: 'field',
+                ruleTag: 'dray-global-proxy',
+                outboundTag: 'direct',
+                domain: ['geosite:private'],
+                ip: ['geoip:private'],
+            }]
+        }
+    }
 }
