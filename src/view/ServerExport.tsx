@@ -33,19 +33,19 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     const [base64UriList, setBase64UriList] = useState<string[]>([])
     const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
-        readServerList().then((d) => {
-            let serverList = d as ServerList
+        (async () => {
+            let serverList = await readServerList()
             if (serverList) {
                 if (selectedKeys && selectedKeys.length > 0) {
                     serverList = serverList.filter((_, index) => selectedKeys.includes(index))
                 }
                 setServerList(serverList)
                 initPsAndUriList(serverList)
+            } else {
+                setServerList([])
+                setErrorMsg('暂无服务器')
             }
-        }).catch(_ => {
-            setServerList([])
-            setErrorMsg('暂无服务器')
-        })
+        })()
     }
     useEffect(() => readList(), [])
 
