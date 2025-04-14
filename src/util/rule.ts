@@ -14,12 +14,12 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
             }
         }
 
-        // 当未匹配策略为直连时，添加直连规则
-        if (ruleConfig.unmatchedStrategy === 'direct') {
+        // 当未匹配策略，方便观察域名匹配都走哪个规则
+        if (ruleConfig.unmatchedStrategy) {
             rules.push({
                 type: 'field',
                 ruleTag: 'dray-unmatched',
-                outboundTag: 'direct',
+                outboundTag: ruleConfig.unmatchedStrategy,
                 // network: 'tcp,udp',
                 port: '1-65535',
             })
@@ -40,7 +40,7 @@ export function modeRulesToConf(modeRules: RuleRow[]): any[] {
         const v = modeRules[i]
         let rule: any = {
             type: 'field',
-            ruleTag: `${i+1}-dray-mode-${v.outboundTag}`,
+            ruleTag: `${i + 1}-dray-mode-${v.outboundTag}`,
             outboundTag: v.outboundTag
         }
         if (v.ruleType === 'domain') {
