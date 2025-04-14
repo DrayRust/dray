@@ -106,7 +106,7 @@ export function processDomain(domain: string, validate: boolean = false, sort: b
     if (domain.length === 0) return ''
 
     // 清理每行字符串的两端空格，排除空字符串行
-    const cleanedDomains = domain.split('\n')
+    const cleanedDomains = domain.toLowerCase().split('\n')
         .map(d => d.trim())
         .filter(d => {
             if (d.length === 0) return false
@@ -133,7 +133,7 @@ export function processIP(ip: string): string {
     if (ip.length === 0) return ''
 
     // 清理每行字符串的两端空格，排除空字符串行
-    const cleanedIPs = ip.split('\n')
+    const cleanedIPs = ip.toLowerCase().split('\n')
         .map(i => i.trim())
         .filter(i => i.length > 0)
 
