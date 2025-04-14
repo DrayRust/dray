@@ -273,7 +273,7 @@ export async function readLogList(): Promise<LogList | undefined> {
     }
 }
 
-export async function readLogFile(filename: string, reverse: boolean = true, start: number = -1) {
+export async function readLogFile(filename: string, reverse: boolean = true, start: number = -1): Promise<LogContent | undefined> {
     if (!isTauri) return
     try {
         const s = await invoke('read_log_file', {filename, reverse, start}) as string
