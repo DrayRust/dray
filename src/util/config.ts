@@ -61,13 +61,13 @@ export const DEFAULT_RULE: RuleRow = {
 
 export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
-        name: "中国大陆模式",
-        note: "专为中国大陆网络环境优化的访问规则",
-        hash: "81bd1c09da6b7d0ff43055b0adc4585f607a17c258cae4c32952c1099fa09025",
-        rules: [
+        "name": "中国大陆模式",
+        "note": "专为中国大陆网络环境优化的访问规则",
+        "hash": "e7600b7f166e9726297e58cbe54ba431a726f85eb061ed5fca7f4577eccf670a",
+        "rules": [
             {
                 "name": "中国大陆 DNS 服务器",
-                "note": "排除中国大陆常用 DNS 服务器，不用读取IP数据库文件",
+                "note": "排除中国大陆常用 DNS 服务器",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -94,7 +94,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "note": "代理常用 Google 域名，精准匹配域名，性能能快那么一点",
                 "outboundTag": "proxy",
                 "ruleType": "domain",
-                "domain": "domain:doubleclick.net\ndomain:google-analytics.com\ndomain:google-analytics.com.cn\ndomain:google.com\ndomain:googleadapis.com\ndomain:googleadservices.com\ndomain:googleadservices.com.cn\ndomain:googleapis.cn\ndomain:googleapis.com\ndomain:googletagmanager.com\ndomain:googletagservices.com\ndomain:googleusercontent.com\ndomain:gstatic.com",
+                "domain": "domain:google-analytics.com\ndomain:google-analytics.com.cn\ndomain:google.com\ndomain:googleadapis.com\ndomain:googleadservices.com\ndomain:googleadservices.com.cn\ndomain:googleapis.cn\ndomain:googleapis.com\ndomain:googletagmanager.com\ndomain:googletagservices.com\ndomain:googleusercontent.com\ndomain:gstatic.com",
                 "ip": "",
                 "port": "",
                 "sourcePort": "",
@@ -139,7 +139,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有IP",
-                "note": "排除代理服务器无法访问的私有IP 如：192.168.1.1",
+                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -151,7 +151,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有域名",
-                "note": "排除代理服务器无法访问的私有域名 如：localhost",
+                "note": "排除代理服务器无法访问的私有域名 如: localhost",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:private",
@@ -162,8 +162,8 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
-                "name": "中国大陆IP",
-                "note": "排除IP数据库中所有中国大陆IP不走代理服务器",
+                "name": "中国大陆 IP",
+                "note": "排除 IP 数据库中的所有中国大陆 IP",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -175,7 +175,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "中国大陆域名",
-                "note": "排除域名数据库中整理的中国大陆常见域名",
+                "note": "排除域名数据库中的中国大陆常见域名",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:cn",
@@ -188,15 +188,197 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         ]
     },
     {
-        name: "俄罗斯模式",
-        note: "专为俄罗斯网络环境优化的访问规则",
-        hash: "",
-        rules: []
+        "name": "俄罗斯模式",
+        "note": "专为俄罗斯网络环境优化的访问规则",
+        "hash": "72cdfaa9802e3b7565be4e9a234809b073a1d75886ac8133cf24d8394682a888",
+        "rules": [
+            {
+                "name": "UDP 443 流量",
+                "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
+                "outboundTag": "block",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "443",
+                "sourcePort": "",
+                "network": "udp",
+                "protocol": ""
+            },
+            {
+                "name": "广告域名",
+                "note": "屏蔽热心网友整理的广告域名和广告商域名",
+                "outboundTag": "block",
+                "ruleType": "domain",
+                "domain": "geosite:category-ads-all",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "屏蔽 BT 流量",
+                "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
+                "outboundTag": "block",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": "bittorrent"
+            },
+            {
+                "name": "私有IP",
+                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "outboundTag": "direct",
+                "ruleType": "ip",
+                "domain": "",
+                "ip": "geoip:private",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "私有域名",
+                "note": "排除代理服务器无法访问的私有域名 如: localhost",
+                "outboundTag": "direct",
+                "ruleType": "domain",
+                "domain": "geosite:private",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "俄罗斯 IP",
+                "note": "排除 IP 数据库中的所有俄罗斯 IP",
+                "outboundTag": "direct",
+                "ruleType": "ip",
+                "domain": "",
+                "ip": "geoip:ru",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "俄罗斯域名",
+                "note": "排除域名数据库中的俄罗斯常见域名",
+                "outboundTag": "direct",
+                "ruleType": "domain",
+                "domain": "geosite:ru",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            }
+        ]
     },
     {
-        name: "伊朗模式",
-        note: "专为伊朗网络环境优化的访问规则",
-        hash: "",
-        rules: []
-    },
+        "name": "伊朗模式",
+        "note": "专为伊朗网络环境优化的访问规则",
+        "hash": "d42c649cc6f7636f09c5518cdf166e62ec2dff1063807a9df05f29a368130d2c",
+        "rules": [
+            {
+                "name": "常用 Google 域名",
+                "note": "代理常用 Google 域名",
+                "outboundTag": "proxy",
+                "ruleType": "domain",
+                "domain": "domain:google-analytics.com\ndomain:google-analytics.com.cn\ndomain:google.com\ndomain:googleadapis.com\ndomain:googleadservices.com\ndomain:googleadservices.com.cn\ndomain:googleapis.cn\ndomain:googleapis.com\ndomain:googletagmanager.com\ndomain:googletagservices.com\ndomain:googleusercontent.com\ndomain:gstatic.com",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "UDP 443 流量",
+                "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
+                "outboundTag": "block",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "443",
+                "sourcePort": "",
+                "network": "udp",
+                "protocol": ""
+            },
+            {
+                "name": "广告域名",
+                "note": "屏蔽热心网友整理的广告域名和广告商域名",
+                "outboundTag": "block",
+                "ruleType": "domain",
+                "domain": "geosite:category-ads-all",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "屏蔽 BT 流量",
+                "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
+                "outboundTag": "block",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": "bittorrent"
+            },
+            {
+                "name": "私有IP",
+                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "outboundTag": "direct",
+                "ruleType": "ip",
+                "domain": "",
+                "ip": "geoip:private",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "私有域名",
+                "note": "排除代理服务器无法访问的私有域名 如: localhost",
+                "outboundTag": "direct",
+                "ruleType": "domain",
+                "domain": "geosite:private",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "伊朗 IP",
+                "note": "排除 IP 数据库中的所有伊朗 IP",
+                "outboundTag": "direct",
+                "ruleType": "ip",
+                "domain": "",
+                "ip": "geoip:ir",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            },
+            {
+                "name": "伊朗域名",
+                "note": "排除域名数据库中的伊朗常见域名",
+                "outboundTag": "direct",
+                "ruleType": "domain",
+                "domain": "geosite:ir",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": ""
+            }
+        ]
+    }
 ]
