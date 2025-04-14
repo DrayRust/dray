@@ -106,7 +106,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!rayCommonConfig) rayCommonConfig = await loadRayCommonConfig()
     }
 
-    const setEnable = async (selectedKey: number) => {
+    const setServerEnable = async (selectedKey: number) => {
         if (!serverList) return
         const newServerList = serverList.map((server, index) => {
             server.on = index === selectedKey ? 1 : 0
@@ -116,6 +116,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!ok) {
             showSnackbar('设置启用失败', 'error')
         }
+        return ok
     }
 
     const getServerConf = async (callback: (conf: any) => void) => {
@@ -136,8 +137,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         await getServerConf(async (conf) => {
             const ok = await saveRayConfig(conf)
             if (ok) {
-                await setEnable(selectedKey)
-                restartRay()
+                const setOk = await setServerEnable(selectedKey)
+                setOk && restartRay()
             }
         })
         handleMenuClose()
