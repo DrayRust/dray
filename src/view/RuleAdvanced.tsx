@@ -366,7 +366,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
                                 <Tooltip placement="left" title={contentCopied || '点击复制'}>
-                                    <IconButton onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
+                                    <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </div>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
@@ -377,7 +377,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
                                 {ruleModeConf && (
                                     <Tooltip placement="left" title={contentCopied || '点击复制'}>
-                                        <IconButton onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                                        <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 )}
                             </div>
