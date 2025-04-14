@@ -38,8 +38,25 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         }).catch(_ => 0)
     }, [])
 
+    const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
+        const rayConfig = await readRayConfig()
+        if (rayConfig) {
+            const ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
+            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+            const conf = {...rayConfig, ...routing}
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                restartRay()
+            }
+        }
+    }
+
     const handleGlobalProxy = () => {
-        setRuleConfig(prev => ({...prev, globalProxy: !prev.globalProxy}))
+        setRuleConfig(prev => {
+            const newRuleConfig = {...prev, globalProxy: !prev.globalProxy}
+            updateRayConfig(newRuleConfig, ruleDomain).catch(_ => 0)
+            return newRuleConfig
+        })
     }
 
     const handleDomainChange = (type: keyof RuleDomain) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,22 +76,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
             return
         }
 
-        // 读取 ray 配置文件是否存在，如果不存在则不生成配置文件
-        const rayConfig = await readRayConfig()
-        if (rayConfig) {
-            // 读取模式数据 ruleModeList
-            let ruleModeList = await readRuleModeList()
-            if (!ruleModeList) ruleModeList = DEFAULT_RULE_MODE_LIST
-
-            // 生成配置文件
-            const routing = ruleToConf(ruleConfig, newRuleDomain, ruleModeList)
-            const conf = {...rayConfig, ...routing}
-            const ok = await saveRayConfig(conf)
-            if (ok) {
-                restartRay()
-            }
-        }
-
+        await updateRayConfig(ruleConfig, newRuleDomain)
         showChip('设置成功', 'success')
     }, 50)
 
