@@ -17,7 +17,7 @@ import { useAlertDialog } from '../component/useAlertDialog.tsx'
 import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
-import { ErrorCard } from "../component/useCard.tsx"
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { hashJson } from "../util/crypto.ts"
 import { DEFAULT_RULE } from "../util/config.ts"
@@ -46,6 +46,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     ruleModeKey: number,
     setRuleModeKey: (ruleModeKey: number) => void
 }) => {
+    const [loading, setLoading] = useState(true)
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>({
         name: '',
         note: '',
@@ -56,6 +57,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     useEffect(() => {
         const item = ruleModeList[ruleModeKey]
         if (item) setRuleModeRow(item)
+        setLoading(false)
     }, [])
 
     const saveRuleModeRow = useDebounce(async (newRuleMode: RuleModeRow) => {
@@ -230,7 +232,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         } else if (sortKey === key) {
             setSortKey(-1)
         } else {
-            handleSortEnd(key)
+            handleSortEnd(key).catch(_ => 0)
         }
     }
 
@@ -350,36 +352,41 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleCreate}>添加</Button>
             </Stack>
-            {ruleModeRow.rules.length === 0 && <ErrorCard errorMsg="规则为空" height="160px"/>}
-            <TableContainer component={Card}>
-                <Table size="small">
-                    <TableBody>
-                        {ruleModeRow.rules.map((row, key) => (
-                            <TableRow
-                                key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
-                                onClick={() => handleSortEnd(key)}>
-                                <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
-                                    <Typography variant="body1" component="div">{row.name}</Typography>
-                                    <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                </TableCell>
-                                <TableCell sx={{p: '4px 8px'}} align="right">
-                                    <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
-                                    <Tooltip title="排序" placement="left">
-                                        <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="修改" placement="top">
-                                        <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="删除" placement="top">
-                                        <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
-                                    </Tooltip>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            {loading ? (
+                <LoadingCard height="160px"/>
+            ) : ruleModeRow.rules.length === 0 ? (
+                <ErrorCard errorMsg="规则为空" height="160px"/>
+            ) : (
+                <TableContainer component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            {ruleModeRow.rules.map((row, key) => (
+                                <TableRow
+                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                    onClick={() => handleSortEnd(key)}>
+                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                        <Typography variant="body1" component="div">{row.name}</Typography>
+                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                    </TableCell>
+                                    <TableCell sx={{p: '4px 8px'}} align="right">
+                                        <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
+                                        <Tooltip title="排序" placement="left">
+                                            <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="修改" placement="top">
+                                            <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="删除" placement="top">
+                                            <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
+                                        </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
         </>)}
     </>)
 }
