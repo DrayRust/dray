@@ -33,32 +33,33 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const [errorMsg, setErrorMsg] = useState('')
 
     const readList = () => {
-        readServerList().then((d) => {
-            let serverList = d as ServerList
-            setServerList(serverList)
+        (async () => {
+            let serverList = await readServerList()
+            if (serverList) {
+                setServerList(serverList)
+                if (serverList[key]) {
+                    let item = serverList[key]
+                    setServerType(item.type)
+                    setPs(item.ps)
+                    setItemOn(item.on)
 
-            if (serverList[key]) {
-                let item = serverList[key]
-                setServerType(item.type)
-                setPs(item.ps)
-                setItemOn(item.on)
-
-                if (item.type === 'vmess') {
-                    setVmessForm(item.data as VmessRow)
-                } else if (item.type === 'vless') {
-                    setVlessForm(item.data as VlessRow)
-                } else if (item.type === 'ss') {
-                    setSsForm(item.data as SsRow)
-                } else if (item.type === 'trojan') {
-                    setTrojanForm(item.data as TrojanRow)
+                    if (item.type === 'vmess') {
+                        setVmessForm(item.data as VmessRow)
+                    } else if (item.type === 'vless') {
+                        setVlessForm(item.data as VlessRow)
+                    } else if (item.type === 'ss') {
+                        setSsForm(item.data as SsRow)
+                    } else if (item.type === 'trojan') {
+                        setTrojanForm(item.data as TrojanRow)
+                    }
+                } else {
+                    setErrorMsg('服务器不存在')
                 }
             } else {
-                setErrorMsg('服务器不存在')
+                setServerList([])
+                setErrorMsg('暂无服务器')
             }
-        }).catch(_ => {
-            setServerList([])
-            setErrorMsg('暂无服务器')
-        })
+        })()
     }
     useEffect(() => readList(), [])
 
