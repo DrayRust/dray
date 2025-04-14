@@ -43,13 +43,16 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
     const [ruleModeKey, setRuleModeKey] = useState(-1)
 
     useEffect(() => {
-        readRuleModeList().then((d) => {
-            const mergedList = (d as RuleModeList).map(item => ({
-                ...DEFAULT_RULE_MODE_ROW,
-                ...item
-            }))
-            setRuleModeList(mergedList)
-        }).catch(_ => 0)
+        (async () => {
+            const list = await readRuleModeList() as RuleModeList
+            if (list) {
+                const mergedList = (list).map(item => ({
+                    ...DEFAULT_RULE_MODE_ROW,
+                    ...item
+                }))
+                setRuleModeList(mergedList)
+            }
+        })()
     }, [])
 
     const handleClose = () => {

@@ -29,13 +29,13 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleConfig, setRuleConfig] = useState<RuleConfig>(DEFAULT_RULE_CONFIG)
     const [ruleDomain, setRuleDomain] = useState<RuleDomain>(DEFAULT_RULE_DOMAIN)
     useEffect(() => {
-        readRuleConfig().then((data) => {
-            setRuleConfig({...DEFAULT_RULE_CONFIG, ...data})
-        }).catch(_ => 0)
+        (async () => {
+            const newRuleConfig = await readRuleConfig() as RuleConfig
+            if (newRuleConfig) setRuleConfig({...DEFAULT_RULE_CONFIG, ...newRuleConfig})
 
-        readRuleDomain().then((data) => {
-            setRuleDomain({...DEFAULT_RULE_DOMAIN, ...data})
-        }).catch(_ => 0)
+            const newRuleDomain = await readRuleDomain() as RuleDomain
+            if (newRuleDomain) setRuleDomain({...DEFAULT_RULE_DOMAIN, ...newRuleDomain})
+        })()
     }, [])
 
     const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
