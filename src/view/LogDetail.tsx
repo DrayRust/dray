@@ -10,7 +10,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 import { useSnackbar } from '../component/useSnackbar.tsx'
 import { useWindowFocus } from '../hook/useWindowFocus.ts'
-import { readLogFile, log } from '../util/invoke.ts'
+import { readLogFile } from '../util/invoke.ts'
 import { formatLogName } from "../util/util.ts"
 import highlightLog from '../util/highlightLog'
 import { useDebounce } from "../hook/useDebounce.ts"
@@ -39,34 +39,32 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     const startPositionCache = useRef<number[]>([]) // 缓存 startPosition 读取过的位置，防止重复合并数据
     const htmlCache = useRef<string[]>([]) // 缓存 html，按行存放
     const fetchLogContent = (reverse: boolean, startPosition: number) => {
-        setStartPosition(startPosition)
-        readLogFile(filename, reverse, startPosition).then((data) => {
-            try {
-                let logData = data as LogContent
-                setPrevLogContent({fileSize: logData.size, start: logData.start, end: logData.end, len: logData.content.length})
+        (async () => {
+            setStartPosition(startPosition)
+            const logData = await readLogFile(filename, reverse, startPosition) as LogContent
+            if (!logData) return
 
-                // console.log('fileSize:', logData.size, 'start:', logData.start, 'end:', logData.end, 'len:', logData.content.length)
-                // console.log('reverse:', reverse, 'autoRefresh:', autoRefresh, 'startPosition:', startPosition)
+            setPrevLogContent({fileSize: logData.size, start: logData.start, end: logData.end, len: logData.content.length})
 
-                const htmlLogContent = highlightLog(logData.content)
-                if (!autoRefresh) {
-                    // 防止重复合并数据
-                    if (startPositionCache.current.includes(logData.start)) return
-                    startPositionCache.current.push(logData.start)
+            // console.log('fileSize:', logData.size, 'start:', logData.start, 'end:', logData.end, 'len:', logData.content.length)
+            // console.log('reverse:', reverse, 'autoRefresh:', autoRefresh, 'startPosition:', startPosition)
 
-                    if (reverse) {
-                        htmlCache.current = [...htmlLogContent, ...htmlCache.current]
-                    } else {
-                        htmlCache.current = [...htmlCache.current, ...htmlLogContent]
-                    }
-                    setLogList(htmlCache.current)
+            const htmlLogContent = highlightLog(logData.content)
+            if (!autoRefresh) {
+                // 防止重复合并数据
+                if (startPositionCache.current.includes(logData.start)) return
+                startPositionCache.current.push(logData.start)
+
+                if (reverse) {
+                    htmlCache.current = [...htmlLogContent, ...htmlCache.current]
                 } else {
-                    setLogList(htmlLogContent) // 自动刷新时，直接替换全部内容，简化程序逻辑
+                    htmlCache.current = [...htmlCache.current, ...htmlLogContent]
                 }
-            } catch (error) {
-                log.error('Failed to parse log content:', error)
+                setLogList(htmlCache.current)
+            } else {
+                setLogList(htmlLogContent) // 自动刷新时，直接替换全部内容，简化程序逻辑
             }
-        }).catch(void 0)
+        })()
     }
 
     // 监听 logList 变化，滚动到什么位置

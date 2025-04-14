@@ -20,12 +20,15 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     const [logList, setLogList] = useState<LogList>()
     const [errorMsg, setErrorMsg] = useState('')
     const readList = () => {
-        readLogList().then((d) => {
-            setLogList(d as LogList)
-        }).catch(_ => {
-            setLogList([])
-            setErrorMsg('暂无日志')
-        })
+        (async () => {
+            let logList = await readLogList()
+            if (logList) {
+                setLogList(logList)
+            } else {
+                setLogList([])
+                setErrorMsg('暂无日志')
+            }
+        })()
     }
     useEffect(() => readList(), [])
 
