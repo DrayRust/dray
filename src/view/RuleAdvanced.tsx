@@ -67,7 +67,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             return
         }
 
-        // 读取 ray 配置文件是否存在，如果不存在则不生成配置文件
+        // 读取 ray 配置文件，如果不存在，则不修改配置文件
         const rayConfig = await readRayConfig()
         if (rayConfig) {
             // 生成配置文件
