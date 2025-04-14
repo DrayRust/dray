@@ -142,6 +142,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setRuleModeImportData('')
         setRuleModeExportData('')
         setRuleModeChecked([])
+        setErrorImportData(false)
     }
 
     const handleRuleModeCreate = () => {
@@ -343,10 +344,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                                 />
                                 <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeChange('note')} multiline rows={2}/>
                             </Stack>
-                            <Stack direction="row" spacing={1}>
+                            <div className="flex-between">
                                 <Button variant="contained" color="info" onClick={handleRuleModeSubmit}>添加</Button>
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </Stack>
+                            </div>
                         </>) : action === 'import' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                                 <TextField
@@ -358,10 +359,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                                     onChange={handleRuleModeImportDataChange}
                                 />
                             </Stack>
-                            <Stack direction="row" spacing={1}>
+                            <div className="flex-between">
                                 <Button variant="contained" color="info" onClick={handleRuleModeImportSubmit}>确定</Button>
                                 <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </Stack>
+                            </div>
                         </>) : action === 'export' ? (<>
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
