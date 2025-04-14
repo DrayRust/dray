@@ -25,7 +25,7 @@ import { debounce, validateIp, validatePort } from '../util/util.ts'
 import {
     log, isTauri,
     checkPortAvailable,
-    readAppConfig, setAppConfig, loadRayCommonConfig,
+    readAppConfig, setAppConfig, readRayCommonConfig,
     openWebServerDir,
 } from '../util/invoke.ts'
 import {
@@ -39,9 +39,7 @@ import {
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
-    useEffect(() => {
-        setNavState(5)
-    }, [setNavState])
+    useEffect(() => setNavState(5), [setNavState])
 
     // 从上下文中获取当前主题模式和切换模式的函数
     const {mode, toggleMode} = useTheme()
@@ -84,10 +82,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
         if (!isTauri) return
         (async () => {
-            const config = await readAppConfig()
-            if (config) setConfig(config)
-            const rayConfig = await loadRayCommonConfig()
-            if (rayConfig) setRayCommonConfig(rayConfig)
+            const newConfig = await readAppConfig()
+            if (newConfig) setConfig({...config, ...newConfig})
+            const newRayCommonConfig = await readRayCommonConfig()
+            if (newRayCommonConfig) setRayCommonConfig({...rayCommonConfig, ...newRayCommonConfig})
         })()
     }, [])
 
@@ -148,14 +146,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
     const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
-    const debouncedSetRayHost = useMemo(() => debounce((value: string) => {
-        readAppConfig().then(async c => {
-            if (c.ray_host !== value) {
-                setConfig(prevConfig => ({...prevConfig, ray_host: value}))
-                setAppConfig('set_ray_host', value)
-                rayHostChange(value)
-            }
-        }).catch(_ => 0)
+    const debouncedSetRayHost = useMemo(() => debounce(async (value: string) => {
+        let c = await readAppConfig()
+        if (c?.ray_host !== value) {
+            setConfig(prevConfig => ({...prevConfig, ray_host: value}))
+            setAppConfig('set_ray_host', value)
+            rayHostChange(value)
+        }
     }, 1000), [])
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.trim()
@@ -165,20 +162,19 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (ok) debouncedSetRayHost(value)
     }
 
-    const debouncedSetRaySocksPort = useMemo(() => debounce((value: number) => {
-        readAppConfig().then(async c => {
-            if (c.ray_socks_port !== value) {
-                const ok = await checkPortAvailable(value)
-                setRaySocksPortError(!ok)
-                !ok && setRaySocksPortErrorText('本机端口不可用')
-                if (ok) {
-                    setRaySocksPortErrorText('')
-                    setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
-                    setAppConfig('set_ray_socks_port', value)
-                    raySocksPortChange(value)
-                }
+    const debouncedSetRaySocksPort = useMemo(() => debounce(async (value: number) => {
+        let c = await readAppConfig()
+        if (c?.ray_socks_port !== value) {
+            const ok = await checkPortAvailable(value)
+            setRaySocksPortError(!ok)
+            !ok && setRaySocksPortErrorText('本机端口不可用')
+            if (ok) {
+                setRaySocksPortErrorText('')
+                setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
+                setAppConfig('set_ray_socks_port', value)
+                raySocksPortChange(value)
             }
-        }).catch(_ => 0)
+        }
     }, 1500), [])
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
@@ -191,19 +187,18 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const debouncedSetRayHttpPort = useMemo(() => debounce(async (value: number) => {
-        readAppConfig().then(async c => {
-            if (c.ray_http_port !== value) {
-                const ok = await checkPortAvailable(value)
-                setRayHttpPortError(!ok)
-                !ok && setRayHttpPortErrorText('本机端口不可用')
-                if (ok) {
-                    setRayHttpPortErrorText('')
-                    setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
-                    setAppConfig('set_ray_http_port', value)
-                    rayHttpPortChange(value)
-                }
+        let c = await readAppConfig()
+        if (c?.ray_http_port !== value) {
+            const ok = await checkPortAvailable(value)
+            setRayHttpPortError(!ok)
+            !ok && setRayHttpPortErrorText('本机端口不可用')
+            if (ok) {
+                setRayHttpPortErrorText('')
+                setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
+                setAppConfig('set_ray_http_port', value)
+                rayHttpPortChange(value)
             }
-        }).catch(_ => 0)
+        }
     }, 1500), [])
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
@@ -298,13 +293,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_web_server_enable', value)
     }
 
-    const debouncedSetWebServerHost = useMemo(() => debounce((value: string) => {
-        readAppConfig().then(async c => {
-            if (c.web_server_host !== value) {
-                setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
-                setAppConfig('set_web_server_host', value)
-            }
-        }).catch(_ => 0)
+    const debouncedSetWebServerHost = useMemo(() => debounce(async (value: string) => {
+        const c = await readAppConfig()
+        if (c?.web_server_host !== value) {
+            setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
+            setAppConfig('set_web_server_host', value)
+        }
     }, 1000), [])
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.trim()
@@ -315,18 +309,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const debouncedSetWebServerPort = useMemo(() => debounce(async (value: number) => {
-        readAppConfig().then(async c => {
-            if (c.web_server_port !== value) {
-                const ok = await checkPortAvailable(value)
-                setWebPortError(!ok)
-                !ok && setWebPortErrorText('本机端口不可用')
-                if (ok) {
-                    setWebPortErrorText('')
-                    setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
-                    setAppConfig('set_web_server_port', value)
-                }
+        const c = await readAppConfig()
+        if (c?.web_server_port !== value) {
+            const ok = await checkPortAvailable(value)
+            setWebPortError(!ok)
+            !ok && setWebPortErrorText('本机端口不可用')
+            if (ok) {
+                setWebPortErrorText('')
+                setConfig(prevConfig => ({...prevConfig, web_server_port: value}))
+                setAppConfig('set_web_server_port', value)
             }
-        }).catch(_ => 0)
+        }
     }, 1500), [])
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0

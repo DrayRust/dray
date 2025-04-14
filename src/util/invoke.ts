@@ -1,5 +1,4 @@
 import { invoke, isTauri as isTauriFn } from '@tauri-apps/api/core'
-import { DEFAULT_RAY_COMMON_CONFIG } from "./config.ts"
 
 export const isTauri = isTauriFn()
 export const log = {
@@ -78,11 +77,6 @@ export function setAppConfig(cmd: string, value: string | number | boolean) {
             log.error('Failed to setConfig:', err)
         }
     })()
-}
-
-export async function loadRayCommonConfig(): Promise<RayCommonConfig> {
-    if (!isTauri) return DEFAULT_RAY_COMMON_CONFIG
-    return await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
 }
 
 export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
