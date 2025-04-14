@@ -37,18 +37,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [selectedAll, setSelectedAll] = useState(false)
     const [showAction, setShowAction] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
-    const readList = async () => {
-        const d = await readServerList()
-        if (d) {
-            setServerList(d as ServerList)
-        } else {
-            setServerList([])
-            setErrorMsg('暂无服务器')
-        }
+    const readList = () => {
+        (async () => {
+            const d = await readServerList()
+            if (d) {
+                setServerList(d as ServerList)
+            } else {
+                setServerList([])
+                setErrorMsg('暂无服务器')
+            }
+        })()
     }
-    useEffect(() => {
-        setTimeout(readList, 0)
-    }, [])
+    useEffect(() => readList(), [])
 
     const handleCreate = () => {
         navigate(`/server_create`)
