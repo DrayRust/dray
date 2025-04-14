@@ -125,6 +125,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!ok) {
             showSnackbar('设置启用失败', 'error')
         }
+        updateServerList(newServerList)
         return ok
     }
 
