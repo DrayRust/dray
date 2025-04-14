@@ -21,9 +21,11 @@ import { useServerImport } from "../component/useServerImport.tsx"
 import { useDebounce } from '../hook/useDebounce.ts'
 import {
     readAppConfig, loadRayCommonConfig, saveRayConfig, getDrayAppDir,
-    restartRay, readServerList, saveServerList
+    restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList
 } from "../util/invoke.ts"
 import { getConf } from "../util/serverConf.ts"
+import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
+import { ruleToConf } from "../util/rule.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -100,10 +102,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     let appDir: string
     let config: AppConfig
     let rayCommonConfig: RayCommonConfig
+    let ruleConfig: RuleConfig
+    let ruleDomain: RuleDomain
+    let ruleModeList: RuleModeList
     const initConfig = async () => {
         if (!appDir) appDir = await getDrayAppDir()
         if (!config) config = await readAppConfig()
         if (!rayCommonConfig) rayCommonConfig = await loadRayCommonConfig()
+
+        if (!ruleConfig) ruleConfig = await readRuleConfig() || DEFAULT_RULE_CONFIG
+        if (!ruleDomain) ruleDomain = await readRuleDomain() || DEFAULT_RULE_DOMAIN
+        if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
     }
 
     const setServerEnable = async (selectedKey: number) => {
@@ -124,7 +133,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
             const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
             if (conf) {
-                callback(conf)
+                const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+                callback({...conf, ...routing})
             } else {
                 showSnackbar('生成 conf 失败', 'error')
             }
