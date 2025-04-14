@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import {
     Box, Card, Checkbox, Drawer, Stack, TextField, MenuItem, Button, Typography,
-    TableContainer, Table, TableBody, TableRow, TableCell, IconButton,
+    TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import ForkRightIcon from '@mui/icons-material/ForkRight'
 import ModeIcon from '@mui/icons-material/Tune'
@@ -14,6 +16,7 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { ErrorCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useChip } from "../component/useChip.tsx"
@@ -225,11 +228,13 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setRuleModeExportData(arr.join('\n'))
     }
 
+    const [contentCopied, setContentCopied] = useState('')
     const handleRuleModeCopy = (content: string) => {
         navigator.clipboard.writeText(content).then(() => {
-            showAlertDialog('复制成功', 'warning', 2000)
+            setContentCopied('复制成功')
+            setTimeout(() => setContentCopied(''), 2000)
         }).catch(() => {
-            showAlertDialog('复制失败', 'error')
+            setContentCopied('复制失败')
         })
     }
 
@@ -245,8 +250,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             const rules = modeRulesToConf(ruleMode.rules)
             setRuleModeConf(JSON.stringify(rules, null, 2))
         } else {
-            showAlertDialog('该模式下无规则')
-            return
+            setRuleModeConf('')
         }
     }
 
@@ -329,13 +333,21 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                         {ruleModeKey > -1 ? (<>
                             <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
                         </>) : action === 'viewConf' ? (<>
-                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
-                            </Stack>
-                            <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="info" onClick={() => handleRuleModeCopy(ruleModeConf)}>复制</Button>
-                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </Stack>
+                            <div className="flex-between">
+                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
+                                {ruleModeConf && (
+                                    <Tooltip placement="left" title={contentCopied || '点击复制'}>
+                                        <IconButton onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                                    </Tooltip>
+                                )}
+                            </div>
+                            {ruleModeConf ? (
+                                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                                    <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
+                                </Stack>
+                            ) : (
+                                <ErrorCard errorMsg="没有任何规则" height="160px"/>
+                            )}
                         </>) : action === 'create' ? (<>
                             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                                 <TextField
