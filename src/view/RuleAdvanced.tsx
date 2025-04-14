@@ -18,11 +18,11 @@ import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useChip } from "../component/useChip.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
-import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
+import { saveRuleConfig, readRuleModeList, saveRuleModeList, readRayConfig, saveRayConfig, restartRay } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
-import { modeRulesToConf } from "../util/rule.ts"
+import { modeRulesToConf, ruleToConf } from "../util/rule.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -31,11 +31,12 @@ const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     rules: []
 }
 
-export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
+export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDomain}: {
     open: boolean,
     setOpen: (open: boolean) => void,
     ruleConfig: RuleConfig,
-    setRuleConfig: React.Dispatch<React.SetStateAction<RuleConfig>>
+    setRuleConfig: React.Dispatch<React.SetStateAction<RuleConfig>>,
+    ruleDomain: RuleDomain,
 }) => {
     const [tab, setTab] = useState(0)
     const [ruleModeList, setRuleModeList] = useState<RuleModeList>(DEFAULT_RULE_MODE_LIST)
@@ -65,6 +66,19 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig}: {
             showChip('设置失败', 'error')
             return
         }
+
+        // 读取 ray 配置文件是否存在，如果不存在则不生成配置文件
+        const rayConfig = await readRayConfig()
+        if (rayConfig) {
+            // 生成配置文件
+            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+            const conf = {...rayConfig, ...routing}
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                restartRay()
+            }
+        }
+
         showChip('设置成功', 'success')
     }
 

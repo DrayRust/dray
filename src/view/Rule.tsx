@@ -59,7 +59,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
             return
         }
 
-        // 读取 ray 配置文件是否存在，如果不存在则不生成规则
+        // 读取 ray 配置文件是否存在，如果不存在则不生成配置文件
         const rayConfig = await readRayConfig()
         if (rayConfig) {
             // 读取模式数据 ruleModeList
@@ -157,7 +157,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 </>)}
             </Card>
         </Paper>
-        <RuleAdvanced open={open} setOpen={setOpen} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig}/>
+        <RuleAdvanced open={open} setOpen={setOpen} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig} ruleDomain={ruleDomain}/>
     </>)
 }
 
