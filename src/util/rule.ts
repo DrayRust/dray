@@ -7,6 +7,7 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
     } else {
         rules = [...ruleDomainToConf(ruleDomain)]
 
+        // 采用的哪个模式
         if (Array.isArray(ruleModeList) && ruleModeList.length > 0) {
             const ruleMode = ruleModeList[ruleConfig.mode]
             if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
