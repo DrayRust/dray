@@ -43,8 +43,8 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         setRuleConfig(prev => {
             const newRuleConfig = {...prev, globalProxy: checked}
             updateRayConfig(newRuleConfig, ruleDomain).catch(_ => 0)
-            setGlobalProxyByAppConfig(checked).catch(_ => 0)
             saveRuleConfig(newRuleConfig).catch(_ => 0)
+            setGlobalProxyByAppConfig(checked).catch(_ => 0)
             return newRuleConfig
         })
     }
