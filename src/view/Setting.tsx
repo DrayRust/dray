@@ -101,7 +101,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
         setAppConfig('set_auto_setup_pac', value)
-        value && reloadProxyPAC()
+        if (value) {
+            reloadProxyPAC()
+
+            // 开启 PAC 自动配置时，关闭其他配置，避免影响 PAC 规则
+            setConfig(prevConfig => ({
+                ...prevConfig,
+                auto_setup_socks: false,
+                auto_setup_http: false,
+                auto_setup_https: false,
+            }))
+        }
     }
 
     const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {

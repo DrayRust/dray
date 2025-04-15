@@ -2,15 +2,15 @@ import { readAppConfig, readRuleConfig, readRuleDomain, saveProxyPac, setAppConf
 import { processLines } from "./util.ts"
 
 export function reloadProxyPAC() {
-    (async () => {
+    setTimeout(async () => {
         const ruleConfig = await readRuleConfig() as RuleConfig
         const ruleDomain = await readRuleDomain() as RuleDomain
-        if (ruleConfig && ruleDomain) await updateProxyPAC(ruleConfig, ruleDomain)
-    })()
+        if (ruleConfig && ruleDomain) await updateProxyPAC(ruleConfig, ruleDomain, false)
+    }, 200)
 }
 
 // 更新 proxy.js 文件
-export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDomain) {
+export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDomain, isReset: boolean = true) {
     const config = await readAppConfig() as AppConfig
     if (config?.auto_setup_pac) {
         const proxy = config.ray_host + ":" + config.ray_socks_port
@@ -21,13 +21,15 @@ export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDom
         await saveProxyPac(s)
 
         // 通知操作系统 PAC 文件已经更新，关闭再开启
-        setAppConfig('set_auto_setup_pac', false)
-        setTimeout(() => setAppConfig('set_auto_setup_pac', true), 200)
+        if (isReset) {
+            setAppConfig('set_auto_setup_pac', false)
+            setTimeout(() => setAppConfig('set_auto_setup_pac', true), 800)
+        }
 
         // 避免影响 PAC 规则，其他代理设置全部关闭
-        setTimeout(() => setAppConfig('set_auto_setup_socks', false), 400)
-        setTimeout(() => setAppConfig('set_auto_setup_http', false), 600)
-        setTimeout(() => setAppConfig('set_auto_setup_https', false), 800)
+        setTimeout(() => setAppConfig('set_auto_setup_socks', false), 200)
+        setTimeout(() => setAppConfig('set_auto_setup_http', false), 400)
+        setTimeout(() => setAppConfig('set_auto_setup_https', false), 600)
     }
 }
 
