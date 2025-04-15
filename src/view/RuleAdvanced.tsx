@@ -32,6 +32,7 @@ import { updateProxyPAC } from "../util/proxy.ts"
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
     note: '',
+    domainStrategy: '',
     hash: '',
     rules: []
 }
@@ -290,17 +291,6 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                         <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
                     </BottomNavigation>
                     {tab === 0 ? (<>
-                        <div className="flex-between">
-                            <TextField
-                                select fullWidth size="small"
-                                label="域名匹配"
-                                value={ruleConfig.domainStrategy}
-                                onChange={handleRuleConfigChange('domainStrategy')}>
-                                <MenuItem value="AsIs">仅域名匹配</MenuItem>
-                                <MenuItem value="IPIfNonMatch">优先域名匹配，未匹配上则解析为IP再次匹配</MenuItem>
-                                <MenuItem value="IPOnDemand">优先解析为IP匹配</MenuItem>
-                            </TextField>
-                        </div>
                         <TextField
                             select fullWidth size="small"
                             label="未匹配上的域名"

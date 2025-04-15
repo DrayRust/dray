@@ -175,7 +175,6 @@ interface TrojanRow {
 // ============= rule ============
 interface RuleConfig {
     globalProxy: boolean; // 是否全局代理
-    domainStrategy: string; // 域名匹配策略 如：AsIs / IPIfNonMatch / IPOnDemand
     unmatchedStrategy: string; // 未匹配到的域名访问方式 如：proxy / direct
     mode: number; // 采用模式 如: 0 / 1 / 2
 }
@@ -229,6 +228,7 @@ interface RuleRow {
 interface RuleModeRow {
     name: string; // 模式名称
     note: string; // 模式描述
+    domainStrategy: string; // 域名匹配策略 如：AsIs / IPIfNonMatch / IPOnDemand
     hash: string; // rules JSON 字符串的哈希值，用来排重
     rules: RuleRow[]; // 路由规则具体内容
 }

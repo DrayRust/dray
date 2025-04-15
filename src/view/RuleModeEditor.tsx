@@ -50,6 +50,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>({
         name: '',
         note: '',
+        domainStrategy: '',
         hash: '',
         rules: []
     })
@@ -264,6 +265,15 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
             <TextField size="small" label="模式名称" value={ruleModeRow.name} onChange={handleRuleModeRowChange('name')}/>
             <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeRowChange('note')} multiline rows={2}/>
+            <TextField
+                select fullWidth size="small"
+                label="域名解析策略"
+                value={ruleModeRow.domainStrategy || 'AsIs'}
+                onChange={handleRuleModeRowChange('domainStrategy')}>
+                <MenuItem value="AsIs">仅域名匹配，不解析为IP匹配</MenuItem>
+                <MenuItem value="IPIfNonMatch">优先域名匹配，未匹配上则解析为IP再次匹配</MenuItem>
+                <MenuItem value="IPOnDemand">优先解析为IP匹配</MenuItem>
+            </TextField>
         </Stack>
 
         {action ? (<>

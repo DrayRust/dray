@@ -3,12 +3,14 @@ import { processLines } from "./util.ts"
 export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList): any {
     if (ruleConfig.globalProxy) return getGlobalProxyConf()
 
+    let domainStrategy = 'AsIs'
     let rules = [...ruleDomainToConf(ruleDomain)]
 
     // 采用的哪个模式
     if (Array.isArray(ruleModeList) && ruleModeList.length > 0) {
         const ruleMode = ruleModeList[ruleConfig.mode]
         if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
+            domainStrategy = ruleMode.domainStrategy
             rules = [...rules, ...modeRulesToConf(ruleMode.rules)]
         }
     }
@@ -26,7 +28,7 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
 
     return {
         "routing": {
-            "domainStrategy": ruleConfig.domainStrategy,
+            "domainStrategy": domainStrategy,
             "rules": rules
         }
     }

@@ -33,7 +33,6 @@ export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
 
 export const DEFAULT_RULE_CONFIG: RuleConfig = {
     globalProxy: false,
-    domainStrategy: 'AsIs',
     unmatchedStrategy: 'proxy',
     mode: 0
 }
@@ -63,6 +62,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         "name": "中国大陆模式",
         "note": "专为中国大陆网络环境优化的访问规则",
+        "domainStrategy": 'IPIfNonMatch',
         "hash": "e7600b7f166e9726297e58cbe54ba431a726f85eb061ed5fca7f4577eccf670a",
         "rules": [
             {
@@ -190,6 +190,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         "name": "俄罗斯模式",
         "note": "专为俄罗斯网络环境优化的访问规则",
+        "domainStrategy": 'IPIfNonMatch',
         "hash": "144ea270d77f516f60138522620149c521d8fa72c7cff7fcdefc82ad73bb97ae",
         "rules": [
             {
@@ -269,6 +270,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         "name": "伊朗模式",
         "note": "专为伊朗网络环境优化的访问规则",
+        "domainStrategy": 'IPIfNonMatch',
         "hash": "740b450642f85c0e78ccd15810ced1fedefb865f66bef1b168b4e52a8fda3558",
         "rules": [
             {
