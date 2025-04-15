@@ -50,7 +50,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     const [ruleModeRow, setRuleModeRow] = useState<RuleModeRow>({
         name: '',
         note: '',
-        domainStrategy: '',
+        domainStrategy: 'AsIs',
         hash: '',
         rules: []
     })
