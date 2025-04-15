@@ -3,7 +3,7 @@ import { processLines } from "./util.ts"
 export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList): any {
     if (ruleConfig.globalProxy) return getGlobalProxyConf()
 
-    let domainStrategy = 'AsIs'
+    let domainStrategy = ''
     let rules = [...ruleDomainToConf(ruleDomain)]
 
     // 采用的哪个模式
@@ -28,7 +28,7 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
 
     return {
         "routing": {
-            "domainStrategy": domainStrategy,
+            "domainStrategy": domainStrategy || 'AsIs',
             "rules": rules
         }
     }
