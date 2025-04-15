@@ -12,11 +12,11 @@ export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDom
         const s = generateProxyPAC(proxy, proxyDomains, directDomains, blockDomains, ruleConfig.unmatchedStrategy === 'direct')
         await saveProxyPac(s)
 
-        // 通知 PAC 文件已经更新，关闭再开启
+        // 通知操作系统 PAC 文件已经更新，关闭再开启
         setAppConfig('set_auto_setup_pac', false)
         setTimeout(() => setAppConfig('set_auto_setup_pac', true), 200)
 
-        // 其他设置全部关闭，避免影响 PAC 生效
+        // 避免影响 PAC 规则，其他代理设置全部关闭
         setTimeout(() => setAppConfig('set_auto_setup_socks', false), 400)
         setTimeout(() => setAppConfig('set_auto_setup_http', false), 600)
         setTimeout(() => setAppConfig('set_auto_setup_https', false), 800)

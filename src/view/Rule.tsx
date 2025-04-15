@@ -13,7 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
-import { readRuleConfig, readRuleDomain, readRuleModeList, saveRuleDomain } from "../util/invoke.ts"
+import { readAppConfig, readRuleConfig, readRuleDomain, readRuleModeList, saveRuleDomain, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
@@ -39,12 +39,25 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         })()
     }, [])
 
-    const handleGlobalProxy = () => {
+    const handleGlobalProxy = (checked: boolean) => {
         setRuleConfig(prev => {
-            const newRuleConfig = {...prev, globalProxy: !prev.globalProxy}
+            const newRuleConfig = {...prev, globalProxy: checked}
             updateRayConfig(newRuleConfig, ruleDomain).catch(_ => 0)
+            setGlobalProxyByAppConfig(checked).catch(_ => 0)
             return newRuleConfig
         })
+    }
+
+    const setGlobalProxyByAppConfig = async (isChange: boolean) => {
+        if (!isChange) return
+        const config = await readAppConfig() as AppConfig
+        if (config) {
+            // 防止用户误操作，修改为最保险的配置
+            setTimeout(() => setAppConfig('set_auto_setup_pac', false), 0)
+            setTimeout(() => setAppConfig('set_auto_setup_socks', true), 200)
+            setTimeout(() => setAppConfig('set_auto_setup_http', false), 300)
+            setTimeout(() => setAppConfig('set_auto_setup_https', false), 600)
+        }
     }
 
     const handleDomainChange = (type: keyof RuleDomain) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +106,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 {ruleMode === 'route' && (<div className="flex-column gap2">
                     <div className="flex-between">
                         <Typography variant="body1" sx={{pl: 1}}>全局代理</Typography>
-                        <Switch checked={ruleConfig.globalProxy} onChange={handleGlobalProxy}/>
+                        <Switch checked={ruleConfig.globalProxy} onChange={(_, checked) => handleGlobalProxy(checked)}/>
                     </div>
                     {!ruleConfig.globalProxy && (<>
                         <BottomNavigation
