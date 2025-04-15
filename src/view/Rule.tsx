@@ -13,7 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
-import { readAppConfig, readRuleConfig, readRuleDomain, readRuleModeList, saveRuleDomain, setAppConfig } from "../util/invoke.ts"
+import { readAppConfig, readRuleConfig, readRuleDomain, readRuleModeList, saveRuleConfig, saveRuleDomain, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
@@ -44,6 +44,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
             const newRuleConfig = {...prev, globalProxy: checked}
             updateRayConfig(newRuleConfig, ruleDomain).catch(_ => 0)
             setGlobalProxyByAppConfig(checked).catch(_ => 0)
+            saveRuleConfig(newRuleConfig).catch(_ => 0)
             return newRuleConfig
         })
     }
