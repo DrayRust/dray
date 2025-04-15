@@ -78,7 +78,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         }
 
         await updateRayConfig(ruleConfig, newRuleDomain)
-        await updateProxyPAC(newRuleDomain)
+        await updateProxyPAC(ruleConfig, newRuleDomain)
         showChip('设置成功', 'success')
     }, 50)
 
