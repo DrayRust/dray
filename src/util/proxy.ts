@@ -1,16 +1,25 @@
-import { readAppConfig, saveProxyPac } from "./invoke.ts"
+import { readAppConfig, saveProxyPac, setAppConfig } from "./invoke.ts"
 import { processLines } from "./util.ts"
 
 // 更新 proxy.js 文件
 export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDomain) {
     const config = await readAppConfig() as AppConfig
-    if (config) {
+    if (config?.auto_setup_pac) {
         const proxy = config.ray_host + ":" + config.ray_socks_port
         const proxyDomains = ruleDomain.proxy ? JSON.stringify(processLines(ruleDomain.proxy.toLowerCase()), null, '\t') : '[]'
         const directDomains = ruleDomain.direct ? JSON.stringify(processLines(ruleDomain.direct.toLowerCase()), null, '\t') : '[]'
         const blockDomains = ruleDomain.block ? JSON.stringify(processLines(ruleDomain.block.toLowerCase()), null, '\t') : '[]'
         const s = generateProxyPAC(proxy, proxyDomains, directDomains, blockDomains, ruleConfig.unmatchedStrategy === 'direct')
         await saveProxyPac(s)
+
+        // 通知 PAC 文件已经更新，关闭再开启
+        setAppConfig('set_auto_setup_pac', false)
+        setTimeout(() => setAppConfig('set_auto_setup_pac', true), 1200)
+
+        // 其他设置全部关闭，避免影响 PAC 生效
+        setTimeout(() => setAppConfig('set_auto_setup_socks', false), 300)
+        setTimeout(() => setAppConfig('set_auto_setup_http', false), 600)
+        setTimeout(() => setAppConfig('set_auto_setup_https', false), 900)
     }
 }
 
