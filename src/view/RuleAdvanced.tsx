@@ -173,7 +173,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             if (v.length === 0) continue
 
             if (v.startsWith('drayRule://')) {
-                const decoded = decodeBase64(v.substring(11))
+                const base64 = v.substring(11).replace(/#.*$/, '')
+                const decoded = decodeBase64(base64)
                 const ruleMode = safeJsonParse(decoded)
                 if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
                     if (newRuleModeList.some(item => item.hash === ruleMode.hash)) {
@@ -217,7 +218,10 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         let arr = []
         for (let i = 0; i < ruleModeChecked.length; i++) {
             const ruleMode = ruleModeList[i]
-            if (ruleMode) arr.push('drayRule://' + encodeBase64(JSON.stringify(ruleMode)))
+            if (ruleMode) {
+                const encoded = 'drayRule://' + encodeBase64(JSON.stringify(ruleMode)) + '#' + ruleMode.name
+                arr.push(encoded)
+            }
         }
         setRuleModeExportData(arr.join('\n'))
     }
@@ -348,7 +352,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                         </>) : action === 'export' ? (<>
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                                <Tooltip placement="left" title={contentCopied || '点击复制'}>
+                                <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
                                     <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </div>
@@ -359,7 +363,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
                                 {ruleModeConf && (
-                                    <Tooltip placement="left" title={contentCopied || '点击复制'}>
+                                    <Tooltip placement="left" arrow title={contentCopied || '复制规则配置'}>
                                         <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 )}
