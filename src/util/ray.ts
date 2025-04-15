@@ -1,5 +1,6 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
 import { getStatsConf } from "./serverConf.ts"
+import { ruleToConf } from "./rule.ts"
 
 export function getSocksConf(config: AppConfig, rayCommonConfig: RayCommonConfig) {
     return {
@@ -25,6 +26,21 @@ export function getHttpConf(config: AppConfig) {
         listen: config.ray_host,
         port: config.ray_http_port
     }
+}
+
+export function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
+    (async () => {
+        const rayConfig = await readRayConfig()
+        if (rayConfig) {
+            // 生成配置文件
+            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+            const conf = {...rayConfig, ...routing}
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                restartRay()
+            }
+        }
+    })()
 }
 
 export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {

@@ -21,11 +21,13 @@ import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useChip } from "../component/useChip.tsx"
 import { RuleModeEditor } from "./RuleModeEditor.tsx"
-import { saveRuleConfig, readRuleModeList, saveRuleModeList, readRayConfig, saveRayConfig, restartRay } from "../util/invoke.ts"
+import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invoke.ts"
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
-import { modeRulesToConf, ruleToConf } from "../util/rule.ts"
+import { modeRulesToConf } from "../util/rule.ts"
+import { rayRuleChange } from "../util/ray.ts"
+import { updateProxyPAC } from "../util/proxy.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -73,18 +75,8 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             return
         }
 
-        // 读取 ray 配置文件，如果不存在，则不修改配置文件
-        const rayConfig = await readRayConfig()
-        if (rayConfig) {
-            // 生成配置文件
-            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
-            const conf = {...rayConfig, ...routing}
-            const ok = await saveRayConfig(conf)
-            if (ok) {
-                restartRay()
-            }
-        }
-
+        await updateProxyPAC(ruleConfig, ruleDomain)
+        rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
         showChip('设置成功', 'success')
     }
 

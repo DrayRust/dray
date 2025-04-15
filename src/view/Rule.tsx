@@ -13,12 +13,12 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
-import { readRayConfig, readRuleConfig, readRuleDomain, readRuleModeList, restartRay, saveRayConfig, saveRuleDomain } from "../util/invoke.ts"
+import { readRuleConfig, readRuleDomain, readRuleModeList, saveRuleDomain } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
-import { ruleToConf } from "../util/rule.ts"
 import { updateProxyPAC } from "../util/proxy.ts"
+import { rayRuleChange } from "../util/ray.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => {
@@ -38,19 +38,6 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
             if (newRuleDomain) setRuleDomain({...DEFAULT_RULE_DOMAIN, ...newRuleDomain})
         })()
     }, [])
-
-    const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
-        const rayConfig = await readRayConfig()
-        if (rayConfig) {
-            const ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
-            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
-            const conf = {...rayConfig, ...routing}
-            const ok = await saveRayConfig(conf)
-            if (ok) {
-                restartRay()
-            }
-        }
-    }
 
     const handleGlobalProxy = () => {
         setRuleConfig(prev => {
@@ -81,6 +68,12 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         await updateProxyPAC(ruleConfig, newRuleDomain)
         showChip('设置成功', 'success')
     }, 50)
+
+    let ruleModeList: RuleModeList
+    const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
+        if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
+        rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
+    }
 
     const [open, setOpen] = useState(false)
     const handleOpenAdvanced = () => {
