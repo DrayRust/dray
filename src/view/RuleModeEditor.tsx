@@ -355,13 +355,19 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                     <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
                     <Button variant="contained" onClick={handleRuleBack}>取消</Button>
                 </Stack>
-                <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}
-                          onClick={() => openUrl("https://xtls.github.io/config/routing.html#ruleobject")}/>
+                <Tooltip placement="left" arrow title={'官方文档'}>
+                    <HelpIcon
+                        fontSize="small" sx={{cursor: 'pointer', color: 'text.secondary'}}
+                        onClick={() => openUrl("https://xtls.github.io/config/routing.html#ruleobject")}/>
+                </Tooltip>
             </div>
         </>) : (<>
-            <Stack direction="row" spacing={1}>
+            <div className="flex-between">
                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleCreate}>添加</Button>
-            </Stack>
+                <Tooltip placement="left" arrow title={'热心网友整理的域名和IP数据'}>
+                    <HelpIcon sx={{cursor: 'pointer'}} onClick={() => openUrl("https://github.com/Loyalsoldier/v2ray-rules-dat/releases")}/>
+                </Tooltip>
+            </div>
             {loading ? (
                 <LoadingCard height="160px"/>
             ) : ruleModeRow.rules.length === 0 ? (
