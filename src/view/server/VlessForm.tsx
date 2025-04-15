@@ -65,7 +65,7 @@ export const VlessForm = ({form, errors, handleChange, setFormData}: VlessFormPr
                 onChange={(value) => setFormData('scy', value)}/>
         </Grid>
 
-        {form.net !== 'raw' && (<>
+        {(form.net !== 'raw' || form.scy === 'reality') && (<>
             <Grid size={12} sx={{mt: 2}}>
                 <TextField fullWidth size="small" label="伪装域名(host)" name="host" value={form.host} onChange={handleChange}/>
             </Grid>
