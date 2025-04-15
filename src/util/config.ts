@@ -190,7 +190,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     {
         "name": "俄罗斯模式",
         "note": "专为俄罗斯网络环境优化的访问规则",
-        "hash": "72cdfaa9802e3b7565be4e9a234809b073a1d75886ac8133cf24d8394682a888",
+        "hash": "144ea270d77f516f60138522620149c521d8fa72c7cff7fcdefc82ad73bb97ae",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -263,25 +263,13 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "sourcePort": "",
                 "network": "",
                 "protocol": ""
-            },
-            {
-                "name": "俄罗斯域名",
-                "note": "排除域名数据库中的俄罗斯常见域名",
-                "outboundTag": "direct",
-                "ruleType": "domain",
-                "domain": "geosite:ru",
-                "ip": "",
-                "port": "",
-                "sourcePort": "",
-                "network": "",
-                "protocol": ""
             }
         ]
     },
     {
         "name": "伊朗模式",
         "note": "专为伊朗网络环境优化的访问规则",
-        "hash": "d42c649cc6f7636f09c5518cdf166e62ec2dff1063807a9df05f29a368130d2c",
+        "hash": "740b450642f85c0e78ccd15810ced1fedefb865f66bef1b168b4e52a8fda3558",
         "rules": [
             {
                 "name": "常用 Google 域名",
@@ -362,18 +350,6 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "ruleType": "ip",
                 "domain": "",
                 "ip": "geoip:ir",
-                "port": "",
-                "sourcePort": "",
-                "network": "",
-                "protocol": ""
-            },
-            {
-                "name": "伊朗域名",
-                "note": "排除域名数据库中的伊朗常见域名",
-                "outboundTag": "direct",
-                "ruleType": "domain",
-                "domain": "geosite:ir",
-                "ip": "",
                 "port": "",
                 "sourcePort": "",
                 "network": "",
