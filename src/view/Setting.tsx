@@ -37,6 +37,7 @@ import {
     rayOutboundsMuxChange, rayOutboundsConcurrencyChange
 } from "../util/ray.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
+import { reloadProxyPAC } from "../util/proxy.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(5), [setNavState])
@@ -100,6 +101,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
         setAppConfig('set_auto_setup_pac', value)
+        value && reloadProxyPAC()
     }
 
     const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {

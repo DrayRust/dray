@@ -1,5 +1,13 @@
-import { readAppConfig, saveProxyPac, setAppConfig } from "./invoke.ts"
+import { readAppConfig, readRuleConfig, readRuleDomain, saveProxyPac, setAppConfig } from "./invoke.ts"
 import { processLines } from "./util.ts"
+
+export function reloadProxyPAC() {
+    (async () => {
+        const ruleConfig = await readRuleConfig() as RuleConfig
+        const ruleDomain = await readRuleDomain() as RuleDomain
+        if (ruleConfig && ruleDomain) await updateProxyPAC(ruleConfig, ruleDomain)
+    })()
+}
 
 // 更新 proxy.js 文件
 export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDomain) {
