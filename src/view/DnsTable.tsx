@@ -16,7 +16,7 @@ import { useDialog } from "../component/useDialog.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { readDnsTableList, saveDnsTableList } from "../util/invoke.ts"
 import { processIP } from "../util/util.ts"
-import { decodeBase64, encodeBase64, safeJsonParse } from "../util/crypto.ts"
+import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 
 const DEFAULT_DNS_TABLE: DnsTable = {
     name: '',
@@ -153,10 +153,12 @@ export const DnsTable = () => {
         if (isEmpty) return
 
         item.note = item.note.trim()
+        item.hash = ''
         item.IPv4 = processIP(item.IPv4)
         item.IPv6 = processIP(item.IPv6)
         item.DoH = item.DoH.trim()
         item.DoT = item.DoT.trim()
+        item.hash = await hashJson(item)
 
         updateKey === -1 ? dnsTableList.push(item) : dnsTableList[updateKey] = item
         const ok = await saveDnsTableList(dnsTableList)
