@@ -123,7 +123,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
                         {ruleType === 0 ? (<>
                             <Alert variant="filled" severity="warning">
-                                通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。比如访问 Google、YouTube 等。
+                                通过第三方服务器访问网络，适合访问国外网站或需要隐藏真实 IP 的场景。
                             </Alert>
                             <TextField
                                 variant="outlined" fullWidth multiline rows={6}
@@ -133,7 +133,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 placeholder="例如：google.com"/>
                         </>) : ruleType === 1 ? (<>
                             <Alert variant="filled" severity="success">
-                                直接连接网络，不经过任何代理服务器，适合访问国内网站。比如访问百度、淘宝等。
+                                直接连接网络，不经过任何代理服务器，适合访问国内网站。
                             </Alert>
                             <TextField
                                 variant="outlined" fullWidth multiline rows={6}
