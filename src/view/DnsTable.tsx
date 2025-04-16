@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import {
     Card, Stack, Typography, TextField, Button, Tooltip, IconButton,
 } from '@mui/material'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
@@ -14,6 +16,7 @@ import { useDialog } from "../component/useDialog.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { readDnsTableList, saveDnsTableList } from "../util/invoke.ts"
 import { processIP } from "../util/util.ts"
+import { encodeBase64 } from "../util/crypto.ts"
 
 const DEFAULT_DNS_TABLE: DnsTable = {
     name: '',
@@ -40,6 +43,7 @@ export const DnsTable = () => {
     const [row, setRow] = useState<DnsTable>(DEFAULT_DNS_TABLE)
     const [nameError, setNameError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
+    const [dnsTableExportData, setDnsTableExportData] = useState('')
 
     const handleRowChange = (type: keyof DnsTable) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRow(prev => {
@@ -47,6 +51,12 @@ export const DnsTable = () => {
             type === 'name' && setNameError(value === '')
             return {...prev, [type]: value}
         })
+    }
+
+    const handleBack = () => {
+        setAction('')
+        setDnsTableExportData('')
+        setUpdateKey(-1)
     }
 
     const handleCreate = () => {
@@ -60,7 +70,15 @@ export const DnsTable = () => {
     }
 
     const handleExport = () => {
+        setAction('export')
 
+        let arr = []
+        for (let k = 0; k < dnsTableList.length; k++) {
+            const v = dnsTableList[k]
+            const encoded = 'drayPublicDns://' + encodeBase64(JSON.stringify(v)) + '#' + v.name
+            arr.push(encoded)
+        }
+        setDnsTableExportData(arr.join('\n'))
     }
 
     const handleSubmit = async () => {
@@ -138,8 +156,14 @@ export const DnsTable = () => {
         })
     }
 
-    const handleBack = () => {
-        setAction('')
+    const [contentCopied, setContentCopied] = useState('')
+    const handleRuleModeCopy = (content: string) => {
+        navigator.clipboard.writeText(content).then(() => {
+            setContentCopied('复制成功')
+            setTimeout(() => setContentCopied(''), 2000)
+        }).catch(() => {
+            setContentCopied('复制失败')
+        })
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
@@ -148,18 +172,30 @@ export const DnsTable = () => {
         <AlertDialogComponent/>
         <DialogComponent/>
         {action === 'create' || action === 'update' ? <>
-            <TextField fullWidth size="small" label="DNS 服务商名称"
-                       error={nameError} helperText={nameError ? "名称不能为空" : ""}
-                       value={row.name} onChange={handleRowChange('name')}/>
-            <TextField fullWidth size="small" label="DNS 服务商描述" value={row.note} multiline rows={2} onChange={handleRowChange('note')}/>
-            <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline rows={2} onChange={handleRowChange('IPv4')}/>
-            <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline rows={2} onChange={handleRowChange('IPv6')}/>
-            <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
-            <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
+            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                <TextField fullWidth size="small" label="公共 DNS 服务商名称"
+                           error={nameError} helperText={nameError ? "名称不能为空" : ""}
+                           value={row.name} onChange={handleRowChange('name')}/>
+                <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline rows={2} onChange={handleRowChange('note')}/>
+                <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline rows={2} onChange={handleRowChange('IPv4')}/>
+                <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline rows={2} onChange={handleRowChange('IPv6')}/>
+                <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
+                <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
+            </Stack>
             <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
+                <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
                 <Button variant="contained" onClick={handleBack}>取消</Button>
             </div>
+        </> : action === 'export' ? <>
+            <div className="flex-between">
+                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
+                <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
+                    <IconButton size="small" onClick={() => handleRuleModeCopy(dnsTableExportData)}><ContentCopyIcon/></IconButton>
+                </Tooltip>
+            </div>
+            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={dnsTableExportData}/>
+            </Stack>
         </> : <>
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
@@ -195,8 +231,8 @@ export const DnsTable = () => {
                         <Stack spacing={2}>
                             {row.IPv4 && <TextField fullWidth size="small" label="IPv4 地址" value={row.IPv4} multiline/>}
                             {row.IPv6 && <TextField fullWidth size="small" label="IPv6 地址" value={row.IPv6} multiline/>}
-                            {row.DoH && <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} multiline/>}
-                            {row.DoT && <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} multiline/>}
+                            {row.DoH && <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH}/>}
+                            {row.DoT && <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT}/>}
                         </Stack>
                     </Card>
                 </>))}
