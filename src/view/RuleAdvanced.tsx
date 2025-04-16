@@ -396,9 +396,15 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                                                     <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                                 </TableCell>
                                                 <TableCell align="right">
-                                                    <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
-                                                    <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
-                                                    <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                                    <Tooltip title="设置" arrow placement="top">
+                                                        <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="查看配置" arrow placement="top">
+                                                        <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="删除" arrow placement="top">
+                                                        <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                                    </Tooltip>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
