@@ -289,9 +289,9 @@ export const DnsTable = () => {
             </Stack>
             <Stack spacing={1}>
                 {loading ? (
-                    <LoadingCard height="160px"/>
+                    <LoadingCard height="160px" elevation={5}/>
                 ) : dnsTableList.length === 0 ? (
-                    <ErrorCard errorMsg="暂无内容" height="160px"/>
+                    <ErrorCard errorMsg="暂无内容" height="160px" elevation={5}/>
                 ) : dnsTableList.map((row, key) => (<>
                     <Card
                         elevation={5} key={key} sx={{p: 1}}

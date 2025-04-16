@@ -12,24 +12,25 @@ const centerSx = {
     textAlign: 'center'
 }
 
-export const ErrorCard = ({errorMsg, height, mt}: {
+export const ErrorCard = ({errorMsg, height, elevation, mt}: {
     errorMsg: string
     height?: string
+    elevation?: number
     mt?: number
 }) => {
     let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
-        <Card sx={sx}>
+        <Card elevation={elevation ?? 0} sx={sx}>
             <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
             <div>{errorMsg}</div>
         </Card>
     )
 }
 
-export const LoadingCard = ({height, mt}: { height?: string, mt?: number }) => {
+export const LoadingCard = ({height, elevation, mt}: { height?: string, elevation?: number, mt?: number }) => {
     let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
-        <Card sx={sx}>
+        <Card elevation={elevation ?? 0} sx={sx}>
             <CircularProgress/>
         </Card>
     )
