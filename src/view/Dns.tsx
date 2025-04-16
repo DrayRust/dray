@@ -6,7 +6,9 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings'
 import TuneIcon from '@mui/icons-material/Tune'
 import ListIcon from '@mui/icons-material/List'
-import { readDnsConfig, readDnsModeList, readDnsTableList } from "../util/invoke.ts"
+
+import { DnsTable } from "./DnsTable.tsx"
+import { readDnsConfig, readDnsModeList } from "../util/invoke.ts"
 
 export const Dns = () => {
     const [dnsNav, setDnsNav] = useState(0)
@@ -15,7 +17,6 @@ export const Dns = () => {
         mode: 0,
     })
     const [dnsModeList, setDnsModeList] = useState<DnsModeList>([])
-    const [dnsTableList, setDnsTableList] = useState<DnsTableList>([])
     useEffect(() => {
         (async () => {
             const config = await readDnsConfig() as DnsConfig
@@ -23,9 +24,6 @@ export const Dns = () => {
 
             const modeList = await readDnsModeList() as DnsModeList
             if (modeList) setDnsModeList(modeList)
-
-            const tableList = await readDnsTableList() as DnsTableList
-            if (tableList) setDnsTableList(tableList)
         })()
     }, [])
 
@@ -46,7 +44,7 @@ export const Dns = () => {
             <BottomNavigationAction label="模式管理" icon={<TuneIcon/>}/>
             <BottomNavigationAction label="常见 DNS" icon={<ListIcon/>}/>
         </BottomNavigation>
-        {dnsNav === 0 && <>
+        {dnsNav === 0 ? <>
             <div className="flex-between">
                 <Typography variant="body1" sx={{pl: 1}}>启用内置 DNS</Typography>
                 <Switch checked={dnsConfig.enable} onChange={(_, checked) => handleDnsEnabled(checked)}/>
@@ -74,6 +72,8 @@ export const Dns = () => {
                     错误设置 DNS 可能导致访问失败、隐私泄露、安全性降低、网络延迟增加和功能受限，影响网络体验
                 </Alert>
             </Stack>
-        </>}
+        </> : dnsNav === 1 ? <>
+
+        </> : dnsNav === 2 && <DnsTable/>}
     </Stack>)
 }

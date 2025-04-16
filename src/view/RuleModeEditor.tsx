@@ -207,10 +207,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         confirm('确认删除', `确定要删除这条规则吗？`, async () => {
             const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
             const ok = await updateHashAndRule(rules)
-            if (!ok) {
-                showAlertDialog('删除失败')
-                return
-            }
+            if (!ok) showAlertDialog('删除失败')
         })
     }
 

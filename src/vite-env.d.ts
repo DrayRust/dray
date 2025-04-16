@@ -241,16 +241,16 @@ interface DnsConfig {
 
 // https://xtls.github.io/config/dns.html#dnsobject
 interface DnsHostRow {
-    name: string; // DNS 服务器名称
-    note: string; // DNS 服务器描述
+    name: string; // 名称
+    note: string; // 描述
     domain: string; // DNS 域名
     host: string; // DNS 地址，如: IP 或 域名
 }
 
 // https://xtls.github.io/config/dns.html#dnsserverobject
 interface DnsServerRow {
-    name: string; // DNS 服务器名称
-    note: string; // DNS 服务器描述
+    name: string; // 名称
+    note: string; // 描述
     tag: string; // 标签
     address: string; // DNS 服务器地址
     port: number; // DNS 服务器端口
@@ -281,13 +281,13 @@ interface DnsModeRow {
 type DnsModeList = DnsModeRow[];
 
 interface DnsTable {
-    name: string; // DNS 服务器名称
-    note: string; // DNS 服务器描述
+    name: string; // 名称
+    note: string; // 描述
     hash: string; // JSON 字符串的哈希值，用来排重
-    IPv4: string;
-    IPv6: string;
-    DoH: string;
-    DoT: string;
+    IPv4: string; // IPv4 地址
+    IPv6: string; // IPv6 地址
+    DoH: string; // DNS over HTTPS (DoH) 通过 HTTPS 协议加密进行 DNS 查询
+    DoT: string; // DNS over TLS (DoT)，通过 TLS 协议加密进行 DNS 查询
 }
 
 type DnsTableList = DnsTable[];
