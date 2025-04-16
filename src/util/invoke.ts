@@ -222,7 +222,7 @@ export async function saveRuleModeList(content: RuleModeList) {
     return saveConf('rule_mode_list.json', content)
 }
 
-export async function readDnsConfig() {
+export async function readDnsConfig(): Promise<DnsConfig | undefined> {
     return readConf('dns_config.json')
 }
 
@@ -230,7 +230,7 @@ export async function saveDnsConfig(content: DnsConfig) {
     return saveConf('dns_config.json', content)
 }
 
-export async function readDnsModeList() {
+export async function readDnsModeList(): Promise<DnsModeList | undefined> {
     return readConf('dns_mode_list.json')
 }
 
@@ -238,7 +238,7 @@ export async function saveDnsModeList(content: DnsModeList) {
     return saveConf('dns_mode_list.json', content)
 }
 
-export async function readDnsTableList() {
+export async function readDnsTableList(): Promise<DnsTableList | undefined> {
     return readConf('dns_table_list.json')
 }
 
