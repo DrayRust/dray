@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Card, Stack, Typography, TextField, Button, Tooltip, IconButton,
+    Card, Dialog, Stack, Typography, TextField, Button, Tooltip, IconButton,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
@@ -241,87 +241,91 @@ export const DnsTable = () => {
     return (<>
         <AlertDialogComponent/>
         <DialogComponent/>
-        {action === 'create' || action === 'update' ? <>
-            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
-                <TextField fullWidth size="small" label="公共 DNS 服务商名称"
-                           error={nameError} helperText={nameError ? "名称不能为空" : ""}
-                           value={row.name} onChange={handleRowChange('name')}/>
-                <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline rows={2} onChange={handleRowChange('note')}/>
-                <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline rows={2} onChange={handleRowChange('IPv4')}/>
-                <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline rows={2} onChange={handleRowChange('IPv6')}/>
-                <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
-                <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
+        <Dialog open={action !== ''}>
+            <Stack spacing={2} sx={{p: 2, minWidth: 600}}>
+                {action === 'create' || action === 'update' ? <>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                        <TextField fullWidth size="small" label="公共 DNS 服务商名称"
+                                   error={nameError} helperText={nameError ? "名称不能为空" : ""}
+                                   value={row.name} onChange={handleRowChange('name')}/>
+                        <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline rows={2} onChange={handleRowChange('note')}/>
+                        <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline rows={2} onChange={handleRowChange('IPv4')}/>
+                        <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline rows={2} onChange={handleRowChange('IPv6')}/>
+                        <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
+                        <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
+                    </Stack>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
+                </> : action === 'import' ? <>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <TextField
+                            size="small" multiline rows={10}
+                            label="导入内容（URI）"
+                            placeholder="每行一条，例如：drayPublicDns://xxxxxx"
+                            error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
+                            value={dnsTableImportData}
+                            onChange={handleDnsTableImportDataChange}
+                        />
+                    </Stack>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleDnsTableImportSubmit}>确定</Button>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
+                </> : action === 'export' && <>
+                    <div className="flex-between">
+                        <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
+                        <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
+                            <IconButton size="small" onClick={() => handleRuleModeCopy(dnsTableExportData)}><ContentCopyIcon/></IconButton>
+                        </Tooltip>
+                    </div>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={dnsTableExportData}/>
+                    </Stack>
+                </>}
             </Stack>
-            <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
-                <Button variant="contained" onClick={handleBack}>取消</Button>
-            </div>
-        </> : action === 'import' ? <>
-            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                <TextField
-                    size="small" multiline rows={10}
-                    label="导入内容（URI）"
-                    placeholder="每行一条，例如：drayPublicDns://xxxxxx"
-                    error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
-                    value={dnsTableImportData}
-                    onChange={handleDnsTableImportDataChange}
-                />
-            </Stack>
-            <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleDnsTableImportSubmit}>确定</Button>
-                <Button variant="contained" onClick={handleBack}>取消</Button>
-            </div>
-        </> : action === 'export' ? <>
-            <div className="flex-between">
-                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
-                <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
-                    <IconButton size="small" onClick={() => handleRuleModeCopy(dnsTableExportData)}><ContentCopyIcon/></IconButton>
-                </Tooltip>
-            </div>
-            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={dnsTableExportData}/>
-            </Stack>
-        </> : <>
-            <Stack direction="row" spacing={1}>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
-                <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
-                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
-            </Stack>
-            <Stack spacing={1}>
-                {loading ? (
-                    <LoadingCard height="160px" elevation={5}/>
-                ) : dnsTableList.length === 0 ? (
-                    <ErrorCard errorMsg="暂无内容" height="160px" elevation={5}/>
-                ) : dnsTableList.map((row, key) => (<>
-                    <Card
-                        elevation={5} key={key} sx={{p: 1}}
-                        className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
-                        onClick={() => handleSortEnd(key)}
-                    >
-                        <div className="flex-between">
-                            <Typography variant="h6">{row.name}</Typography>
-                            <div>
-                                <Tooltip title="排序" arrow placement="top">
-                                    <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                </Tooltip>
-                                <Tooltip title="修改" arrow placement="top">
-                                    <IconButton color="primary" onClick={() => handleUpdate(key)}><EditSquareIcon/></IconButton>
-                                </Tooltip>
-                                <Tooltip title="删除" arrow placement="top">
-                                    <IconButton color="error" onClick={() => handleDelete(key)}><DeleteIcon/></IconButton>
-                                </Tooltip>
-                            </div>
+        </Dialog>
+
+        <Stack direction="row" spacing={1}>
+            <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
+            <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
+            <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
+        </Stack>
+        <Stack spacing={1}>
+            {loading ? (
+                <LoadingCard height="160px" elevation={5}/>
+            ) : dnsTableList.length === 0 ? (
+                <ErrorCard errorMsg="暂无内容" height="160px" elevation={5}/>
+            ) : dnsTableList.map((row, key) => (<>
+                <Card
+                    elevation={5} key={key} sx={{p: 1}}
+                    className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
+                    onClick={() => handleSortEnd(key)}
+                >
+                    <div className="flex-between">
+                        <Typography variant="h6">{row.name}</Typography>
+                        <div>
+                            <Tooltip title="排序" arrow placement="top">
+                                <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
+                            </Tooltip>
+                            <Tooltip title="修改" arrow placement="top">
+                                <IconButton color="primary" onClick={() => handleUpdate(key)}><EditSquareIcon/></IconButton>
+                            </Tooltip>
+                            <Tooltip title="删除" arrow placement="top">
+                                <IconButton color="error" onClick={() => handleDelete(key)}><DeleteIcon/></IconButton>
+                            </Tooltip>
                         </div>
-                        <Typography variant="body2" sx={{color: 'text.secondary', pl: '3px', pb: 2}}>{row.note}</Typography>
-                        <Stack spacing={2}>
-                            {row.IPv4 && <TextField fullWidth size="small" label="IPv4 地址" value={row.IPv4} multiline/>}
-                            {row.IPv6 && <TextField fullWidth size="small" label="IPv6 地址" value={row.IPv6} multiline/>}
-                            {row.DoH && <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH}/>}
-                            {row.DoT && <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT}/>}
-                        </Stack>
-                    </Card>
-                </>))}
-            </Stack>
-        </>}
+                    </div>
+                    <Typography variant="body2" sx={{color: 'text.secondary', pl: '3px', pb: 2}}>{row.note}</Typography>
+                    <Stack spacing={2}>
+                        {row.IPv4 && <TextField fullWidth size="small" label="IPv4 地址" value={row.IPv4} multiline/>}
+                        {row.IPv6 && <TextField fullWidth size="small" label="IPv6 地址" value={row.IPv6} multiline/>}
+                        {row.DoH && <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH}/>}
+                        {row.DoT && <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT}/>}
+                    </Stack>
+                </Card>
+            </>))}
+        </Stack>
     </>)
 }
