@@ -16,7 +16,7 @@ import { useDialog } from "../component/useDialog.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { readDnsTableList, saveDnsTableList } from "../util/invoke.ts"
 import { processIP } from "../util/util.ts"
-import { encodeBase64 } from "../util/crypto.ts"
+import { decodeBase64, encodeBase64, safeJsonParse } from "../util/crypto.ts"
 
 const DEFAULT_DNS_TABLE: DnsTable = {
     name: '',
@@ -43,6 +43,7 @@ export const DnsTable = () => {
     const [row, setRow] = useState<DnsTable>(DEFAULT_DNS_TABLE)
     const [nameError, setNameError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
+    const [dnsTableImportData, setDnsTableImportData] = useState('')
     const [dnsTableExportData, setDnsTableExportData] = useState('')
 
     const handleRowChange = (type: keyof DnsTable) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,7 @@ export const DnsTable = () => {
 
     const handleBack = () => {
         setAction('')
+        setDnsTableImportData('')
         setDnsTableExportData('')
         setUpdateKey(-1)
     }
@@ -66,7 +68,68 @@ export const DnsTable = () => {
     }
 
     const handleImport = () => {
+        setAction('import')
+    }
 
+    const [errorImportData, setErrorImportData] = useState(false)
+    const handleDnsTableImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value
+        setDnsTableImportData(value)
+        setErrorImportData(value === '')
+    }
+
+    const handleDnsTableImportSubmit = async () => {
+        let s = dnsTableImportData.trim()
+        setErrorImportData(!s)
+        if (!s) return
+
+        const newDnsTableList = [...dnsTableList]
+        let okNum = 0
+        let repeatNum = 0
+        let errNum = 0
+        let errMsg = ''
+        const arr = s.split('\n')
+        for (let v of arr) {
+            v = v.trim()
+            if (v.length === 0) continue
+
+            if (v.startsWith('drayPublicDns://')) {
+                const base64 = v.substring(16).replace(/#.*$/, '')
+                const decoded = decodeBase64(base64)
+                const ruleMode = safeJsonParse(decoded)
+                if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
+                    if (newDnsTableList.some(item => item.hash === ruleMode.hash)) {
+                        repeatNum++ // 存在重复
+                    } else {
+                        newDnsTableList.push(ruleMode)
+                        okNum++
+                    }
+                } else {
+                    errNum++
+                    errMsg = '解析失败，或数据不正确'
+                }
+            } else {
+                errNum++
+                errMsg = '格式不正确，前缀非 drayPublicDns:// 开头'
+            }
+        }
+
+        if (okNum > 0) {
+            const ok = await saveDnsTableList(newDnsTableList)
+            if (!ok) {
+                showAlertDialog('导入保存失败')
+                return
+            }
+
+            setDnsTableList(newDnsTableList)
+            handleBack()
+        }
+
+        if (okNum === 0 && errMsg) {
+            showAlertDialog(errMsg, 'error')
+        } else if (errNum > 0 || repeatNum > 0) {
+            showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
+        }
     }
 
     const handleExport = () => {
@@ -184,6 +247,21 @@ export const DnsTable = () => {
             </Stack>
             <div className="flex-between">
                 <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
+                <Button variant="contained" onClick={handleBack}>取消</Button>
+            </div>
+        </> : action === 'import' ? <>
+            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                <TextField
+                    size="small" multiline rows={10}
+                    label="导入内容（URI）"
+                    placeholder="每行一条，例如：drayPublicDns://xxxxxx"
+                    error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
+                    value={dnsTableImportData}
+                    onChange={handleDnsTableImportDataChange}
+                />
+            </Stack>
+            <div className="flex-between">
+                <Button variant="contained" color="info" onClick={handleDnsTableImportSubmit}>确定</Button>
                 <Button variant="contained" onClick={handleBack}>取消</Button>
             </div>
         </> : action === 'export' ? <>
