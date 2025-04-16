@@ -13,6 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 
 import { useChip } from "../component/useChip.tsx"
 import { RuleAdvanced } from './RuleAdvanced.tsx'
+import { Dns } from './Dns.tsx'
 import { readAppConfig, readRuleConfig, readRuleDomain, readRuleModeList, saveRuleConfig, saveRuleDomain, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
@@ -21,9 +22,7 @@ import { updateProxyPAC } from "../util/proxy.ts"
 import { rayRuleChange } from "../util/ray.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
-    useEffect(() => {
-        setNavState(3)
-    }, [setNavState])
+    useEffect(() => setNavState(3), [setNavState])
 
     const [ruleMode, setRuleMode] = useState('route')
     const [ruleType, setRuleType] = useState(0)
@@ -164,8 +163,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                 </div>)}
 
-                {ruleMode === 'dns' && (<>
-                </>)}
+                {ruleMode === 'dns' && <Dns/>}
             </Card>
         </Paper>
         <RuleAdvanced open={open} setOpen={setOpen} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig} ruleDomain={ruleDomain}/>
