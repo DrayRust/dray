@@ -99,7 +99,7 @@ export const DnsTable = () => {
                 const ruleMode = safeJsonParse(decoded)
                 if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
                     if (newDnsTableList.some(item => item.hash === ruleMode.hash)) {
-                        repeatNum++ // 存在重复
+                        repeatNum++
                     } else {
                         newDnsTableList.push(ruleMode)
                         okNum++
@@ -121,6 +121,11 @@ export const DnsTable = () => {
                 return
             }
 
+            if (errNum > 0 || repeatNum > 0) {
+                showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
+            } else {
+                showAlertDialog(`导入成功 ${okNum} 条`, 'success')
+            }
             setDnsTableList(newDnsTableList)
             handleBack()
         }
