@@ -236,28 +236,27 @@ type RuleModeList = RuleModeRow[];
 // ============= DNS ============
 interface DnsConfig {
     enable: boolean; // 启用内置 DNS 服务器，不启用则使用操作系统设置的 DNS 服务器
-    mode: number; // 采用模式 如: -1 / 0 / 1 ，特别说明 -1 表示自定义 JSON
-    data: string; // 自定义 JSON 字符串，模式 -1 时，使用这里的数据
+    mode: number; // 采用模式 如: 0 / 1 / 2
 }
 
 // https://xtls.github.io/config/dns.html#dnsobject
 interface DnsHostRow {
-    name: string; // 名称
-    note: string; // 描述
+    name: string; // DNS 服务器名称
+    note: string; // DNS 服务器描述
     domain: string; // DNS 域名
     host: string; // DNS 地址，如: IP 或 域名
 }
 
 // https://xtls.github.io/config/dns.html#dnsserverobject
 interface DnsServerRow {
-    name: string; // 名称
-    note: string; // 描述
+    name: string; // DNS 服务器名称
+    note: string; // DNS 服务器描述
     tag: string; // 标签
-    address: string; // DNS 地址
-    port: string; // DNS 端口
+    address: string; // DNS 服务器地址
+    port: number; // DNS 服务器端口
     domains: string; // 域名列表
     expectIPs: string; // 验证 IP 范围列表
-    clientIP: string; // 通知服务器 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址
+    clientIP: string; // 客户端 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址
     queryStrategy: string; // DNS 查询策略 参数：UseIP | UseIPv4 | UseIPv6，默认值: UseIP
     timeoutMs: number; // 超时时间，默认 4000 ms
     skipFallback: boolean; // 跳过 DNS fallback 查询，默认 false 不跳过（等同 disableFallback）
@@ -268,9 +267,9 @@ interface DnsServerRow {
 interface DnsModeRow {
     name: string; // 模式名称
     note: string; // 模式描述
-    tag: string; // 标签
+    tag: string; // 标签（此为全局默认值，DnsServer 没设置时使用此值）
     hash: string; // hosts+servers JSON 字符串的哈希值，用来排重
-    hosts: DnsHostRow[]; // 静态 IP 列表，
+    hosts: DnsHostRow[]; // DNS 服务器静态 IP 列表，减少解析请求，提升解析效率
     servers: DnsServerRow[]; // DNS 服务器
     clientIP: string; // 客户端 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址（此为全局默认值，DnsServer 没设置时使用此值）
     queryStrategy: string; // DNS 查询策略 参数：UseIP | UseIPv4 | UseIPv6，默认值: UseIP（此为全局默认值，DnsServer 没设置时使用此值）
@@ -282,8 +281,8 @@ interface DnsModeRow {
 type DnsModeList = DnsModeRow[];
 
 interface DnsItem {
-    name: string; // 名称
-    note: string; // 描述
+    name: string; // DNS 服务器名称
+    note: string; // DNS 服务器描述
     hash: string; // JSON 字符串的哈希值，用来排重
     IPv4: string;
     IPv6: string;
