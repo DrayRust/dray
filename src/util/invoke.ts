@@ -79,122 +79,6 @@ export function setAppConfig(cmd: string, value: string | number | boolean) {
     })()
 }
 
-export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
-    if (!isTauri) return
-    try {
-        let s = await invoke('read_conf', {'filename': 'ray_common_config.json'}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as RayCommonConfig
-    } catch (err) {
-        log.error('Failed to readRayCommonConfig:', err)
-    }
-}
-
-export async function saveRayCommonConfig(content: RayCommonConfig) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf', {
-            'filename': 'ray_common_config.json',
-            'content': JSON.stringify(content, null, 2)
-        })
-    } catch (err) {
-        log.error('Failed to saveRayCommonConfig:', err)
-        return false
-    }
-}
-
-export async function readServerList(): Promise<ServerList | undefined> {
-    if (!isTauri) return
-    try {
-        let s = await invoke('read_conf', {'filename': 'server.json'}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as ServerList
-    } catch (err) {
-        log.error('Failed to readServerList:', err)
-    }
-}
-
-export async function saveServerList(serverList: ServerList) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf',
-            {'filename': 'server.json', 'content': JSON.stringify(serverList, null, 2)}
-        )
-    } catch (err) {
-        log.error('Failed to saveServerList:', err)
-        return false
-    }
-}
-
-export async function readRuleConfig(): Promise<RuleConfig | undefined> {
-    if (!isTauri) return
-    try {
-        let s = await invoke('read_conf', {'filename': 'rule_config.json'}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as RuleConfig
-    } catch (err) {
-        log.error('Failed to readRuleConfig:', err)
-    }
-}
-
-export async function saveRuleConfig(ruleConfig: RuleConfig) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf',
-            {'filename': 'rule_config.json', 'content': JSON.stringify(ruleConfig, null, 2)}
-        )
-    } catch (err) {
-        log.error('Failed to saveRuleConfig:', err)
-        return false
-    }
-}
-
-export async function readRuleDomain(): Promise<RuleDomain | undefined> {
-    if (!isTauri) return
-    try {
-        let s = await invoke('read_conf', {'filename': 'rule_domain.json'}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as RuleDomain
-    } catch (err) {
-        log.error('Failed to readRuleDomain:', err)
-    }
-}
-
-export async function saveRuleDomain(ruleDomain: RuleDomain) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf',
-            {'filename': 'rule_domain.json', 'content': JSON.stringify(ruleDomain, null, 2)}
-        )
-    } catch (err) {
-        log.error('Failed to saveRuleDomain:', err)
-        return false
-    }
-}
-
-export async function readRuleModeList(): Promise<RuleModeList | undefined> {
-    if (!isTauri) return
-    try {
-        let s = await invoke('read_conf', {'filename': 'rule_mode_list.json'}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as RuleModeList
-    } catch (err) {
-        log.error('Failed to readRuleModeList:', err)
-    }
-}
-
-export async function saveRuleModeList(ruleModeList: RuleModeList) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf',
-            {'filename': 'rule_mode_list.json', 'content': JSON.stringify(ruleModeList, null, 2)}
-        )
-    } catch (err) {
-        log.error('Failed to saveRuleModeList:', err)
-        return false
-    }
-}
-
 export async function readRayConfig(): Promise<any> {
     if (!isTauri) return
     try {
@@ -275,4 +159,89 @@ export async function readLogFile(filename: string, reverse: boolean = true, sta
     } catch (err) {
         log.error('Failed to readLogFile:', err)
     }
+}
+
+async function readConf(filename: string) {
+    if (!isTauri) return
+    try {
+        let s = await invoke('read_conf', {filename}) as string
+        s = s.trim()
+        if (s) return JSON.parse(s)
+    } catch (err) {
+        log.error('Failed to readConf:', err)
+    }
+}
+
+async function saveConf(filename: string, content: any) {
+    if (!isTauri) return false
+    try {
+        return invoke<Boolean>('save_conf', {filename, 'content': JSON.stringify(content, null, 2)})
+    } catch (err) {
+        log.error('Failed to saveConf:', err)
+        return false
+    }
+}
+
+export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
+    return readConf('ray_common_config.json')
+}
+
+export async function saveRayCommonConfig(content: RayCommonConfig) {
+    return saveConf('ray_common_config.json', content)
+}
+
+export async function readServerList(): Promise<ServerList | undefined> {
+    return readConf('server.json')
+}
+
+export async function saveServerList(content: ServerList) {
+    return saveConf('server.json', content)
+}
+
+export async function readRuleConfig(): Promise<RuleConfig | undefined> {
+    return readConf('rule_config.json')
+}
+
+export async function saveRuleConfig(content: RuleConfig) {
+    return saveConf('rule_config.json', content)
+}
+
+export async function readRuleDomain(): Promise<RuleDomain | undefined> {
+    return readConf('rule_domain.json')
+}
+
+export async function saveRuleDomain(content: RuleDomain) {
+    return saveConf('rule_domain.json', content)
+}
+
+export async function readRuleModeList(): Promise<RuleModeList | undefined> {
+    return readConf('rule_mode_list.json')
+}
+
+export async function saveRuleModeList(content: RuleModeList) {
+    return saveConf('rule_mode_list.json', content)
+}
+
+export async function readDnsConfig() {
+    return readConf('dns_config.json')
+}
+
+export async function saveDnsConfig(content: DnsConfig) {
+    return saveConf('dns_config.json', content)
+}
+
+export async function readDnsModeList() {
+    return readConf('dns_mode_list.json')
+}
+
+export async function saveDnsModeList(content: DnsModeList) {
+    return saveConf('dns_mode_list.json', content)
+}
+
+export async function readDnsTableList() {
+    return readConf('dns_table_list.json')
+}
+
+export async function saveDnsTableList(content: DnsTableList) {
+    return saveConf('dns_table_list.json', content)
 }
