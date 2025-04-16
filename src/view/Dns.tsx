@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Alert, Box, Stack, BottomNavigation, BottomNavigationAction, Paper,
+    Alert, Stack, BottomNavigation, BottomNavigationAction, Paper,
     Typography, Switch, TextField, MenuItem,
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -46,32 +46,34 @@ export const Dns = () => {
             <BottomNavigationAction label="模式管理" icon={<TuneIcon/>}/>
             <BottomNavigationAction label="常见 DNS" icon={<ListIcon/>}/>
         </BottomNavigation>
-        {dnsNav === 0 && <Box>
+        {dnsNav === 0 && <>
             <div className="flex-between">
                 <Typography variant="body1" sx={{pl: 1}}>启用内置 DNS</Typography>
                 <Switch checked={dnsConfig.enable} onChange={(_, checked) => handleDnsEnabled(checked)}/>
             </div>
-            {dnsConfig.enable && <TextField
-                select fullWidth size="small" sx={{mt: 2}}
+            <TextField
+                select fullWidth size="small"
                 label="采用模式"
                 value={dnsConfig.mode}
                 onChange={handleDnsModeChange}>
                 {dnsModeList.map((item, index) => (
                     <MenuItem key={index} value={index}>{item.name}</MenuItem>
                 ))}
-            </TextField>}
-            <Alert severity="info" sx={{mt: 2}}>
-                DNS（Domain Name System，域名系统）是互联网的核心基础设施之一，其主要功能是将人类可读的域名（如 www.google.com）转换为计算机可识别的 IP 地址（如 142.250.190.14）
-            </Alert>
-            <Alert severity="warning" sx={{mt: .5}}>
-                网络传输的底层依赖于 IP 地址，而域名则是 IP 地址的“别名”，这一设计旨在方便人类记忆和使用
-            </Alert>
-            <Alert severity="success" sx={{mt: .5}}>
-                正确设置 DNS 可以提升访问速度、增强安全性、绕过地域限制、提高稳定性，优化网络体验
-            </Alert>
-            <Alert severity="error" sx={{mt: .5}}>
-                错误设置 DNS 可能导致访问失败、隐私泄露、安全性降低、网络延迟增加和功能受限，影响网络体验
-            </Alert>
-        </Box>}
+            </TextField>
+            <Stack spacing={.5}>
+                <Alert severity="info">
+                    DNS（Domain Name System，域名系统）是互联网的核心基础设施之一，其主要功能是将人类可读的域名（如 www.google.com）转换为计算机可识别的 IP 地址（如 142.250.190.14）
+                </Alert>
+                <Alert severity="warning">
+                    网络传输的底层依赖于 IP 地址，而域名则是 IP 地址的“别名”，这一设计旨在方便人类记忆和使用
+                </Alert>
+                <Alert severity="success">
+                    正确设置 DNS 可以提升访问速度、增强安全性、绕过地域限制、提高稳定性，优化网络体验
+                </Alert>
+                <Alert severity="error">
+                    错误设置 DNS 可能导致访问失败、隐私泄露、安全性降低、网络延迟增加和功能受限，影响网络体验
+                </Alert>
+            </Stack>
+        </>}
     </Stack>)
 }
