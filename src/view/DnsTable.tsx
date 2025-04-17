@@ -295,14 +295,14 @@ export const DnsTable = () => {
                 <LoadingCard height="160px" elevation={5}/>
             ) : dnsTableList.length === 0 ? (
                 <ErrorCard errorMsg="暂无内容" height="160px" elevation={5}/>
-            ) : dnsTableList.map((row, key) => (<>
+            ) : dnsTableList.map((row, key) => (
                 <Card
-                    elevation={5} key={key} sx={{p: 1}}
+                    key={key} elevation={5} sx={{p: 1}}
                     className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
                     onClick={() => handleSortEnd(key)}
                 >
                     <div className="flex-between">
-                        <Typography variant="h6">{row.name}</Typography>
+                        <Typography variant="h6">{key + 1}. {row.name}</Typography>
                         <div>
                             <Tooltip title="排序" arrow placement="top">
                                 <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
@@ -323,7 +323,7 @@ export const DnsTable = () => {
                         {row.DoT && <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT}/>}
                     </Stack>
                 </Card>
-            </>))}
+            ))}
         </Stack>
     </>)
 }
