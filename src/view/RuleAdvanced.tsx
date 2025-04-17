@@ -157,15 +157,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
 
     const handleRuleModeImportSubmit = async () => {
         let s = ruleModeImportData.trim()
-        if (!s) {
-            setErrorImportData(true)
-            return
-        }
-        setErrorImportData(false)
+        setErrorImportData(!s)
+        if (!s) return
 
         const newRuleModeList = [...ruleModeList]
         let okNum = 0
-        let repeatNum = 0
+        let existNum = 0
         let errNum = 0
         let errMsg = ''
         const arr = s.split('\n')
@@ -179,7 +176,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                 const data = safeJsonParse(decoded)
                 if (data && typeof data === 'object' && 'hash' in data) {
                     if (newRuleModeList.some(item => item.hash === data.hash)) {
-                        repeatNum++ // 存在重复
+                        existNum++
                     } else {
                         newRuleModeList.push(data)
                         okNum++
@@ -200,19 +197,18 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                 showAlertDialog('导入保存失败')
                 return
             }
-
             setRuleModeList(newRuleModeList)
             handleRuleModeCancel()
 
-            if (repeatNum > 0 || errNum > 0) {
-                showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
+            if (existNum > 0 || errNum > 0) {
+                showAlertDialog(`导入成功 ${okNum} 条，已存在 ${existNum} 条，失败 ${errNum} 条`, 'warning')
             } else {
                 showAlertDialog(`导入成功 ${okNum} 条`, 'success')
             }
-        } else if (okNum === 0 && errMsg) {
+        } else if (existNum > 0) {
+            showAlertDialog(`导入成功 ${okNum} 条，已存在 ${existNum} 条，失败 ${errNum} 条`, 'warning')
+        } else if (errMsg) {
             showAlertDialog(errMsg, 'error')
-        } else if (repeatNum > 0 || errNum > 0) {
-            showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
     }
 
