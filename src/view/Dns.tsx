@@ -16,7 +16,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { DnsTable } from "./DnsTable.tsx"
-import { readDnsConfig, readDnsModeList, saveDnsModeList } from "../util/invoke.ts"
+import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
@@ -57,11 +57,25 @@ export const Dns = () => {
     }, [])
 
     const handleDnsEnabled = async (checked: boolean) => {
-        setDnsConfig({...dnsConfig, enable: checked})
+        const newConf = {...dnsConfig, enable: checked}
+        setDnsConfig(newConf)
+        saveDnsConf(newConf)
     }
 
     const handleDnsModeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDnsConfig({...dnsConfig, mode: Number(e.target.value)})
+        const newConf = {...dnsConfig, mode: Number(e.target.value)}
+        setDnsConfig(newConf)
+        saveDnsConf(newConf)
+    }
+
+    const saveDnsConf = (dnsConfig: DnsConfig) => {
+        (async () => {
+            const ok = await saveDnsConfig(dnsConfig)
+            if (!ok) {
+                showAlertDialog('设置失败', 'error')
+                return
+            }
+        })()
     }
 
     const [action, setAction] = useState('')
