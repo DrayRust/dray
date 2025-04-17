@@ -253,7 +253,7 @@ interface DnsServerRow {
     note: string; // 描述
     tag: string; // 标签
     address: string; // DNS 服务器地址
-    port: number; // DNS 服务器端口
+    port: number | ''; // DNS 服务器端口
     domains: string; // 域名列表
     expectIPs: string; // 验证 IP 范围列表
     clientIP: string; // 客户端 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址
