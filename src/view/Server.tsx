@@ -13,7 +13,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
-import { readText } from '@tauri-apps/plugin-clipboard-manager'
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
@@ -26,6 +25,7 @@ import {
 import { getConf } from "../util/serverConf.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG, DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { ruleToConf } from "../util/rule.ts"
+import { clipboardReadText } from "../util/tauri.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -56,9 +56,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const handleClipboardImport = async () => {
         try {
-            const clipboardText = await readText()
-            if (clipboardText) {
-                await useServerImport(clipboardText, showSnackbar, null, readList)
+            const text = await clipboardReadText()
+            if (text) {
+                await useServerImport(text, showSnackbar, null, readList)
             } else {
                 showSnackbar('剪切板没有内容', 'error')
             }
