@@ -25,7 +25,7 @@ import {
 import { getConf } from "../util/serverConf.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG, DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { ruleToConf } from "../util/rule.ts"
-import { clipboardReadText } from "../util/tauri.ts"
+import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -174,11 +174,11 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         handleMenuClose()
     }
 
-    const [jsonCopied, setJsonCopied] = useState('')
+    const [isCopied, setIsCopied] = useState(false)
     const handleCopyJson = async () => {
-        await navigator.clipboard.writeText(rayConfigJson)
-        setJsonCopied('已复制')
-        setTimeout(() => setJsonCopied(''), 1000)
+        await clipboardWriteText(rayConfigJson)
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 1000)
     }
 
     const handleDelete = () => {
@@ -377,7 +377,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack sx={{p: 1, width: 660}} spacing={2}>
                 <div className="flex-between">
                     <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
-                    <Tooltip title={jsonCopied || '点击复制'}>
+                    <Tooltip title={isCopied ? '已复制' : '点击复制'}>
                         <IconButton onClick={handleCopyJson}><ContentCopyIcon/></IconButton>
                     </Tooltip>
                 </div>

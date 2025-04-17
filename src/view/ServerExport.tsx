@@ -19,6 +19,7 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { log, readServerList, saveTextFile } from "../util/invoke.ts"
 import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
 import { getCurrentYMDHIS } from "../util/util.ts"
+import { clipboardWriteText } from "../util/tauri.ts"
 
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -113,20 +114,20 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         if (!showKeys.includes(i)) setShowKeys([...showKeys, i])
     }
 
-    const [uriCopied, setUriCopied] = useState('')
+    const [uriCopied, setUriCopied] = useState(false)
     const handleCopyURI = async (i: number) => {
-        await navigator.clipboard.writeText(getUri(i))
-        setUriCopied('已复制')
-        setTimeout(() => setUriCopied(''), 1000)
+        await clipboardWriteText(getUri(i))
+        setUriCopied(true)
+        setTimeout(() => setUriCopied(false), 1000)
     }
 
-    const [svgCopied, setSvgCopied] = useState('')
+    const [svgCopied, setSvgCopied] = useState(false)
     const handleCopyQRCodeSVG = async (i: number) => {
         const qrCodeHtml = document.querySelector(`.qrcode-${i}`)?.outerHTML
         if (qrCodeHtml) {
-            await navigator.clipboard.writeText(qrCodeHtml)
-            setSvgCopied('已复制')
-            setTimeout(() => setSvgCopied(''), 1000)
+            await clipboardWriteText(qrCodeHtml)
+            setSvgCopied(true)
+            setTimeout(() => setSvgCopied(false), 1000)
         }
     }
 
@@ -161,10 +162,10 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/>
                             </Box>
                             <Box sx={{mt: 1}}>
-                                <Tooltip title={uriCopied || (isBase64 ? '复制 Base64 URI' : '复制 URL')}>
+                                <Tooltip title={uriCopied ? '已复制' : (isBase64 ? '复制 Base64 URI' : '复制 URL')}>
                                     <IconButton onClick={() => handleCopyURI(i)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
-                                <Tooltip title={svgCopied || '复制二维码 SVG'}>
+                                <Tooltip title={svgCopied ? '已复制' : '复制二维码 SVG'}>
                                     <IconButton onClick={() => handleCopyQRCodeSVG(i)}><FileCopyIcon/></IconButton>
                                 </Tooltip>
                             </Box>
