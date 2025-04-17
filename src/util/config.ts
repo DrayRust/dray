@@ -491,8 +491,8 @@ export const DEFAULT_DNS_TABLE_LIST: DnsTableList = [
     {
         "name": "[全球] OpenDNS (Cisco)",
         "note": "主打安全防护（过滤恶意网站），适合家庭和企业，提供家长控制功能",
-        "hash": "7f4b735c113b9968f846e4922f6d94c53f1ca24c2e3a8d2a6b1a4c01414ad318",
-        "IPv4": "208.67.220.220\n208.67.222.222",
+        "hash": "08be55e3f775db0072f1fec32e34fb6a795314226fa626918ec579cc13f014ae",
+        "IPv4": "208.67.222.222\n208.67.220.220",
         "IPv6": "2620:119:35::35\n2620:119:53::53",
         "DoH": "https://doh.opendns.com/dns-query",
         "DoT": ""
