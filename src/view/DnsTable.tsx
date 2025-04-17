@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
-    Card, Dialog, Stack, Typography, TextField, Button, Tooltip, IconButton,
+    Card, Chip, Dialog, Stack, Typography, TextField, Button, Tooltip, IconButton,
 } from '@mui/material'
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -17,6 +16,7 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { readDnsTableList, saveDnsTableList } from "../util/invoke.ts"
 import { processIP } from "../util/util.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
+import { clipboardWriteText } from "../util/tauri.ts"
 
 const DEFAULT_DNS_TABLE: DnsTable = {
     name: '',
@@ -96,12 +96,12 @@ export const DnsTable = () => {
             if (v.startsWith('drayPublicDns://')) {
                 const base64 = v.substring(16).replace(/#.*$/, '')
                 const decoded = decodeBase64(base64)
-                const ruleMode = safeJsonParse(decoded)
-                if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
-                    if (newDnsTableList.some(item => item.hash === ruleMode.hash)) {
+                const data = safeJsonParse(decoded)
+                if (data && typeof data === 'object' && 'hash' in data) {
+                    if (newDnsTableList.some(item => item.hash === data.hash)) {
                         repeatNum++
                     } else {
-                        newDnsTableList.push(ruleMode)
+                        newDnsTableList.push(data)
                         okNum++
                     }
                 } else {
@@ -226,14 +226,12 @@ export const DnsTable = () => {
         })
     }
 
-    const [contentCopied, setContentCopied] = useState('')
-    const handleRuleModeCopy = (content: string) => {
-        navigator.clipboard.writeText(content).then(() => {
-            setContentCopied('复制成功')
-            setTimeout(() => setContentCopied(''), 2000)
-        }).catch(() => {
-            setContentCopied('复制失败')
-        })
+    const [isCopied, setIsCopied] = useState(false)
+    const handleDnsTableCopy = async (content: string) => {
+        const ok = await clipboardWriteText(content)
+        if (!ok) return
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
@@ -274,15 +272,16 @@ export const DnsTable = () => {
                         <Button variant="contained" onClick={handleBack}>取消</Button>
                     </div>
                 </> : action === 'export' && <>
-                    <div className="flex-between">
-                        <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleBack}>返回</Button>
-                        <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
-                            <IconButton size="small" onClick={() => handleRuleModeCopy(dnsTableExportData)}><ContentCopyIcon/></IconButton>
-                        </Tooltip>
-                    </div>
                     <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                         <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={dnsTableExportData}/>
                     </Stack>
+                    <div className="flex-between">
+                        <div>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleDnsTableCopy(dnsTableExportData)}>复制</Button>
+                            {isCopied && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </div>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
                 </>}
             </Stack>
         </Dialog>

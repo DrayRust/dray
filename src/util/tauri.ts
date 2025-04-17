@@ -1,7 +1,12 @@
 import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager'
 
 export async function clipboardWriteText(text: string) {
-    return await writeText(text)
+    try {
+        await writeText(text)
+        return true
+    } catch (err) {
+        return false
+    }
 }
 
 export async function clipboardReadText() {
