@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
+import { DnsModeEditor } from "./DnsModeEditor.tsx"
 import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
@@ -96,7 +97,7 @@ export const Dns = () => {
         setDnsModeImportData('')
         setDnsModeExportData('')
         setDnsModeChecked([])
-        setUpdateKey(-1)
+        setDnsModeUpdateKey(-1)
     }
 
     const handleCreate = () => {
@@ -220,12 +221,13 @@ export const Dns = () => {
         })
     }
 
-    const [updateKey, setUpdateKey] = useState(-1)
+    const [dnsModeUpdateKey, setDnsModeUpdateKey] = useState(-1)
     const handleDnsModeUpdate = (key: number) => {
-        setUpdateKey(key)
+        setAction('update')
+        setDnsModeUpdateKey(key)
     }
 
-    const handleDnsModeViewConf = (key: number) => {
+    const handleDnsModeViewConf = (_key: number) => {
 
     }
 
@@ -315,7 +317,9 @@ export const Dns = () => {
                             <Button variant="contained" color="info" onClick={handleCreateSubmit}>添加</Button>
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
-                    </> : action === 'import' ? <>
+                    </> : action === 'update' ? (
+                        <DnsModeEditor dnsModeList={dnsModeList} setDnsModeList={setDnsModeList} dnsModeKey={dnsModeUpdateKey} handleBack={handleBack}/>
+                    ) : action === 'import' ? <>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                             <TextField
                                 size="small" multiline rows={10}
