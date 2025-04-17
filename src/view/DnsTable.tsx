@@ -246,8 +246,8 @@ export const DnsTable = () => {
                                    error={nameError} helperText={nameError ? "名称不能为空" : ""}
                                    value={row.name} onChange={handleRowChange('name')}/>
                         <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
-                        <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv4')}/>
-                        <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv6')}/>
+                        <TextField fullWidth size="small" label="IPv4 地址 (每行一条)" value={row.IPv4} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv4')}/>
+                        <TextField fullWidth size="small" label="IPv6 地址 (每行一条)" value={row.IPv6} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv6')}/>
                         <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
                         <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
                     </Stack>
