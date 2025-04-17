@@ -28,6 +28,7 @@ import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/cry
 import { modeRulesToConf } from "../util/rule.ts"
 import { rayRuleChange } from "../util/ray.ts"
 import { updateProxyPAC } from "../util/proxy.ts"
+import { clipboardWriteText } from "../util/tauri.ts"
 
 const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     name: '',
@@ -175,12 +176,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             if (v.startsWith('drayRule://')) {
                 const base64 = v.substring(11).replace(/#.*$/, '')
                 const decoded = decodeBase64(base64)
-                const ruleMode = safeJsonParse(decoded)
-                if (ruleMode && typeof ruleMode === 'object' && 'hash' in ruleMode) {
-                    if (newRuleModeList.some(item => item.hash === ruleMode.hash)) {
+                const data = safeJsonParse(decoded)
+                if (data && typeof data === 'object' && 'hash' in data) {
+                    if (newRuleModeList.some(item => item.hash === data.hash)) {
                         repeatNum++ // 存在重复
                     } else {
-                        newRuleModeList.push(ruleMode)
+                        newRuleModeList.push(data)
                         okNum++
                     }
                 } else {
@@ -201,13 +202,16 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             }
 
             setRuleModeList(newRuleModeList)
-            setRuleModeImportData('')
-            setAction('')
-        }
+            handleRuleModeCancel()
 
-        if (okNum === 0 && errMsg) {
+            if (repeatNum > 0 || errNum > 0) {
+                showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
+            } else {
+                showAlertDialog(`导入成功 ${okNum} 条`, 'success')
+            }
+        } else if (okNum === 0 && errMsg) {
             showAlertDialog(errMsg, 'error')
-        } else if (errNum > 0 || repeatNum > 0) {
+        } else if (repeatNum > 0 || errNum > 0) {
             showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
     }
@@ -226,14 +230,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setRuleModeExportData(arr.join('\n'))
     }
 
-    const [contentCopied, setContentCopied] = useState('')
-    const handleRuleModeCopy = (content: string) => {
-        navigator.clipboard.writeText(content).then(() => {
-            setContentCopied('复制成功')
-            setTimeout(() => setContentCopied(''), 2000)
-        }).catch(() => {
-            setContentCopied('复制失败')
-        })
+    const [isCopied, setIsCopied] = useState(false)
+    const handleRuleModeCopy = async (content: string) => {
+        const ok = await clipboardWriteText(content)
+        if (!ok) return
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
     }
 
     const handleRuleModeUpdate = (key: number) => {
@@ -352,7 +354,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                         </>) : action === 'export' ? (<>
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                                <Tooltip placement="left" arrow title={contentCopied || '复制导出内容'}>
+                                <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制导出内容'}>
                                     <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </div>
@@ -363,7 +365,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
                             <div className="flex-between">
                                 <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
                                 {ruleModeConf && (
-                                    <Tooltip placement="left" arrow title={contentCopied || '复制规则配置'}>
+                                    <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制规则配置'}>
                                         <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 )}

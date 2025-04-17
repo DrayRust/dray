@@ -120,19 +120,17 @@ export const DnsTable = () => {
                 showAlertDialog('导入保存失败')
                 return
             }
+            setDnsTableList(newDnsTableList)
+            handleBack()
 
-            if (errNum > 0 || repeatNum > 0) {
+            if (repeatNum > 0 || errNum > 0) {
                 showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
             } else {
                 showAlertDialog(`导入成功 ${okNum} 条`, 'success')
             }
-            setDnsTableList(newDnsTableList)
-            handleBack()
-        }
-
-        if (okNum === 0 && errMsg) {
+        } else if (okNum === 0 && errMsg) {
             showAlertDialog(errMsg, 'error')
-        } else if (errNum > 0 || repeatNum > 0) {
+        } else if (repeatNum > 0 || errNum > 0) {
             showAlertDialog(`导入成功 ${okNum} 条，重复 ${repeatNum} 条，失败 ${errNum} 条`, 'warning')
         }
     }
