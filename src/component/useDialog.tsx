@@ -7,7 +7,7 @@ export function useDialog() {
     const [content, setContent] = useState('')
     const [onConfirm, setOnConfirm] = useState<() => void>()
 
-    const confirm = (title: string, content: string, onConfirm: () => void) => {
+    const dialogConfirm = (title: string, content: string, onConfirm: () => void) => {
         setTitle(title)
         setContent(content)
         setOnConfirm(() => onConfirm)
@@ -36,5 +36,5 @@ export function useDialog() {
         </Dialog>
     )
 
-    return {DialogComponent, confirm}
+    return {DialogComponent, dialogConfirm}
 }

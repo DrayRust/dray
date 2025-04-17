@@ -182,7 +182,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleDelete = () => {
-        confirm('确认删除', `确定要删除这个服务器吗？`, async () => {
+        dialogConfirm('确认删除', `确定要删除这个服务器吗？`, async () => {
             const newServerList = serverList?.filter((_, index) => index !== selectedKey) || []
             const ok = await saveServerList(newServerList)
             if (!ok) {
@@ -197,7 +197,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const handleBatchDelete = () => {
         const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
         if (selectedKeys.length > 0) {
-            confirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
+            dialogConfirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
                 const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index)) || []
                 const ok = await saveServerList(newServerList)
                 if (!ok) {
@@ -288,7 +288,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar()
-    const {DialogComponent, confirm} = useDialog()
+    const {DialogComponent, dialogConfirm} = useDialog()
     const height = 'calc(100vh - 70px)'
     return (<>
         <SnackbarComponent/>

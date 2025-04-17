@@ -204,7 +204,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     }
 
     const handleRuleDelete = (key: number, name: string) => {
-        confirm('确认删除', `确定要删除 “${name}” 这条规则吗？`, async () => {
+        dialogConfirm('确认删除', `确定要删除 “${name}” 这条规则吗？`, async () => {
             const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
             const ok = await updateHashAndRule(rules)
             if (!ok) showAlertDialog('删除失败')
@@ -251,7 +251,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
-    const {DialogComponent, confirm} = useDialog()
+    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <AlertDialogComponent/>
         <DialogComponent/>

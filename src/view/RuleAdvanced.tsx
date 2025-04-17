@@ -251,7 +251,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
     }
 
     const handleRuleModeDelete = async (key: number, name: string) => {
-        confirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
+        dialogConfirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
             if (ruleConfig.mode === key) {
                 showAlertDialog('不允许删除正在使用的模式')
                 return
@@ -275,7 +275,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
-    const {DialogComponent, confirm} = useDialog()
+    const {DialogComponent, dialogConfirm} = useDialog()
     const {ChipComponent, showChip} = useChip()
     return (<>
         <AlertDialogComponent/>

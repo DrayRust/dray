@@ -214,7 +214,7 @@ export const DnsTable = () => {
     }
 
     const handleDelete = (key: number, name: string) => {
-        confirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
+        dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
             const newList = dnsTableList.filter((_, index) => index !== key) || []
             const ok = await saveDnsTableList(newList)
             if (!ok) {
@@ -234,7 +234,7 @@ export const DnsTable = () => {
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
-    const {DialogComponent, confirm} = useDialog()
+    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <AlertDialogComponent/>
         <DialogComponent/>

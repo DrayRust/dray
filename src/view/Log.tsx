@@ -33,7 +33,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => readList(), [])
 
     const handleClearLogs = () => {
-        confirm('确认清空', `确定要清空所有日志吗？`, async () => {
+        dialogConfirm('确认清空', `确定要清空所有日志吗？`, async () => {
             const ok = await clearLogAll()
             ok && readList()
         })
@@ -44,7 +44,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
         if (dir) await revealItemInDir(`${dir}/logs/`)
     }
 
-    const {DialogComponent, confirm} = useDialog()
+    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <DialogComponent/>
         {!logList ? (
