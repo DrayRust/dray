@@ -17,6 +17,7 @@ import { readDnsTableList, saveDnsTableList } from "../util/invoke.ts"
 import { processIP } from "../util/util.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
+import { DEFAULT_DNS_TABLE_LIST } from "../util/config.ts"
 
 const DEFAULT_DNS_TABLE: DnsTable = {
     name: '',
@@ -33,8 +34,8 @@ export const DnsTable = () => {
     const [dnsTableList, setDnsTableList] = useState<DnsTableList>([])
     useEffect(() => {
         (async () => {
-            const tableList = await readDnsTableList() as DnsTableList
-            if (tableList) setDnsTableList(tableList)
+            const tableList = await readDnsTableList() as DnsTableList || DEFAULT_DNS_TABLE_LIST
+            setDnsTableList(tableList)
             setTimeout(() => setLoading(false), 200)
         })()
     }, [])
