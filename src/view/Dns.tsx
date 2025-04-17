@@ -15,13 +15,13 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { useAlertDialog } from "../component/useAlertDialog.tsx"
+import { useDialog } from "../component/useDialog.tsx"
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
-import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
-import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { clipboardWriteText } from "../util/tauri.ts"
-import { useDialog } from "../component/useDialog.tsx"
 
 const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     name: '',
@@ -59,16 +59,16 @@ export const Dns = () => {
     const handleDnsEnabled = async (checked: boolean) => {
         const newConf = {...dnsConfig, enable: checked}
         setDnsConfig(newConf)
-        saveDnsConf(newConf)
+        updateDnsConfig(newConf)
     }
 
     const handleDnsModeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newConf = {...dnsConfig, mode: Number(e.target.value)}
         setDnsConfig(newConf)
-        saveDnsConf(newConf)
+        updateDnsConfig(newConf)
     }
 
-    const saveDnsConf = (dnsConfig: DnsConfig) => {
+    const updateDnsConfig = (dnsConfig: DnsConfig) => {
         (async () => {
             const ok = await saveDnsConfig(dnsConfig)
             if (!ok) {
