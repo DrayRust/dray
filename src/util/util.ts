@@ -128,7 +128,7 @@ export function processDomain(domain: string, validate: boolean = false, sort: b
     return uniqueDomains.join('\n')
 }
 
-export function processIP(ip: string): string {
+export function processIP(ip: string, sort: boolean = true): string {
     ip = ip.trim()
     if (ip.length === 0) return ''
 
@@ -137,8 +137,11 @@ export function processIP(ip: string): string {
         .map(i => i.trim())
         .filter(i => i.length > 0)
 
-    // 去重，并排序
-    const uniqueIPs = [...new Set(cleanedIPs)].sort()
+    // 去重
+    const uniqueIPs = [...new Set(cleanedIPs)]
+
+    // 根据 sort 参数决定是否排序
+    if (sort) uniqueIPs.sort()
 
     // 重新用 \n 连接
     return uniqueIPs.join('\n')

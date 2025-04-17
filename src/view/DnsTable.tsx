@@ -157,8 +157,8 @@ export const DnsTable = () => {
 
         item.note = item.note.trim()
         item.hash = ''
-        item.IPv4 = processIP(item.IPv4)
-        item.IPv6 = processIP(item.IPv6)
+        item.IPv4 = processIP(item.IPv4, false)
+        item.IPv6 = processIP(item.IPv6, false)
         item.DoH = item.DoH.trim()
         item.DoT = item.DoT.trim()
         item.hash = await hashJson(item)
