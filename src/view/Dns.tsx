@@ -23,20 +23,7 @@ import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
-
-const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
-    name: '',
-    note: '',
-    tag: '',
-    hash: '',
-    hosts: [],
-    servers: [],
-    clientIP: '',
-    queryStrategy: '',
-    disableCache: false,
-    disableFallback: false,
-    disableFallbackIfMatch: false,
-}
+import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 
 export const Dns = () => {
     const [loading, setLoading] = useState(true)
@@ -119,7 +106,7 @@ export const Dns = () => {
         dnsModeList.push(item)
         const ok = await saveDnsModeList(dnsModeList)
         if (!ok) {
-            showAlertDialog('保存失败')
+            showAlertDialog('添加保存失败')
             return
         }
         setDnsModeList([...dnsModeList])
@@ -225,6 +212,21 @@ export const Dns = () => {
     const handleDnsModeUpdate = (key: number) => {
         setAction('update')
         setDnsModeUpdateKey(key)
+        setRow({...DEFAULT_DNS_MODE_ROW, ...(dnsModeList[key] || {})})
+    }
+
+    const handleUpdateSubmit = async (row: DnsModeRow) => {
+        let item: DnsModeRow = {...row}
+        item.hash = ''
+        item.hash = await hashJson(item)
+        dnsModeList[dnsModeUpdateKey] = item
+        const ok = await saveDnsModeList(dnsModeList)
+        if (!ok) {
+            showAlertDialog('编辑保存失败')
+            return
+        }
+        setDnsModeList([...dnsModeList])
+        handleBack()
     }
 
     const handleDnsModeViewConf = (_key: number) => {
@@ -318,7 +320,7 @@ export const Dns = () => {
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
                     </> : action === 'update' ? (
-                        <DnsModeEditor dnsModeList={dnsModeList} setDnsModeList={setDnsModeList} dnsModeKey={dnsModeUpdateKey} handleBack={handleBack}/>
+                        <DnsModeEditor dnsModeRow={row} handleUpdateSubmit={handleUpdateSubmit} handleBack={handleBack}/>
                     ) : action === 'import' ? <>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                             <TextField

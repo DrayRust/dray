@@ -325,6 +325,20 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     }
 ]
 
+export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
+    name: '',
+    note: '',
+    tag: '',
+    hash: '',
+    hosts: [],
+    servers: [],
+    clientIP: '',
+    queryStrategy: '',
+    disableCache: false,
+    disableFallback: false,
+    disableFallbackIfMatch: false,
+}
+
 export const DEFAULT_DNS_MODE_LIST: DnsModeList = []
 
 export const DEFAULT_DNS_TABLE_LIST: DnsTableList = [
