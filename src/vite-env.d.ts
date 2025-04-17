@@ -280,7 +280,7 @@ interface DnsModeRow {
 
 type DnsModeList = DnsModeRow[];
 
-interface DnsTable {
+interface DnsTableRow {
     name: string; // 名称
     note: string; // 描述
     hash: string; // JSON 字符串的哈希值，用来排重
@@ -290,7 +290,7 @@ interface DnsTable {
     DoT: string; // DNS over TLS (DoT)，通过 TLS 协议加密进行 DNS 查询
 }
 
-type DnsTableList = DnsTable[];
+type DnsTableList = DnsTableRow[];
 
 /*interface Tauri {
     app: {

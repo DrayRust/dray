@@ -19,7 +19,7 @@ import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/cry
 import { clipboardWriteText } from "../util/tauri.ts"
 import { DEFAULT_DNS_TABLE_LIST } from "../util/config.ts"
 
-const DEFAULT_DNS_TABLE: DnsTable = {
+const DEFAULT_DNS_TABLE: DnsTableRow = {
     name: '',
     note: '',
     hash: '',
@@ -41,13 +41,13 @@ export const DnsTable = () => {
     }, [])
 
     const [action, setAction] = useState('')
-    const [row, setRow] = useState<DnsTable>(DEFAULT_DNS_TABLE)
+    const [row, setRow] = useState<DnsTableRow>(DEFAULT_DNS_TABLE)
     const [nameError, setNameError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
     const [dnsTableImportData, setDnsTableImportData] = useState('')
     const [dnsTableExportData, setDnsTableExportData] = useState('')
 
-    const handleRowChange = (type: keyof DnsTable) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRowChange = (type: keyof DnsTableRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRow(prev => {
             const value = e.target.value
             type === 'name' && setNameError(value === '')
@@ -149,7 +149,7 @@ export const DnsTable = () => {
     }
 
     const handleSubmit = async () => {
-        let item: DnsTable = {...row}
+        let item: DnsTableRow = {...row}
 
         item.name = item.name.trim()
         const isEmpty = item.name === ''
