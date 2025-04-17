@@ -213,8 +213,8 @@ export const DnsTable = () => {
         if (row) setRow(row)
     }
 
-    const handleDelete = (key: number) => {
-        confirm('确认删除', `确定要删除这条数据吗？`, async () => {
+    const handleDelete = (key: number, name: string) => {
+        confirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
             const newList = dnsTableList.filter((_, index) => index !== key) || []
             const ok = await saveDnsTableList(newList)
             if (!ok) {
@@ -311,7 +311,7 @@ export const DnsTable = () => {
                                 <IconButton color="primary" onClick={() => handleUpdate(key)}><EditSquareIcon/></IconButton>
                             </Tooltip>
                             <Tooltip title="删除" arrow placement="top">
-                                <IconButton color="error" onClick={() => handleDelete(key)}><DeleteIcon/></IconButton>
+                                <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
                             </Tooltip>
                         </div>
                     </div>

@@ -141,7 +141,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
 /**
  * VMess / VLESS 分享链接提案: https://github.com/XTLS/Xray-core/discussions/716
  *
- * ！！！下面这 3 种设计，一个都不去支持，我已经把这个归类到 vmess，让 vless 保存简洁。 over
+ * ！！！下面这 3 种设计，一个都不去支持，我已经把这些归类到 vmess，让 vless 保存简洁。 over
  *
  * # VLESS + TCP + XTLS
  * vless://b0dd64e4-0fbd-4038-9139-d1f32a68a0dc@qv2ray.net:3279?security=xtls&flow=rprx-xtls-splice#VLESSTCPXTLSSplice

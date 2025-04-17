@@ -203,8 +203,8 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         if (item) setRuleRow(item)
     }
 
-    const handleRuleDelete = (key: number) => {
-        confirm('确认删除', `确定要删除这条规则吗？`, async () => {
+    const handleRuleDelete = (key: number, name: string) => {
+        confirm('确认删除', `确定要删除 “${name}” 这条规则吗？`, async () => {
             const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
             const ok = await updateHashAndRule(rules)
             if (!ok) showAlertDialog('删除失败')
@@ -391,7 +391,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                             <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
                                         </Tooltip>
                                         <Tooltip title="删除" arrow placement="top">
-                                            <IconButton color="error" onClick={() => handleRuleDelete(key)}><DeleteIcon/></IconButton>
+                                            <IconButton color="error" onClick={() => handleRuleDelete(key, row.name)}><DeleteIcon/></IconButton>
                                         </Tooltip>
                                     </TableCell>
                                 </TableRow>
