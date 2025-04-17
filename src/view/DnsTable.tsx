@@ -238,15 +238,15 @@ export const DnsTable = () => {
         <AlertDialogComponent/>
         <DialogComponent/>
         <Dialog open={action !== ''}>
-            <Stack spacing={2} sx={{p: 2, minWidth: 600}}>
+            <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
                 {action === 'create' || action === 'update' ? <>
                     <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
                         <TextField fullWidth size="small" label="公共 DNS 服务商名称"
                                    error={nameError} helperText={nameError ? "名称不能为空" : ""}
                                    value={row.name} onChange={handleRowChange('name')}/>
-                        <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline rows={2} onChange={handleRowChange('note')}/>
-                        <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline rows={2} onChange={handleRowChange('IPv4')}/>
-                        <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline rows={2} onChange={handleRowChange('IPv6')}/>
+                        <TextField fullWidth size="small" label="公共 DNS 服务商描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
+                        <TextField fullWidth size="small" label="IPv4 地址 (每行一个)" value={row.IPv4} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv4')}/>
+                        <TextField fullWidth size="small" label="IPv6 地址 (每行一个)" value={row.IPv6} multiline minRows={2} maxRows={6} onChange={handleRowChange('IPv6')}/>
                         <TextField fullWidth size="small" label="DoH (DNS over HTTPS)" value={row.DoH} onChange={handleRowChange('DoH')}/>
                         <TextField fullWidth size="small" label="DoT (DNS over TLS)" value={row.DoT} onChange={handleRowChange('DoT')}/>
                     </Stack>
@@ -271,7 +271,7 @@ export const DnsTable = () => {
                     </div>
                 </> : action === 'export' && <>
                     <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                        <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={dnsTableExportData}/>
+                        <TextField size="small" multiline disabled minRows={10} maxRows={16} label="导出内容（URI）" value={dnsTableExportData}/>
                     </Stack>
                     <div className="flex-between">
                         <div>
