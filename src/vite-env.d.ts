@@ -241,24 +241,25 @@ interface DnsConfig {
 
 // https://xtls.github.io/config/dns.html#dnsobject
 interface DnsHostRow {
-    name: string; // 名称
-    note: string; // 描述
+    name: string; // DNS 地址表名称
+    note: string; // DNS 地址表描述
     domain: string; // DNS 域名
     host: string; // DNS 地址，如: IP 或 域名
 }
 
 // https://xtls.github.io/config/dns.html#dnsserverobject
 interface DnsServerRow {
-    name: string; // 名称
-    note: string; // 描述
-    tag: string; // 标签
+    name: string; // DNS 服务器名称
+    note: string; // DNS 服务器描述
+    type: string; // DNS 服务器类型 如: address | object
+    // tag: string; // 标签
     address: string; // DNS 服务器地址
     port: number | ''; // DNS 服务器端口
     domains: string; // 域名列表
     expectIPs: string; // 验证 IP 范围列表
     clientIP: string; // 客户端 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址
     queryStrategy: string; // DNS 查询策略 参数：UseIP | UseIPv4 | UseIPv6，默认值: UseIP
-    timeoutMs: number; // 超时时间，默认 4000 ms
+    timeoutMs: number; // 查询超时时间，默认 4000 ms
     skipFallback: boolean; // 跳过 DNS fallback 查询，默认 false 不跳过（等同 disableFallback）
     allowUnexpectedIPs: boolean; // 是否允许意外 IP 范围列表，默认 false 不允许
 }
@@ -267,8 +268,8 @@ interface DnsServerRow {
 interface DnsModeRow {
     name: string; // 模式名称
     note: string; // 模式描述
-    tag: string; // 标签（此为全局默认值，DnsServer 没设置时使用此值）
-    hash: string; // hosts+servers JSON 字符串的哈希值，用来排重
+    // tag: string; // 标签（此为全局默认值，DnsServer 没设置时使用此值）
+    hash: string; // JSON 字符串的哈希值，用来排重
     hosts: DnsHostRow[]; // DNS 服务器静态 IP 列表，减少解析请求，提升解析效率
     servers: DnsServerRow[]; // DNS 服务器
     clientIP: string; // 客户端 IP 地址，用于 DNS 查询时通知服务器的公网 IP 地址（此为全局默认值，DnsServer 没设置时使用此值）

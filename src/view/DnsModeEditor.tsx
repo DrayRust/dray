@@ -11,7 +11,9 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
+import { SelectField } from "../component/SelectField.tsx"
 import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
+import { processDomain, processIP } from "../util/util.ts"
 
 const DEFAULT_DNS_HOST_ROW: DnsHostRow = {
     name: '',
@@ -23,7 +25,7 @@ const DEFAULT_DNS_HOST_ROW: DnsHostRow = {
 const DEFAULT_DNS_SERVER_ROW: DnsServerRow = {
     name: '',
     note: '',
-    tag: '',
+    type: 'address',
     address: '',
     port: '',
     domains: '',
@@ -141,10 +143,52 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         modeRow.hosts = hosts
     }
 
+    const [dnsServerKey, setDnsServerKey] = useState(-1)
     const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
+    const [dnsServerNameError, setDnsServerNameError] = useState(false)
     const handleServerCreate = () => {
         setAction('server')
         setDnsServerRow(DEFAULT_DNS_SERVER_ROW)
+    }
+
+    const handleServerSubmit = () => {
+        const item = {...dnsServerRow}
+        item.name = item.name.trim()
+        setDnsServerNameError(!item.name)
+        if (!item.name) return
+
+        item.note = item.note.trim()
+        item.address = item.address.trim()
+        item.domains = processDomain(item.domains)
+        item.expectIPs = processIP(item.expectIPs)
+        item.clientIP = item.clientIP.trim()
+
+        dnsServerKey === -1 ? modeRow.servers.push(item) : (modeRow.servers[dnsServerKey] = item)
+        handleBackToList()
+    }
+
+    const handleServerRowChange = (type: keyof DnsServerRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        if (type === 'name') setDnsServerNameError(!value.trim())
+        setDnsServerRow({...dnsServerRow, [type]: value})
+    }
+
+    const handleServerRowSelectChange = (type: string, value: string) => {
+        setDnsServerRow({...dnsServerRow, [type]: value})
+    }
+
+    const handleServerRowPortChange = (type: keyof DnsServerRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = Number(e.target.value)
+        value = value < 1 ? 0 : value > 65535 ? 65535 : value
+        setDnsServerRow({...dnsServerRow, [type]: value || ''})
+    }
+
+    const handleServerRowNumberChange = (type: keyof DnsServerRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDnsServerRow({...dnsServerRow, [type]: Number(e.target.value)})
+    }
+
+    const handleServerRowSwitchChange = (type: string, value: boolean) => {
+        setDnsServerRow({...dnsServerRow, [type]: value})
     }
 
     const [serverSortKey, setServerSortKey] = useState(-1)
@@ -160,12 +204,29 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     }
 
     const handleServerSortEnd = (key: number) => {
+        if (serverSortKey === -1) return
+        if (serverSortKey === key) {
+            setServerSortKey(-1)
+            return
+        }
+
+        let servers = [...modeRow.servers]
+        let [temp] = servers.splice(serverSortKey, 1)
+        servers.splice(key, 0, temp)
+        setServerSortKey(-1)
+        modeRow.servers = servers
     }
 
     const handleServerUpdate = (key: number) => {
+        setAction('server')
+        setDnsServerKey(key)
+        setDnsServerRow(modeRow.servers[key] || DEFAULT_DNS_SERVER_ROW)
     }
 
     const handleServerDelete = (key: number, name: string) => {
+        dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
+            modeRow.servers = modeRow.servers.filter((_, index) => index !== key) || []
+        })
     }
 
     const {DialogComponent, dialogConfirm} = useDialog()
@@ -186,8 +247,47 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 <Button variant="contained" onClick={handleBackToList}>返回</Button>
             </div>
         </>) : action === 'server' ? (<>
+            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                <TextField size="small" label="DNS 服务器名称"
+                           error={dnsServerNameError} helperText={dnsServerNameError ? "不能为空" : ""}
+                           value={dnsServerRow.name} onChange={handleServerRowChange('name')}/>
+                <TextField size="small" label="DNS 服务器描述" value={dnsServerRow.note} onChange={handleServerRowChange('note')} multiline rows={2}/>
+
+                <TextField select fullWidth size="small" label="DNS 服务器类型" value={dnsServerRow.type} onChange={handleServerRowChange('type')}>
+                    <MenuItem value="address">简单类型</MenuItem>
+                    <MenuItem value="object">复杂类型</MenuItem>
+                </TextField>
+
+                <TextField size="small" label="DNS 服务器地址" value={dnsServerRow.address} onChange={handleServerRowChange('address')}/>
+
+                {dnsServerRow.type === 'object' && (<>
+                    <TextField size="small" label="DNS 服务器端口" value={dnsServerRow.port} onChange={handleServerRowPortChange('port')}/>
+                    <TextField size="small" label="域名列表（每行一条）" value={dnsServerRow.domains} onChange={handleServerRowChange('domains')} multiline rows={2}/>
+                    <TextField size="small" label="验证 IP 范围列表（每行一条）" value={dnsServerRow.expectIPs} onChange={handleServerRowChange('expectIPs')} multiline rows={2}/>
+                    <TextField size="small" label="客户端 IP 地址 (clientIP)" value={dnsServerRow.clientIP} onChange={handleServerRowChange('clientIP')}/>
+
+                    <SelectField
+                        label="DNS 查询策略 (queryStrategy)" id="dns-mode-server-query-strategy"
+                        value={dnsServerRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                        onChange={(value) => handleServerRowSelectChange('queryStrategy', value)}/>
+
+                    <TextField size="small" label="查询超时时间（单位：毫秒）" value={dnsServerRow.timeoutMs} onChange={handleServerRowNumberChange('timeoutMs')}/>
+
+                    <Stack spacing={0.5}>
+                        <div className="flex-between">
+                            <Typography variant="body1" sx={{pl: 1}}>跳过 DNS fallback 查询</Typography>
+                            <Switch checked={dnsServerRow.skipFallback} onChange={(_, value) => handleServerRowSwitchChange('skipFallback', value)}/>
+                        </div>
+                        <div className="flex-between">
+                            <Typography variant="body1" sx={{pl: 1}}>跳过验证 IP 范围列表</Typography>
+                            <Switch checked={dnsServerRow.allowUnexpectedIPs} onChange={(_, value) => handleServerRowSwitchChange('allowUnexpectedIPs', value)}/>
+                        </div>
+                    </Stack>
+                </>)}
+            </Stack>
+
             <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleHostSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
+                <Button variant="contained" color="info" onClick={handleServerSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
                 <Button variant="contained" onClick={handleBackToList}>返回</Button>
             </div>
         </>) : loading ? (

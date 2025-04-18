@@ -328,7 +328,6 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
 export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     name: '',
     note: '',
-    tag: '',
     hash: '',
     hosts: [],
     servers: [],
