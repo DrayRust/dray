@@ -201,71 +201,71 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
             </Stack>
 
-            {modeRow.hosts.length === 0 && modeRow.servers.length === 0 ? (
-                <ErrorCard errorMsg="暂无内容" height="160px"/>
-            ) : (<>
-                {modeRow.hosts.length > 0 && (
-                    <TableContainer component={Card}>
-                        <Table size="small">
-                            <TableBody>
-                                {modeRow.hosts.map((row, key) => (
-                                    <TableRow
-                                        key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                        className={hostSortKey > -1 ? (hostSortKey === key ? 'sort-current' : 'sort-target') : ''}
-                                        onClick={() => handleHostSortEnd(key)}>
-                                        <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
-                                            <Typography variant="body1" component="div">{row.name}</Typography>
-                                            <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                        </TableCell>
-                                        <TableCell sx={{p: '4px 8px'}} align="right">
-                                            <Tooltip title="排序" arrow placement="top">
-                                                <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="修改" arrow placement="top">
-                                                <IconButton color="primary" onClick={() => handleHostUpdate(key)}><EditSquareIcon/></IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="删除" arrow placement="top">
-                                                <IconButton color="error" onClick={() => handleHostDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
+            {modeRow.hosts.length === 0 ? (
+                <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
+            ) : modeRow.hosts.length > 0 && (
+                <TableContainer component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            {modeRow.hosts.map((row, key) => (
+                                <TableRow
+                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    className={hostSortKey > -1 ? (hostSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                    onClick={() => handleHostSortEnd(key)}>
+                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                        <Typography variant="body1" component="div">{row.name}</Typography>
+                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                    </TableCell>
+                                    <TableCell sx={{p: '4px 8px'}} align="right">
+                                        <Tooltip title="排序" arrow placement="top">
+                                            <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="修改" arrow placement="top">
+                                            <IconButton color="primary" onClick={() => handleHostUpdate(key)}><EditSquareIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="删除" arrow placement="top">
+                                            <IconButton color="error" onClick={() => handleHostDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                        </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
 
-                {modeRow.servers.length > 0 && (
-                    <TableContainer component={Card}>
-                        <Table size="small">
-                            <TableBody>
-                                {modeRow.servers.map((row, key) => (
-                                    <TableRow
-                                        key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                        className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
-                                        onClick={() => handleServerSortEnd(key)}>
-                                        <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
-                                            <Typography variant="body1" component="div">{row.name}</Typography>
-                                            <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                        </TableCell>
-                                        <TableCell sx={{p: '4px 8px'}} align="right">
-                                            <Tooltip title="排序" arrow placement="top">
-                                                <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="修改" arrow placement="top">
-                                                <IconButton color="primary" onClick={() => handleServerUpdate(key)}><EditSquareIcon/></IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="删除" arrow placement="top">
-                                                <IconButton color="error" onClick={() => handleServerDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            </>)}
+            {modeRow.servers.length === 0 ? (
+                <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
+            ) : modeRow.servers.length > 0 && (
+                <TableContainer component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            {modeRow.servers.map((row, key) => (
+                                <TableRow
+                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                    onClick={() => handleServerSortEnd(key)}>
+                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                        <Typography variant="body1" component="div">{row.name}</Typography>
+                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                    </TableCell>
+                                    <TableCell sx={{p: '4px 8px'}} align="right">
+                                        <Tooltip title="排序" arrow placement="top">
+                                            <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="修改" arrow placement="top">
+                                            <IconButton color="primary" onClick={() => handleServerUpdate(key)}><EditSquareIcon/></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="删除" arrow placement="top">
+                                            <IconButton color="error" onClick={() => handleServerDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                        </Tooltip>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
 
             <div className="flex-between">
                 <Button variant="contained" color="info" onClick={handleSubmit}>修改</Button>
