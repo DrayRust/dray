@@ -44,8 +44,6 @@ export const DnsTable = () => {
     const [row, setRow] = useState<DnsTableRow>(DEFAULT_DNS_TABLE)
     const [nameError, setNameError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
-    const [dnsTableImportData, setDnsTableImportData] = useState('')
-    const [dnsTableExportData, setDnsTableExportData] = useState('')
 
     const handleRowChange = (type: keyof DnsTableRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRow(prev => {
@@ -62,17 +60,53 @@ export const DnsTable = () => {
         setUpdateKey(-1)
     }
 
+    // ============================== create & update ==============================
     const handleCreate = () => {
         setAction('create')
         setUpdateKey(-1)
         setRow(DEFAULT_DNS_TABLE)
     }
 
+    const handleUpdate = (key: number) => {
+        setAction('update')
+        setUpdateKey(key)
+        const row = dnsTableList[key]
+        if (row) setRow(row)
+    }
+
+    const handleSubmit = async () => {
+        let item: DnsTableRow = {...row}
+
+        item.name = item.name.trim()
+        const isEmpty = item.name === ''
+        setNameError(isEmpty)
+        if (isEmpty) return
+
+        item.note = item.note.trim()
+        item.hash = ''
+        item.IPv4 = processIP(item.IPv4, false)
+        item.IPv6 = processIP(item.IPv6, false)
+        item.DoH = item.DoH.trim()
+        item.DoT = item.DoT.trim()
+        item.hash = await hashJson(item)
+
+        updateKey === -1 ? dnsTableList.push(item) : dnsTableList[updateKey] = item
+        const ok = await saveDnsTableList(dnsTableList)
+        if (!ok) {
+            showAlertDialog('保存失败')
+            return
+        }
+        setDnsTableList([...dnsTableList])
+        handleBack()
+    }
+
+    // ============================== import ==============================
+    const [errorImportData, setErrorImportData] = useState(false)
+    const [dnsTableImportData, setDnsTableImportData] = useState('')
     const handleImport = () => {
         setAction('import')
     }
 
-    const [errorImportData, setErrorImportData] = useState(false)
     const handleDnsTableImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value
         setDnsTableImportData(value)
@@ -136,6 +170,8 @@ export const DnsTable = () => {
         }
     }
 
+    // ============================== export ==============================
+    const [dnsTableExportData, setDnsTableExportData] = useState('')
     const handleExport = () => {
         setAction('export')
 
@@ -148,32 +184,7 @@ export const DnsTable = () => {
         setDnsTableExportData(arr.join('\n'))
     }
 
-    const handleSubmit = async () => {
-        let item: DnsTableRow = {...row}
-
-        item.name = item.name.trim()
-        const isEmpty = item.name === ''
-        setNameError(isEmpty)
-        if (isEmpty) return
-
-        item.note = item.note.trim()
-        item.hash = ''
-        item.IPv4 = processIP(item.IPv4, false)
-        item.IPv6 = processIP(item.IPv6, false)
-        item.DoH = item.DoH.trim()
-        item.DoT = item.DoT.trim()
-        item.hash = await hashJson(item)
-
-        updateKey === -1 ? dnsTableList.push(item) : dnsTableList[updateKey] = item
-        const ok = await saveDnsTableList(dnsTableList)
-        if (!ok) {
-            showAlertDialog('保存失败')
-            return
-        }
-        setDnsTableList([...dnsTableList])
-        handleBack()
-    }
-
+    // ============================== sort ==============================
     const [sortKey, setSortKey] = useState(-1)
     const handleSortStart = (e: React.MouseEvent, key: number) => {
         e.stopPropagation()
@@ -206,13 +217,7 @@ export const DnsTable = () => {
         }
     }
 
-    const handleUpdate = (key: number) => {
-        setAction('update')
-        setUpdateKey(key)
-        const row = dnsTableList[key]
-        if (row) setRow(row)
-    }
-
+    // ============================== delete ==============================
     const handleDelete = (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
             const newList = dnsTableList.filter((_, index) => index !== key) || []
@@ -225,6 +230,7 @@ export const DnsTable = () => {
         })
     }
 
+    // ============================== copy ==============================
     const [isCopied, setIsCopied] = useState(false)
     const handleDnsTableCopy = async (content: string) => {
         const ok = await clipboardWriteText(content)
