@@ -57,6 +57,14 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         setModeRow({...modeRow, [type]: value})
     }
 
+    const handleRowSelectChange = (type: string, value: string) => {
+        setModeRow({...modeRow, [type]: value})
+    }
+
+    const handleRowSwitchChange = (type: string, value: boolean) => {
+        setModeRow({...modeRow, [type]: value})
+    }
+
     const handleSubmit = () => {
         let item: DnsModeRow = {...modeRow}
 
@@ -70,6 +78,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         handleUpdateSubmit(item)
     }
 
+    // ====================================== dnsHost ======================================
     const [dnsHostKey, setDnsHostKey] = useState(-1)
     const [dnsHostRow, setDnsHostRow] = useState<DnsHostRow>(DEFAULT_DNS_HOST_ROW)
     const [dnsHostNameError, setDnsHostNameError] = useState(false)
@@ -144,6 +153,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         modeRow.hosts = hosts
     }
 
+    // ====================================== dnsServer ======================================
     const [dnsServerKey, setDnsServerKey] = useState(-1)
     const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
     const [dnsServerNameError, setDnsServerNameError] = useState(false)
@@ -375,6 +385,28 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                     </Table>
                 </TableContainer>
             )}
+
+            <TextField size="small" label="全局客户端 IP 地址 (clientIP)" value={modeRow.clientIP} onChange={handleRowChange('clientIP')}/>
+
+            <SelectField
+                label="全局 DNS 查询策略 (queryStrategy)" id="dns-mode-query-strategy"
+                value={modeRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                onChange={(value) => handleRowSelectChange('queryStrategy', value)}/>
+
+            <Stack spacing={0.5}>
+                <div className="flex-between">
+                    <Typography variant="body1" sx={{pl: 1}}>禁用 DNS 缓存</Typography>
+                    <Switch checked={modeRow.disableCache} onChange={(_, value) => handleRowSwitchChange('disableCache', value)}/>
+                </div>
+                <div className="flex-between">
+                    <Typography variant="body1" sx={{pl: 1}}>禁用 DNS fallback 查询</Typography>
+                    <Switch checked={modeRow.disableFallback} onChange={(_, value) => handleRowSwitchChange('disableFallback', value)}/>
+                </div>
+                <div className="flex-between">
+                    <Typography variant="body1" sx={{pl: 1}}>禁用 匹配上域名时 DNS fallback 查询</Typography>
+                    <Switch checked={modeRow.disableFallbackIfMatch} onChange={(_, value) => handleRowSwitchChange('disableFallbackIfMatch', value)}/>
+                </div>
+            </Stack>
 
             <div className="flex-between">
                 <Button variant="contained" color="info" onClick={handleSubmit}>修改</Button>
