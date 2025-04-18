@@ -370,11 +370,11 @@ export const Dns = () => {
                                         <TableCell padding="checkbox">
                                             <Checkbox value={key} checked={dnsModeChecked.includes(key)} onChange={handleDnsModeCheckedChange}/>
                                         </TableCell>
-                                        <TableCell component="th" scope="row">
+                                        <TableCell component="th" scope="row" sx={{p: 1}}>
                                             <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
                                             <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                         </TableCell>
-                                        <TableCell align="right">
+                                        <TableCell align="right" width="140" sx={{p: 0}}>
                                             <Tooltip title="设置" arrow placement="top">
                                                 <IconButton color="primary" onClick={() => handleDnsModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
                                             </Tooltip>
