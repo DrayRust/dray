@@ -9,8 +9,9 @@ import EditSquareIcon from '@mui/icons-material/EditSquare'
 import OpenWithIcon from '@mui/icons-material/OpenWith'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
+import { useDialog } from "../component/useDialog.tsx"
+import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 
 const DEFAULT_DNS_HOST_ROW: DnsHostRow = {
     name: '',
@@ -63,20 +64,36 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         handleUpdateSubmit(item)
     }
 
-    const handleCancel = () => {
+    const handleBackToList = () => {
         setAction('')
     }
 
+    const [dnsHostKey, setDnsHostKey] = useState(-1)
     const [dnsHostRow, setDnsHostRow] = useState<DnsHostRow>(DEFAULT_DNS_HOST_ROW)
     const handleHostCreate = () => {
         setAction('host')
         setDnsHostRow(DEFAULT_DNS_HOST_ROW)
     }
 
-    const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
-    const handleServerCreate = () => {
-        setAction('server')
-        setDnsServerRow(DEFAULT_DNS_SERVER_ROW)
+    const handleHostRowChange = (type: keyof DnsHostRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDnsHostRow({...dnsHostRow, [type]: e.target.value})
+    }
+
+    const handleHostSubmit = () => {
+        dnsHostKey === -1 ? row.hosts.push(dnsHostRow) : (row.hosts[dnsHostKey] = dnsHostRow)
+        handleBackToList()
+    }
+
+    const handleHostUpdate = (key: number) => {
+        setAction('host')
+        setDnsHostKey(key)
+        setDnsHostRow(row.hosts[key] || DEFAULT_DNS_HOST_ROW)
+    }
+
+    const handleHostDelete = (key: number, name: string) => {
+        dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
+            row.hosts = row.hosts.filter((_, index) => index !== key) || []
+        })
     }
 
     const [hostSortKey, setHostSortKey] = useState(-1)
@@ -94,10 +111,10 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const handleHostSortEnd = (key: number) => {
     }
 
-    const handleHostUpdate = (key: number) => {
-    }
-
-    const handleHostDelete = (key: number, name: string) => {
+    const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
+    const handleServerCreate = () => {
+        setAction('server')
+        setDnsServerRow(DEFAULT_DNS_SERVER_ROW)
     }
 
     const [serverSortKey, setServerSortKey] = useState(-1)
@@ -121,18 +138,20 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const handleServerDelete = (key: number, name: string) => {
     }
 
+    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
+        <DialogComponent/>
         {action === 'host' ? (<>
             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="名称" value={dnsHostRow.name} onChange={handleRowChange('name')}/>
-                <TextField size="small" label="描述" value={dnsHostRow.note} onChange={handleRowChange('note')} multiline rows={2}/>
-                <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleRowChange('note')}/>
-                <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleRowChange('note')} multiline rows={2}/>
+                <TextField size="small" label="名称" value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
+                <TextField size="small" label="描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
+                <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
+                <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleHostRowChange('host')} multiline rows={2}/>
             </Stack>
 
             <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleSubmit}>添加</Button>
-                <Button variant="contained" onClick={handleCancel}>返回</Button>
+                <Button variant="contained" color="info" onClick={handleHostSubmit}>添加</Button>
+                <Button variant="contained" onClick={handleBackToList}>返回</Button>
             </div>
         </>) : action === 'server' ? (<>
 
