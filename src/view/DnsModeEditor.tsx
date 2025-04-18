@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Button, Card, Stack,
+    Button, Card, Stack, DialogContent, DialogActions,
     TableContainer, Table, TableRow, TableCell, TableBody, Tooltip, IconButton,
     Typography, Switch, TextField, MenuItem,
 } from '@mui/material'
@@ -241,177 +241,196 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         })
     }
 
+    const widthSx = {p: 2, width: 580}
+    const width2Sx = {...widthSx, pb: 0}
+
     const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <DialogComponent/>
-        {action === 'host' ? (<>
-            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="DNS 地址表名称"
-                           error={dnsHostNameError} helperText={dnsHostNameError ? "不能为空" : ""}
-                           value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
-                <TextField size="small" label="DNS 地址表描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
-                <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
-                <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleHostRowChange('host')} multiline rows={2}/>
+        {action === 'host' ? (
+            <Stack spacing={2} sx={widthSx}>
+                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                    <TextField size="small" label="DNS 地址表名称"
+                               error={dnsHostNameError} helperText={dnsHostNameError ? "不能为空" : ""}
+                               value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
+                    <TextField size="small" label="DNS 地址表描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
+                    <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
+                    <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleHostRowChange('host')} multiline rows={2}/>
+                </Stack>
+
+                <div className="flex-between">
+                    <Button variant="contained" color="info" onClick={handleHostSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
+                    <Button variant="contained" onClick={handleBackToList}>返回</Button>
+                </div>
             </Stack>
+        ) : action === 'server' ? (<>
+            <DialogContent sx={width2Sx}>
+                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                    <TextField size="small" label="DNS 服务器名称"
+                               error={dnsServerNameError} helperText={dnsServerNameError ? "不能为空" : ""}
+                               value={dnsServerRow.name} onChange={handleServerRowChange('name')}/>
+                    <TextField size="small" label="DNS 服务器描述" value={dnsServerRow.note} onChange={handleServerRowChange('note')} multiline rows={2}/>
 
-            <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleHostSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
-                <Button variant="contained" onClick={handleBackToList}>返回</Button>
-            </div>
-        </>) : action === 'server' ? (<>
-            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="DNS 服务器名称"
-                           error={dnsServerNameError} helperText={dnsServerNameError ? "不能为空" : ""}
-                           value={dnsServerRow.name} onChange={handleServerRowChange('name')}/>
-                <TextField size="small" label="DNS 服务器描述" value={dnsServerRow.note} onChange={handleServerRowChange('note')} multiline rows={2}/>
+                    <TextField select fullWidth size="small" label="DNS 服务器类型" value={dnsServerRow.type} onChange={handleServerRowChange('type')}>
+                        <MenuItem value="address">简单类型</MenuItem>
+                        <MenuItem value="object">复杂类型</MenuItem>
+                    </TextField>
 
-                <TextField select fullWidth size="small" label="DNS 服务器类型" value={dnsServerRow.type} onChange={handleServerRowChange('type')}>
-                    <MenuItem value="address">简单类型</MenuItem>
-                    <MenuItem value="object">复杂类型</MenuItem>
-                </TextField>
+                    <TextField size="small" label="DNS 服务器地址" value={dnsServerRow.address} onChange={handleServerRowChange('address')}/>
 
-                <TextField size="small" label="DNS 服务器地址" value={dnsServerRow.address} onChange={handleServerRowChange('address')}/>
+                    {dnsServerRow.type === 'object' && (<>
+                        <TextField size="small" label="DNS 服务器端口" placeholder="不填写默认为: 53" value={dnsServerRow.port} onChange={handleServerRowPortChange('port')}/>
+                        <TextField size="small" label="域名列表（每行一条）"
+                                   value={dnsServerRow.domains} onChange={handleServerRowChange('domains')} multiline rows={2}/>
+                        <TextField size="small" label="验证 IP 范围列表（每行一条）"
+                                   value={dnsServerRow.expectIPs} onChange={handleServerRowChange('expectIPs')} multiline rows={2}/>
+                        <TextField size="small" label="客户端 IP 地址 (clientIP)" value={dnsServerRow.clientIP} onChange={handleServerRowChange('clientIP')}/>
 
-                {dnsServerRow.type === 'object' && (<>
-                    <TextField size="small" label="DNS 服务器端口" placeholder="不填写默认为: 53" value={dnsServerRow.port} onChange={handleServerRowPortChange('port')}/>
-                    <TextField size="small" label="域名列表（每行一条）" value={dnsServerRow.domains} onChange={handleServerRowChange('domains')} multiline rows={2}/>
-                    <TextField size="small" label="验证 IP 范围列表（每行一条）" value={dnsServerRow.expectIPs} onChange={handleServerRowChange('expectIPs')} multiline rows={2}/>
-                    <TextField size="small" label="客户端 IP 地址 (clientIP)" value={dnsServerRow.clientIP} onChange={handleServerRowChange('clientIP')}/>
+                        <SelectField
+                            label="DNS 查询策略 (queryStrategy)" id="dns-mode-server-query-strategy"
+                            value={dnsServerRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                            onChange={(value) => handleServerRowSelectChange('queryStrategy', value)}/>
 
-                    <SelectField
-                        label="DNS 查询策略 (queryStrategy)" id="dns-mode-server-query-strategy"
-                        value={dnsServerRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
-                        onChange={(value) => handleServerRowSelectChange('queryStrategy', value)}/>
+                        <TextField size="small" label="查询超时时间（单位：毫秒）" value={dnsServerRow.timeoutMs} onChange={handleServerRowNumberChange('timeoutMs')}/>
 
-                    <TextField size="small" label="查询超时时间（单位：毫秒）" value={dnsServerRow.timeoutMs} onChange={handleServerRowNumberChange('timeoutMs')}/>
+                        <Stack spacing={0.5}>
+                            <div className="flex-between">
+                                <Typography variant="body1" sx={{pl: 1}}>跳过 DNS fallback 查询</Typography>
+                                <Switch checked={dnsServerRow.skipFallback} onChange={(_, value) => handleServerRowSwitchChange('skipFallback', value)}/>
+                            </div>
+                            <div className="flex-between">
+                                <Typography variant="body1" sx={{pl: 1}}>跳过验证 IP 范围列表</Typography>
+                                <Switch checked={dnsServerRow.allowUnexpectedIPs} onChange={(_, value) => handleServerRowSwitchChange('allowUnexpectedIPs', value)}/>
+                            </div>
+                        </Stack>
+                    </>)}
+                </Stack>
+            </DialogContent>
 
-                    <Stack spacing={0.5}>
-                        <div className="flex-between">
-                            <Typography variant="body1" sx={{pl: 1}}>跳过 DNS fallback 查询</Typography>
-                            <Switch checked={dnsServerRow.skipFallback} onChange={(_, value) => handleServerRowSwitchChange('skipFallback', value)}/>
-                        </div>
-                        <div className="flex-between">
-                            <Typography variant="body1" sx={{pl: 1}}>跳过验证 IP 范围列表</Typography>
-                            <Switch checked={dnsServerRow.allowUnexpectedIPs} onChange={(_, value) => handleServerRowSwitchChange('allowUnexpectedIPs', value)}/>
-                        </div>
-                    </Stack>
-                </>)}
-            </Stack>
-
-            <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleServerSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
-                <Button variant="contained" onClick={handleBackToList}>返回</Button>
-            </div>
+            <DialogActions sx={{p: 2}}>
+                <Stack direction="row" spacing={2} sx={{width: '100%', justifyContent: "space-between", alignItems: "center"}}>
+                    <Button variant="contained" color="info" onClick={handleServerSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
+                    <Button variant="contained" onClick={handleBackToList}>返回</Button>
+                </Stack>
+            </DialogActions>
         </>) : loading ? (
-            <LoadingCard height="160px"/>
+            <DialogContent sx={widthSx}><LoadingCard height="160px"/></DialogContent>
         ) : (<>
-            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="模式名称"
-                           error={dnsNameError} helperText={dnsNameError ? "模式名称不能为空" : ""}
-                           value={modeRow.name} onChange={handleRowChange('name')}/>
-                <TextField size="small" label="模式描述" value={modeRow.note} onChange={handleRowChange('note')} multiline rows={2}/>
-            </Stack>
+            <DialogContent sx={width2Sx}>
+                <Stack spacing={2}>
+                    <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                        <TextField size="small" label="模式名称"
+                                   error={dnsNameError} helperText={dnsNameError ? "模式名称不能为空" : ""}
+                                   value={modeRow.name} onChange={handleRowChange('name')}/>
+                        <TextField size="small" label="模式描述" value={modeRow.note} onChange={handleRowChange('note')} multiline rows={2}/>
+                    </Stack>
 
-            <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleHostCreate}>添加 DNS 地址表</Button>
-            </Stack>
+                    <Stack direction="row" spacing={2}>
+                        <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleHostCreate}>添加 DNS 地址表</Button>
+                    </Stack>
 
-            {modeRow.hosts.length === 0 ? (
-                <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
-            ) : (
-                <TableContainer component={Card}>
-                    <Table size="small">
-                        <TableBody>
-                            {modeRow.hosts.map((row, key) => (
-                                <TableRow
-                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                    className={hostSortKey > -1 ? (hostSortKey === key ? 'sort-current' : 'sort-target') : ''}
-                                    onClick={() => handleHostSortEnd(key)}>
-                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
-                                        <Typography variant="body1" component="div">{row.name}</Typography>
-                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                    </TableCell>
-                                    <TableCell sx={{p: '4px 8px'}} align="right">
-                                        <Tooltip title="排序" arrow placement="top">
-                                            <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="修改" arrow placement="top">
-                                            <IconButton color="primary" onClick={() => handleHostUpdate(key)}><EditSquareIcon/></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="删除" arrow placement="top">
-                                            <IconButton color="error" onClick={() => handleHostDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
+                    {modeRow.hosts.length === 0 ? (
+                        <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
+                    ) : (
+                        <TableContainer component={Card}>
+                            <Table size="small">
+                                <TableBody>
+                                    {modeRow.hosts.map((row, key) => (
+                                        <TableRow
+                                            key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                            className={hostSortKey > -1 ? (hostSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                            onClick={() => handleHostSortEnd(key)}>
+                                            <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                                <Typography variant="body1" component="div">{row.name}</Typography>
+                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                            </TableCell>
+                                            <TableCell sx={{p: '4px 8px'}} align="right">
+                                                <Tooltip title="排序" arrow placement="top">
+                                                    <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="修改" arrow placement="top">
+                                                    <IconButton color="primary" onClick={() => handleHostUpdate(key)}><EditSquareIcon/></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="删除" arrow placement="top">
+                                                    <IconButton color="error" onClick={() => handleHostDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
 
-            <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
-            </Stack>
+                    <Stack direction="row" spacing={2}>
+                        <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
+                    </Stack>
 
-            {modeRow.servers.length === 0 ? (
-                <ErrorCard errorMsg="暂无 DNS 服务器" height="160px"/>
-            ) : (
-                <TableContainer component={Card}>
-                    <Table size="small">
-                        <TableBody>
-                            {modeRow.servers.map((row, key) => (
-                                <TableRow
-                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                    className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
-                                    onClick={() => handleServerSortEnd(key)}>
-                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
-                                        <Typography variant="body1" component="div">{row.name}</Typography>
-                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                    </TableCell>
-                                    <TableCell sx={{p: '4px 8px'}} align="right">
-                                        <Tooltip title="排序" arrow placement="top">
-                                            <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="修改" arrow placement="top">
-                                            <IconButton color="primary" onClick={() => handleServerUpdate(key)}><EditSquareIcon/></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="删除" arrow placement="top">
-                                            <IconButton color="error" onClick={() => handleServerDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
+                    {modeRow.servers.length === 0 ? (
+                        <ErrorCard errorMsg="暂无 DNS 服务器" height="160px"/>
+                    ) : (
+                        <TableContainer component={Card}>
+                            <Table size="small">
+                                <TableBody>
+                                    {modeRow.servers.map((row, key) => (
+                                        <TableRow
+                                            key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                            className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                            onClick={() => handleServerSortEnd(key)}>
+                                            <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                                <Typography variant="body1" component="div">{row.name}</Typography>
+                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                            </TableCell>
+                                            <TableCell sx={{p: '4px 8px'}} align="right">
+                                                <Tooltip title="排序" arrow placement="top">
+                                                    <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="修改" arrow placement="top">
+                                                    <IconButton color="primary" onClick={() => handleServerUpdate(key)}><EditSquareIcon/></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="删除" arrow placement="top">
+                                                    <IconButton color="error" onClick={() => handleServerDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
 
-            <TextField size="small" label="全局客户端 IP 地址 (clientIP)" value={modeRow.clientIP} onChange={handleRowChange('clientIP')}/>
+                    <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                        <TextField size="small" label="全局客户端 IP 地址 (clientIP)" value={modeRow.clientIP} onChange={handleRowChange('clientIP')}/>
 
-            <SelectField
-                label="全局 DNS 查询策略 (queryStrategy)" id="dns-mode-query-strategy"
-                value={modeRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
-                onChange={(value) => handleRowSelectChange('queryStrategy', value)}/>
+                        <SelectField
+                            label="全局 DNS 查询策略 (queryStrategy)" id="dns-mode-query-strategy"
+                            value={modeRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                            onChange={(value) => handleRowSelectChange('queryStrategy', value)}/>
 
-            <Stack spacing={0.5}>
-                <div className="flex-between">
-                    <Typography variant="body1" sx={{pl: 1}}>禁用 DNS 缓存</Typography>
-                    <Switch checked={modeRow.disableCache} onChange={(_, value) => handleRowSwitchChange('disableCache', value)}/>
-                </div>
-                <div className="flex-between">
-                    <Typography variant="body1" sx={{pl: 1}}>禁用 DNS fallback 查询</Typography>
-                    <Switch checked={modeRow.disableFallback} onChange={(_, value) => handleRowSwitchChange('disableFallback', value)}/>
-                </div>
-                <div className="flex-between">
-                    <Typography variant="body1" sx={{pl: 1}}>禁用 匹配上域名时 DNS fallback 查询</Typography>
-                    <Switch checked={modeRow.disableFallbackIfMatch} onChange={(_, value) => handleRowSwitchChange('disableFallbackIfMatch', value)}/>
-                </div>
-            </Stack>
+                        <Stack spacing={0.5}>
+                            <div className="flex-between">
+                                <Typography variant="body1" sx={{pl: 1}}>禁用 DNS 缓存</Typography>
+                                <Switch checked={modeRow.disableCache} onChange={(_, value) => handleRowSwitchChange('disableCache', value)}/>
+                            </div>
+                            <div className="flex-between">
+                                <Typography variant="body1" sx={{pl: 1}}>禁用 DNS fallback 查询</Typography>
+                                <Switch checked={modeRow.disableFallback} onChange={(_, value) => handleRowSwitchChange('disableFallback', value)}/>
+                            </div>
+                            <div className="flex-between">
+                                <Typography variant="body1" sx={{pl: 1}}>禁用 匹配上域名时 DNS fallback 查询</Typography>
+                                <Switch checked={modeRow.disableFallbackIfMatch} onChange={(_, value) => handleRowSwitchChange('disableFallbackIfMatch', value)}/>
+                            </div>
+                        </Stack>
+                    </Stack>
+                </Stack>
+            </DialogContent>
 
-            <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleSubmit}>修改</Button>
-                <Button variant="contained" onClick={handleBack}>取消</Button>
-            </div>
+            <DialogActions sx={{p: 2}}>
+                <Stack direction="row" spacing={2} sx={{width: '100%', justifyContent: "space-between", alignItems: "center"}}>
+                    <Button variant="contained" color="info" onClick={handleSubmit}>修改</Button>
+                    <Button variant="contained" onClick={handleBack}>取消</Button>
+                </Stack>
+            </DialogActions>
         </>)}
     </>)
 }
