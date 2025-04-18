@@ -74,6 +74,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         if (isNameEmpty) return
 
         item.note = item.note.trim()
+        item.clientIP = item.clientIP.trim()
 
         handleUpdateSubmit(item)
     }
@@ -92,6 +93,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         setAction('')
         setDnsHostKey(-1)
         setDnsHostNameError(false)
+        setDnsServerNameError(false)
     }
 
     const handleHostRowChange = (type: keyof DnsHostRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
