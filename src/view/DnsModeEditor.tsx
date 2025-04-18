@@ -110,7 +110,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 
         item.note = item.note.trim()
         item.domain = item.domain.trim()
-        item.host = item.host.trim()
+        item.host = processIP(item.host)
 
         dnsHostKey === -1 ? modeRow.hosts.push(item) : (modeRow.hosts[dnsHostKey] = item)
         handleBackToList()
@@ -165,18 +165,36 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     }
 
     const handleServerSubmit = () => {
-        const item = {...dnsServerRow}
+        let item = {...dnsServerRow}
         item.name = item.name.trim()
         setDnsServerNameError(!item.name)
         if (!item.name) return
 
         item.note = item.note.trim()
         item.address = item.address.trim()
-        item.domains = processDomain(item.domains)
-        item.expectIPs = processIP(item.expectIPs)
-        item.clientIP = item.clientIP.trim()
 
-        dnsServerKey === -1 ? modeRow.servers.push(item) : (modeRow.servers[dnsServerKey] = item)
+        if (item.type === 'object') {
+            item.domains = processDomain(item.domains)
+            item.expectIPs = processIP(item.expectIPs)
+            item.clientIP = item.clientIP.trim()
+        } else if (item.type === 'address') {
+            item = {
+                ...DEFAULT_DNS_SERVER_ROW,
+                ...{
+                    name: item.name,
+                    note: item.note,
+                    type: item.type,
+                    address: item.address,
+                }
+            }
+        }
+
+        if (dnsServerKey === -1) {
+            modeRow.servers.push(item)
+        } else {
+            modeRow.servers[dnsServerKey] = item
+        }
+
         handleBackToList()
     }
 
