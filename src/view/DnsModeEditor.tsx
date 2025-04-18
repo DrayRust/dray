@@ -309,7 +309,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 
             <DialogActions sx={{p: 2}}>
                 <Stack direction="row" spacing={2} sx={{width: '100%', justifyContent: "space-between", alignItems: "center"}}>
-                    <Button variant="contained" color="info" onClick={handleServerSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
+                    <Button variant="contained" color="info" onClick={handleServerSubmit}>{dnsServerKey === -1 ? '添加' : '修改'}</Button>
                     <Button variant="contained" onClick={handleBackToList}>返回</Button>
                 </Stack>
             </DialogActions>
