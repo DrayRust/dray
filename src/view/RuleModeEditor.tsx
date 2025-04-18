@@ -78,16 +78,17 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
+    const handleRuleBack = () => {
+        setAction('')
+        setRuleUpdateKey(-1)
+    }
+
+    // ====================================== create ======================================
     const [action, setAction] = useState('')
     const [ruleRow, setRuleRow] = useState<RuleRow>(DEFAULT_RULE)
     const handleRuleCreate = () => {
         setAction('create')
         setRuleRow(DEFAULT_RULE)
-    }
-
-    const handleRuleBack = () => {
-        setAction('')
-        setRuleUpdateKey(-1)
     }
 
     const [nameError, setNameError] = useState(false)
@@ -195,6 +196,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         return ok
     }
 
+    // ====================================== update ======================================
     const [ruleUpdateKey, setRuleUpdateKey] = useState(-1)
     const handleRuleUpdate = (key: number) => {
         setAction('update')
@@ -203,6 +205,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         if (item) setRuleRow(item)
     }
 
+    // ====================================== delete ======================================
     const handleRuleDelete = (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 “${name}” 这条规则吗？`, async () => {
             const rules = ruleModeList[ruleModeKey].rules?.filter((_, index) => index !== key) || []
@@ -219,6 +222,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
+    // ====================================== sort ======================================
     // 在 MacOS 上测试，tauri 内置浏览器支持原生 HTML 5 拖拽事件非常差，测试结果，仅支持 onDragStart onDragEnd
     // 本想通过 onDragStart onDragEnd 结合传统判断坐标位置实现拖拽排序，但是测试发现，clientX 和 clientY 参数在不同浏览器环境表现不一致，最终放弃使用 HTML 5 原生拖拽实现排序功能
     // 又不想通过 mouse move 事件来实现。主要实现后，要么难用，要么复杂，所以设计一个《点击排序的功能》来简化排序
