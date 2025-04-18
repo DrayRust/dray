@@ -44,6 +44,7 @@ export const Dns = () => {
         })()
     }, [])
 
+    // ============================== setting ==============================
     const handleDnsEnabled = async (checked: boolean) => {
         const newConf = {...dnsConfig, enable: checked}
         setDnsConfig(newConf)
@@ -66,6 +67,7 @@ export const Dns = () => {
         })()
     }
 
+    // ============================== base ==============================
     const [action, setAction] = useState('')
     const [row, setRow] = useState<DnsModeRow>(DEFAULT_DNS_MODE_ROW)
     const [nameError, setNameError] = useState(false)
@@ -87,6 +89,7 @@ export const Dns = () => {
         setDnsModeUpdateKey(-1)
     }
 
+    // ============================== create ==============================
     const handleCreate = () => {
         setAction('create')
         setRow(DEFAULT_DNS_MODE_ROW)
@@ -117,6 +120,7 @@ export const Dns = () => {
         setAction('import')
     }
 
+    // ============================== import ==============================
     const [dnsModeImportData, setDnsModeImportData] = useState('')
     const [errorImportData, setErrorImportData] = useState(false)
     const handleDnsModeImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,6 +186,7 @@ export const Dns = () => {
         }
     }
 
+    // ============================== export ==============================
     const [dnsModeExportData, setDnsModeExportData] = useState('')
     const [dnsModeChecked, setDnsModeChecked] = useState<number[]>([])
     const handleExport = () => {
@@ -208,6 +213,7 @@ export const Dns = () => {
         })
     }
 
+    // ============================== update ==============================
     const [dnsModeUpdateKey, setDnsModeUpdateKey] = useState(-1)
     const handleDnsModeUpdate = (key: number) => {
         setAction('update')
@@ -229,10 +235,12 @@ export const Dns = () => {
         handleBack()
     }
 
+    // ============================== view config ==============================
     const handleDnsModeViewConf = (_key: number) => {
 
     }
 
+    // ============================== delete ==============================
     const handleDnsModeDelete = (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
             if (dnsConfig.mode === key) {
@@ -256,6 +264,7 @@ export const Dns = () => {
         })
     }
 
+    // ============================== copy ==============================
     const [isCopied, setIsCopied] = useState(false)
     const handleDnsModeCopy = async (content: string) => {
         const ok = await clipboardWriteText(content)
@@ -263,6 +272,8 @@ export const Dns = () => {
         setIsCopied(true)
         setTimeout(() => setIsCopied(false), 2000)
     }
+
+    const widthSx = {p: 2, minWidth: 580}
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
     const {DialogComponent, dialogConfirm} = useDialog()
@@ -307,8 +318,8 @@ export const Dns = () => {
             </Stack>
         </> : dnsNav === 1 ? <>
             <Dialog open={action !== ''}>
-                <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
-                    {action === 'create' ? <>
+                {action === 'create' ? (
+                    <Stack spacing={2} sx={widthSx}>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
                             <TextField fullWidth size="small" label="模式名称"
                                        error={nameError} helperText={nameError ? "模式名称不能为空" : ""}
@@ -319,9 +330,11 @@ export const Dns = () => {
                             <Button variant="contained" color="info" onClick={handleCreateSubmit}>添加</Button>
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
-                    </> : action === 'update' ? (
-                        <DnsModeEditor dnsModeRow={row} handleUpdateSubmit={handleUpdateSubmit} handleBack={handleBack}/>
-                    ) : action === 'import' ? <>
+                    </Stack>
+                ) : action === 'update' ? (
+                    <DnsModeEditor dnsModeRow={row} handleUpdateSubmit={handleUpdateSubmit} handleBack={handleBack}/>
+                ) : action === 'import' ? (
+                    <Stack spacing={2} sx={widthSx}>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                             <TextField
                                 size="small" multiline rows={10}
@@ -336,7 +349,9 @@ export const Dns = () => {
                             <Button variant="contained" color="info" onClick={handleDnsModeImportSubmit}>确定</Button>
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
-                    </> : action === 'export' && <>
+                    </Stack>
+                ) : action === 'export' && (
+                    <Stack spacing={2} sx={widthSx}>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                             <TextField size="small" multiline disabled minRows={10} maxRows={16} label="导出内容（URI）" value={dnsModeExportData}/>
                         </Stack>
@@ -347,8 +362,8 @@ export const Dns = () => {
                             </div>
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
-                    </>}
-                </Stack>
+                    </Stack>
+                )}
             </Dialog>
 
             <Stack direction="row" spacing={1}>
