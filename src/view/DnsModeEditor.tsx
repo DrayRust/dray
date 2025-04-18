@@ -168,10 +168,10 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         <DialogComponent/>
         {action === 'host' ? (<>
             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="名称"
+                <TextField size="small" label="DNS 地址表名称"
                            error={dnsHostNameError} helperText={dnsHostNameError ? "名称不能为空" : ""}
                            value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
-                <TextField size="small" label="描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
+                <TextField size="small" label="DNS 地址表描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
                 <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
                 <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleHostRowChange('host')} multiline rows={2}/>
             </Stack>
@@ -191,7 +191,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
             </Stack>
 
             <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleHostCreate}>添加 DNS 静态地址</Button>
+                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleHostCreate}>添加 DNS 地址表</Button>
                 <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
             </Stack>
 
