@@ -64,23 +64,37 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         handleUpdateSubmit(item)
     }
 
-    const handleBackToList = () => {
-        setAction('')
-    }
-
     const [dnsHostKey, setDnsHostKey] = useState(-1)
     const [dnsHostRow, setDnsHostRow] = useState<DnsHostRow>(DEFAULT_DNS_HOST_ROW)
+    const [dnsHostNameError, setDnsHostNameError] = useState(false)
+
     const handleHostCreate = () => {
         setAction('host')
         setDnsHostRow(DEFAULT_DNS_HOST_ROW)
     }
 
+    const handleBackToList = () => {
+        setAction('')
+        setDnsHostKey(-1)
+    }
+
     const handleHostRowChange = (type: keyof DnsHostRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDnsHostRow({...dnsHostRow, [type]: e.target.value})
+        const value = e.target.value
+        if (type === 'name') setDnsHostNameError(!value.trim())
+        setDnsHostRow({...dnsHostRow, [type]: value})
     }
 
     const handleHostSubmit = () => {
-        dnsHostKey === -1 ? row.hosts.push(dnsHostRow) : (row.hosts[dnsHostKey] = dnsHostRow)
+        const item = {...dnsHostRow}
+        item.name = item.name.trim()
+        setDnsHostNameError(!item.name)
+        if (!item.name) return
+
+        item.note = item.note.trim()
+        item.domain = item.domain.trim()
+        item.host = item.host.trim()
+
+        dnsHostKey === -1 ? row.hosts.push(item) : (row.hosts[dnsHostKey] = item)
         handleBackToList()
     }
 
@@ -109,6 +123,17 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     }
 
     const handleHostSortEnd = (key: number) => {
+        if (hostSortKey === -1) return
+        if (hostSortKey === key) {
+            setHostSortKey(-1)
+            return
+        }
+
+        let hosts = [...row.hosts]
+        let [temp] = hosts.splice(hostSortKey, 1)
+        hosts.splice(key, 0, temp)
+        setHostSortKey(-1)
+        row.hosts = hosts
     }
 
     const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
@@ -143,14 +168,16 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         <DialogComponent/>
         {action === 'host' ? (<>
             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="名称" value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
+                <TextField size="small" label="名称"
+                           error={dnsHostNameError} helperText={dnsHostNameError ? "名称不能为空" : ""}
+                           value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
                 <TextField size="small" label="描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
                 <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
                 <TextField size="small" label="DNS 地址（每行一条）" value={dnsHostRow.host} onChange={handleHostRowChange('host')} multiline rows={2}/>
             </Stack>
 
             <div className="flex-between">
-                <Button variant="contained" color="info" onClick={handleHostSubmit}>添加</Button>
+                <Button variant="contained" color="info" onClick={handleHostSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
                 <Button variant="contained" onClick={handleBackToList}>返回</Button>
             </div>
         </>) : action === 'server' ? (<>
