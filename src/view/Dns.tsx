@@ -293,15 +293,17 @@ export const Dns = () => {
                 <Typography variant="body1" sx={{pl: 1}}>启用内置 DNS</Typography>
                 <Switch checked={dnsConfig.enable} onChange={(_, checked) => handleDnsEnabled(checked)}/>
             </div>
-            <TextField
-                select fullWidth size="small"
-                label="采用模式"
-                value={dnsConfig.mode}
-                onChange={handleDnsModeChange}>
-                {dnsModeList.map((item, index) => (
-                    <MenuItem key={index} value={index}>{item.name}</MenuItem>
-                ))}
-            </TextField>
+            {dnsModeList.length > 0 && (
+                <TextField
+                    select fullWidth size="small"
+                    label="采用模式"
+                    value={dnsConfig.mode}
+                    onChange={handleDnsModeChange}>
+                    {dnsModeList.map((item, index) => (
+                        <MenuItem key={index} value={index}>{item.name}</MenuItem>
+                    ))}
+                </TextField>
+            )}
             <Stack spacing={.5}>
                 <Alert severity="info">
                     DNS（Domain Name System，域名系统）是互联网的核心基础设施之一，其主要功能是将人类可读的域名（如 www.google.com）转换为计算机可识别的 IP 地址（如 142.250.190.14）
