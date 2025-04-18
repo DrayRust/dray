@@ -62,6 +62,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         })()
     }, [])
 
+    // ============================== setting ==============================
     const handleClose = () => {
         setOpen(false)
     }
@@ -82,6 +83,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         showChip('设置成功', 'success')
     }
 
+    // ============================== base ==============================
     const [action, setAction] = useState('')
     const [ruleModeImportData, setRuleModeImportData] = useState('')
     const [ruleModeExportData, setRuleModeExportData] = useState('')
@@ -107,6 +109,21 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         })
     }
 
+    const handleRuleModeCancel = () => {
+        setAction('')
+        setRuleModeConf('')
+        setRuleModeImportData('')
+        setRuleModeExportData('')
+        setRuleModeChecked([])
+        setErrorImportData(false)
+    }
+
+    // ============================== create ==============================
+    const handleRuleModeCreate = () => {
+        setAction('create')
+        setRuleModeRow(DEFAULT_RULE_MODE_ROW)
+    }
+
     const handleRuleModeSubmit = useDebounce(async () => {
         const newRuleModeRow = {...ruleModeRow}
         newRuleModeRow.name = newRuleModeRow.name.trim()
@@ -130,20 +147,12 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setAction('')
     }, 50)
 
-    const handleRuleModeCancel = () => {
-        setAction('')
-        setRuleModeConf('')
-        setRuleModeImportData('')
-        setRuleModeExportData('')
-        setRuleModeChecked([])
-        setErrorImportData(false)
+    // ============================== update ==============================
+    const handleRuleModeUpdate = (key: number) => {
+        setRuleModeKey(key)
     }
 
-    const handleRuleModeCreate = () => {
-        setAction('create')
-        setRuleModeRow(DEFAULT_RULE_MODE_ROW)
-    }
-
+    // ============================== import ==============================
     const handleRuleModeImport = () => {
         setAction('import')
     }
@@ -212,6 +221,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         }
     }
 
+    // ============================== export ==============================
     const handleRuleModeExport = () => {
         setAction('export')
 
@@ -226,18 +236,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setRuleModeExportData(arr.join('\n'))
     }
 
-    const [isCopied, setIsCopied] = useState(false)
-    const handleRuleModeCopy = async (content: string) => {
-        const ok = await clipboardWriteText(content)
-        if (!ok) return
-        setIsCopied(true)
-        setTimeout(() => setIsCopied(false), 2000)
-    }
-
-    const handleRuleModeUpdate = (key: number) => {
-        setRuleModeKey(key)
-    }
-
+    // ============================== viewConf ==============================
     const [ruleModeConf, setRuleModeConf] = useState('')
     const handleRuleModeViewConf = (key: number) => {
         setAction('viewConf')
@@ -250,6 +249,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         }
     }
 
+    // ============================== delete ==============================
     const handleRuleModeDelete = async (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 “${name}” 吗？`, async () => {
             if (ruleConfig.mode === key) {
@@ -272,6 +272,15 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
             setRuleModeList(newRuleModeList)
             setRuleModeChecked([])
         })
+    }
+
+    // ============================== copy ==============================
+    const [isCopied, setIsCopied] = useState(false)
+    const handleRuleModeCopy = async (content: string) => {
+        const ok = await clipboardWriteText(content)
+        if (!ok) return
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
     }
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
