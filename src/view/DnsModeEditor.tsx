@@ -120,6 +120,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const [hostSortKey, setHostSortKey] = useState(-1)
     const handleHostSortStart = (e: React.MouseEvent, key: number) => {
         e.stopPropagation()
+        setServerSortKey(-1)
         if (hostSortKey === -1) {
             setHostSortKey(key)
         } else if (hostSortKey === key) {
@@ -184,7 +185,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     }
 
     const handleServerRowNumberChange = (type: keyof DnsServerRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDnsServerRow({...dnsServerRow, [type]: Number(e.target.value)})
+        setDnsServerRow({...dnsServerRow, [type]: Number(e.target.value) || 0})
     }
 
     const handleServerRowSwitchChange = (type: string, value: boolean) => {
@@ -194,6 +195,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const [serverSortKey, setServerSortKey] = useState(-1)
     const handleServerSortStart = (e: React.MouseEvent, key: number) => {
         e.stopPropagation()
+        setHostSortKey(-1)
         if (hostSortKey === -1) {
             setServerSortKey(key)
         } else if (hostSortKey === key) {
@@ -261,7 +263,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 <TextField size="small" label="DNS 服务器地址" value={dnsServerRow.address} onChange={handleServerRowChange('address')}/>
 
                 {dnsServerRow.type === 'object' && (<>
-                    <TextField size="small" label="DNS 服务器端口" value={dnsServerRow.port} onChange={handleServerRowPortChange('port')}/>
+                    <TextField size="small" label="DNS 服务器端口" placeholder="不填写默认为: 53" value={dnsServerRow.port} onChange={handleServerRowPortChange('port')}/>
                     <TextField size="small" label="域名列表（每行一条）" value={dnsServerRow.domains} onChange={handleServerRowChange('domains')} multiline rows={2}/>
                     <TextField size="small" label="验证 IP 范围列表（每行一条）" value={dnsServerRow.expectIPs} onChange={handleServerRowChange('expectIPs')} multiline rows={2}/>
                     <TextField size="small" label="客户端 IP 地址 (clientIP)" value={dnsServerRow.clientIP} onChange={handleServerRowChange('clientIP')}/>
