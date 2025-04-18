@@ -42,21 +42,25 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 }) => {
     const [loading, setLoading] = useState(true)
     const [action, setAction] = useState('')
-    const [row, setRow] = useState<DnsModeRow>(DEFAULT_DNS_MODE_ROW)
+    const [modeRow, setModeRow] = useState<DnsModeRow>(DEFAULT_DNS_MODE_ROW)
+    const [dnsNameError, setDnsNameError] = useState(false)
     useEffect(() => {
-        setRow(dnsModeRow)
+        setModeRow(dnsModeRow)
         setLoading(false)
     }, [dnsModeRow])
 
     const handleRowChange = (type: keyof DnsModeRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRow({...row, [type]: e.target.value})
+        const value = e.target.value
+        if (type === 'name') setDnsNameError(!value.trim())
+        setModeRow({...modeRow, [type]: value})
     }
 
     const handleSubmit = () => {
-        let item: DnsModeRow = {...row}
+        let item: DnsModeRow = {...modeRow}
 
         item.name = item.name.trim()
         const isNameEmpty = item.name === ''
+        setDnsNameError(isNameEmpty)
         if (isNameEmpty) return
 
         item.note = item.note.trim()
@@ -94,19 +98,19 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         item.domain = item.domain.trim()
         item.host = item.host.trim()
 
-        dnsHostKey === -1 ? row.hosts.push(item) : (row.hosts[dnsHostKey] = item)
+        dnsHostKey === -1 ? modeRow.hosts.push(item) : (modeRow.hosts[dnsHostKey] = item)
         handleBackToList()
     }
 
     const handleHostUpdate = (key: number) => {
         setAction('host')
         setDnsHostKey(key)
-        setDnsHostRow(row.hosts[key] || DEFAULT_DNS_HOST_ROW)
+        setDnsHostRow(modeRow.hosts[key] || DEFAULT_DNS_HOST_ROW)
     }
 
     const handleHostDelete = (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
-            row.hosts = row.hosts.filter((_, index) => index !== key) || []
+            modeRow.hosts = modeRow.hosts.filter((_, index) => index !== key) || []
         })
     }
 
@@ -129,11 +133,11 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
             return
         }
 
-        let hosts = [...row.hosts]
+        let hosts = [...modeRow.hosts]
         let [temp] = hosts.splice(hostSortKey, 1)
         hosts.splice(key, 0, temp)
         setHostSortKey(-1)
-        row.hosts = hosts
+        modeRow.hosts = hosts
     }
 
     const [dnsServerRow, setDnsServerRow] = useState<DnsServerRow>(DEFAULT_DNS_SERVER_ROW)
@@ -186,8 +190,10 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
             <LoadingCard height="160px"/>
         ) : (<>
             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                <TextField size="small" label="模式名称" value={row.name} onChange={handleRowChange('name')}/>
-                <TextField size="small" label="模式描述" value={row.note} onChange={handleRowChange('note')} multiline rows={2}/>
+                <TextField size="small" label="模式名称"
+                           error={dnsNameError} helperText={dnsNameError ? "模式名称不能为空" : ""}
+                           value={modeRow.name} onChange={handleRowChange('name')}/>
+                <TextField size="small" label="模式描述" value={modeRow.note} onChange={handleRowChange('note')} multiline rows={2}/>
             </Stack>
 
             <Stack direction="row" spacing={2}>
@@ -195,14 +201,14 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
             </Stack>
 
-            {row.hosts.length === 0 && row.servers.length === 0 ? (
+            {modeRow.hosts.length === 0 && modeRow.servers.length === 0 ? (
                 <ErrorCard errorMsg="暂无内容" height="160px"/>
             ) : (<>
-                {row.hosts.length > 0 && (
+                {modeRow.hosts.length > 0 && (
                     <TableContainer component={Card}>
                         <Table size="small">
                             <TableBody>
-                                {row.hosts.map((row, key) => (
+                                {modeRow.hosts.map((row, key) => (
                                     <TableRow
                                         key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                         className={hostSortKey > -1 ? (hostSortKey === key ? 'sort-current' : 'sort-target') : ''}
@@ -229,11 +235,11 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                     </TableContainer>
                 )}
 
-                {row.servers.length > 0 && (
+                {modeRow.servers.length > 0 && (
                     <TableContainer component={Card}>
                         <Table size="small">
                             <TableBody>
-                                {row.servers.map((row, key) => (
+                                {modeRow.servers.map((row, key) => (
                                     <TableRow
                                         key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                         className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
