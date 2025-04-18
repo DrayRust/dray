@@ -80,6 +80,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const handleBackToList = () => {
         setAction('')
         setDnsHostKey(-1)
+        setDnsHostNameError(false)
     }
 
     const handleHostRowChange = (type: keyof DnsHostRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,7 +174,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
         {action === 'host' ? (<>
             <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
                 <TextField size="small" label="DNS 地址表名称"
-                           error={dnsHostNameError} helperText={dnsHostNameError ? "名称不能为空" : ""}
+                           error={dnsHostNameError} helperText={dnsHostNameError ? "不能为空" : ""}
                            value={dnsHostRow.name} onChange={handleHostRowChange('name')}/>
                 <TextField size="small" label="DNS 地址表描述" value={dnsHostRow.note} onChange={handleHostRowChange('note')} multiline rows={2}/>
                 <TextField size="small" label="DNS 域名" value={dnsHostRow.domain} onChange={handleHostRowChange('domain')}/>
@@ -185,7 +186,10 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 <Button variant="contained" onClick={handleBackToList}>返回</Button>
             </div>
         </>) : action === 'server' ? (<>
-
+            <div className="flex-between">
+                <Button variant="contained" color="info" onClick={handleHostSubmit}>{dnsHostKey === -1 ? '添加' : '修改'}</Button>
+                <Button variant="contained" onClick={handleBackToList}>返回</Button>
+            </div>
         </>) : loading ? (
             <LoadingCard height="160px"/>
         ) : (<>
@@ -198,12 +202,11 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 
             <Stack direction="row" spacing={2}>
                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleHostCreate}>添加 DNS 地址表</Button>
-                <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
             </Stack>
 
             {modeRow.hosts.length === 0 ? (
                 <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
-            ) : modeRow.hosts.length > 0 && (
+            ) : (
                 <TableContainer component={Card}>
                     <Table size="small">
                         <TableBody>
@@ -234,9 +237,13 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                 </TableContainer>
             )}
 
+            <Stack direction="row" spacing={2}>
+                <Button variant="contained" color="success" startIcon={<AddIcon/>} onClick={handleServerCreate}>添加 DNS 服务器</Button>
+            </Stack>
+
             {modeRow.servers.length === 0 ? (
-                <ErrorCard errorMsg="暂无 DNS 地址表" height="160px"/>
-            ) : modeRow.servers.length > 0 && (
+                <ErrorCard errorMsg="暂无 DNS 服务器" height="160px"/>
+            ) : (
                 <TableContainer component={Card}>
                     <Table size="small">
                         <TableBody>
