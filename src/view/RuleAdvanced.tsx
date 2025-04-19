@@ -25,7 +25,7 @@ import { saveRuleConfig, readRuleModeList, saveRuleModeList } from "../util/invo
 import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
-import { modeRulesToConf } from "../util/rule.ts"
+import { ruleModeToConf } from "../util/rule.ts"
 import { rayRuleChange } from "../util/ray.ts"
 import { updateProxyPAC } from "../util/proxy.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
@@ -242,7 +242,7 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
         setAction('viewConf')
         const ruleMode = ruleModeList[key]
         if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
-            const rules = modeRulesToConf(ruleMode.rules)
+            const rules = ruleModeToConf(ruleMode.rules)
             setRuleModeConf(JSON.stringify(rules, null, 2))
         } else {
             setRuleModeConf('')

@@ -11,7 +11,7 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
         const ruleMode = ruleModeList[ruleConfig.mode]
         if (ruleMode && Array.isArray(ruleMode.rules) && ruleMode.rules.length > 0) {
             domainStrategy = ruleMode.domainStrategy
-            rules = [...rules, ...modeRulesToConf(ruleMode.rules)]
+            rules = [...rules, ...ruleModeToConf(ruleMode.rules)]
         }
     }
 
@@ -34,10 +34,10 @@ export function ruleToConf(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleM
     }
 }
 
-export function modeRulesToConf(modeRules: RuleRow[]): any[] {
+export function ruleModeToConf(row: RuleRow[]): any[] {
     let rules = []
-    for (let i = 0; i < modeRules.length; i++) {
-        const v = modeRules[i]
+    for (let i = 0; i < row.length; i++) {
+        const v = row[i]
         let rule: any = {
             type: 'field',
             ruleTag: `${i + 1}-dray-mode-${v.outboundTag}`,
