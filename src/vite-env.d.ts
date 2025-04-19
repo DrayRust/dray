@@ -176,6 +176,7 @@ interface SubscriptionRow {
     note: string; // 订阅描述
     url: string; // 订阅 URL
     isProxy: boolean; // 是否使用代理下载订阅
+    isHtml: boolean; // 是否为 HTML 页面，如果为 HTML 页面，程序将正则自动解析
 }
 
 type SubscriptionList = SubscriptionRow[];
