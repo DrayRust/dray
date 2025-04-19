@@ -43,6 +43,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const handleBack = () => {
         setAction('')
         setUpdateKey(-1)
+        setSubscriptionChecked([])
     }
 
     const handleRowChange = (type: keyof SubscriptionRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,8 +101,24 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                 showAlertDialog('删除失败')
             } else {
                 setSubscriptionList([...newList])
+                handleBack()
             }
         })
+    }
+
+    const handleBatchDelete = () => {
+        if (subscriptionChecked.length > 0) {
+            dialogConfirm('确认删除', `确定要删除这 ${subscriptionChecked.length} 个服务器吗？`, async () => {
+                const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
+                const ok = await saveSubscriptionList(newList)
+                if (!ok) {
+                    showAlertDialog('删除失败', 'error')
+                } else {
+                    setSubscriptionList([...newList])
+                    handleBack()
+                }
+            })
+        }
     }
 
     const height = 'calc(100vh - 70px)'
@@ -129,6 +146,9 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
 
         <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
             <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
+            {subscriptionChecked.length > 0 && (<>
+                <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
+            </>)}
         </Stack>
         <Stack spacing={1}>
             {loading ? (
@@ -145,7 +165,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Checkbox value={key} checked={subscriptionChecked.includes(key)} onChange={handleCheckedChange}/>
                                     </TableCell>
                                     <TableCell component="th" scope="row">
-                                        <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
+                                        <Typography variant="h6" component="div">{row.name}</Typography>
                                         <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                     </TableCell>
                                     <TableCell align="right">
