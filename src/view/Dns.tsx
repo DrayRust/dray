@@ -23,8 +23,9 @@ import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
-import { dnsModeToConf } from "../util/dns.ts"
 import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
+import { dnsModeToConf } from "../util/dns.ts"
+import { rayDnsChange } from "../util/ray.ts"
 
 export const Dns = () => {
     const [loading, setLoading] = useState(true)
@@ -65,6 +66,8 @@ export const Dns = () => {
                 showAlertDialog('设置失败', 'error')
                 return
             }
+
+            rayDnsChange(dnsConfig, dnsModeList)
         })()
     }
 
@@ -244,7 +247,8 @@ export const Dns = () => {
         const row = dnsModeList[key]
         if (!row) return
 
-        setDnsModeViewJson(dnsModeToConf(row))
+        const dns = dnsModeToConf(row)
+        setDnsModeViewJson(JSON.stringify(dns, null, 2))
     }
 
     // ============================== delete ==============================

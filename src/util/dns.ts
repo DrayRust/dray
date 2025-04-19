@@ -1,4 +1,4 @@
-export function dnsModeToConf(row: DnsModeRow): string {
+export function dnsModeToConf(row: DnsModeRow) {
     const dns: any = {}
     dns.tag = 'dray-dns'
     if (Array.isArray(row.hosts) && row.hosts.length > 0) {
@@ -43,5 +43,5 @@ export function dnsModeToConf(row: DnsModeRow): string {
     if (row.disableFallback) dns.disableFallback = true
     if (row.disableFallbackIfMatch) dns.disableFallbackIfMatch = true
 
-    return JSON.stringify(dns, null, 2)
+    return dns
 }

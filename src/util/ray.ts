@@ -1,6 +1,7 @@
 import { readRayConfig, restartRay, saveRayCommonConfig, saveRayConfig } from "./invoke.ts"
 import { getStatsConf } from "./serverConf.ts"
 import { ruleToConf } from "./rule.ts"
+import { dnsModeToConf } from "./dns.ts"
 
 export function getSocksConf(config: AppConfig, rayCommonConfig: RayCommonConfig) {
     return {
@@ -35,6 +36,26 @@ export function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ru
             // 生成配置文件
             const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
             const conf = {...rayConfig, ...routing}
+            const ok = await saveRayConfig(conf)
+            if (ok) {
+                restartRay()
+            }
+        }
+    })()
+}
+
+export function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
+    (async () => {
+        const rayConfig = await readRayConfig()
+        if (rayConfig) {
+            let conf = {...rayConfig}
+            if (dnsConfig.enable) {
+                const row = dnsModeList[dnsConfig.mode]
+                if (row) conf.dns = dnsModeToConf(row)
+            } else {
+                delete conf.dns
+            }
+
             const ok = await saveRayConfig(conf)
             if (ok) {
                 restartRay()
