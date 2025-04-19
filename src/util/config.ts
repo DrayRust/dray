@@ -447,7 +447,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
     {
         "name": "Google DNS 优先模式",
         "note": "优先使用 Google DNS 解析，其次使用阿里云 DNS",
-        "hash": "cb5875c00d74b078fc86171239a2480559778b79a780e52bd6a6fdd54f9eec0c",
+        "hash": "b35161a6822e9634f917f0774669969fab556636914a438bb453d75e941db9cb",
         "hosts": [
             {
                 "name": "Google DNS",
@@ -471,7 +471,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
         "servers": [
             {
                 "name": "Google DNS",
-                "note": "使用 Google DNS 系统解析域名",
+                "note": "使用 Google DNS 解析域名",
                 "type": "address",
                 "address": "8.8.8.8",
                 "port": "",
@@ -485,7 +485,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
             },
             {
                 "name": "阿里云 DNS",
-                "note": "使用阿里云 DNS 解析域名数据库中的中国大陆域名",
+                "note": "使用阿里云 DNS 解析域名",
                 "type": "address",
                 "address": "223.5.5.5",
                 "port": "",
