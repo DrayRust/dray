@@ -1,3 +1,12 @@
+export function dnsToConf(dnsConfig: DnsConfig, dnsModeList: DnsModeList): any {
+    if (!dnsConfig.enable) return {}
+    const row = dnsModeList[dnsConfig.mode]
+    if (row) {
+        return {dns: dnsModeToConf(row)}
+    }
+    return {}
+}
+
 export function dnsModeToConf(row: DnsModeRow) {
     const dns: any = {}
     dns.tag = 'dray-dns'

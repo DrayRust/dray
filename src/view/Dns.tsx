@@ -23,17 +23,14 @@ import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
-import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
+import { DEFAULT_DNS_CONFIG, DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 import { dnsModeToConf } from "../util/dns.ts"
 import { rayDnsChange } from "../util/ray.ts"
 
 export const Dns = () => {
     const [loading, setLoading] = useState(true)
     const [dnsNav, setDnsNav] = useState(0)
-    const [dnsConfig, setDnsConfig] = useState<DnsConfig>({
-        enable: false,
-        mode: 0,
-    })
+    const [dnsConfig, setDnsConfig] = useState<DnsConfig>(DEFAULT_DNS_CONFIG)
     const [dnsModeList, setDnsModeList] = useState<DnsModeList>([])
     useEffect(() => {
         (async () => {

@@ -338,6 +338,11 @@ export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     disableFallbackIfMatch: false,
 }
 
+export const DEFAULT_DNS_CONFIG: DnsConfig = {
+    enable: false,
+    mode: 0,
+}
+
 export const DEFAULT_DNS_MODE_LIST: DnsModeList = []
 
 export const DEFAULT_DNS_TABLE_LIST: DnsTableList = [

@@ -20,10 +20,19 @@ import { useServerImport } from "../component/useServerImport.tsx"
 import { useDebounce } from '../hook/useDebounce.ts'
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
-    restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList
+    restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList, readDnsConfig, readDnsModeList
 } from "../util/invoke.ts"
 import { getConf } from "../util/serverConf.ts"
-import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG, DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
+import {
+    DEFAULT_APP_CONFIG,
+    DEFAULT_DNS_CONFIG,
+    DEFAULT_DNS_MODE_LIST,
+    DEFAULT_RAY_COMMON_CONFIG,
+    DEFAULT_RULE_CONFIG,
+    DEFAULT_RULE_DOMAIN,
+    DEFAULT_RULE_MODE_LIST
+} from "../util/config.ts"
+import { dnsToConf } from "../util/dns.ts"
 import { ruleToConf } from "../util/rule.ts"
 import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
 
@@ -139,6 +148,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     let ruleConfig: RuleConfig
     let ruleDomain: RuleDomain
     let ruleModeList: RuleModeList
+    let dnsConfig: DnsConfig
+    let dnsModeList: DnsModeList
     const initConfig = async () => {
         if (!appDir) appDir = await getDrayAppDir()
         if (!config) config = await readAppConfig() || DEFAULT_APP_CONFIG
@@ -147,6 +158,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!ruleConfig) ruleConfig = await readRuleConfig() || DEFAULT_RULE_CONFIG
         if (!ruleDomain) ruleDomain = await readRuleDomain() || DEFAULT_RULE_DOMAIN
         if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
+
+        if (!dnsConfig) dnsConfig = await readDnsConfig() || DEFAULT_DNS_CONFIG
+        if (!dnsModeList) dnsModeList = await readDnsModeList() || DEFAULT_DNS_MODE_LIST
     }
 
     const getServerConf = async (callback: (conf: any) => void) => {
@@ -154,8 +168,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
             const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
             if (conf) {
+                const dns = dnsToConf(dnsConfig, dnsModeList)
                 const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
-                callback({...conf, ...routing})
+                callback({...conf, ...dns, ...routing})
             } else {
                 showSnackbar('生成 conf 失败', 'error')
             }
