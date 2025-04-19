@@ -47,7 +47,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const [modeRow, setModeRow] = useState<DnsModeRow>(DEFAULT_DNS_MODE_ROW)
     const [dnsNameError, setDnsNameError] = useState(false)
     useEffect(() => {
-        setModeRow(dnsModeRow)
+        setModeRow({...dnsModeRow})
         setLoading(false)
     }, [dnsModeRow])
 
@@ -292,8 +292,8 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                     <TextField size="small" label="DNS 服务器描述" value={dnsServerRow.note} onChange={handleServerRowChange('note')} multiline rows={2}/>
 
                     <TextField select fullWidth size="small" label="DNS 服务器类型" value={dnsServerRow.type} onChange={handleServerRowChange('type')}>
-                        <MenuItem value="address">简单类型</MenuItem>
-                        <MenuItem value="object">复杂类型</MenuItem>
+                        <MenuItem value="address">简洁类型</MenuItem>
+                        <MenuItem value="object">精细类型</MenuItem>
                     </TextField>
 
                     <TextField size="small" label="DNS 服务器地址" value={dnsServerRow.address} onChange={handleServerRowChange('address')}/>
