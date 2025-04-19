@@ -181,9 +181,10 @@ pub fn set_auto_setup_https(value: bool) -> bool {
     set_config(|config| config.auto_setup_https = value)
 }
 
-const ALLOWED_CONFIG_FILES: [&str; 8] = [
+const ALLOWED_CONFIG_FILES: [&str; 9] = [
     "ray_common_config.json",
     "server.json",
+    "subscription.json",
     "rule_config.json",
     "rule_domain.json",
     "rule_mode_list.json",
