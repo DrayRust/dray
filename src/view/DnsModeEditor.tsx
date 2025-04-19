@@ -362,9 +362,9 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                             onClick={() => handleHostSortEnd(key)}>
                                             <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
                                                 <Typography variant="body1" component="div">{row.name}</Typography>
-                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                                {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
-                                            <TableCell sx={{p: '4px 8px'}} align="right">
+                                            <TableCell sx={{p: '4px 8px'}} width="140" align="right">
                                                 <Tooltip title="排序" arrow placement="top">
                                                     <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
@@ -399,9 +399,9 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                             onClick={() => handleServerSortEnd(key)}>
                                             <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
                                                 <Typography variant="body1" component="div">{row.name}</Typography>
-                                                <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                                {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
-                                            <TableCell sx={{p: '4px 8px'}} align="right">
+                                            <TableCell sx={{p: '4px 8px'}} width="140" align="right">
                                                 <Tooltip title="排序" arrow placement="top">
                                                     <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
