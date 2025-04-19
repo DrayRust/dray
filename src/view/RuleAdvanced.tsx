@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Box, Card, Checkbox, Drawer, Stack, TextField, MenuItem, Button, Typography,
+    Card, Checkbox, Stack, TextField, MenuItem, Button, Typography,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -38,9 +38,8 @@ const DEFAULT_RULE_MODE_ROW: RuleModeRow = {
     rules: []
 }
 
-export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDomain}: {
-    open: boolean,
-    setOpen: (open: boolean) => void,
+export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain}: {
+    handleClose: () => void,
     ruleConfig: RuleConfig,
     setRuleConfig: React.Dispatch<React.SetStateAction<RuleConfig>>,
     ruleDomain: RuleDomain,
@@ -63,10 +62,6 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
     }, [])
 
     // ============================== setting ==============================
-    const handleClose = () => {
-        setOpen(false)
-    }
-
     const handleRuleConfigChange = (name: keyof RuleConfig) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRuleConfig(prev => ({...prev, [name]: e.target.value}))
     }
@@ -289,139 +284,135 @@ export const RuleAdvanced = ({open, setOpen, ruleConfig, setRuleConfig, ruleDoma
     return (<>
         <AlertDialogComponent/>
         <DialogComponent/>
-        <Drawer anchor="right" open={open} onClose={handleClose}>
-            <Box sx={{p: 2}}>
-                <Stack spacing={2} sx={{minWidth: '650px'}}>
-                    <DoubleArrowIcon onClick={handleClose}/>
-                    <BottomNavigation
-                        sx={{mb: 2, mt: 1}}
-                        component={Card}
-                        showLabels value={tab}
-                        onChange={(_, v) => setTab(v)}>
-                        <BottomNavigationAction label="访问策略" icon={<ForkRightIcon/>}/>
-                        <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
-                    </BottomNavigation>
-                    {tab === 0 ? (<>
-                        <TextField
-                            select fullWidth size="small"
-                            label="未匹配上的域名"
-                            value={ruleConfig.unmatchedStrategy}
-                            onChange={handleRuleConfigChange('unmatchedStrategy')}>
-                            <MenuItem value="proxy">代理访问</MenuItem>
-                            <MenuItem value="direct">直接访问</MenuItem>
-                        </TextField>
-                        <TextField
-                            select fullWidth size="small"
-                            label="采用模式"
-                            value={ruleConfig.mode}
-                            onChange={handleRuleConfigChange('mode')}>
-                            {ruleModeList.map((item, index) => (
-                                <MenuItem key={index} value={index}>{item.name}</MenuItem>
-                            ))}
-                        </TextField>
-                        <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
-                            <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
-                            <ChipComponent/>
-                        </Stack>
-                    </>) : tab === 1 && (<>
-                        {ruleModeKey > -1 ? (<>
-                            <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
-                        </>) : action === 'create' ? (<>
-                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField
-                                    size="small"
-                                    label="模式名称"
-                                    error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
-                                    value={ruleModeRow.name}
-                                    onChange={handleRuleModeChange('name')}
-                                />
-                                <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeChange('note')} multiline rows={2}/>
-                            </Stack>
-                            <div className="flex-between">
-                                <Button variant="contained" color="info" onClick={handleRuleModeSubmit}>添加</Button>
-                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </div>
-                        </>) : action === 'import' ? (<>
-                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField
-                                    size="small" multiline rows={10}
-                                    label="导入内容（URI）"
-                                    placeholder="每行一条，例如：drayRule://xxxxxx"
-                                    error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
-                                    value={ruleModeImportData}
-                                    onChange={handleRuleModeImportDataChange}
-                                />
-                            </Stack>
-                            <div className="flex-between">
-                                <Button variant="contained" color="info" onClick={handleRuleModeImportSubmit}>确定</Button>
-                                <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
-                            </div>
-                        </>) : action === 'export' ? (<>
-                            <div className="flex-between">
-                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                                <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制导出内容'}>
-                                    <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
-                                </Tooltip>
-                            </div>
-                            <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={ruleModeExportData}/>
-                            </Stack>
-                        </>) : action === 'viewConf' ? (<>
-                            <div className="flex-between">
-                                <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                                {ruleModeConf && (
-                                    <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制规则配置'}>
-                                        <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
-                                    </Tooltip>
-                                )}
-                            </div>
-                            {ruleModeConf ? (
-                                <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                                    <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
-                                </Stack>
-                            ) : (
-                                <ErrorCard errorMsg="没有规则" height="160px"/>
-                            )}
-                        </>) : (<>
-                            <Stack direction="row" spacing={1}>
-                                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleModeCreate}>添加</Button>
-                                <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleRuleModeImport}>导入</Button>
-                                {ruleModeChecked.length > 0 && (
-                                    <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleRuleModeExport}>导出</Button>
-                                )}
-                            </Stack>
-                            <TableContainer component={Card}>
-                                <Table>
-                                    <TableBody>
-                                        {ruleModeList.map((row, key) => (
-                                            <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox value={key} checked={ruleModeChecked.includes(key)} onChange={handleRuleModeCheckedChange}/>
-                                                </TableCell>
-                                                <TableCell component="th" scope="row">
-                                                    <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
-                                                    <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    <Tooltip title="设置" arrow placement="top">
-                                                        <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
-                                                    </Tooltip>
-                                                    <Tooltip title="查看配置" arrow placement="top">
-                                                        <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
-                                                    </Tooltip>
-                                                    <Tooltip title="删除" arrow placement="top">
-                                                        <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                                    </Tooltip>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </>)}
-                    </>)}
+        <Stack spacing={2} sx={{p: 2, minWidth: '700px'}}>
+            <DoubleArrowIcon onClick={handleClose}/>
+            <BottomNavigation
+                sx={{mb: 2, mt: 1}}
+                component={Card}
+                showLabels value={tab}
+                onChange={(_, v) => setTab(v)}>
+                <BottomNavigationAction label="访问策略" icon={<ForkRightIcon/>}/>
+                <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
+            </BottomNavigation>
+            {tab === 0 ? (<>
+                <TextField
+                    select fullWidth size="small"
+                    label="未匹配上的域名"
+                    value={ruleConfig.unmatchedStrategy}
+                    onChange={handleRuleConfigChange('unmatchedStrategy')}>
+                    <MenuItem value="proxy">代理访问</MenuItem>
+                    <MenuItem value="direct">直接访问</MenuItem>
+                </TextField>
+                <TextField
+                    select fullWidth size="small"
+                    label="采用模式"
+                    value={ruleConfig.mode}
+                    onChange={handleRuleConfigChange('mode')}>
+                    {ruleModeList.map((item, index) => (
+                        <MenuItem key={index} value={index}>{item.name}</MenuItem>
+                    ))}
+                </TextField>
+                <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                    <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
+                    <ChipComponent/>
                 </Stack>
-            </Box>
-        </Drawer>
+            </>) : tab === 1 && (<>
+                {ruleModeKey > -1 ? (<>
+                    <RuleModeEditor ruleModeList={ruleModeList} setRuleModeList={setRuleModeList} ruleModeKey={ruleModeKey} setRuleModeKey={setRuleModeKey}/>
+                </>) : action === 'create' ? (<>
+                    <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                        <TextField
+                            size="small"
+                            label="模式名称"
+                            error={errorName} helperText={errorName ? '模式名称不能为空' : ''}
+                            value={ruleModeRow.name}
+                            onChange={handleRuleModeChange('name')}
+                        />
+                        <TextField size="small" label="模式描述" value={ruleModeRow.note} onChange={handleRuleModeChange('note')} multiline rows={2}/>
+                    </Stack>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleRuleModeSubmit}>添加</Button>
+                        <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
+                    </div>
+                </>) : action === 'import' ? (<>
+                    <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                        <TextField
+                            size="small" multiline rows={10}
+                            label="导入内容（URI）"
+                            placeholder="每行一条，例如：drayRule://xxxxxx"
+                            error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
+                            value={ruleModeImportData}
+                            onChange={handleRuleModeImportDataChange}
+                        />
+                    </Stack>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleRuleModeImportSubmit}>确定</Button>
+                        <Button variant="contained" onClick={handleRuleModeCancel}>取消</Button>
+                    </div>
+                </>) : action === 'export' ? (<>
+                    <div className="flex-between">
+                        <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
+                        <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制导出内容'}>
+                            <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
+                        </Tooltip>
+                    </div>
+                    <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                        <TextField size="small" multiline disabled minRows={10} maxRows={20} label="导出内容（URI）" value={ruleModeExportData}/>
+                    </Stack>
+                </>) : action === 'viewConf' ? (<>
+                    <div className="flex-between">
+                        <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
+                        {ruleModeConf && (
+                            <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制规则配置'}>
+                                <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        )}
+                    </div>
+                    {ruleModeConf ? (
+                        <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                            <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
+                        </Stack>
+                    ) : (
+                        <ErrorCard errorMsg="没有规则" height="160px"/>
+                    )}
+                </>) : (<>
+                    <Stack direction="row" spacing={1}>
+                        <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleRuleModeCreate}>添加</Button>
+                        <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleRuleModeImport}>导入</Button>
+                        {ruleModeChecked.length > 0 && (
+                            <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleRuleModeExport}>导出</Button>
+                        )}
+                    </Stack>
+                    <TableContainer component={Card}>
+                        <Table>
+                            <TableBody>
+                                {ruleModeList.map((row, key) => (
+                                    <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox value={key} checked={ruleModeChecked.includes(key)} onChange={handleRuleModeCheckedChange}/>
+                                        </TableCell>
+                                        <TableCell component="th" scope="row">
+                                            <Typography gutterBottom variant="h6" component="div">{row.name}</Typography>
+                                            <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <Tooltip title="设置" arrow placement="top">
+                                                <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="查看配置" arrow placement="top">
+                                                <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="删除" arrow placement="top">
+                                                <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </>)}
+            </>)}
+        </Stack>
     </>)
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Paper, Card, TextField, ToggleButtonGroup, ToggleButton,
+    Paper, Card, TextField, ToggleButtonGroup, ToggleButton, Drawer,
     Stack, Button, Alert, Typography, Switch,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -88,9 +88,14 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
     }
 
+    // ============================== advanced ==============================
     const [open, setOpen] = useState(false)
     const handleOpenAdvanced = () => {
         setOpen(true)
+    }
+
+    const handleClose = () => {
+        setOpen(false)
     }
 
     const {ChipComponent, showChip} = useChip()
@@ -166,7 +171,10 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                 {ruleMode === 'dns' && <Dns/>}
             </Card>
         </Paper>
-        <RuleAdvanced open={open} setOpen={setOpen} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig} ruleDomain={ruleDomain}/>
+
+        <Drawer anchor="right" open={open} onClose={handleClose}>
+            <RuleAdvanced handleClose={handleClose} ruleConfig={ruleConfig} setRuleConfig={setRuleConfig} ruleDomain={ruleDomain}/>
+        </Drawer>
     </>)
 }
 
