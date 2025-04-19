@@ -325,6 +325,11 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
     }
 ]
 
+export const DEFAULT_DNS_CONFIG: DnsConfig = {
+    enable: false,
+    mode: 0,
+}
+
 export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     name: '',
     note: '',
@@ -336,11 +341,6 @@ export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     disableCache: false,
     disableFallback: false,
     disableFallbackIfMatch: false,
-}
-
-export const DEFAULT_DNS_CONFIG: DnsConfig = {
-    enable: false,
-    mode: 0,
 }
 
 export const DEFAULT_DNS_MODE_LIST: DnsModeList = []
