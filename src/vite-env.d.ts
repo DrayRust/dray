@@ -170,6 +170,16 @@ interface TrojanRow {
     path: string; // (ws) 伪装路径 path / (grpc) 伪装主机名 SNI = Server Name Indication 如：example.com
 }
 
+// ============= subscription ============
+interface SubscriptionRow {
+    name: string; // 订阅名称
+    note: string; // 订阅描述
+    url: string; // 订阅 URL
+    isProxy: boolean; // 是否使用代理下载订阅
+}
+
+type SubscriptionList = SubscriptionRow[];
+
 // ============= rule ============
 interface RuleConfig {
     globalProxy: boolean; // 是否全局代理
