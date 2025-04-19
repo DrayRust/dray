@@ -337,7 +337,7 @@ export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     hosts: [],
     servers: [],
     clientIP: '',
-    queryStrategy: '',
+    queryStrategy: 'UseIP',
     disableCache: false,
     disableFallback: false,
     disableFallbackIfMatch: false,

@@ -31,7 +31,7 @@ const DEFAULT_DNS_SERVER_ROW: DnsServerRow = {
     domains: '',
     expectIPs: '',
     clientIP: '',
-    queryStrategy: '',
+    queryStrategy: 'UseIP',
     timeoutMs: 4000,
     skipFallback: false,
     allowUnexpectedIPs: false,
@@ -308,7 +308,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 
                         <SelectField
                             label="DNS 查询策略 (queryStrategy)" id="dns-mode-server-query-strategy"
-                            value={dnsServerRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                            value={dnsServerRow.queryStrategy} options={['UseIP', 'UseIPv4', 'UseIPv6']}
                             onChange={(value) => handleServerRowSelectChange('queryStrategy', value)}/>
 
                         <TextField size="small" label="查询超时时间（单位：毫秒）" value={dnsServerRow.timeoutMs} onChange={handleServerRowNumberChange('timeoutMs')}/>
@@ -427,7 +427,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
 
                         <SelectField
                             label="全局 DNS 查询策略 (queryStrategy)" id="dns-mode-query-strategy"
-                            value={modeRow.queryStrategy || 'UseIP'} options={['UseIP', 'UseIPv4', 'UseIPv6']}
+                            value={modeRow.queryStrategy} options={['UseIP', 'UseIPv4', 'UseIPv6']}
                             onChange={(value) => handleRowSelectChange('queryStrategy', value)}/>
 
                         <Stack spacing={0.5}>
