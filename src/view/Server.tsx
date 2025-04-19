@@ -50,10 +50,16 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
     useEffect(() => readList(), [])
 
+    // ============================== create & update ==============================
     const handleCreate = () => {
         navigate(`/server_create`)
     }
 
+    const handleUpdate = () => {
+        navigate(`/server_update?key=${selectedKey}`)
+    }
+
+    // ============================== clipboard import ==============================
     const handleClipboardImport = async () => {
         try {
             const text = await clipboardReadText()
@@ -71,6 +77,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         navigate(`/server_import`)
     }
 
+    // ============================== export ==============================
     const handleExport = () => {
         const selectedKeys = getSelectedKeys()
         navigate(`/server_export`, {state: {selectedKeys}})
@@ -84,6 +91,33 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         return selectedKeys
     }
 
+    // ============================== select ==============================
+    useEffect(() => {
+        if (serverList) setSelectedServers(new Array(serverList.length).fill(false))
+    }, [serverList])
+
+    const handleSelectAll = (checked: boolean) => {
+        setSelectedServers(new Array(serverList?.length).fill(checked))
+        setSelectedAll(checked)
+        setShowAction(checked)
+    }
+
+    const handleSelectServer = (index: number, checked: boolean) => {
+        const newSelected = [...selectedServers]
+        newSelected[index] = checked
+        setSelectedServers(newSelected)
+        setSelectedAll(newSelected.every(Boolean))
+        setShowAction(newSelected.some(Boolean))
+    }
+
+    const updateServerList = (newServerList: ServerList) => {
+        setServerList(newServerList)
+        setSelectedServers(new Array(newServerList.length).fill(false))
+        setSelectedAll(false)
+        setShowAction(false)
+    }
+
+    // ============================== menu ==============================
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [selectedKey, setSelectedKey] = useState<number>(-1)
 
@@ -97,10 +131,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setSelectedKey(-1)
     }
 
-    const handleUpdate = () => {
-        navigate(`/server_update?key=${selectedKey}`)
-    }
-
+    // ============================== enable ==============================
     // 必须放内部，否则不会读取最新配置文件
     let appDir: string
     let config: AppConfig
@@ -116,20 +147,6 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         if (!ruleConfig) ruleConfig = await readRuleConfig() || DEFAULT_RULE_CONFIG
         if (!ruleDomain) ruleDomain = await readRuleDomain() || DEFAULT_RULE_DOMAIN
         if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
-    }
-
-    const setServerEnable = async (selectedKey: number) => {
-        if (!serverList) return false
-        const newServerList = serverList.map((server, index) => {
-            server.on = index === selectedKey ? 1 : 0
-            return server
-        })
-        const ok = await saveServerList(newServerList)
-        if (!ok) {
-            showSnackbar('设置启用失败', 'error')
-        }
-        updateServerList(newServerList)
-        return ok
     }
 
     const getServerConf = async (callback: (conf: any) => void) => {
@@ -163,6 +180,21 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         handleMenuClose()
     }
 
+    const setServerEnable = async (selectedKey: number) => {
+        if (!serverList) return false
+        const newServerList = serverList.map((server, index) => {
+            server.on = index === selectedKey ? 1 : 0
+            return server
+        })
+        const ok = await saveServerList(newServerList)
+        if (!ok) {
+            showSnackbar('设置启用失败', 'error')
+        }
+        updateServerList(newServerList)
+        return ok
+    }
+
+    // ============================== view config ==============================
     const [openDrawer, setOpenDrawer] = useState(false)
     const [rayConfigJson, setRayConfigJson] = useState('')
     const handleCloseDrawer = () => setOpenDrawer(false)
@@ -174,13 +206,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         handleMenuClose()
     }
 
-    const [isCopied, setIsCopied] = useState(false)
-    const handleCopyJson = async () => {
-        await clipboardWriteText(rayConfigJson)
-        setIsCopied(true)
-        setTimeout(() => setIsCopied(false), 1000)
-    }
-
+    // ============================== delete ==============================
     const handleDelete = () => {
         dialogConfirm('确认删除', `确定要删除这个服务器吗？`, async () => {
             const newServerList = serverList?.filter((_, index) => index !== selectedKey) || []
@@ -209,31 +235,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    useEffect(() => {
-        if (serverList) setSelectedServers(new Array(serverList.length).fill(false))
-    }, [serverList])
-
-    const handleSelectAll = (checked: boolean) => {
-        setSelectedServers(new Array(serverList?.length).fill(checked))
-        setSelectedAll(checked)
-        setShowAction(checked)
-    }
-
-    const handleSelectServer = (index: number, checked: boolean) => {
-        const newSelected = [...selectedServers]
-        newSelected[index] = checked
-        setSelectedServers(newSelected)
-        setSelectedAll(newSelected.every(Boolean))
-        setShowAction(newSelected.some(Boolean))
-    }
-
-    const updateServerList = (newServerList: ServerList) => {
-        setServerList(newServerList)
-        setSelectedServers(new Array(newServerList.length).fill(false))
-        setSelectedAll(false)
-        setShowAction(false)
-    }
-
+    // ============================== drag sort ==============================
     const [enableDragSort, setEnableDragSort] = useState(false)
     const [dragIndex, setDragIndex] = useState<number>(-1)
     const [dragIsChange, setDragIsChange] = useState(false)
@@ -285,6 +287,14 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             setDragIndex(key)
             setDragIsChange(true)
         }
+    }
+
+    // ============================== copy ==============================
+    const [isCopied, setIsCopied] = useState(false)
+    const handleCopyJson = async () => {
+        await clipboardWriteText(rayConfigJson)
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 1000)
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar()
