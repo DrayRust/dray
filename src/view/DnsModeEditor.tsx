@@ -364,7 +364,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                                 <Typography variant="body1" component="div">{row.name}</Typography>
                                                 {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
-                                            <TableCell sx={{p: '4px 8px'}} width="140" align="right">
+                                            <TableCell sx={{p: '4px 8px'}} width="150" align="right">
                                                 <Tooltip title="排序" arrow placement="top">
                                                     <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
@@ -401,7 +401,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                                 <Typography variant="body1" component="div">{row.name}</Typography>
                                                 {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
-                                            <TableCell sx={{p: '4px 8px'}} width="140" align="right">
+                                            <TableCell sx={{p: '4px 8px'}} width="150" align="right">
                                                 <Tooltip title="排序" arrow placement="top">
                                                     <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
