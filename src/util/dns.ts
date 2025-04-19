@@ -26,7 +26,7 @@ export function dnsModeToConf(row: DnsModeRow): string {
                     obj.queryStrategy = item.queryStrategy
                     if (['UseIPv4', 'UseIPv6'].indexOf(item.queryStrategy) > -1) globalUseIP = true
                 }
-                if (item.timeoutMs && item.timeoutMs !== 4000) obj.timeoutMs = Number(item.timeoutMs)
+                if (item.timeoutMs > 0 && item.timeoutMs !== 4000) obj.timeoutMs = Number(item.timeoutMs)
                 if (item.skipFallback) obj.skipFallback = true
                 if (item.allowUnexpectedIPs) obj.allowUnexpectedIPs = true
                 servers.push(obj)
