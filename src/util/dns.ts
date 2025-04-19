@@ -22,7 +22,7 @@ export function dnsModeToConf(row: DnsModeRow): string {
                 if (item.domains) obj.domains = item.domains.split('\n')
                 if (item.expectIPs) obj.expectIPs = item.expectIPs.split('\n')
                 if (item.clientIP) obj.clientIP = item.clientIP
-                if (item.queryStrategy) {
+                if (item.queryStrategy && item.queryStrategy !== 'UseIP') {
                     obj.queryStrategy = item.queryStrategy
                     if (['UseIPv4', 'UseIPv6'].indexOf(item.queryStrategy) > -1) globalUseIP = true
                 }

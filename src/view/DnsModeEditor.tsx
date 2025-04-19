@@ -226,9 +226,9 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
     const handleServerSortStart = (e: React.MouseEvent, key: number) => {
         e.stopPropagation()
         setHostSortKey(-1)
-        if (hostSortKey === -1) {
+        if (serverSortKey === -1) {
             setServerSortKey(key)
-        } else if (hostSortKey === key) {
+        } else if (serverSortKey === key) {
             setServerSortKey(-1)
         } else {
             handleServerSortEnd(key)
