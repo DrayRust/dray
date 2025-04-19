@@ -23,6 +23,7 @@ import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
+import { dnsModeToConf } from "../util/dns.ts"
 import { DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 
 export const Dns = () => {
@@ -85,8 +86,8 @@ export const Dns = () => {
         setErrorImportData(false)
         setDnsModeImportData('')
         setDnsModeExportData('')
-        setDnsModeChecked([])
         setDnsModeUpdateKey(-1)
+        setDnsModeChecked([])
     }
 
     // ============================== create ==============================
@@ -236,8 +237,14 @@ export const Dns = () => {
     }
 
     // ============================== view config ==============================
-    const handleDnsModeViewConf = (_key: number) => {
+    const [dnsModeViewJson, setDnsModeViewJson] = useState('')
+    const handleDnsModeViewConf = (key: number) => {
+        setAction('viewConf')
 
+        const row = dnsModeList[key]
+        if (!row) return
+
+        setDnsModeViewJson(dnsModeToConf(row))
     }
 
     // ============================== delete ==============================
@@ -352,7 +359,7 @@ export const Dns = () => {
                             <Button variant="contained" onClick={handleBack}>取消</Button>
                         </div>
                     </Stack>
-                ) : action === 'export' && (
+                ) : action === 'export' ? (
                     <Stack spacing={2} sx={widthSx}>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                             <TextField size="small" multiline disabled minRows={10} maxRows={16} label="导出内容（URI）" value={dnsModeExportData}/>
@@ -360,6 +367,19 @@ export const Dns = () => {
                         <div className="flex-between">
                             <div>
                                 <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleDnsModeCopy(dnsModeExportData)}>复制</Button>
+                                {isCopied && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                            </div>
+                            <Button variant="contained" onClick={handleBack}>取消</Button>
+                        </div>
+                    </Stack>
+                ) : action === 'viewConf' && (
+                    <Stack spacing={2} sx={widthSx}>
+                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                            <TextField size="small" multiline disabled minRows={10} maxRows={16} label="DNS 配置" value={dnsModeViewJson}/>
+                        </Stack>
+                        <div className="flex-between">
+                            <div>
+                                <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleDnsModeCopy(dnsModeViewJson)}>复制</Button>
                                 {isCopied && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
                             </div>
                             <Button variant="contained" onClick={handleBack}>取消</Button>
