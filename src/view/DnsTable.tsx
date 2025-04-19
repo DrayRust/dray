@@ -19,7 +19,7 @@ import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/cry
 import { clipboardWriteText } from "../util/tauri.ts"
 import { DEFAULT_DNS_TABLE_LIST } from "../util/config.ts"
 
-const DEFAULT_DNS_TABLE: DnsTableRow = {
+const DEFAULT_DNS_TABLE_ROW: DnsTableRow = {
     name: '',
     note: '',
     hash: '',
@@ -41,7 +41,7 @@ export const DnsTable = () => {
     }, [])
 
     const [action, setAction] = useState('')
-    const [row, setRow] = useState<DnsTableRow>(DEFAULT_DNS_TABLE)
+    const [row, setRow] = useState<DnsTableRow>(DEFAULT_DNS_TABLE_ROW)
     const [nameError, setNameError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
 
@@ -64,7 +64,7 @@ export const DnsTable = () => {
     const handleCreate = () => {
         setAction('create')
         setUpdateKey(-1)
-        setRow(DEFAULT_DNS_TABLE)
+        setRow(DEFAULT_DNS_TABLE_ROW)
     }
 
     const handleUpdate = (key: number) => {

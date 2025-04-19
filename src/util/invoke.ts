@@ -198,6 +198,14 @@ export async function saveServerList(content: ServerList) {
     return saveConf('server.json', content)
 }
 
+export async function readSubscriptionList(): Promise<SubscriptionList | undefined> {
+    return readConf('subscription.json')
+}
+
+export async function saveSubscriptionList(content: SubscriptionList) {
+    return saveConf('subscription.json', content)
+}
+
 export async function readRuleConfig(): Promise<RuleConfig | undefined> {
     return readConf('rule_config.json')
 }

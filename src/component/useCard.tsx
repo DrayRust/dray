@@ -20,7 +20,7 @@ export const ErrorCard = ({errorMsg, height, elevation, mt}: {
 }) => {
     let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
-        <Card elevation={elevation ?? 0} sx={sx}>
+        <Card elevation={elevation ?? 2} sx={sx}>
             <FmdBadIcon sx={{fontSize: '5rem', mb: 2}}/>
             <div>{errorMsg}</div>
         </Card>
@@ -30,7 +30,7 @@ export const ErrorCard = ({errorMsg, height, elevation, mt}: {
 export const LoadingCard = ({height, elevation, mt}: { height?: string, elevation?: number, mt?: number }) => {
     let sx = {...centerSx, ...(height ? {height} : {}), ...(mt ? {mt} : {})}
     return (
-        <Card elevation={elevation ?? 0} sx={sx}>
+        <Card elevation={elevation ?? 2} sx={sx}>
             <CircularProgress/>
         </Card>
     )
