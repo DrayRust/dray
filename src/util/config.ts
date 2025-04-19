@@ -347,7 +347,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
     {
         "name": "Cloudflare DNS 优先模式",
         "note": "优先使用 Cloudflare DNS、Google DNS 解析域名，中国大陆域名使用阿里云 DNS 解析",
-        "hash": "2165f2be636b990b6d98e47cdb54600de198cb0dddc8d06d60154c919d26dd81",
+        "hash": "32ba424272a378ec4c55bd9a1f317b1f7485783f6f27c302d659e1139dcba279",
         "hosts": [
             {
                 "name": "Google DNS",
@@ -383,7 +383,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
         "servers": [
             {
                 "name": "Cloudflare DNS",
-                "note": "使用 Cloudflare 解析域名数据库中的非中国大陆域名",
+                "note": "使用 Cloudflare 解析域名数据库中常见的非中国大陆域名",
                 "type": "object",
                 "address": "https://1.1.1.1/dns-query",
                 "port": "",
@@ -411,7 +411,7 @@ export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
             },
             {
                 "name": "阿里云 DNS",
-                "note": "使用阿里云 DNS 解析域名数据库中的中国大陆域名",
+                "note": "使用阿里云 DNS 解析域名数据库中常见的中国大陆域名",
                 "type": "object",
                 "address": "223.5.5.5",
                 "port": "",
