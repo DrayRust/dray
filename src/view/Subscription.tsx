@@ -146,9 +146,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
 
         <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
             <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
-            {subscriptionChecked.length > 0 && (<>
-                <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
-            </>)}
+            {subscriptionChecked.length > 0 && <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>}
         </Stack>
         <Stack spacing={1}>
             {loading ? (
