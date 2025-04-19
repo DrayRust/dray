@@ -382,11 +382,11 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                     key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
                                     onClick={() => handleSortEnd(key)}>
-                                    <TableCell sx={{p: '6px 12px'}} component="th" scope="row">
+                                    <TableCell sx={{p: '6px 12px', maxWidth: '500px'}} component="th" scope="row">
                                         <Typography variant="body1" component="div">{row.name}</Typography>
                                         <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                     </TableCell>
-                                    <TableCell sx={{p: '4px 8px'}} align="right">
+                                    <TableCell sx={{p: '4px'}} width="240" align="right">
                                         <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
                                         <Tooltip title="排序" arrow placement="top">
                                             <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
