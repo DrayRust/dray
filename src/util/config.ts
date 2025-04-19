@@ -343,7 +343,182 @@ export const DEFAULT_DNS_MODE_ROW: DnsModeRow = {
     disableFallbackIfMatch: false,
 }
 
-export const DEFAULT_DNS_MODE_LIST: DnsModeList = []
+export const DEFAULT_DNS_MODE_LIST: DnsModeList = [
+    {
+        "name": "Cloudflare DNS 优先模式",
+        "note": "优先使用 Cloudflare DNS、Google DNS 解析域名，中国大陆域名使用阿里云 DNS 解析",
+        "hash": "2165f2be636b990b6d98e47cdb54600de198cb0dddc8d06d60154c919d26dd81",
+        "hosts": [
+            {
+                "name": "Google DNS",
+                "note": "跳过 Google DNS 域名解析，直接使用 IP 地址",
+                "domain": "dns.google",
+                "host": "8.8.8.8"
+            },
+            {
+                "name": "Cloudflare DNS",
+                "note": "跳过 Cloudflare DNS 域名解析，直接使用 IP 地址",
+                "domain": "one.one.one.one",
+                "host": "1.1.1.1"
+            },
+            {
+                "name": "阿里云 DNS",
+                "note": "跳过阿里云 DNS 域名解析，直接使用 IP 地址",
+                "domain": "dns.alidns.com",
+                "host": "223.5.5.5"
+            },
+            {
+                "name": "腾讯云 DNS",
+                "note": "跳过腾讯云 DNS 域名解析，直接使用 IP 地址",
+                "domain": "dns.pub",
+                "host": "119.29.29.29"
+            },
+            {
+                "name": "广告域名",
+                "note": "跳过远程域名系统解析域名数据库中的广告域名",
+                "domain": "geosite:category-ads-all",
+                "host": "127.0.0.1"
+            }
+        ],
+        "servers": [
+            {
+                "name": "Cloudflare DNS",
+                "note": "使用 Cloudflare 解析域名数据库中的非中国大陆域名",
+                "type": "object",
+                "address": "https://1.1.1.1/dns-query",
+                "port": "",
+                "domains": "geosite:geolocation-!cn",
+                "expectIPs": "geoip:!cn",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            },
+            {
+                "name": "Google DNS",
+                "note": "使用 Google DNS 系统解析域名",
+                "type": "address",
+                "address": "8.8.8.8",
+                "port": "",
+                "domains": "",
+                "expectIPs": "",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            },
+            {
+                "name": "阿里云 DNS",
+                "note": "使用阿里云 DNS 解析域名数据库中的中国大陆域名",
+                "type": "object",
+                "address": "223.5.5.5",
+                "port": "",
+                "domains": "geosite:cn",
+                "expectIPs": "geoip:cn",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": true,
+                "allowUnexpectedIPs": false
+            },
+            {
+                "name": "本机 DNS",
+                "note": "使用本机设置的域名服务器解析域名",
+                "type": "address",
+                "address": "localhost",
+                "port": "",
+                "domains": "",
+                "expectIPs": "",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            }
+        ],
+        "clientIP": "",
+        "queryStrategy": "UseIP",
+        "disableCache": false,
+        "disableFallback": false,
+        "disableFallbackIfMatch": false
+    },
+    {
+        "name": "Google DNS 优先模式",
+        "note": "优先使用 Google DNS 解析，其次使用阿里云 DNS",
+        "hash": "cb5875c00d74b078fc86171239a2480559778b79a780e52bd6a6fdd54f9eec0c",
+        "hosts": [
+            {
+                "name": "Google DNS",
+                "note": "跳过 Google DNS 域名解析，直接使用 IP 地址",
+                "domain": "dns.google",
+                "host": "8.8.8.8"
+            },
+            {
+                "name": "阿里云 DNS",
+                "note": "跳过阿里云 DNS 域名解析，直接使用 IP 地址",
+                "domain": "dns.alidns.com",
+                "host": "223.5.5.5"
+            },
+            {
+                "name": "广告域名",
+                "note": "跳过远程域名系统解析域名数据库中的广告域名",
+                "domain": "geosite:category-ads-all",
+                "host": "127.0.0.1"
+            }
+        ],
+        "servers": [
+            {
+                "name": "Google DNS",
+                "note": "使用 Google DNS 系统解析域名",
+                "type": "address",
+                "address": "8.8.8.8",
+                "port": "",
+                "domains": "",
+                "expectIPs": "",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            },
+            {
+                "name": "阿里云 DNS",
+                "note": "使用阿里云 DNS 解析域名数据库中的中国大陆域名",
+                "type": "address",
+                "address": "223.5.5.5",
+                "port": "",
+                "domains": "",
+                "expectIPs": "",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            },
+            {
+                "name": "本机 DNS",
+                "note": "使用本机设置的域名服务器解析域名",
+                "type": "address",
+                "address": "localhost",
+                "port": "",
+                "domains": "",
+                "expectIPs": "",
+                "clientIP": "",
+                "queryStrategy": "UseIP",
+                "timeoutMs": 4000,
+                "skipFallback": false,
+                "allowUnexpectedIPs": false
+            }
+        ],
+        "clientIP": "",
+        "queryStrategy": "UseIP",
+        "disableCache": false,
+        "disableFallback": false,
+        "disableFallbackIfMatch": false
+    }
+]
 
 export const DEFAULT_DNS_TABLE_LIST: DnsTableList = [
     {
