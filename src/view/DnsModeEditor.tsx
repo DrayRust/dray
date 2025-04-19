@@ -420,7 +420,10 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                     )}
 
                     <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                        <TextField size="small" label="全局客户端 IP 地址 (clientIP)" value={modeRow.clientIP} onChange={handleRowChange('clientIP')}/>
+                        <TextField
+                            size="small" label="全局客户端 IP 地址 (clientIP)"
+                            placeholder="用于 DNS 查询时通知服务器，必须是公网 IP 地址"
+                            value={modeRow.clientIP} onChange={handleRowChange('clientIP')}/>
 
                         <SelectField
                             label="全局 DNS 查询策略 (queryStrategy)" id="dns-mode-query-strategy"
