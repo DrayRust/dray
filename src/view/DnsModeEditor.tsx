@@ -437,7 +437,7 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                 <Switch checked={modeRow.disableFallback} onChange={(_, value) => handleRowSwitchChange('disableFallback', value)}/>
                             </div>
                             <div className="flex-between">
-                                <Typography variant="body1" sx={{pl: 1}}>禁用 匹配上域名时 DNS fallback 查询</Typography>
+                                <Typography variant="body1" sx={{pl: 1}}>优先匹配域名列表命中时，禁用 DNS fallback 查询</Typography>
                                 <Switch checked={modeRow.disableFallbackIfMatch} onChange={(_, value) => handleRowSwitchChange('disableFallbackIfMatch', value)}/>
                             </div>
                         </Stack>
