@@ -23,7 +23,7 @@ import { DnsTable } from "./DnsTable.tsx"
 import { readDnsConfig, readDnsModeList, saveDnsConfig, saveDnsModeList } from "../util/invoke.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
-import { DEFAULT_DNS_CONFIG, DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
+import { DEFAULT_DNS_CONFIG, DEFAULT_DNS_MODE_LIST, DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 import { dnsModeToConf } from "../util/dns.ts"
 import { rayDnsChange } from "../util/ray.ts"
 
@@ -31,14 +31,14 @@ export const Dns = () => {
     const [loading, setLoading] = useState(true)
     const [dnsNav, setDnsNav] = useState(0)
     const [dnsConfig, setDnsConfig] = useState<DnsConfig>(DEFAULT_DNS_CONFIG)
-    const [dnsModeList, setDnsModeList] = useState<DnsModeList>([])
+    const [dnsModeList, setDnsModeList] = useState<DnsModeList>(DEFAULT_DNS_MODE_LIST)
     useEffect(() => {
         (async () => {
-            const config = await readDnsConfig() as DnsConfig
-            if (config) setDnsConfig(config)
+            const newDnsConfig = await readDnsConfig() as DnsConfig
+            if (newDnsConfig) setDnsConfig(newDnsConfig)
 
-            const modeList = await readDnsModeList() as DnsModeList
-            if (modeList) setDnsModeList(modeList)
+            const newDnsModeList = await readDnsModeList() as DnsModeList
+            if (newDnsModeList) setDnsModeList(newDnsModeList)
             setLoading(false)
         })()
     }, [])
