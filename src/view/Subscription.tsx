@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 import {
-    Button, Checkbox, Card, Dialog, Stack, Switch, Typography, TextField,
+    Button, Chip, Checkbox, Card, Dialog, Stack, Switch, Typography, TextField,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -193,12 +193,16 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Typography variant="body2" color="warning">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Tooltip title="设置" arrow placement="top">
-                                            <IconButton color="primary" onClick={() => handleUpdate(key)}><SettingsSuggestIcon/></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="删除" arrow placement="top">
-                                            <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
-                                        </Tooltip>
+                                        <div style={{minWidth: '220px'}}>
+                                            {row.isProxy && <Chip size="small" label="代理" color="warning" sx={{mr: 1}}/>}
+                                            {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
+                                            <Tooltip title="设置" arrow placement="top">
+                                                <IconButton color="primary" onClick={() => handleUpdate(key)}><SettingsSuggestIcon/></IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="删除" arrow placement="top">
+                                                <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
+                                            </Tooltip>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
