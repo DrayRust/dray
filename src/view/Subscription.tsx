@@ -14,6 +14,7 @@ import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { readSubscriptionList, saveSubscriptionList } from "../util/invoke.ts"
 import { formatUrl, isValidUrl } from "../util/util.ts"
+import { getSubscription } from "../util/subscription.ts"
 
 const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
@@ -121,17 +122,26 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleBatchDelete = () => {
-        if (subscriptionChecked.length > 0) {
-            dialogConfirm('确认删除', `确定要删除这 ${subscriptionChecked.length} 个服务器吗？`, async () => {
-                const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
-                const ok = await saveSubscriptionList(newList)
-                if (!ok) {
-                    showAlertDialog('删除失败', 'error')
-                } else {
-                    setSubscriptionList([...newList])
-                    handleBack()
-                }
-            })
+        if (subscriptionChecked.length < 1) return
+
+        dialogConfirm('确认删除', `确定要删除这 ${subscriptionChecked.length} 个服务器吗？`, async () => {
+            const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
+            const ok = await saveSubscriptionList(newList)
+            if (!ok) {
+                showAlertDialog('删除失败', 'error')
+            } else {
+                setSubscriptionList([...newList])
+                handleBack()
+            }
+        })
+    }
+
+    const handleBatchUpdateSub = async () => {
+        if (subscriptionChecked.length < 1) return
+
+        const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
+        for (const row of newList) {
+            await getSubscription(row)
         }
     }
 
@@ -192,7 +202,10 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
 
         <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
             <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
-            {subscriptionChecked.length > 0 && <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>}
+            {subscriptionChecked.length > 0 && (<>
+                <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
+                <Button variant="contained" color="warning" onClick={handleBatchUpdateSub}>更新订阅</Button>
+            </>)}
         </Stack>
         <Stack spacing={1}>
             {loading ? (
