@@ -33,7 +33,7 @@ async function parseHtml(s: string, name: string) {
 
     const input = uriArr.join('\n')
     const {newServerList, errNum, existNum, newNum} = await getNewServerList(input)
-    log.info(`Update subscription "${name}" html: ${errNum} Errors, ${existNum} Exists, ${newNum} New`)
+    log.info(`Update subscription "${name}" HTML: ${errNum} Errors, ${existNum} Exists, ${newNum} New`)
     if (newNum > 0) {
         const ok = await saveServerList(newServerList)
         if (!ok) {
@@ -45,7 +45,7 @@ async function parseHtml(s: string, name: string) {
 async function parseJson(obj: any, name: string) {
     if ("servers" in obj && Array.isArray(obj.servers)) {
         const {newServerList, errNum, existNum, newNum} = await getNewServerListBySub(obj.servers)
-        log.info(`Update subscription "${name}" json: ${errNum} Errors, ${existNum} Exists, ${newNum} New`)
+        log.info(`Update subscription "${name}" JSON: ${errNum} Errors, ${existNum} Exists, ${newNum} New`)
         if (newNum > 0) {
             const ok = await saveServerList(newServerList)
             if (!ok) {
@@ -53,7 +53,7 @@ async function parseJson(obj: any, name: string) {
             }
         }
     } else {
-        log.info(`Update subscription not support json format: ${name}`)
+        log.info(`Update subscription not support JSON format: ${name}`)
     }
 }
 
