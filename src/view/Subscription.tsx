@@ -21,6 +21,7 @@ const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     url: '',
     updateCount: 0,
     lastUpdate: 0,
+    autoUpdate: true,
     isProxy: false,
     isHtml: false
 }
@@ -143,7 +144,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         <DialogComponent/>
         <Dialog open={action !== ''}>
             <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
-                <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                     <TextField fullWidth size="small" label="订阅名称"
                                error={nameError} helperText={nameError ? "订阅名称不能为空" : ""}
                                value={row.name} onChange={handleRowChange('name')}/>
@@ -154,11 +155,25 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                value={row.url} onChange={handleRowChange('url')}/>
                     <Stack spacing={0.5}>
                         <div className="flex-between">
-                            <Typography variant="body1" sx={{pl: 1}}>代理更新订阅</Typography>
+                            <div className="flex-center-gap1">
+                                <Typography variant="body1" sx={{pl: 1}}>自动更新</Typography>
+                                <Tooltip arrow title="开启后，程序会自动更新订阅服务器" placement="right">
+                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                </Tooltip>
+                            </div>
+                            <Switch checked={row.autoUpdate} onChange={(_, value) => handleRowSwitchChange('autoUpdate', value)}/>
+                        </div>
+                        <div className="flex-between">
+                            <div className="flex-center-gap1">
+                                <Typography variant="body1" sx={{pl: 1}}>代理更新</Typography>
+                                <Tooltip arrow title="开启后，程序使用启用的代理服务器更新订阅" placement="right">
+                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                </Tooltip>
+                            </div>
                             <Switch checked={row.isProxy} onChange={(_, value) => handleRowSwitchChange('isProxy', value)}/>
                         </div>
                         <div className="flex-between">
-                            <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+                            <div className="flex-center-gap1">
                                 <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
                                 <Tooltip arrow title="开启后，将自动获取页面中的分享链接" placement="right">
                                     <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
@@ -199,7 +214,8 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>
-                                        <div style={{minWidth: '220px'}}>
+                                        <div style={{minWidth: '260px'}}>
+                                            {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
                                             {row.isProxy && <Chip size="small" label="代理" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
                                             <Tooltip title="设置" arrow placement="top">
