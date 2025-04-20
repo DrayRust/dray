@@ -142,7 +142,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     return <>
         <AlertDialogComponent/>
         <DialogComponent/>
-        <Dialog open={action !== ''}>
+        <Dialog open={action !== ''} onClose={handleBack}>
             <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
                 <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                     <TextField fullWidth size="small" label="订阅名称"
