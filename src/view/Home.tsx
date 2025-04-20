@@ -3,9 +3,7 @@ import { Paper, Stack, Typography, Switch } from '@mui/material'
 import { readAppConfig, setAppConfig } from "../util/invoke.ts"
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
-    useEffect(() => {
-        setNavState(0)
-    }, [setNavState])
+    useEffect(() => setNavState(0), [setNavState])
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)

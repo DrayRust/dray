@@ -113,10 +113,14 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
         setErrorImportData(false)
     }
 
-    // ============================== create ==============================
+    // ============================== create & update ==============================
     const handleRuleModeCreate = () => {
         setAction('create')
         setRuleModeRow(DEFAULT_RULE_MODE_ROW)
+    }
+
+    const handleRuleModeUpdate = (key: number) => {
+        setRuleModeKey(key)
     }
 
     const handleRuleModeSubmit = useDebounce(async () => {
@@ -141,11 +145,6 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
         setRuleModeList(newRuleModeList)
         setAction('')
     }, 50)
-
-    // ============================== update ==============================
-    const handleRuleModeUpdate = (key: number) => {
-        setRuleModeKey(key)
-    }
 
     // ============================== import ==============================
     const handleRuleModeImport = () => {
