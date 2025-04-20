@@ -1,5 +1,43 @@
-import { log } from './invoke.ts'
+import { log, readServerList } from './invoke.ts'
 import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify, hashJson } from './crypto.ts'
+
+// 排出重复数据
+export async function getNewServerList(input: string) {
+    let errNum = 0
+    let existNum = 0
+    let newNum = 0
+    let newServerList: ServerList = []
+    let serverList = await readServerList() || []
+    const arr = input.split('\n')
+    for (let uri of arr) {
+        uri = uri.trim()
+        if (!uri) continue
+
+        const row = await uriToServerRow(uri)
+        if (!row) {
+            errNum++
+            continue
+        }
+
+        let isExist = serverList.some(server => server.hash === row.hash)
+        if (isExist) {
+            existNum++
+            continue
+        }
+
+        isExist = newServerList.some(server => server.hash === row.hash)
+        if (isExist) {
+            existNum++
+            continue
+        }
+
+        newNum++
+        newServerList.push(row)
+    }
+
+    newServerList = [...newServerList, ...serverList]
+    return {newServerList, errNum, existNum, newNum}
+}
 
 export function isValidUri(uri: string): boolean {
     try {

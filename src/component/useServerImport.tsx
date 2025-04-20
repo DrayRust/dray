@@ -1,5 +1,5 @@
-import { readServerList, saveServerList } from "../util/invoke.ts"
-import { uriToServerRow } from "../util/server.ts"
+import { getNewServerList } from "../util/server.ts"
+import { saveServerList } from "../util/invoke.ts"
 
 export const useServerImport = async (
     inputValue: string,
@@ -10,44 +10,14 @@ export const useServerImport = async (
     const s = inputValue.trim()
     if (!s) return
 
-    let errNum = 0
-    let newNum = 0
-    let existNum = 0
-    let newServerList: ServerList = []
-    let serverList = await readServerList() || []
-    const arr = s.split('\n')
-    for (let uri of arr) {
-        uri = uri.trim()
-        if (!uri) continue
-
-        const row = await uriToServerRow(uri)
-        if (!row) {
-            errNum++
-            continue
-        }
-
-        let isExist = serverList.some(server => server.hash === row.hash)
-        if (isExist) {
-            existNum++
-            continue
-        }
-
-        isExist = newServerList.some(server => server.hash === row.hash)
-        if (isExist) {
-            existNum++
-            continue
-        }
-
-        newNum++
-        newServerList.push(row)
-    }
+    const {newServerList, errNum, existNum, newNum} = await getNewServerList(s)
 
     const errMsg = `解析链接（URI）错误: ${errNum} 条`
     const okMsg = `导入成功: ${newNum} 条`
     const existMsg = `已存在: ${existNum} 条`
     setError && setError(existNum > 0)
     if (newNum) {
-        const ok = await saveServerList([...newServerList, ...serverList])
+        const ok = await saveServerList(newServerList)
         if (!ok) {
             showSnackbar('导入失败', 'error')
         } else {
