@@ -103,9 +103,7 @@ pub fn start() -> bool {
 async fn handle_proxy_pac() -> actix_web::HttpResponse {
     let pac_path = dirs::get_dray_web_server_dir().unwrap().join("proxy.js");
     match fs::read_to_string(&pac_path) {
-        Ok(content) => actix_web::HttpResponse::Ok()
-            .content_type("application/x-ns-proxy-autoconfig")
-            .body(content),
+        Ok(content) => actix_web::HttpResponse::Ok().content_type("application/x-ns-proxy-autoconfig").body(content),
         Err(_) => actix_web::HttpResponse::NotFound().body("proxy.js not found"),
     }
 }

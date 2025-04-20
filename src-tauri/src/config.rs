@@ -190,7 +190,7 @@ const ALLOWED_CONFIG_FILES: [&str; 9] = [
     "rule_mode_list.json",
     "dns_config.json",
     "dns_mode_list.json",
-    "dns_table_list.json"
+    "dns_table_list.json",
 ];
 
 fn get_conf_path(filename: &str) -> Result<PathBuf, String> {

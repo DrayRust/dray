@@ -25,8 +25,7 @@ pub fn enable_auto_proxy() -> bool {
     let url = format!("http://{}:{}/dray/proxy.js", config.web_server_host, config.web_server_port);
 
     if HAS_GSETTINGS {
-        execute_command(&format!("{} autoconfig-url '{}'", GSETTINGS_PROXY, url))
-            && execute_command(&format!("{} mode 'auto'", GSETTINGS_PROXY))
+        execute_command(&format!("{} autoconfig-url '{}'", GSETTINGS_PROXY, url)) && execute_command(&format!("{} mode 'auto'", GSETTINGS_PROXY))
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("{} '{}' proxy.pac-url '{}'", NMCLI_CONNECTION, conn_name, url))
@@ -115,8 +114,7 @@ pub fn disable_auto_proxy() -> bool {
 
 pub fn disable_socks_proxy() -> bool {
     if HAS_GSETTINGS {
-        execute_command(&format!("{}.socks host ''", GSETTINGS_PROXY))
-            && execute_command(&format!("{}.socks port 0", GSETTINGS_PROXY))
+        execute_command(&format!("{}.socks host ''", GSETTINGS_PROXY)) && execute_command(&format!("{}.socks port 0", GSETTINGS_PROXY))
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("{} '{}' proxy.socks-host ''", NMCLI_CONNECTION, conn_name))
@@ -131,8 +129,7 @@ pub fn disable_socks_proxy() -> bool {
 
 pub fn disable_web_proxy() -> bool {
     if HAS_GSETTINGS {
-        execute_command(&format!("{}.http host ''", GSETTINGS_PROXY))
-            && execute_command(&format!("{}.http port 0", GSETTINGS_PROXY))
+        execute_command(&format!("{}.http host ''", GSETTINGS_PROXY)) && execute_command(&format!("{}.http port 0", GSETTINGS_PROXY))
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("{} '{}' proxy.http-host ''", NMCLI_CONNECTION, conn_name))
@@ -147,8 +144,7 @@ pub fn disable_web_proxy() -> bool {
 
 pub fn disable_secure_web_proxy() -> bool {
     if HAS_GSETTINGS {
-        execute_command(&format!("{}.https host ''", GSETTINGS_PROXY))
-            && execute_command(&format!("{}.https port 0", GSETTINGS_PROXY))
+        execute_command(&format!("{}.https host ''", GSETTINGS_PROXY)) && execute_command(&format!("{}.https port 0", GSETTINGS_PROXY))
     } else if HAS_NMCLI {
         if let Some(conn_name) = get_nmcli_connection_name() {
             execute_command(&format!("{} '{}' proxy.https-host ''", NMCLI_CONNECTION, conn_name))

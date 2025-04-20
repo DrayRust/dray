@@ -9,10 +9,9 @@ use_try_shorthand = false
 use_field_init_shorthand = false
 force_explicit_abi = true
 
-normalize_comments = true
-wrap_comments = true
+# normalize_comments = true
+# wrap_comments = true
 
-max_width = 150
+max_width = 160
 hard_tabs = false
 tab_spaces = 4
-tab_width = 4

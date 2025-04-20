@@ -4,17 +4,13 @@ use std::process::Command;
 
 // 获取当前使用的网络接口名称，如果没有获取到则返回 "Wi-Fi"
 fn get_active_network_interface() -> String {
-    let output = Command::new("networksetup")
-        .arg("-listallnetworkservices")
-        .output()
-        .ok()
-        .and_then(|output| {
-            if output.status.success() {
-                String::from_utf8(output.stdout).ok()
-            } else {
-                None
-            }
-        });
+    let output = Command::new("networksetup").arg("-listallnetworkservices").output().ok().and_then(|output| {
+        if output.status.success() {
+            String::from_utf8(output.stdout).ok()
+        } else {
+            None
+        }
+    });
 
     output
         .and_then(|s| {
@@ -46,10 +42,8 @@ pub fn enable_socks_proxy() -> bool {
 pub fn enable_web_proxy() -> bool {
     let config = config::get_config();
     let interface = get_active_network_interface();
-    execute_command(&format!(
-        "networksetup -setwebproxy {} {} {}",
-        interface, config.ray_host, config.ray_http_port
-    )) && execute_command(&format!("networksetup -setwebproxystate {} on", interface))
+    execute_command(&format!("networksetup -setwebproxy {} {} {}", interface, config.ray_host, config.ray_http_port))
+        && execute_command(&format!("networksetup -setwebproxystate {} on", interface))
 }
 
 pub fn enable_secure_web_proxy() -> bool {

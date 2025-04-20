@@ -6,7 +6,7 @@ use crate::web;
 use logger::{error, info};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
-use tauri::menu::{Menu, MenuItem, MenuBuilder, PredefinedMenuItem, Submenu};
+use tauri::menu::{Menu, MenuBuilder, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::path::BaseDirectory;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, Manager, Runtime};

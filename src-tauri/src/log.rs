@@ -113,7 +113,12 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
 
     // 确保 start_position 在文件范围内
     let start_position = if start_position < 0 {
-        if reverse { file_size } else { 0 } // -1: 倒序为文件末尾，正序为文件开头
+        // -1: 倒序为文件末尾，正序为文件开头
+        if reverse {
+            file_size
+        } else {
+            0
+        }
     } else {
         std::cmp::min(start_position as u64, file_size) // 限制在文件范围内
     };
