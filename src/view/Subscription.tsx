@@ -12,7 +12,7 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { readSubscriptionList, saveSubscriptionList } from "../util/invoke.ts"
-import { isValidUrl } from "../util/util.ts"
+import { formatUrl, isValidUrl } from "../util/util.ts"
 
 const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
@@ -79,7 +79,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
 
         item.name = item.name.trim()
         item.note = item.note.trim()
-        item.url = item.url.trim().toLowerCase()
+        item.url = formatUrl(item.url.trim())
 
         const nameErr = item.name === ''
         const urlErr = item.url === '' || !isValidUrl(item.url)
@@ -189,7 +189,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                     </TableCell>
                                     <TableCell component="th" scope="row" sx={{p: 1}}>
                                         <Typography variant="h6" component="div">{row.name}</Typography>
-                                        <Typography variant="body2" color="text.secondary">{row.note}</Typography>
+                                        <Typography variant="body2" color="textSecondary">{row.note}</Typography>
                                         <Typography variant="body2" color="warning">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>

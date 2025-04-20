@@ -74,6 +74,17 @@ export const formatLogName = (filename: string, showFull: boolean = false): stri
     return !logNameMap[filename] ? filename : (showFull ? `${logNameMap[filename]} (${filename})` : logNameMap[filename])
 }
 
+export function formatUrl(url: string): string {
+    try {
+        const urlObj = new URL(url)
+        urlObj.protocol = urlObj.protocol.toLowerCase()
+        urlObj.hostname = urlObj.hostname.toLowerCase()
+        return urlObj.toString()
+    } catch (error) {
+        return url
+    }
+}
+
 export function isValidUrl(url: string): boolean {
     const urlPattern = /^(https?:\/\/)?([\da-z-.]+)\.([a-z.]{2,6})(:\d+)?.*?$/i
     return urlPattern.test(url)
