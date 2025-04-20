@@ -2,6 +2,7 @@ mod cleanup;
 mod config;
 mod dirs;
 mod fs;
+mod http;
 mod log;
 mod network;
 mod ray;
@@ -83,6 +84,11 @@ fn save_proxy_pac(content: String) -> bool {
 #[tauri::command]
 fn save_text_file(path: String, content: String) -> bool {
     fs::save_text_file(&path, &content)
+}
+
+#[tauri::command]
+fn fetch_get(url: String) -> String {
+    http::fetch_get(&url)
 }
 
 #[tauri::command]
@@ -216,6 +222,7 @@ pub fn run() {
             save_conf,
             save_proxy_pac,
             save_text_file,
+            fetch_get,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
