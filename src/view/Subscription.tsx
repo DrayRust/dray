@@ -9,6 +9,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import OpenWithIcon from '@mui/icons-material/OpenWith'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 
@@ -246,6 +247,39 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    // ============================== sort ==============================
+    const [subSortKey, setSubSortKey] = useState(-1)
+    const handleSubSortStart = (e: React.MouseEvent, key: number) => {
+        e.stopPropagation()
+        if (subSortKey === -1) {
+            setSubSortKey(key)
+        } else if (subSortKey === key) {
+            setSubSortKey(-1)
+        } else {
+            handleSubSortEnd(key).catch(_ => 0)
+        }
+    }
+
+    const handleSubSortEnd = async (key: number) => {
+        if (subSortKey === -1) return
+        if (subSortKey === key) {
+            setSubSortKey(-1)
+            return
+        }
+
+        let newList = [...subscriptionList]
+        let [temp] = newList.splice(subSortKey, 1)
+        newList.splice(key, 0, temp)
+        setSubSortKey(-1)
+
+        const ok = await saveSubscriptionList(newList)
+        if (!ok) {
+            showAlertDialog('保存排序失败', 'error')
+        } else {
+            setSubscriptionList(newList)
+        }
+    }
+
     // ============================== copy ==============================
     const [isCopied, setIsCopied] = useState(false)
     const handleSubCopy = async (content: string) => {
@@ -358,7 +392,11 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                     <Table>
                         <TableBody>
                             {subscriptionList.map((row, key) => (
-                                <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                <TableRow
+                                    key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                    className={subSortKey > -1 ? (subSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                    onClick={() => handleSubSortEnd(key)}
+                                >
                                     <TableCell padding="checkbox">
                                         <Checkbox value={key} checked={subscriptionChecked.includes(key)} onChange={handleCheckedChange}/>
                                     </TableCell>
@@ -368,10 +406,13 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>
-                                        <div style={{minWidth: '260px'}}>
+                                        <div style={{minWidth: '300px'}}>
                                             {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
                                             {row.isProxy && <Chip size="small" label="代理更新" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
+                                            <Tooltip title="排序" arrow placement="top">
+                                                <IconButton color="info" onClick={e => handleSubSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                            </Tooltip>
                                             <Tooltip title="设置" arrow placement="top">
                                                 <IconButton color="primary" onClick={() => handleUpdate(key)}><SettingsSuggestIcon/></IconButton>
                                             </Tooltip>
