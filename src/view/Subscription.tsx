@@ -216,7 +216,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                     <TableCell align="right" sx={{p: 1}}>
                                         <div style={{minWidth: '260px'}}>
                                             {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
-                                            {row.isProxy && <Chip size="small" label="代理" color="warning" sx={{mr: 1}}/>}
+                                            {row.isProxy && <Chip size="small" label="代理更新" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
                                             <Tooltip title="设置" arrow placement="top">
                                                 <IconButton color="primary" onClick={() => handleUpdate(key)}><SettingsSuggestIcon/></IconButton>
