@@ -247,7 +247,7 @@ export const DnsTable = () => {
         <Dialog open={action !== ''}>
             <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
                 {action === 'create' || action === 'update' ? <>
-                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
                         <TextField fullWidth size="small" label="公共 DNS 服务商名称"
                                    error={nameError} helperText={nameError ? "名称不能为空" : ""}
                                    value={row.name} onChange={handleRowChange('name')}/>
