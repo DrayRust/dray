@@ -40,7 +40,7 @@ import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts
 import { reloadProxyPAC } from "../util/proxy.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
-    useEffect(() => setNavState(5), [setNavState])
+    useEffect(() => setNavState(6), [setNavState])
 
     // 从上下文中获取当前主题模式和切换模式的函数
     const {mode, toggleMode} = useTheme()

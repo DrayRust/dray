@@ -13,6 +13,7 @@ import {
     Inbox as InboxIcon,
     Rule as RuleIcon,
     Assignment as AssignmentIcon,
+    Handyman as HandymanIcon,
     Settings as SettingsIcon,
     Logout as LogoutIcon
 } from '@mui/icons-material'
@@ -30,6 +31,7 @@ import Subscription from "./view/Subscription.tsx"
 import Rule from "./view/Rule.tsx"
 import Log from "./view/Log.tsx"
 import LogDetail from "./view/LogDetail.tsx"
+import Tool from "./view/Tool.tsx"
 import Setting from "./view/Setting.tsx"
 
 import { invoke } from "@tauri-apps/api/core"
@@ -48,6 +50,7 @@ const App: React.FC = () => {
         {path: '/subscription', text: '订阅', icon: <InboxIcon/>},
         {path: '/rule', text: '规则', icon: <RuleIcon/>},
         {path: '/log', text: '日志', icon: <AssignmentIcon/>},
+        {path: '/tool', text: '工具', icon: <HandymanIcon/>},
         {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
@@ -135,6 +138,7 @@ const App: React.FC = () => {
                         <Route path="/rule" element={<Rule setNavState={setNavState}/>}/>
                         <Route path="/log" element={<Log setNavState={setNavState}/>}/>
                         <Route path="/log_detail" element={<LogDetail setNavState={setNavState}/>}/>
+                        <Route path="/tool" element={<Tool setNavState={setNavState}/>}/>
                         <Route path="/setting" element={<Setting setNavState={setNavState}/>}/>
                     </Routes>
                 </div>
