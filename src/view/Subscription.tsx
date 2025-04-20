@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 import {
-    Button, Checkbox, Card, Dialog, Stack, Typography, TextField,
+    Button, Checkbox, Card, Dialog, Stack, Switch, Typography, TextField,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -52,6 +52,10 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
             type === 'name' && setNameError(value === '')
             return {...prev, [type]: value}
         })
+    }
+
+    const handleRowSwitchChange = (type: string, value: boolean) => {
+        setRow({...row, [type]: value})
     }
 
     const handleCreate = () => {
@@ -136,6 +140,16 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                value={row.name} onChange={handleRowChange('name')}/>
                     <TextField fullWidth size="small" label="订阅描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
                     <TextField fullWidth size="small" label="订阅 URL" value={row.url} multiline onChange={handleRowChange('url')}/>
+                    <Stack spacing={0.5}>
+                        <div className="flex-between">
+                            <Typography variant="body1" sx={{pl: 1}}>代理更新订阅</Typography>
+                            <Switch checked={row.isProxy} onChange={(_, value) => handleRowSwitchChange('isProxy', value)}/>
+                        </div>
+                        <div className="flex-between">
+                            <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
+                            <Switch checked={row.isHtml} onChange={(_, value) => handleRowSwitchChange('isHtml', value)}/>
+                        </div>
+                    </Stack>
                 </Stack>
                 <div className="flex-between">
                     <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
