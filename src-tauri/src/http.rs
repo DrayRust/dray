@@ -11,6 +11,7 @@ pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
     let client_builder = if is_proxy {
         let config = config::get_config();
         let proxy_url = format!("socks5://{}:{}", config.ray_host, config.ray_socks_port);
+        debug!("Proxy URL: {}", proxy_url);
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
