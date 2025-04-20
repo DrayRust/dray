@@ -175,8 +175,8 @@ interface SubscriptionRow {
     name: string; // 订阅名称
     note: string; // 订阅描述
     url: string; // 订阅 URL
-    updateCount: number; // 最后更新数量
-    lastUpdate: number; // 最后更新时间
+    // updateCount: number; // 最后更新数量
+    // lastUpdate: number; // 最后更新时间
     autoUpdate: boolean; // 是否开启自动更新
     isProxy: boolean; // 是否使用代理更新订阅
     isHtml: boolean; // 是否为 HTML 页面，如果为 HTML 页面，程序使用正则自动获取页面中的分享链接

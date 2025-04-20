@@ -20,8 +20,8 @@ const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
     note: '',
     url: '',
-    updateCount: 0,
-    lastUpdate: 0,
+    // updateCount: 0,
+    // lastUpdate: 0,
     autoUpdate: true,
     isProxy: false,
     isHtml: false
