@@ -79,7 +79,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
 
         item.name = item.name.trim()
         item.note = item.note.trim()
-        item.url = item.url.trim()
+        item.url = item.url.trim().toLowerCase()
 
         const nameErr = item.name === ''
         const urlErr = item.url === '' || !isValidUrl(item.url)
@@ -187,12 +187,12 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                     <TableCell padding="checkbox">
                                         <Checkbox value={key} checked={subscriptionChecked.includes(key)} onChange={handleCheckedChange}/>
                                     </TableCell>
-                                    <TableCell component="th" scope="row">
+                                    <TableCell component="th" scope="row" sx={{p: 1}}>
                                         <Typography variant="h6" component="div">{row.name}</Typography>
                                         <Typography variant="body2" color="text.secondary">{row.note}</Typography>
                                         <Typography variant="body2" color="warning">{row.url}</Typography>
                                     </TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="right" sx={{p: 1}}>
                                         <div style={{minWidth: '220px'}}>
                                             {row.isProxy && <Chip size="small" label="代理" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
