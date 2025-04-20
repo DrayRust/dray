@@ -1,4 +1,5 @@
 use logger::{debug, error};
+use reqwest::header;
 use reqwest::Client;
 use std::time::Duration;
 

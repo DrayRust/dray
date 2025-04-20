@@ -87,8 +87,8 @@ fn save_text_file(path: String, content: String) -> bool {
 }
 
 #[tauri::command]
-fn fetch_get(url: String) -> String {
-    http::fetch_get(&url)
+async fn fetch_get(url: String) -> String {
+    http::fetch_get(&url).await
 }
 
 #[tauri::command]
