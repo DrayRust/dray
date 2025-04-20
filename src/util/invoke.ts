@@ -120,10 +120,10 @@ export async function saveTextFile(path: string, content: string) {
     }
 }
 
-export async function fetchGet(url: string) {
+export async function fetchGet(url: string, isProxy: boolean = false) {
     if (!isTauri) return ''
     try {
-        return await invoke<string>('fetch_get', {url})
+        return await invoke<string>('fetch_get', {url, isProxy})
     } catch (err) {
         log.error('Failed to fetchGet:', err)
         return ''

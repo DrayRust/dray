@@ -3,7 +3,7 @@ import { getNewServerList, getScy } from "./server.ts"
 import { hashJson } from "./crypto.ts"
 
 export async function getSubscription(row: SubscriptionRow) {
-    const s = await fetchGet(row.url)
+    const s = await fetchGet(row.url, row.isProxy)
     if (s) {
         if (row.isHtml) {
             await parseHtml(s, row.name)
