@@ -8,6 +8,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
+import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline'
 import EditIcon from '@mui/icons-material/Edit'
@@ -324,7 +325,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         <Stack direction="row" sx={{mb: 1, minHeight: '42px', justifyContent: "space-between", alignItems: "center"}}>
             <Stack direction="row" spacing={1}>
                 <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
-                <Button variant="contained" color="success" onClick={handleClipboardImport}>剪切板导入</Button>
+                <Button variant="contained" color="success" startIcon={<ContentPasteGoIcon/>} onClick={handleClipboardImport}>剪切板导入</Button>
                 <Button variant="contained" color="warning" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
                 {showAction && (<>
                     <Button variant="contained" color="info" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
