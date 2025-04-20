@@ -406,7 +406,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>
-                                        <div style={{minWidth: '300px'}}>
+                                        <div style={{minWidth: '100px'}}>
                                             {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
                                             {row.isProxy && <Chip size="small" label="代理更新" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
