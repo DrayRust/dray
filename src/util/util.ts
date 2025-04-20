@@ -86,7 +86,7 @@ export function formatUrl(url: string): string {
 }
 
 export function isValidUrl(url: string): boolean {
-    const urlPattern = /^(https?:\/\/)?([\da-z-.]+)\.([a-z.]{2,6})(:\d+)?.*?$/i
+    const urlPattern = /^(https?:\/\/)?([\da-z-.]+)(\.[a-z.]{2,6})?(:\d+)?.*?$/i
     return urlPattern.test(url)
 }
 
