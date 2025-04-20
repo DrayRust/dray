@@ -174,6 +174,7 @@ interface TrojanRow {
 interface SubscriptionRow {
     name: string; // 订阅名称
     note: string; // 订阅描述
+    hash: string; // JSON 字符串的哈希值，用来排重
     url: string; // 订阅 URL
     // updateCount: number; // 最后更新数量
     // lastUpdate: number; // 最后更新时间

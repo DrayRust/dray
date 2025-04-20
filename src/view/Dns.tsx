@@ -117,11 +117,11 @@ export const Dns = () => {
         handleBack()
     }
 
+    // ============================== import ==============================
     const handleImport = () => {
         setAction('import')
     }
 
-    // ============================== import ==============================
     const [dnsModeImportData, setDnsModeImportData] = useState('')
     const [errorImportData, setErrorImportData] = useState(false)
     const handleDnsModeImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {

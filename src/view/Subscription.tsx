@@ -5,7 +5,10 @@ import {
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import FileUploadIcon from '@mui/icons-material/FileUpload'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 
@@ -15,10 +18,13 @@ import { useDialog } from "../component/useDialog.tsx"
 import { readSubscriptionList, saveSubscriptionList } from "../util/invoke.ts"
 import { formatUrl, isValidUrl } from "../util/util.ts"
 import { getSubscription } from "../util/subscription.ts"
+import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
+import { clipboardWriteText } from "../util/tauri.ts"
 
 const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
     note: '',
+    hash: '',
     url: '',
     // updateCount: 0,
     // lastUpdate: 0,
@@ -50,6 +56,9 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const handleBack = () => {
         setAction('')
         setUpdateKey(-1)
+        setErrorImportData(false)
+        setSubImportData('')
+        setSubExportData('')
         setSubscriptionChecked([])
     }
 
@@ -66,6 +75,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         setRow({...row, [type]: value})
     }
 
+    // ============================== create & update ==============================
     const handleCreate = () => {
         setAction('create')
         setRow(DEFAULT_SUBSCRIPTION_ROW)
@@ -90,6 +100,8 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         setUrlError(urlErr)
         if (nameErr || urlErr) return
 
+        item.hash = ''
+        item.hash = await hashJson(item)
 
         updateKey === -1 ? subscriptionList.push(item) : subscriptionList[updateKey] = item
         const ok = await saveSubscriptionList(subscriptionList)
@@ -101,6 +113,92 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         handleBack()
     }
 
+    // ============================== import ==============================
+    const handleImport = () => {
+        setAction('import')
+    }
+
+    const [errorImportData, setErrorImportData] = useState(false)
+    const [subImportData, setSubImportData] = useState('')
+    const handleSubImportDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value
+        setSubImportData(value)
+        setErrorImportData(value === '')
+    }
+
+    const handleSubImportSubmit = async () => {
+        let s = subImportData.trim()
+        setErrorImportData(!s)
+        if (!s) return
+
+        const newSubList = [...subscriptionList]
+        let okNum = 0
+        let existNum = 0
+        let errNum = 0
+        let errMsg = ''
+        const arr = s.split('\n')
+        for (let v of arr) {
+            v = v.trim()
+            if (v.length === 0) continue
+
+            if (v.startsWith('draySub://')) {
+                const base64 = v.substring(10).replace(/#.*$/, '')
+                const decoded = decodeBase64(base64)
+                const data = safeJsonParse(decoded)
+                if (data && typeof data === 'object' && 'hash' in data) {
+                    if (newSubList.some(item => item.hash === data.hash)) {
+                        existNum++
+                    } else {
+                        newSubList.push(data)
+                        okNum++
+                    }
+                } else {
+                    errNum++
+                    errMsg = '解析失败，或数据不正确'
+                }
+            } else {
+                errNum++
+                errMsg = '格式不正确，前缀非 drayDns:// 开头'
+            }
+        }
+
+        if (okNum > 0) {
+            const ok = await saveSubscriptionList(newSubList)
+            if (!ok) {
+                showAlertDialog('导入保存失败')
+                return
+            }
+            setSubscriptionList(newSubList)
+            handleBack()
+
+            if (existNum > 0 || errNum > 0) {
+                showAlertDialog(`导入成功 ${okNum} 条，已存在 ${existNum} 条，失败 ${errNum} 条`, 'warning')
+            } else {
+                showAlertDialog(`导入成功 ${okNum} 条`, 'success')
+            }
+        } else if (existNum > 0) {
+            showAlertDialog(`导入成功 ${okNum} 条，已存在 ${existNum} 条，失败 ${errNum} 条`, 'warning')
+        } else if (errMsg) {
+            showAlertDialog(errMsg, 'error')
+        }
+    }
+
+    // ============================== export ==============================
+    const [subExportData, setSubExportData] = useState('')
+    const handleExport = () => {
+        setAction('export')
+
+        let arr = []
+        for (let k = 0; k < subscriptionChecked.length; k++) {
+            const v = subscriptionList[k]
+            if (!v) continue
+            const encoded = 'draySub://' + encodeBase64(JSON.stringify(v)) + '#' + v.name
+            arr.push(encoded)
+        }
+        setSubExportData(arr.join('\n'))
+    }
+
+    // ============================== delete ==============================
     const handleCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSubscriptionChecked(prev => {
             const value = Number(e.target.value)
@@ -136,15 +234,25 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
+    // ============================== update subscription ==============================
     const handleBatchUpdateSub = async () => {
         if (subscriptionChecked.length < 1) return
 
         const newList = subscriptionList.filter((_, index) => subscriptionChecked.includes(index)) || []
         handleBack()
-        showAlertDialog('更新订阅提交成功，详情查看日志', 'success')
+        showAlertDialog('更新订阅任务提交成功，执行结果请查看日志', 'success')
         for (const row of newList) {
             await getSubscription(row)
         }
+    }
+
+    // ============================== copy ==============================
+    const [isCopied, setIsCopied] = useState(false)
+    const handleSubCopy = async (content: string) => {
+        const ok = await clipboardWriteText(content)
+        if (!ok) return
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
     }
 
     const height = 'calc(100vh - 70px)'
@@ -156,55 +264,86 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         <DialogComponent/>
         <Dialog open={action !== ''} onClose={handleBack}>
             <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
-                <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                    <TextField fullWidth size="small" label="订阅名称"
-                               error={nameError} helperText={nameError ? "订阅名称不能为空" : ""}
-                               value={row.name} onChange={handleRowChange('name')}/>
-                    <TextField fullWidth size="small" label="订阅描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
-                    <TextField fullWidth size="small" label="订阅 URL"
-                               placeholder="请输入URL，如: https://abc.com/sub.json"
-                               error={urlError} helperText={urlError ? "请填写正确的 URL" : ""}
-                               value={row.url} onChange={handleRowChange('url')}/>
-                    <Stack spacing={0.5}>
-                        <div className="flex-between">
-                            <div className="flex-center-gap1">
-                                <Typography variant="body1" sx={{pl: 1}}>自动更新</Typography>
-                                <Tooltip arrow title="开启后，程序会自动更新订阅服务器" placement="right">
-                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
-                                </Tooltip>
+                {action === 'create' || action === 'update' ? (<>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <TextField fullWidth size="small" label="订阅名称"
+                                   error={nameError} helperText={nameError ? "订阅名称不能为空" : ""}
+                                   value={row.name} onChange={handleRowChange('name')}/>
+                        <TextField fullWidth size="small" label="订阅描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
+                        <TextField fullWidth size="small" label="订阅 URL"
+                                   placeholder="请输入URL，如: https://abc.com/sub.json"
+                                   error={urlError} helperText={urlError ? "请填写正确的 URL" : ""}
+                                   value={row.url} onChange={handleRowChange('url')}/>
+                        <Stack spacing={0.5}>
+                            <div className="flex-between">
+                                <div className="flex-center-gap1">
+                                    <Typography variant="body1" sx={{pl: 1}}>自动更新</Typography>
+                                    <Tooltip arrow title="开启后，程序会自动更新订阅服务器" placement="right">
+                                        <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                    </Tooltip>
+                                </div>
+                                <Switch checked={row.autoUpdate} onChange={(_, value) => handleRowSwitchChange('autoUpdate', value)}/>
                             </div>
-                            <Switch checked={row.autoUpdate} onChange={(_, value) => handleRowSwitchChange('autoUpdate', value)}/>
-                        </div>
-                        <div className="flex-between">
-                            <div className="flex-center-gap1">
-                                <Typography variant="body1" sx={{pl: 1}}>代理更新</Typography>
-                                <Tooltip arrow title="开启后，程序使用启用的代理服务器更新订阅" placement="right">
-                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
-                                </Tooltip>
+                            <div className="flex-between">
+                                <div className="flex-center-gap1">
+                                    <Typography variant="body1" sx={{pl: 1}}>代理更新</Typography>
+                                    <Tooltip arrow title="开启后，程序使用启用的代理服务器更新订阅" placement="right">
+                                        <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                    </Tooltip>
+                                </div>
+                                <Switch checked={row.isProxy} onChange={(_, value) => handleRowSwitchChange('isProxy', value)}/>
                             </div>
-                            <Switch checked={row.isProxy} onChange={(_, value) => handleRowSwitchChange('isProxy', value)}/>
-                        </div>
-                        <div className="flex-between">
-                            <div className="flex-center-gap1">
-                                <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
-                                <Tooltip arrow title="开启后，将自动获取页面中的分享链接" placement="right">
-                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
-                                </Tooltip>
+                            <div className="flex-between">
+                                <div className="flex-center-gap1">
+                                    <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
+                                    <Tooltip arrow title="开启后，将自动获取页面中的分享链接" placement="right">
+                                        <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                    </Tooltip>
+                                </div>
+                                <Switch checked={row.isHtml} onChange={(_, value) => handleRowSwitchChange('isHtml', value)}/>
                             </div>
-                            <Switch checked={row.isHtml} onChange={(_, value) => handleRowSwitchChange('isHtml', value)}/>
-                        </div>
+                        </Stack>
                     </Stack>
-                </Stack>
-                <div className="flex-between">
-                    <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
-                    <Button variant="contained" onClick={handleBack}>取消</Button>
-                </div>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleSubmit}>{action === 'create' ? '添加' : '修改'}</Button>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
+                </>) : action === 'import' ? (<>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <TextField
+                            size="small" multiline rows={10}
+                            label="导入内容（URI）"
+                            placeholder="每行一条，例如：draySub://xxxxxx"
+                            error={errorImportData} helperText={errorImportData ? '导入内容不能为空' : ''}
+                            value={subImportData}
+                            onChange={handleSubImportDataChange}
+                        />
+                    </Stack>
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleSubImportSubmit}>确定</Button>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
+                </>) : action === 'export' && (<>
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <TextField size="small" multiline disabled minRows={10} maxRows={16} label="导出内容（URI）" value={subExportData}/>
+                    </Stack>
+                    <div className="flex-between">
+                        <div>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleSubCopy(subExportData)}>复制</Button>
+                            {isCopied && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </div>
+                        <Button variant="contained" onClick={handleBack}>取消</Button>
+                    </div>
+                </>)}
             </Stack>
         </Dialog>
 
         <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
             <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
+            <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
+
             {subscriptionChecked.length > 0 && (<>
+                <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
                 <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
                 <Button variant="contained" color="warning" onClick={handleBatchUpdateSub}>更新订阅</Button>
             </>)}
