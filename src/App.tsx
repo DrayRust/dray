@@ -35,6 +35,11 @@ import Setting from "./view/Setting.tsx"
 import { invoke } from "@tauri-apps/api/core"
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
+import { readSubscriptionList } from "./util/invoke.ts"
+import { getSubscription } from "./util/subscription.ts"
+import { useDebounce } from "./hook/useDebounce.ts"
+
+let subscribeLastUpdate = 0
 
 const App: React.FC = () => {
     const navItems = [
@@ -51,6 +56,20 @@ const App: React.FC = () => {
         setNavState(index)
     }
 
+    const subscribeUpdate = useDebounce(async () => {
+        if (Date.now() - subscribeLastUpdate < 1000 * 60 * 5) return // 更新频率，不要超过 5 分钟
+
+        const subList = await readSubscriptionList() as SubscriptionList
+        if (subList) {
+            for (const row of subList) {
+                if (row.autoUpdate) {
+                    await getSubscription(row)
+                }
+            }
+        }
+        subscribeLastUpdate = Date.now()
+    }, 300)
+
     const isFocus = useWindowFocus()
     useEffect(() => {
         setTimeout(async () => {
@@ -65,6 +84,8 @@ const App: React.FC = () => {
                 // console.log(e)
             }
         }, 0)
+
+        setTimeout(subscribeUpdate, 0)
     }, [isFocus])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
