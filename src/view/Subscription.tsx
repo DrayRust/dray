@@ -139,7 +139,9 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const handleBatchUpdateSub = async () => {
         if (subscriptionChecked.length < 1) return
 
-        const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
+        const newList = subscriptionList.filter((_, index) => subscriptionChecked.includes(index)) || []
+        handleBack()
+        showAlertDialog('更新订阅提交成功，详情查看日志', 'success')
         for (const row of newList) {
             await getSubscription(row)
         }
