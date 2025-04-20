@@ -74,6 +74,11 @@ export const formatLogName = (filename: string, showFull: boolean = false): stri
     return !logNameMap[filename] ? filename : (showFull ? `${logNameMap[filename]} (${filename})` : logNameMap[filename])
 }
 
+export function isValidUrl(url: string): boolean {
+    const urlPattern = /^(https?:\/\/)?([\da-z-.]+)\.([a-z.]{2,6})(:\d+)?([\/\w .-]*)*(\?[\/\w .-=&]*)?\/?$/i
+    return urlPattern.test(url)
+}
+
 export function validateIp(value: string) {
     // IPv4 正则表达式
     const ipv4Pattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/

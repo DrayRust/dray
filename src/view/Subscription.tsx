@@ -9,9 +9,10 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
-import { readSubscriptionList, saveSubscriptionList } from "../util/invoke.ts"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
+import { readSubscriptionList, saveSubscriptionList } from "../util/invoke.ts"
+import { isValidUrl } from "../util/util.ts"
 
 const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
@@ -40,6 +41,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const [action, setAction] = useState('')
     const [row, setRow] = useState<SubscriptionRow>(DEFAULT_SUBSCRIPTION_ROW)
     const [nameError, setNameError] = useState(false)
+    const [urlError, setUrlError] = useState(false)
     const [updateKey, setUpdateKey] = useState(-1)
 
     const handleBack = () => {
@@ -52,6 +54,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         setRow(prev => {
             const value = e.target.value
             type === 'name' && setNameError(value === '')
+            type === 'url' && setUrlError(value === '' || !isValidUrl(value))
             return {...prev, [type]: value}
         })
     }
@@ -75,12 +78,15 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
         let item: SubscriptionRow = {...row}
 
         item.name = item.name.trim()
-        const isEmpty = item.name === ''
-        setNameError(isEmpty)
-        if (isEmpty) return
-
         item.note = item.note.trim()
         item.url = item.url.trim()
+
+        const nameErr = item.name === ''
+        const urlErr = item.url === '' || !isValidUrl(item.url)
+        setNameError(nameErr)
+        setUrlError(urlErr)
+        if (nameErr || urlErr) return
+
 
         updateKey === -1 ? subscriptionList.push(item) : subscriptionList[updateKey] = item
         const ok = await saveSubscriptionList(subscriptionList)
@@ -141,7 +147,10 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                error={nameError} helperText={nameError ? "订阅名称不能为空" : ""}
                                value={row.name} onChange={handleRowChange('name')}/>
                     <TextField fullWidth size="small" label="订阅描述" value={row.note} multiline minRows={2} maxRows={6} onChange={handleRowChange('note')}/>
-                    <TextField fullWidth size="small" label="订阅 URL" value={row.url} multiline onChange={handleRowChange('url')}/>
+                    <TextField fullWidth size="small" label="订阅 URL"
+                               placeholder="请输入URL，如: https://abc.com/sub.json"
+                               error={urlError} helperText={urlError ? "请填写正确的 URL" : ""}
+                               value={row.url} multiline onChange={handleRowChange('url')}/>
                     <Stack spacing={0.5}>
                         <div className="flex-between">
                             <Typography variant="body1" sx={{pl: 1}}>代理更新订阅</Typography>
@@ -180,7 +189,8 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                     </TableCell>
                                     <TableCell component="th" scope="row">
                                         <Typography variant="h6" component="div">{row.name}</Typography>
-                                        <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
+                                        <Typography variant="body2" color="text.secondary">{row.note}</Typography>
+                                        <Typography variant="body2" color="warning">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="设置" arrow placement="top">
