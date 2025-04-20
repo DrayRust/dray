@@ -538,7 +538,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <div className="flex-between p1">
                             <Box sx={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                                 <Typography variant="body1" sx={{pl: 1}}>Mux 协议</Typography>
-                                <Tooltip title="开启后，网页浏览加速，但视频和下载速度可能变慢" placement="right">
+                                <Tooltip arrow title="开启后，网页浏览加速，但视频和下载速度可能变慢" placement="right">
                                     <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
                                 </Tooltip>
                             </Box>

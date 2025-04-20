@@ -151,3 +151,10 @@ body, html {
     opacity: 0.5;
     cursor: move;
 }
+
+.text-ellipsis {
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

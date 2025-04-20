@@ -7,6 +7,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import DeleteIcon from '@mui/icons-material/Delete'
+import HelpIcon from '@mui/icons-material/Help'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
@@ -150,14 +151,19 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                     <TextField fullWidth size="small" label="订阅 URL"
                                placeholder="请输入URL，如: https://abc.com/sub.json"
                                error={urlError} helperText={urlError ? "请填写正确的 URL" : ""}
-                               value={row.url} multiline onChange={handleRowChange('url')}/>
+                               value={row.url} onChange={handleRowChange('url')}/>
                     <Stack spacing={0.5}>
                         <div className="flex-between">
                             <Typography variant="body1" sx={{pl: 1}}>代理更新订阅</Typography>
                             <Switch checked={row.isProxy} onChange={(_, value) => handleRowSwitchChange('isProxy', value)}/>
                         </div>
                         <div className="flex-between">
-                            <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+                                <Typography variant="body1" sx={{pl: 1}}>HTML 页面</Typography>
+                                <Tooltip arrow title="开启后，将自动获取页面中的分享链接" placement="right">
+                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                </Tooltip>
+                            </div>
                             <Switch checked={row.isHtml} onChange={(_, value) => handleRowSwitchChange('isHtml', value)}/>
                         </div>
                     </Stack>
@@ -190,7 +196,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                     <TableCell component="th" scope="row" sx={{p: 1}}>
                                         <Typography variant="h6" component="div">{row.name}</Typography>
                                         <Typography variant="body2" color="textSecondary">{row.note}</Typography>
-                                        <Typography variant="body2" color="warning">{row.url}</Typography>
+                                        <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>
                                         <div style={{minWidth: '220px'}}>
