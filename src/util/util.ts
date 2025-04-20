@@ -75,7 +75,7 @@ export const formatLogName = (filename: string, showFull: boolean = false): stri
 }
 
 export function isValidUrl(url: string): boolean {
-    const urlPattern = /^(https?:\/\/)?([\da-z-.]+)\.([a-z.]{2,6})(:\d+)?([\/\w .-]*)*(\?[\/\w .-=&]*)?\/?$/i
+    const urlPattern = /^(https?:\/\/)?([\da-z-.]+)\.([a-z.]{2,6})(:\d+)?.*?$/i
     return urlPattern.test(url)
 }
 
