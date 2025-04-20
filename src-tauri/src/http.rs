@@ -1,10 +1,24 @@
+use crate::config;
 use logger::{debug, error};
 use reqwest::header;
 use reqwest::Client;
 use std::time::Duration;
 
-pub async fn fetch_get(url: &str) -> String {
-    let client = match Client::builder().timeout(Duration::from_secs(10)).build() {
+pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
+    let client_builder = Client::builder().timeout(Duration::from_secs(10));
+
+    let client_builder = if is_proxy {
+        let config = config::get_config();
+        let proxy_url = format!("socks5://{}:{}", config.ray_host, config.ray_socks_port);
+        client_builder.proxy(Proxy::all(proxy_url).unwrap_or_else(|e| {
+            error!("Failed to set proxy: {}", e);
+            Proxy::none()
+        }))
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
         Ok(client) => client,
         Err(e) => {
             error!("Failed to create HTTP client: {}", e);
