@@ -174,7 +174,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline size="small" label="查看代理环境变量‌" value={getProxyGetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="查看代理 “环境变量‌”" value={getProxyGetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'GetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('GetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
@@ -198,7 +198,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="立即生效代理" value={getProxySourceEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="立即生效代理 “环境变量‌”" value={getProxySourceEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'SourceEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('SourceEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
