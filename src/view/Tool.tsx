@@ -65,6 +65,12 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     const getMyIpIp = () => `curl myip.ipip.net`
     const getMyIpJson = () => `curl https://api.myip.la/cn?json`
 
+    const getNetstat = () => {
+        return osType === 'linux' ? 'netstat -tuln' : 'netstat -an | grep LISTEN'
+    }
+
+    const getLsof = () => `lsof -i -P | grep LISTEN`
+
     const timeoutRef = useRef<number>(0)
     const [copiedType, setCopiedType] = useState('')
     const handleCommandCopy = async (type: string) => {
@@ -85,6 +91,10 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getMyIpIp()
         } else if (type === 'MyIpJson') {
             content = getMyIpJson()
+        } else if (type === 'Netstat') {
+            content = getNetstat()
+        } else if (type === 'getLsof') {
+            content = getLsof()
         }
         const ok = await clipboardWriteText(content)
         if (!ok) return
@@ -169,6 +179,21 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                                 <IconButton onClick={() => handleCommandCopy('MyIpJson')}><ContentCopyIcon/></IconButton>
                             </Tooltip>
                         </Stack>
+
+                        {(osType === 'macOS' || osType === 'linux') && (<>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <TextField fullWidth multiline disabled size="small" label="查看本机端口" value={getNetstat()}/>
+                                <Tooltip arrow placement="right" title={copiedType === 'Netstat' ? '已复制' : '点击复制'}>
+                                    <IconButton onClick={() => handleCommandCopy('Netstat')}><ContentCopyIcon/></IconButton>
+                                </Tooltip>
+                            </Stack>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <TextField fullWidth multiline disabled size="small" label="查看本机端口（包含进程名）" value={getLsof()}/>
+                                <Tooltip arrow placement="right" title={copiedType === 'Lsof' ? '已复制' : '点击复制'}>
+                                    <IconButton onClick={() => handleCommandCopy('Lsof')}><ContentCopyIcon/></IconButton>
+                                </Tooltip>
+                            </Stack>
+                        </>)}
                     </Stack>
                 </>)}
                 {action === 'system' && (<></>)}
