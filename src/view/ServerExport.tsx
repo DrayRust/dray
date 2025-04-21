@@ -162,10 +162,10 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/>
                             </Box>
                             <Box sx={{mt: 1}}>
-                                <Tooltip title={uriCopied ? '已复制' : (isBase64 ? '复制 Base64 URI' : '复制 URL')}>
+                                <Tooltip arrow title={uriCopied ? '已复制' : (isBase64 ? '复制 Base64 URI' : '复制 URL')}>
                                     <IconButton onClick={() => handleCopyURI(i)}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
-                                <Tooltip title={svgCopied ? '已复制' : '复制二维码 SVG'}>
+                                <Tooltip arrow title={svgCopied ? '已复制' : '复制二维码 SVG'}>
                                     <IconButton onClick={() => handleCopyQRCodeSVG(i)}><FileCopyIcon/></IconButton>
                                 </Tooltip>
                             </Box>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Card, Chip, Box, Button, BottomNavigation, BottomNavigationAction, Paper, Stack, ToggleButtonGroup, ToggleButton, TextField
+    Card, IconButton, BottomNavigation, BottomNavigationAction,
+    Paper, Stack, ToggleButtonGroup, ToggleButton, TextField, Tooltip
 } from '@mui/material'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import WysiwygIcon from '@mui/icons-material/Wysiwyg'
@@ -60,13 +61,9 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         return `curl -x http://${appConfig.ray_host}:${http_port} https://www.google.com`
     }
 
-    const getMyIP = () => {
-        return `curl httpbin.org/ip`
-    }
-
-    const getMyIpJson = () => {
-        return `curl https://api.myip.la/cn?json`
-    }
+    const getMyIP = () => `curl httpbin.org/ip`
+    const getMyIpIp = () => `curl myip.ipip.net`
+    const getMyIpJson = () => `curl https://api.myip.la/cn?json`
 
     const timeoutRef = useRef<number>(0)
     const [copiedType, setCopiedType] = useState('')
@@ -84,6 +81,8 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getProxyTestHttp()
         } else if (type === 'MyIP') {
             content = getMyIP()
+        } else if (type === 'MyIpIp') {
+            content = getMyIpIp()
         } else if (type === 'MyIpJson') {
             content = getMyIpJson()
         }
@@ -94,8 +93,6 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
         timeoutRef.current = setTimeout(() => setCopiedType(''), 2000)
     }
-
-    const ChipCopied = () => (<Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>)
 
     return (
         <Paper elevation={5} sx={{p: 1, borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
@@ -116,48 +113,62 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         <BottomNavigationAction value="linux" label="Linux"/>
                     </BottomNavigation>
 
-                    <Stack spacing={1} component={Card} elevation={5} sx={{p: 1}}>
-                        <Box sx={{pt: 1}}><TextField fullWidth multiline disabled size="small" label="设置代理命令" value={getProxySetEnv()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('SetEnv')}>复制</Button>
-                            {copiedType === 'SetEnv' && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
-                        </Box>
+                    <Stack spacing={3} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="设置代理命令" value={getProxySetEnv()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'SetEnv' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('SetEnv')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('GetEnv')}>复制</Button>
-                            {copiedType === 'GetEnv' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'GetEnv' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('GetEnv')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="移除代理命令" value={getProxyUnsetEnv()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('UnsetEnv')}>复制</Button>
-                            {copiedType === 'UnsetEnv' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="移除代理命令" value={getProxyUnsetEnv()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'UnsetEnv' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('UnsetEnv')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('TestSocks')}>复制</Button>
-                            {copiedType === 'TestSocks' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'TestSocks' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('TestSocks')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('TestHttp')}>复制</Button>
-                            {copiedType === 'TestHttp' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'TestHttp' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('TestHttp')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看本机外网 IP" value={getMyIP()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('MyIP')}>复制</Button>
-                            {copiedType === 'MyIP' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP" value={getMyIP()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'MyIP' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('MyIP')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
 
-                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看本机外网 IP 归属地" value={getMyIpJson()}/></Box>
-                        <Box>
-                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('MyIpJson')}>复制</Button>
-                            {copiedType === 'MyIpJson' && <ChipCopied/>}
-                        </Box>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP & 归属地" value={getMyIpIp()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'MyIpIp' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('MyIpIp')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
+
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP & 归属地 (JSON)" value={getMyIpJson()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'MyIpJson' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('MyIpJson')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
                     </Stack>
                 </>)}
                 {action === 'system' && (<></>)}
