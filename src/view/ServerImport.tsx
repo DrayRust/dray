@@ -25,7 +25,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         <AppBarComponent/>
         <Card sx={{p: 2, mt: 1}}>
             <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={inputValue}
-                       placeholder="每行一条，例如：vless://xxxxxxx" autoFocus={true} error={error}
+                       placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
                        onChange={(e) => setInputValue(e.target.value)}/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
                 <Button variant="contained" onClick={handleSubmit} disabled={!inputValue}>确认</Button>
