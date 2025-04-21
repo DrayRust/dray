@@ -60,6 +60,14 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         return `curl -x http://${appConfig.ray_host}:${http_port} https://www.google.com`
     }
 
+    const getMyIP = () => {
+        return `curl httpbin.org/ip`
+    }
+
+    const getMyIpJson = () => {
+        return `curl https://api.myip.la/cn?json`
+    }
+
     const timeoutRef = useRef<number>(0)
     const [copiedType, setCopiedType] = useState('')
     const handleCommandCopy = async (type: string) => {
@@ -74,6 +82,10 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getProxyTestSocks()
         } else if (type === 'TestHttp') {
             content = getProxyTestHttp()
+        } else if (type === 'MyIP') {
+            content = getMyIP()
+        } else if (type === 'MyIpJson') {
+            content = getMyIpJson()
         }
         const ok = await clipboardWriteText(content)
         if (!ok) return
@@ -133,6 +145,18 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('TestHttp')}>复制</Button>
                             {copiedType === 'TestHttp' && <ChipCopied/>}
+                        </Box>
+
+                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看本机外网 IP" value={getMyIP()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('MyIP')}>复制</Button>
+                            {copiedType === 'MyIP' && <ChipCopied/>}
+                        </Box>
+
+                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看本机外网 IP 归属地" value={getMyIpJson()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('MyIpJson')}>复制</Button>
+                            {copiedType === 'MyIpJson' && <ChipCopied/>}
                         </Box>
                     </Stack>
                 </>)}
