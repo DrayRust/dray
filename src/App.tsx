@@ -71,7 +71,7 @@ const App: React.FC = () => {
             }
         }
         subscribeLastUpdate = Date.now()
-    }, 300)
+    }, 2000)
 
     const isFocus = useWindowFocus()
     useEffect(() => {
