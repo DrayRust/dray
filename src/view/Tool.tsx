@@ -143,7 +143,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             </div>
             <Card sx={{p: 2, maxWidth: '800px', maxHeight: 'calc(100% - 56px)', m: 'auto', overflow: 'auto'}}>
                 {action === 'term' && (<>
-                    <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={5}
+                    <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={4}
                                       value={osType}
                                       onChange={(_, v) => setOsType(v)}>
                         <BottomNavigationAction value="windows" label="Windows"/>
@@ -152,23 +152,23 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                     </BottomNavigation>
 
                     <Stack spacing={2}>
-                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="设置临时代理" value={getProxySetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="设置临时代理" value={getProxySetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'SetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('SetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="移除临时代理" value={getProxyUnsetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="移除临时代理" value={getProxyUnsetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'UnsetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('UnsetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看代理环境变量‌" value={getProxyGetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="查看代理环境变量‌" value={getProxyGetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'GetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('GetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
@@ -176,30 +176,30 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         </Stack>
 
                         {(osType === 'macOS' || osType === 'linux') && (
-                            <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                            <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline disabled size="small" label="设置永久代理" value={getProxyWriteEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="设置永久代理" value={getProxyWriteEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'WriteEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('WriteEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline disabled size="small" label="移除永久代理" value={getProxyDeleteEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="移除永久代理" value={getProxyDeleteEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'DeleteEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('DeleteEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline disabled size="small" label="立即生效代理" value={getProxySourceEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="立即生效代理" value={getProxySourceEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'SourceEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('SourceEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline disabled size="small" label="测试代理，是否设置成功" value={getProxyTestEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="测试代理，是否设置成功" value={getProxyTestEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'TestEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('TestEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
@@ -207,48 +207,48 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                             </Stack>
                         )}
 
-                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/>
+                                <TextField fullWidth multiline size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'TestSocks' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('TestSocks')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/>
+                                <TextField fullWidth multiline size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'TestHttp' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('TestHttp')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
                         </Stack>
 
-                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP" value={getMyIP()}/>
+                                <TextField fullWidth multiline size="small" label="查看本机外网 IP" value={getMyIP()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'MyIP' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('MyIP')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP & 归属地" value={getMyIpIp()}/>
+                                <TextField fullWidth multiline size="small" label="查看本机外网 IP & 归属地" value={getMyIpIp()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'MyIpIp' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('MyIpIp')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看本机外网 IP & 归属地 (JSON)" value={getMyIpJson()}/>
+                                <TextField fullWidth multiline size="small" label="查看本机外网 IP & 归属地 (JSON)" value={getMyIpJson()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'MyIpJson' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('MyIpJson')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
                         </Stack>
 
-                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                        <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看本机端口" value={getNetstat()}/>
+                                <TextField fullWidth multiline size="small" label="查看本机端口" value={getNetstat()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'Netstat' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('Netstat')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
@@ -256,7 +256,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
 
                             {(osType === 'macOS' || osType === 'linux') && (<>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline disabled size="small" label="查看本机端口（包含进程名）" value={getLsof()}/>
+                                    <TextField fullWidth multiline size="small" label="查看本机端口（包含进程名）" value={getLsof()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'Lsof' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('Lsof')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
