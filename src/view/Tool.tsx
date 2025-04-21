@@ -83,6 +83,8 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         timeoutRef.current = setTimeout(() => setCopiedType(''), 2000)
     }
 
+    const ChipCopied = () => (<Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>)
+
     return (
         <Paper elevation={5} sx={{p: 1, borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
             <div className="flex-center p1">
@@ -112,25 +114,25 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('GetEnv')}>复制</Button>
-                            {copiedType === 'GetEnv' && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                            {copiedType === 'GetEnv' && <ChipCopied/>}
                         </Box>
 
                         <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="移除代理命令" value={getProxyUnsetEnv()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('UnsetEnv')}>复制</Button>
-                            {copiedType === 'UnsetEnv' && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                            {copiedType === 'UnsetEnv' && <ChipCopied/>}
                         </Box>
 
                         <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('TestSocks')}>复制</Button>
-                            {copiedType === 'TestSocks' && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                            {copiedType === 'TestSocks' && <ChipCopied/>}
                         </Box>
 
                         <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy('TestHttp')}>复制</Button>
-                            {copiedType === 'TestHttp' && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                            {copiedType === 'TestHttp' && <ChipCopied/>}
                         </Box>
                     </Stack>
                 </>)}
