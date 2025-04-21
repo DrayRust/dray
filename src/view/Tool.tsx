@@ -72,6 +72,10 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         return `grep 'proxy' ~/.*rc`
     }
 
+    const getProxyTestProxy = () => {
+        return `curl -v https://www.google.com`
+    }
+
     const getProxyTestSocks = () => {
         return `curl -x socks5://${appConfig.ray_host}:${appConfig.ray_socks_port} https://www.google.com`
     }
@@ -107,6 +111,8 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getProxyDeleteEnv()
         } else if (type === 'SourceEnv') {
             content = getProxySourceEnv()
+        } else if (type === 'TestProxy') {
+            content = getProxyTestProxy()
         } else if (type === 'TestEnv') {
             content = getProxyTestEnv()
         } else if (type === 'TestSocks') {
@@ -202,6 +208,13 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                                     <TextField fullWidth multiline size="small" label="测试代理，是否设置成功" value={getProxyTestEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'TestEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('TestEnv')}><ContentCopyIcon/></IconButton>
+                                    </Tooltip>
+                                </Stack>
+
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <TextField fullWidth multiline size="small" label="测试代理，是否正常" value={getProxyTestProxy()}/>
+                                    <Tooltip arrow placement="right" title={copiedType === 'TestProxy' ? '已复制' : '点击复制'}>
+                                        <IconButton onClick={() => handleCommandCopy('TestProxy')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
                             </Stack>
