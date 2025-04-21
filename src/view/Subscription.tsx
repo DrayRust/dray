@@ -159,7 +159,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                 }
             } else {
                 errNum++
-                errMsg = '格式不正确，前缀非 drayDns:// 开头'
+                errMsg = '格式不正确，前缀非 draySub:// 开头'
             }
         }
 
