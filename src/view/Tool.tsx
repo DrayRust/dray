@@ -47,6 +47,15 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
         return osType === 'windows' ? 'set | findstr /i "proxy"' : 'env | grep -i proxy'
     }
 
+    const getProxyTestSocks = () => {
+        return `curl -x socks5://${appConfig.ray_host}:${appConfig.ray_socks_port} https://www.google.com`
+    }
+
+    const getProxyTestHttp = () => {
+        const http_port = rayConfig.http_enable ? appConfig.ray_http_port : appConfig.ray_socks_port
+        return `curl -x http://${appConfig.ray_host}:${http_port} https://www.google.com`
+    }
+
     const timeoutRef = useRef<number>(0)
     const [isCopied, setIsCopied] = useState(-1)
     const handleCommandCopy = async (type: number) => {
@@ -55,6 +64,10 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getProxySetEnv()
         } else if (type === 1) {
             content = getProxyGetEnv()
+        } else if (type === 2) {
+            content = getProxyTestSocks()
+        } else if (type === 3) {
+            content = getProxyTestHttp()
         }
         const ok = await clipboardWriteText(content)
         if (!ok) return
@@ -83,17 +96,29 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         <BottomNavigationAction value="linux" label="Linux"/>
                     </BottomNavigation>
 
-                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                    <Stack spacing={1} component={Card} elevation={5} sx={{p: 1}}>
                         <Box sx={{pt: 1}}><TextField fullWidth multiline disabled size="small" label="设置代理命令" value={getProxySetEnv()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(0)}>复制</Button>
                             {isCopied === 0 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
                         </Box>
 
-                        <Box sx={{pt: 2}}><TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/></Box>
+                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/></Box>
                         <Box>
                             <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(1)}>复制</Button>
                             {isCopied === 1 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </Box>
+
+                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 SOCKS 代理" value={getProxyTestSocks()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(2)}>复制</Button>
+                            {isCopied === 2 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </Box>
+
+                        <Box sx={{pt: 3}}><TextField fullWidth multiline disabled size="small" label="测试 HTTP 代理" value={getProxyTestHttp()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(3)}>复制</Button>
+                            {isCopied === 3 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
                         </Box>
                     </Stack>
                 </>)}
