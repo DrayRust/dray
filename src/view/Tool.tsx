@@ -86,7 +86,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     const getMyIpJson = () => `curl https://api.myip.la/cn?json`
 
     const getNetstat = () => {
-        return osType === 'windows' ? 'netstat -ano | findstr LISTENING' : osType === 'linux' ? 'netstat -tuln' : 'netstat -an | grep LISTEN'
+        return osType === 'windows' ? 'netstat -ano | findstr LISTENING' : osType === 'linux' ? 'netstat -tulnp' : 'netstat -an | grep LISTEN'
     }
 
     const getLsof = () => `lsof -i -P | grep LISTEN`
