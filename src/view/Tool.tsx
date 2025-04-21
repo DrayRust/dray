@@ -66,7 +66,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     const getMyIpJson = () => `curl https://api.myip.la/cn?json`
 
     const getNetstat = () => {
-        return osType === 'linux' ? 'netstat -tuln' : 'netstat -an | grep LISTEN'
+        return osType === 'windows' ? 'netstat -ano | findstr LISTENING' : osType === 'linux' ? 'netstat -tuln' : 'netstat -an | grep LISTEN'
     }
 
     const getLsof = () => `lsof -i -P | grep LISTEN`
@@ -93,7 +93,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
             content = getMyIpJson()
         } else if (type === 'Netstat') {
             content = getNetstat()
-        } else if (type === 'getLsof') {
+        } else if (type === 'Lsof') {
             content = getLsof()
         }
         const ok = await clipboardWriteText(content)
@@ -180,13 +180,14 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                             </Tooltip>
                         </Stack>
 
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField fullWidth multiline disabled size="small" label="查看本机端口" value={getNetstat()}/>
+                            <Tooltip arrow placement="right" title={copiedType === 'Netstat' ? '已复制' : '点击复制'}>
+                                <IconButton onClick={() => handleCommandCopy('Netstat')}><ContentCopyIcon/></IconButton>
+                            </Tooltip>
+                        </Stack>
+
                         {(osType === 'macOS' || osType === 'linux') && (<>
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline disabled size="small" label="查看本机端口" value={getNetstat()}/>
-                                <Tooltip arrow placement="right" title={copiedType === 'Netstat' ? '已复制' : '点击复制'}>
-                                    <IconButton onClick={() => handleCommandCopy('Netstat')}><ContentCopyIcon/></IconButton>
-                                </Tooltip>
-                            </Stack>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <TextField fullWidth multiline disabled size="small" label="查看本机端口（包含进程名）" value={getLsof()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'Lsof' ? '已复制' : '点击复制'}>
