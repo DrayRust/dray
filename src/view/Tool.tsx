@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
-    Card, Chip, Box, Button, Paper, ToggleButtonGroup, ToggleButton, TextField
+    Card, Chip, Box, Button, BottomNavigation, BottomNavigationAction, Paper, Stack, ToggleButtonGroup, ToggleButton, TextField
 } from '@mui/material'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import WysiwygIcon from '@mui/icons-material/Wysiwyg'
@@ -10,6 +10,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { readAppConfig, readRayCommonConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
+import { isLinux, isMacOS, isWindows } from "../util/util.ts"
 
 const Tool: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(5), [setNavState])
@@ -17,6 +18,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
     const [appConfig, setAppConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
     const [rayConfig, setRayConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const [action, setAction] = useState('term')
+    const [osType, setOsType] = useState('macOS')
     useEffect(() => {
         (async () => {
             let newAppConfig = await readAppConfig()
@@ -24,24 +26,42 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
 
             let newRayConfig = await readRayCommonConfig()
             if (newRayConfig) setRayConfig(newRayConfig)
+
+            if (isMacOS()) setOsType('macOS')
+            if (isLinux()) setOsType('linux')
+            if (isWindows()) setOsType('windows')
         })()
     }, [])
 
-    const getProxyEnv = () => {
+    const getProxySetEnv = () => {
         const {ray_host, ray_http_port, ray_socks_port} = appConfig
         const {http_enable} = rayConfig
         const http_port = http_enable ? ray_http_port : ray_socks_port
-        return `export http_proxy=http://${ray_host}:${http_port};
-export https_proxy=http://${ray_host}:${http_port};
-export all_proxy=socks5://${ray_host}:${ray_socks_port}`
+        const cmd = osType === 'windows' ? 'set' : 'export'
+        return `${cmd} http_proxy=http://${ray_host}:${http_port};
+${cmd} https_proxy=http://${ray_host}:${http_port};
+${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     }
 
-    const [isCopied, setIsCopied] = useState(false)
-    const handleCommandCopy = async (content: string) => {
+    const getProxyGetEnv = () => {
+        return osType === 'windows' ? 'set | findstr /i "proxy"' : 'env | grep -i proxy'
+    }
+
+    const timeoutRef = useRef<number>(0)
+    const [isCopied, setIsCopied] = useState(-1)
+    const handleCommandCopy = async (type: number) => {
+        let content = ''
+        if (type === 0) {
+            content = getProxySetEnv()
+        } else if (type === 1) {
+            content = getProxyGetEnv()
+        }
         const ok = await clipboardWriteText(content)
         if (!ok) return
-        setIsCopied(true)
-        setTimeout(() => setIsCopied(false), 2000)
+
+        setIsCopied(type)
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(() => setIsCopied(-1), 2000)
     }
 
     return (
@@ -55,11 +75,27 @@ export all_proxy=socks5://${ray_host}:${ray_socks_port}`
             </div>
             <Card sx={{p: 2, maxWidth: '800px', maxHeight: 'calc(100% - 56px)', m: 'auto', overflow: 'auto'}}>
                 {action === 'term' && (<>
-                    <TextField fullWidth multiline disabled size="small" label="代理命令" value={getProxyEnv()}/>
-                    <Box sx={{mt: 2}}>
-                        <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(getProxyEnv())}>复制</Button>
-                        {isCopied && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
-                    </Box>
+                    <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={5}
+                                      value={osType}
+                                      onChange={(_, v) => setOsType(v)}>
+                        <BottomNavigationAction value="windows" label="Windows"/>
+                        <BottomNavigationAction value="macOS" label="MacOS"/>
+                        <BottomNavigationAction value="linux" label="Linux"/>
+                    </BottomNavigation>
+
+                    <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
+                        <Box sx={{pt: 1}}><TextField fullWidth multiline disabled size="small" label="设置代理命令" value={getProxySetEnv()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(0)}>复制</Button>
+                            {isCopied === 0 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </Box>
+
+                        <Box sx={{pt: 2}}><TextField fullWidth multiline disabled size="small" label="查看代理命令" value={getProxyGetEnv()}/></Box>
+                        <Box>
+                            <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleCommandCopy(1)}>复制</Button>
+                            {isCopied === 1 && <Chip label="复制成功" color="success" size="small" sx={{ml: 2}}/>}
+                        </Box>
+                    </Stack>
                 </>)}
                 {action === 'system' && (<></>)}
                 {action === 'speed' && (<></>)}
