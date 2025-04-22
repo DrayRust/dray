@@ -10,6 +10,25 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     return conf
 }
 
+export function getTestSpeedConf(row: ServerRow, appDir: string, port: number): any {
+    return {
+        log: {
+            loglevel: "debug",
+            access: `${appDir}/logs/xray_test_speed_access.log`,
+            error: `${appDir}/logs/xray_test_speed_error.log`
+        },
+        inbounds: [
+            {
+                tag: "socks-test-in",
+                protocol: "socks",
+                listen: "127.0.0.1",
+                port: port,
+            }
+        ],
+        outbounds: [serverRowToConf(row) || {}]
+    }
+}
+
 export function getLogConf(appDir: string, rayConfig: RayCommonConfig) {
     let obj: any = {}
     obj.loglevel = rayConfig.ray_log_level || "warning"
