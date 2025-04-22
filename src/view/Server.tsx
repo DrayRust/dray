@@ -98,7 +98,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     // ============================== select ==============================
     const handleSelectAll = (checked: boolean) => {
-        setSelectedServers(serverList?.length ? serverList.map((_, k) => k) : [])
+        if (!serverList) return
+        setSelectedServers(checked ? serverList.map((_, k) => k) : [])
         setSelectedAll(checked)
         setShowAction(checked)
     }
