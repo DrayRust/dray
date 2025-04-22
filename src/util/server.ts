@@ -1,6 +1,6 @@
 import { log, readServerList } from './invoke.ts'
 import { decodeBase64, deepSafeDecodeURI, encodeBase64, safeDecodeURI, safeJsonParse, safeJsonStringify, hashJson } from './crypto.ts'
-import { generateShortUniqueId } from "./util.ts"
+import { generateUniqueId } from "./util.ts"
 
 // 排出重复数据
 export async function getNewServerList(input: string) {
@@ -167,7 +167,7 @@ async function uriToVmessRow(uri: string): Promise<ServerRow> {
     if (data.net === 'tcp') data.net = 'raw'
 
     return {
-        id: generateShortUniqueId(),
+        id: generateUniqueId(),
         ps,
         on: 0,
         type: 'vmess',
@@ -267,7 +267,7 @@ async function uriToVlessRow(uri: string): Promise<ServerRow> {
     // if (data.flow) data.net = 'xhttp'
 
     return {
-        id: generateShortUniqueId(),
+        id: generateUniqueId(),
         ps: ps,
         on: 0,
         type: 'vless',
@@ -309,7 +309,7 @@ async function uriToSsRow(uri: string): Promise<ServerRow> {
     data = deepSafeDecodeURI(data)
 
     return {
-        id: generateShortUniqueId(),
+        id: generateUniqueId(),
         ps,
         on: 0,
         type: 'ss',
@@ -361,7 +361,7 @@ async function uriToTrojanRow(uri: string): Promise<ServerRow> {
     data = deepSafeDecodeURI(data)
 
     return {
-        id: generateShortUniqueId(),
+        id: generateUniqueId(),
         ps,
         on: 0,
         type: 'trojan',

@@ -12,7 +12,7 @@ import { VmessForm } from './server/VmessForm.tsx'
 import { VlessForm } from './server/VlessForm.tsx'
 import { SsForm } from './server/SsForm.tsx'
 import { TrojanForm } from './server/TrojanForm.tsx'
-import { generateShortUniqueId } from "../util/util.ts"
+import { generateUniqueId } from "../util/util.ts"
 
 const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -141,7 +141,7 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
 
         let serverList = await readServerList() || []
         const newServer: ServerRow = {
-            id: generateShortUniqueId(),
+            id: generateUniqueId(),
             ps: ps,
             on: 0,
             type: serverType,

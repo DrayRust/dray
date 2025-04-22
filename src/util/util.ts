@@ -24,7 +24,7 @@ export const sizeToUnit = (size: number): string => {
     return `${size.toFixed(decimalPlaces)} ${units[unitIndex]}`
 }
 
-export function generateShortUniqueId(): string {
+export function generateUniqueId(): string {
     const random = Math.floor(Math.random() * 10000)
     const combined = Date.now() * 10000 + random
     return combined.toString(36)
