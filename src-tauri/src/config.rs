@@ -1,5 +1,6 @@
 use crate::dirs;
 use logger::{debug, error, info};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
@@ -241,6 +242,39 @@ pub fn save_conf(filename: &str, content: &str) -> bool {
         },
         Err(e) => {
             error!("{}", e);
+            false
+        }
+    }
+}
+
+pub fn save_test_conf(filename: &str, content: &str) -> bool {
+    let re = Regex::new(r"^[\w.-]+$").unwrap();
+    if !re.is_match(filename) {
+        error!("Invalid filename: '{}' is not allowed.", filename);
+        return false;
+    }
+
+    let dir = dirs::get_dray_conf_dir().unwrap().join("test_speed");
+    if !dir.exists() {
+        if let Err(e) = fs::create_dir_all(&dir) {
+            error!("Failed to create test speed config directory: {}", e);
+            return false;
+        }
+    }
+
+    let path = dir.join(filename);
+    match fs::File::create(path) {
+        Ok(mut file) => {
+            if let Err(e) = file.write_all(content.as_bytes()) {
+                error!("Failed to write config file: {}", e);
+                false
+            } else {
+                debug!("Config file saved successfully: {}", filename);
+                true
+            }
+        }
+        Err(e) => {
+            error!("Failed to create config file: {}", e);
             false
         }
     }

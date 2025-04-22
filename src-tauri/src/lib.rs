@@ -77,6 +77,11 @@ fn save_conf(filename: String, content: String) -> bool {
 }
 
 #[tauri::command]
+fn save_test_conf(filename: String, content: String) -> bool {
+    config::save_test_conf(&filename, &content)
+}
+
+#[tauri::command]
 fn save_proxy_pac(content: String) -> bool {
     web::save_proxy_pac(&content)
 }
@@ -220,6 +225,7 @@ pub fn run() {
             save_ray_config,
             read_conf,
             save_conf,
+            save_test_conf,
             save_proxy_pac,
             save_text_file,
             fetch_get,
