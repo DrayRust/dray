@@ -25,7 +25,7 @@ import { useServerImport } from "../component/useServerImport.tsx"
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
     restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain,
-    readRuleModeList, readDnsConfig, readDnsModeList, checkPortAvailable, saveTestConf
+    readRuleModeList, readDnsConfig, readDnsModeList, checkPortAvailable, saveTestConf, TestSpeedRay, fetchGetGenerate
 } from "../util/invoke.ts"
 import { getConf, getTestSpeedConf } from "../util/serverConf.ts"
 import {
@@ -40,6 +40,7 @@ import {
 import { dnsToConf } from "../util/dns.ts"
 import { ruleToConf } from "../util/rule.ts"
 import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
+import { sleep } from "../util/util.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -264,8 +265,16 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 }
             }
 
+            const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
             const conf = getTestSpeedConf(server, appDir, port)
-            await saveTestConf(server.host.replace(/[\D.]/g, '_') + `-${server.id}.json`, conf)
+            await saveTestConf(filename, conf)
+            await TestSpeedRay(filename)
+
+            await sleep(500)
+            const startTime = Date.now()
+            await fetchGetGenerate(port)
+            const endTime = Date.now() - startTime
+            console.log(`${server.host} 测试速度耗时：${endTime}ms`)
             port++
         }
         resetSelected()

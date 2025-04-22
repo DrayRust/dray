@@ -52,6 +52,11 @@ fn send_log(content: String) -> bool {
 }
 
 #[tauri::command]
+fn test_speed_ray(filename: String) {
+    ray::run_test_server(&filename)
+}
+
+#[tauri::command]
 fn restart_ray() -> bool {
     ray::restart()
 }
@@ -94,6 +99,11 @@ fn save_text_file(path: String, content: String) -> bool {
 #[tauri::command]
 async fn fetch_get(url: String, is_proxy: bool) -> String {
     http::fetch_get(&url, is_proxy).await
+}
+
+#[tauri::command]
+async fn fetch_get_generate(port: u32) -> String {
+    http::fetch_get_generate(port).await
 }
 
 #[tauri::command]
@@ -220,6 +230,7 @@ pub fn run() {
             read_log_file,
             clear_log_all,
             send_log,
+            test_speed_ray,
             restart_ray,
             read_ray_config,
             save_ray_config,
@@ -229,6 +240,7 @@ pub fn run() {
             save_proxy_pac,
             save_text_file,
             fetch_get,
+            fetch_get_generate,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,

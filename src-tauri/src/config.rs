@@ -250,7 +250,7 @@ pub fn save_conf(filename: &str, content: &str) -> bool {
 pub fn save_test_conf(filename: &str, content: &str) -> bool {
     let re = Regex::new(r"^[\w.-]+$").unwrap();
     if !re.is_match(filename) {
-        error!("Invalid filename: '{}' is not allowed.", filename);
+        error!("Error filename: {}", filename);
         return false;
     }
 

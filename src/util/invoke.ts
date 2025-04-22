@@ -48,6 +48,24 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
+export async function TestSpeedRay(filename: string) {
+    if (!isTauri) return
+    try {
+        await invoke('test_speed_ray', {filename})
+    } catch (err) {
+        log.error('Failed to TestSpeedRay:', err)
+    }
+}
+
+export async function fetchGetGenerate(port: number) {
+    if (!isTauri) return
+    try {
+        await invoke('fetch_get_generate', {port})
+    } catch (err) {
+        log.error('Failed to fetchGetGenerate:', err)
+    }
+}
+
 export function restartRay() {
     if (!isTauri) return
     try {
