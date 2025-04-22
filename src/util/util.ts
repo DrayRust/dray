@@ -25,14 +25,8 @@ export const sizeToUnit = (size: number): string => {
 }
 
 export function generateShortUniqueId(): string {
-    // 获取高精度时间戳（微秒级），并转换为纳秒
-    const performanceTime = performance.now ? performance.now() : Math.random() * 1000
-    const nanoseconds = Math.floor((performanceTime % 1) * 1e6)
-
-    const milliseconds = Date.now()
     const random = Math.floor(Math.random() * 10000)
-    const combined = BigInt(milliseconds) * BigInt(1e6) + BigInt(nanoseconds) + BigInt(random)
-
+    const combined = Date.now() * 10000 + random
     return combined.toString(36)
 }
 
