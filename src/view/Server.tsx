@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Stack, Checkbox, Button, Typography, useMediaQuery,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
+    Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Menu, MenuItem, IconButton, Divider, Drawer, TextField, Tooltip,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -24,9 +24,10 @@ import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useServerImport } from "../component/useServerImport.tsx"
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
-    restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList, readDnsConfig, readDnsModeList
+    restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain,
+    readRuleModeList, readDnsConfig, readDnsModeList, checkPortAvailable, saveTestConf
 } from "../util/invoke.ts"
-import { getConf } from "../util/serverConf.ts"
+import { getConf, getTestSpeedConf } from "../util/serverConf.ts"
 import {
     DEFAULT_APP_CONFIG,
     DEFAULT_DNS_CONFIG,
@@ -46,7 +47,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const isMediumScreen = useMediaQuery('(max-width: 1100px)')
 
     const [serverList, setServerList] = useState<ServerList>()
-    const [selectedServers, setSelectedServers] = useState<boolean[]>([])
+    const [selectedServers, setSelectedServers] = useState<number[]>([])
     const [selectedAll, setSelectedAll] = useState(false)
     const [showAction, setShowAction] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
@@ -92,40 +93,30 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     // ============================== export ==============================
     const handleExport = () => {
-        const selectedKeys = getSelectedKeys()
-        navigate(`/server_export`, {state: {selectedKeys}})
-    }
-
-    const getSelectedKeys = () => {
-        const selectedKeys: number[] = []
-        for (let index = 0; index < selectedServers.length; index++) {
-            if (selectedServers[index]) selectedKeys.push(index)
-        }
-        return selectedKeys
+        navigate(`/server_export`, {state: {selectedKeys: selectedServers}})
     }
 
     // ============================== select ==============================
-    useEffect(() => {
-        if (serverList) setSelectedServers(new Array(serverList.length).fill(false))
-    }, [serverList])
-
     const handleSelectAll = (checked: boolean) => {
-        setSelectedServers(new Array(serverList?.length).fill(checked))
+        setSelectedServers(serverList?.length ? serverList.map((_, k) => k) : [])
         setSelectedAll(checked)
         setShowAction(checked)
     }
 
-    const handleSelectServer = (index: number, checked: boolean) => {
-        const newSelected = [...selectedServers]
-        newSelected[index] = checked
+    const handleSelectServer = (key: number, checked: boolean) => {
+        const newSelected = checked ? [...selectedServers, key] : selectedServers.filter(k => k !== key)
         setSelectedServers(newSelected)
-        setSelectedAll(newSelected.every(Boolean))
-        setShowAction(newSelected.some(Boolean))
+        setSelectedAll(newSelected.length === serverList?.length)
+        setShowAction(newSelected.length > 0)
     }
 
     const updateServerList = (newServerList: ServerList) => {
         setServerList(newServerList)
-        setSelectedServers(new Array(newServerList.length).fill(false))
+        resetSelected()
+    }
+
+    const resetSelected = () => {
+        setSelectedServers([])
         setSelectedAll(false)
         setShowAction(false)
     }
@@ -240,18 +231,43 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleBatchDelete = () => {
-        const selectedKeys = selectedServers.map((selected, index) => selected ? index : -1).filter(key => key !== -1)
-        if (selectedKeys.length > 0) {
-            dialogConfirm('确认删除', `确定要删除这 ${selectedKeys.length} 个服务器吗？`, async () => {
-                const newServerList = serverList?.filter((_, index) => !selectedKeys.includes(index)) || []
-                const ok = await saveServerList(newServerList)
-                if (!ok) {
-                    showSnackbar('删除失败', 'error')
+        if (selectedServers.length < 1 || !serverList) return
+
+        dialogConfirm('确认删除', `确定要删除这 ${selectedServers.length} 个服务器吗？`, async () => {
+            const newServerList = serverList.filter((_, index) => !selectedServers.includes(index)) || []
+            const ok = await saveServerList(newServerList)
+            if (!ok) {
+                showSnackbar('删除失败', 'error')
+            } else {
+                updateServerList(newServerList)
+            }
+        })
+    }
+
+    // ============================== test speed ==============================
+    const handleTestSpeed = async () => {
+        if (selectedServers.length < 1 || !serverList) return
+
+        await initConfig()
+        const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
+        let port = 25000
+        let errNum = 0
+        for (const server of testServerList) {
+            for (let i = 0; i < 10; i++) {
+                const portOk = await checkPortAvailable(port)
+                if (portOk) {
+                    break
                 } else {
-                    updateServerList(newServerList)
+                    errNum++
+                    port++
                 }
-            })
+            }
+
+            const conf = getTestSpeedConf(server, appDir, port)
+            await saveTestConf(server.host.replace(':', '-') + `.json`, conf)
+            port++
         }
+        resetSelected()
     }
 
     // ============================== drag sort ==============================
@@ -362,6 +378,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             {showAction && (<>
                 <Button variant="contained" color="info" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
                 <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
+                <Button variant="contained" color="warning" onClick={handleTestSpeed}>测速</Button>
             </>)}
         </Stack>
         {!serverList ? (
@@ -393,7 +410,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             >
                                 <TableCell padding="checkbox">
                                     <Checkbox
-                                        checked={selectedServers[key] ?? false}
+                                        checked={selectedServers.includes(key)}
                                         onChange={(e) => handleSelectServer(key, e.target.checked)}/>
                                 </TableCell>
                                 <TableCell component="th" scope="row">

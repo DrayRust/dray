@@ -192,6 +192,16 @@ async function saveConf(filename: string, content: any) {
     }
 }
 
+export async function saveTestConf(filename: string, content: any) {
+    if (!isTauri) return false
+    try {
+        return invoke<Boolean>('save_test_conf', {filename, 'content': JSON.stringify(content, null, 2)})
+    } catch (err) {
+        log.error('Failed to saveTestConf:', err)
+        return false
+    }
+}
+
 export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
     return readConf('ray_common_config.json')
 }
