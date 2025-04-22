@@ -1,6 +1,7 @@
 import { fetchGet, log, readServerList, saveServerList } from "./invoke.ts"
 import { getNewServerList, getScy } from "./server.ts"
 import { hashJson } from "./crypto.ts"
+import { generateShortUniqueId } from "./util.ts"
 
 export async function getSubscription(row: SubscriptionRow) {
     const s = await fetchGet(row.url, row.isProxy)
@@ -130,6 +131,7 @@ async function subToVmessRow(server: any): Promise<ServerRow> {
     if (data.net === 'tcp') data.net = 'raw'
 
     return {
+        id: generateShortUniqueId(),
         ps,
         on: 0,
         type: 'vmess',
@@ -169,6 +171,7 @@ async function subToVlessRow(server: any): Promise<ServerRow> {
     if (data.net === 'tcp') data.net = 'raw'
 
     return {
+        id: generateShortUniqueId(),
         ps: ps,
         on: 0,
         type: 'vless',
@@ -189,6 +192,7 @@ async function subToSsRow(server: any): Promise<ServerRow> {
     }
 
     return {
+        id: generateShortUniqueId(),
         ps,
         on: 0,
         type: 'ss',
@@ -214,6 +218,7 @@ async function subToTrojanRow(server: any): Promise<ServerRow> {
     }
 
     return {
+        id: generateShortUniqueId(),
         ps,
         on: 0,
         type: 'trojan',
