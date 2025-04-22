@@ -105,7 +105,7 @@ pub fn force_kill() -> bool {
 
     let mut success = true;
     for (pid, process) in sys.processes() {
-        if process.name() == DRAY_XRAY {
+        if process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned()).ends_with(DRAY_XRAY) {
             if process.kill() {
                 info!("Killed xray process with PID: {}", pid);
             } else {
