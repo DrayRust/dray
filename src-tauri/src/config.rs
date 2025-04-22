@@ -205,10 +205,10 @@ pub fn read_conf(filename: &str) -> String {
     match get_conf_path(filename) {
         Ok(config_path) => {
             if !config_path.exists() {
-                if let Err(e) = fs::File::create(&config_path) {
+                /* if let Err(e) = fs::File::create(&config_path) {
                     error!("Failed to create config file: {}", e);
-                    return "".to_string();
-                }
+                } */
+                return "".to_string();
             }
             fs::read_to_string(&config_path).unwrap_or_else(|e| {
                 error!("Failed to read config file: {}", e);
