@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Stack, Checkbox, FormControlLabel, Button, Typography, useMediaQuery,
+    Card, Stack, Checkbox, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
     Menu, MenuItem, IconButton, Divider, Drawer, TextField, Tooltip,
 } from '@mui/material'
@@ -16,12 +16,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import OpenWithIcon from '@mui/icons-material/OpenWith'
 
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useServerImport } from "../component/useServerImport.tsx"
-import { useDebounce } from '../hook/useDebounce.ts'
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
     restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain, readRuleModeList, readDnsConfig, readDnsModeList
@@ -255,7 +255,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ============================== drag sort ==============================
-    const [enableDragSort, setEnableDragSort] = useState(false)
+    /*const [enableDragSort, setEnableDragSort] = useState(false)
     const [dragIndex, setDragIndex] = useState<number>(-1)
     const [dragIsChange, setDragIsChange] = useState(false)
     const handleSaveServerList = useDebounce(async (dragIsChange: boolean, serverList: ServerList) => {
@@ -306,6 +306,39 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             setDragIndex(key)
             setDragIsChange(true)
         }
+    }*/
+
+    // ============================== sort ==============================
+    const [serverSortKey, setServerSortKey] = useState(-1)
+    const handleServerSortStart = (e: React.MouseEvent, key: number) => {
+        e.stopPropagation()
+        if (serverSortKey === -1) {
+            setServerSortKey(key)
+        } else if (serverSortKey === key) {
+            setServerSortKey(-1)
+        } else {
+            handleServerSortEnd(key).catch(_ => 0)
+        }
+    }
+
+    const handleServerSortEnd = async (key: number) => {
+        if (serverSortKey === -1 || !serverList) return
+        if (serverSortKey === key) {
+            setServerSortKey(-1)
+            return
+        }
+
+        let newList = [...serverList]
+        let [temp] = newList.splice(serverSortKey, 1)
+        newList.splice(key, 0, temp)
+        setServerSortKey(-1)
+
+        const ok = await saveServerList(newList)
+        if (!ok) {
+            showSnackbar('保存排序失败', 'error')
+        } else {
+            updateServerList(newList)
+        }
     }
 
     // ============================== copy ==============================
@@ -322,22 +355,14 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     return (<>
         <SnackbarComponent/>
         <DialogComponent/>
-        <Stack direction="row" sx={{mb: 1, minHeight: '42px', justifyContent: "space-between", alignItems: "center"}}>
-            <Stack direction="row" spacing={1}>
-                <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
-                <Button variant="contained" color="success" startIcon={<ContentPasteGoIcon/>} onClick={handleClipboardImport}>剪切板导入</Button>
-                <Button variant="contained" color="warning" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
-                {showAction && (<>
-                    <Button variant="contained" color="info" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
-                    <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
-                </>)}
-            </Stack>
-            {Array.isArray(serverList) && serverList.length > 0 && (
-                <FormControlLabel label="拖拽排序" control={<Checkbox
-                    checked={enableDragSort}
-                    onChange={(e) => setEnableDragSort(e.target.checked)}/>
-                }/>
-            )}
+        <Stack direction="row" spacing={1} sx={{mb: 1}}>
+            <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
+            <Button variant="contained" color="success" startIcon={<ContentPasteGoIcon/>} onClick={handleClipboardImport}>剪切板导入</Button>
+            <Button variant="contained" color="warning" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
+            {showAction && (<>
+                <Button variant="contained" color="info" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
+                <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
+            </>)}
         </Stack>
         {!serverList ? (
             <LoadingCard height={height}/>
@@ -363,10 +388,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             <TableRow
                                 key={key} hover
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                className={enableDragSort ? (dragIndex === key ? 'drag-grabbing' : 'drag-grab') : ''}
-                                onMouseDown={() => handleMouseStart(key)}
-                                onMouseUp={(e) => handleMouseEnd(e)}
-                                onMouseEnter={() => handleMouseEnter(key)}
+                                className={serverSortKey > -1 ? (serverSortKey === key ? 'sort-current' : 'sort-target') : ''}
+                                onClick={() => handleServerSortEnd(key)}
                             >
                                 <TableCell padding="checkbox">
                                     <Checkbox
@@ -386,7 +409,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     </div>
                                 </TableCell>
                                 {!isMediumScreen && (<><TableCell>{row.type}</TableCell><TableCell>{row.scy}</TableCell></>)}
-                                <TableCell padding="checkbox">
+                                <TableCell align="right" width="120" sx={{p: '8px'}}>
+                                    <Tooltip title="排序" arrow placement="top">
+                                        <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
+                                    </Tooltip>
                                     <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
                                 </TableCell>
                             </TableRow>

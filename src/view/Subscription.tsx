@@ -372,10 +372,9 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
             </Stack>
         </Dialog>
 
-        <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
+        <Stack direction="row" spacing={1} sx={{mb: 1}}>
             <Button variant="contained" color="secondary" startIcon={<AddIcon/>} onClick={handleCreate}>添加</Button>
             <Button variant="contained" color="success" startIcon={<FileUploadIcon/>} onClick={handleImport}>导入</Button>
-
             {subscriptionChecked.length > 0 && (<>
                 <Button variant="contained" color="warning" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
                 <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
