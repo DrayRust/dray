@@ -69,7 +69,7 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     }
 
     const getProxyTestEnv = () => {
-        return `grep 'proxy' ~/.*rc`
+        return osType === 'macOS' ? `grep 'proxy' ~/.*rc ~/.bash_profile` : `grep 'proxy' ~/.*rc`
     }
 
     const getProxyTestProxy = () => {
