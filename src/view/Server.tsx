@@ -265,7 +265,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             }
 
             const conf = getTestSpeedConf(server, appDir, port)
-            await saveTestConf(server.host.replace(':', '-') + `.json`, conf)
+            await saveTestConf(server.host.replace(/[\D.]/g, '_') + `-${server.id}.json`, conf)
             port++
         }
         resetSelected()
