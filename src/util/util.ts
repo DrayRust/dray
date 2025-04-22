@@ -24,6 +24,18 @@ export const sizeToUnit = (size: number): string => {
     return `${size.toFixed(decimalPlaces)} ${units[unitIndex]}`
 }
 
+export function generateShortUniqueId(): string {
+    // 获取高精度时间戳（微秒级），并转换为纳秒
+    const performanceTime = performance.now ? performance.now() : Math.random() * 1000
+    const nanoseconds = Math.floor((performanceTime % 1) * 1e6)
+
+    const milliseconds = Date.now()
+    const random = Math.floor(Math.random() * 10000)
+    const combined = BigInt(milliseconds) * BigInt(1e6) + BigInt(nanoseconds) + BigInt(random)
+
+    return combined.toString(36)
+}
+
 export function generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
         const r = (Math.random() * 16) | 0
