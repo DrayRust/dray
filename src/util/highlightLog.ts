@@ -24,7 +24,7 @@ const keywordMap = [
     {regex: /\bdns\b/gi, color: '#568ed9'},
     {regex: /\bproxy\b/g, color: '#fb8c00'},
     {regex: /\bdirect\b/g, color: '#4caf50'},
-    {regex: /\bblock\b/g, color: '#d50000'},
+    {regex: /\breject\b/g, color: '#d50000'},
     {regex: /\binbound\b/g, color: '#69ab73'},
     {regex: /\boutbound\b/g, color: '#cf8e6d'},
     {regex: /\binvalid args\b/g, color: 'red'},

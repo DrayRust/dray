@@ -40,7 +40,7 @@ export const DEFAULT_RULE_CONFIG: RuleConfig = {
 export const DEFAULT_RULE_DOMAIN: RuleDomain = {
     proxy: '',
     direct: '',
-    block: ''
+    reject: ''
 }
 
 // https://xtls.github.io/config/routing.html#ruleobject
@@ -80,7 +80,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "UDP 443 流量",
                 "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",
@@ -92,7 +92,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "domain",
                 "domain": "geosite:category-ads-all",
                 "ip": "",
@@ -104,7 +104,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "屏蔽 BT 流量",
                 "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",
@@ -172,7 +172,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "UDP 443 流量",
                 "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",
@@ -184,7 +184,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "domain",
                 "domain": "geosite:category-ads-all",
                 "ip": "",
@@ -196,7 +196,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "屏蔽 BT 流量",
                 "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",
@@ -252,7 +252,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "UDP 443 流量",
                 "note": "屏蔽 UDP 443 端口流量，部分游戏，流媒体会用这个端口",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",
@@ -264,7 +264,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "domain",
                 "domain": "geosite:category-ads-all",
                 "ip": "",
@@ -276,7 +276,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             {
                 "name": "屏蔽 BT 流量",
                 "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "block",
+                "outboundTag": "reject",
                 "ruleType": "multi",
                 "domain": "",
                 "ip": "",

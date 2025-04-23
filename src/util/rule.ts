@@ -81,12 +81,12 @@ export function ruleDomainToConf(ruleDomain: RuleDomain): any[] {
         })
     }
 
-    if (ruleDomain.block) {
+    if (ruleDomain.reject) {
         rules.push({
             type: 'field',
-            ruleTag: 'dray-domain-block',
-            outboundTag: 'block',
-            domain: processLines(ruleDomain.block),
+            ruleTag: 'dray-domain-reject',
+            outboundTag: 'reject',
+            domain: processLines(ruleDomain.reject),
         })
     }
 

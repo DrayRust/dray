@@ -71,7 +71,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         const newRuleDomain = {
             proxy: processDomain(ruleDomain.proxy, true),
             direct: processDomain(ruleDomain.direct, true),
-            block: processDomain(ruleDomain.block, true),
+            reject: processDomain(ruleDomain.reject, true),
         }
         setRuleDomain(newRuleDomain)
         const ok = await saveRuleDomain(newRuleDomain)
@@ -159,8 +159,8 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
                                 <TextField
                                     variant="outlined" fullWidth multiline rows={6}
                                     label="请填写域名(每行一条)"
-                                    value={ruleDomain.block}
-                                    onChange={handleDomainChange('block')}
+                                    value={ruleDomain.reject}
+                                    onChange={handleDomainChange('reject')}
                                     placeholder="例如：fakebanklogin.com"/>
                             </>)}
 

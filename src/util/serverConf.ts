@@ -59,7 +59,7 @@ export function getOutboundsConf(row: ServerRow, rayConfig: RayCommonConfig) {
             protocol: "freedom"
         },
         {
-            tag: "block",
+            tag: "reject",
             protocol: "blackhole"
         }
     ]

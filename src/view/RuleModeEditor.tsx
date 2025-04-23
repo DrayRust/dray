@@ -25,13 +25,13 @@ import { DEFAULT_RULE } from "../util/config.ts"
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
     direct: '直接访问',
-    block: '阻止访问'
+    reject: '阻止访问'
 }
 
 const oTagColors: Record<string, string> = {
     proxy: 'warning',
     direct: 'success',
-    block: 'error'
+    reject: 'error'
 }
 
 const ruleTypeList: Record<string, string> = {

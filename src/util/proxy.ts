@@ -16,8 +16,8 @@ export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDom
         const proxy = config.ray_host + ":" + config.ray_socks_port
         const proxyDomains = ruleDomain.proxy ? JSON.stringify(processLines(ruleDomain.proxy.toLowerCase()), null, '\t') : '[]'
         const directDomains = ruleDomain.direct ? JSON.stringify(processLines(ruleDomain.direct.toLowerCase()), null, '\t') : '[]'
-        const blockDomains = ruleDomain.block ? JSON.stringify(processLines(ruleDomain.block.toLowerCase()), null, '\t') : '[]'
-        const s = generateProxyPAC(proxy, proxyDomains, directDomains, blockDomains, ruleConfig.unmatchedStrategy === 'direct')
+        const rejectDomains = ruleDomain.reject ? JSON.stringify(processLines(ruleDomain.reject.toLowerCase()), null, '\t') : '[]'
+        const s = generateProxyPAC(proxy, proxyDomains, directDomains, rejectDomains, ruleConfig.unmatchedStrategy === 'direct')
         await saveProxyPac(s)
 
         // 通知操作系统 PAC 文件已经更新，关闭再开启
@@ -33,7 +33,7 @@ export async function updateProxyPAC(ruleConfig: RuleConfig, ruleDomain: RuleDom
     }
 }
 
-function generateProxyPAC(proxy: string, proxyDomains: string, directDomains: string, blockDomains: string, isUnmatchedDirect: boolean = true) {
+function generateProxyPAC(proxy: string, proxyDomains: string, directDomains: string, rejectDomains: string, isUnmatchedDirect: boolean = true) {
     return `
 var proxy = 'SOCKS5 ${proxy}';
 
@@ -41,7 +41,7 @@ var proxyDomains = ${proxyDomains};
 
 var directDomains = ${directDomains};
 
-var blockDomains = ${blockDomains};
+var rejectDomains = ${rejectDomains};
 
 if (!String.prototype.endsWith) {
 	String.prototype.endsWith = function(s) {
@@ -56,7 +56,7 @@ function isHostMatch(domains, host) {
 function FindProxyForURL(url, host) {
 	if (isHostMatch(proxyDomains, host)) return proxy;
 	if (isHostMatch(directDomains, host)) return "DIRECT";
-	if (isHostMatch(blockDomains, host)) return "PROXY 0.0.0.0:80";
+	if (isHostMatch(rejectDomains, host)) return "PROXY 0.0.0.0:80";
 	return ${isUnmatchedDirect ? '"DIRECT"' : 'proxy'};
 }
 `

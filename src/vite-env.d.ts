@@ -196,7 +196,7 @@ interface RuleConfig {
 interface RuleDomain {
     proxy: string; // 通过代理访问的域名，每行一条
     direct: string; // 直接访问的域名，每行一条
-    block: string; // 阻止访问的域名，每行一条
+    reject: string; // 阻止访问的域名，每行一条
 }
 
 // https://xtls.github.io/config/routing.html#ruleobject
@@ -223,7 +223,7 @@ interface RuleDomain {
 interface RuleRow {
     name: string; // 规则名称
     note: string; // 规则描述
-    outboundTag: string; // 访问方式，对应出站连接配置的标识 如: proxy / direct / block
+    outboundTag: string; // 访问方式，对应出站连接配置的标识 如: proxy / direct / reject
     ruleType: string; // 规则类型 如: domain / ip / multi (多维规则)
     domain: string; // 域名
     ip: string; // IP
