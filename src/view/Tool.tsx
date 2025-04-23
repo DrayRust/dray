@@ -39,9 +39,9 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
         const {http_enable} = rayConfig
         const http_port = http_enable ? ray_http_port : ray_socks_port
         const cmd = osType === 'windows' ? 'set' : 'export'
-        return `${cmd} http_proxy=http://${ray_host}:${http_port};
-${cmd} https_proxy=http://${ray_host}:${http_port};
-${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
+        return `${cmd} http_proxy=http://${ray_host}:${http_port};\n`
+            + `${cmd} https_proxy=http://${ray_host}:${http_port};\n`
+            + `${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
     }
 
     const getProxyUnsetEnv = () => {
