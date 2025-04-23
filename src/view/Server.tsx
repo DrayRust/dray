@@ -45,6 +45,9 @@ import { runWithConcurrency } from "../util/concurrency.ts"
 import { generateServersPort, serverTestSpeed } from "../util/serverSpeed.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 
+let SPEED_TEST_SERVERS_CACHE = {}
+let SPEED_TEST_LAST_DATE = 0
+
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
     const navigate = useNavigate()
@@ -61,7 +64,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             if (d) {
                 const list = d as ServerList
                 setServerList(list)
-                serversTestSpeed(list)
+                serverAllTestSpeed(list)
             } else {
                 setServerList([])
                 setErrorMsg('暂无服务器')
@@ -69,6 +72,12 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         })()
     }
     useEffect(() => readList(), [])
+
+    const serverAllTestSpeed = (serverList: ServerList) => {
+        if (Date.now() - SPEED_TEST_LAST_DATE < 1000 * 60 * 5) return // 更新频率，不要超过 5 分钟
+        serversTestSpeed(serverList)
+        SPEED_TEST_LAST_DATE = Date.now()
+    }
 
     // ============================== create & update ==============================
     const handleCreate = () => {
@@ -258,6 +267,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
         serversTestSpeed(testServerList)
         clearSelected()
+        SPEED_TEST_LAST_DATE = Date.now()
     }
 
     const serversTestSpeed = useDebounce(async (serverList: ServerList) => {
@@ -268,16 +278,23 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         await runWithConcurrency(tasks, 5)
     }, 300)
 
-    const [testList, setTestList] = useState<Record<string, string>>({})
-    const testServerSpeed = async (server: ServerRow, port: number) => {
-        setTestList(prev => ({...prev, [server.id]: 'testStart'}))
+    const [testList, setTestList] = useState<Record<string, string>>(SPEED_TEST_SERVERS_CACHE)
+    const setServersTestSpeed = (id: string, value: string) => {
+        setTestList(prev => {
+            const newVal = {...prev, [id]: value}
+            SPEED_TEST_SERVERS_CACHE = newVal
+            return newVal
+        })
+    }
 
+    const testServerSpeed = async (server: ServerRow, port: number) => {
+        setServersTestSpeed(server.id, 'testStart')
         const endTime = await serverTestSpeed(server, appDir, port)
         if (endTime > 10000) {
-            setTestList(prev => ({...prev, [server.id]: `testError`}))
+            setServersTestSpeed(server.id, 'testError')
             return
         } else {
-            setTestList(prev => ({...prev, [server.id]: formatSecond(endTime)}))
+            setServersTestSpeed(server.id, formatSecond(endTime))
         }
     }
 
