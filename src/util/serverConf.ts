@@ -14,8 +14,8 @@ export function getSpeedTestConf(row: ServerRow, appDir: string, port: number): 
     return {
         log: !appDir ? {} : {
             loglevel: "debug",
-            access: `${appDir}/logs/xray_test_speed_access.log`,
-            error: `${appDir}/logs/xray_test_speed_error.log`
+            access: `${appDir}/logs/xray_speed_test_access.log`,
+            error: `${appDir}/logs/xray_speed_test_error.log`
         },
         inbounds: [
             {
