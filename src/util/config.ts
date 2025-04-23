@@ -63,7 +63,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "中国大陆模式",
         "note": "专为中国大陆网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "42e1dff7eafdd5c1b5f399bf178715881ad9bf0203705f9c41e75ddf57c84abc",
+        "hash": "e085c319f010c08e502bfbc8bcdf3e3d28a1f93ed10488a6819be2064f174d99",
         "rules": [
             {
                 "name": "中国大陆 DNS 服务器",
@@ -167,7 +167,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "俄罗斯模式",
         "note": "专为俄罗斯网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "144ea270d77f516f60138522620149c521d8fa72c7cff7fcdefc82ad73bb97ae",
+        "hash": "2326c8c982f75314cac9269f249c45655cc207841dedac3024b8ef9529cb460e",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -247,7 +247,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "伊朗模式",
         "note": "专为伊朗网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "8e894a2a484f893b2314be1d1d00435d57ab442a00caa9b3a911d14883ccce7c",
+        "hash": "94f55a409977848dfb3206d564ff75a41bb580c5c143192eb8a01242562eeca1",
         "rules": [
             {
                 "name": "UDP 443 流量",
