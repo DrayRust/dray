@@ -446,12 +446,12 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell component="th" scope="row">
                                     <div className="flex-between">
                                         <div>
-                                            {isMediumScreen ? (<>
+                                            {!isMediumScreen ? row.ps : (<>
                                                 <Typography>{row.ps}</Typography>
                                                 <Typography variant="body2" color="warning">{row.host}</Typography>
                                                 <Typography variant="body2" color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography>
                                                 </Typography>
-                                            </>) : row.ps}
+                                            </>)}
                                         </div>
                                         {testList[row.id] === 'testStart' ? (
                                             <Chip label="测速中" color="warning" size="small"/>
