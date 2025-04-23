@@ -326,7 +326,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
 ]
 
 export const DEFAULT_DNS_CONFIG: DnsConfig = {
-    enable: false,
+    enable: true,
     mode: 0,
 }
 
