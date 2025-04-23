@@ -281,9 +281,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [testList, setTestList] = useState<Record<string, string>>(SPEED_TEST_SERVERS_CACHE)
     const setServersSpeedTest = (id: string, value: string) => {
         setTestList(prev => {
-            if (!['testStart', 'testError'].includes(value)) {
-                SPEED_TEST_SERVERS_CACHE = {...SPEED_TEST_SERVERS_CACHE, [id]: value}
-            }
+            if ('testStart' !== value) SPEED_TEST_SERVERS_CACHE = {...SPEED_TEST_SERVERS_CACHE, [id]: value}
             return {...prev, [id]: value}
         })
     }
