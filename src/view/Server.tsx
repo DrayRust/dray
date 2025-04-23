@@ -425,7 +425,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                             {!isMediumScreen && (<>
                                 <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
                                 <TableCell sx={{width: '100px'}}>协议类型</TableCell>
-                                <TableCell sx={{width: '180px'}}>安全类型</TableCell>
+                                <TableCell sx={{width: '200px'}}>安全类型</TableCell>
                             </>)}
                             <TableCell width="150"/>
                         </TableRow>
