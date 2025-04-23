@@ -387,7 +387,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 ) : activeTab === 1 ? (
                     <Card>
-                        <Typography variant="body1" sx={{p: 2}}>自动设置</Typography>
+                        <Typography variant="h6" sx={{p: 2, pl: 3, pb: 1.5}}>自动设置</Typography>
                         <Divider/>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
