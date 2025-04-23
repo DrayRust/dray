@@ -58,7 +58,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         (async () => {
             const d = await readServerList()
             if (d) {
-                setServerList(d as ServerList)
+                const list = d as ServerList
+                setServerList(list)
+                await serversTestSpeed(list)
             } else {
                 setServerList([])
                 setErrorMsg('暂无服务器')
@@ -249,18 +251,23 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ============================== test speed ==============================
-    const [testList, setTestList] = useState<Record<string, string>>({})
     const handleTestSpeed = async () => {
         if (selectedServers.length < 1 || !serverList) return
 
-        await initConfig()
-        const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
-        const servers = await generateServersPort(testServerList)
         clearSelected()
+        const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
+        await serversTestSpeed(testServerList)
+    }
+
+    const serversTestSpeed = async (serverList: ServerList) => {
+        if (serverList.length < 1) return
+        await initConfig()
+        const servers = await generateServersPort(serverList)
         const tasks = servers.map((row) => () => testServerSpeed(row.server, row.port))
         await runWithConcurrency(tasks, 5)
     }
 
+    const [testList, setTestList] = useState<Record<string, string>>({})
     const testServerSpeed = async (server: ServerRow, port: number) => {
         setTestList(prev => ({...prev, [server.id]: 'testStart'}))
 
