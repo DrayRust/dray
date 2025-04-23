@@ -1,4 +1,4 @@
-use logger::info;
+use logger::{info, warn};
 use std::net::TcpListener;
 
 use crate::{config, log, network, ray, web};
@@ -125,7 +125,7 @@ pub fn check_port_available(port: u32) -> bool {
             true
         }
         Err(e) => {
-            info!("Port {} is not available: {}", port, e);
+            warn!("[Oops!] Port {} is unavailable: {}", port, e);
             false
         }
     }
