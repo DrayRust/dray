@@ -223,7 +223,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const handleBatchDelete = () => {
         if (subscriptionChecked.length < 1) return
 
-        dialogConfirm('确认删除', `确定要删除这 ${subscriptionChecked.length} 个服务器吗？`, async () => {
+        dialogConfirm('确认删除', `确定要删除这 ${subscriptionChecked.length} 个订阅吗？`, async () => {
             const newList = subscriptionList.filter((_, index) => !subscriptionChecked.includes(index)) || []
             const ok = await saveSubscriptionList(newList)
             if (!ok) {
@@ -400,7 +400,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Checkbox value={key} checked={subscriptionChecked.includes(key)} onChange={handleCheckedChange}/>
                                     </TableCell>
                                     <TableCell component="th" scope="row" sx={{p: 1}}>
-                                        <Typography variant="h6" component="div">{row.name}</Typography>
+                                        <Typography variant="body1">{row.name}</Typography>
                                         <Typography variant="body2" color="textSecondary">{row.note}</Typography>
                                         <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
                                     </TableCell>

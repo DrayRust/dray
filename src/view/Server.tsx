@@ -415,17 +415,20 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <ErrorCard errorMsg={errorMsg} height={height}/>
         ) : (
             <TableContainer component={Card}>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell padding="checkbox">
                                 <Checkbox checked={selectedAll}
                                           onChange={(e) => handleSelectAll(e.target.checked)}/>
                             </TableCell>
-                            <TableCell>服务器名称</TableCell>
-                            <TableCell sx={{width: '280px'}}>服务器地址</TableCell>
-                            {!isMediumScreen && (<><TableCell sx={{width: '100px'}}>协议类型</TableCell><TableCell sx={{width: '200px'}}>安全类型</TableCell></>)}
-                            <TableCell padding="checkbox"/>
+                            <TableCell sx={{py: 1}}>服务器名称</TableCell>
+                            {!isMediumScreen && (<>
+                                <TableCell sx={{width: '200px'}}>服务器地址</TableCell>
+                                <TableCell sx={{width: '100px'}}>协议类型</TableCell>
+                                <TableCell sx={{width: '180px'}}>安全类型</TableCell>
+                            </>)}
+                            <TableCell width="150"/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -444,10 +447,12 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell component="th" scope="row">
                                     <div className="flex-between">
                                         <div>
-                                            {row.ps}
-                                            {isMediumScreen && (
-                                                <Typography color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography></Typography>
-                                            )}
+                                            {isMediumScreen ? (<>
+                                                <Typography>{row.ps}</Typography>
+                                                <Typography variant="body2" color="warning">{row.host}</Typography>
+                                                <Typography variant="body2" color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography>
+                                                </Typography>
+                                            </>) : row.ps}
                                         </div>
                                         {testList[row.id] === 'testStart' ? (
                                             <Chip label="测速中" color="warning" size="small"/>
@@ -458,14 +463,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                         )}
                                     </div>
                                 </TableCell>
-                                <TableCell>
-                                    <div className="flex-between">
-                                        {row.host}
-                                        {Boolean(row.on) && (<Chip label="启用" color="success" size="small"/>)}
-                                    </div>
-                                </TableCell>
-                                {!isMediumScreen && (<><TableCell>{row.type}</TableCell><TableCell>{row.scy}</TableCell></>)}
-                                <TableCell align="right" width="120" sx={{p: '8px'}}>
+                                {!isMediumScreen && (<>
+                                    <TableCell>{row.host}</TableCell>
+                                    <TableCell>{row.type}</TableCell>
+                                    <TableCell>{row.scy}</TableCell>
+                                </>)}
+                                <TableCell align="right" sx={{p: '8px'}}>
+                                    {Boolean(row.on) && (<Chip label="启用" color="secondary" size="small" sx={{mr: 1}}/>)}
                                     <Tooltip title="排序" arrow placement="top">
                                         <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                     </Tooltip>
