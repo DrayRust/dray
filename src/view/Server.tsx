@@ -42,7 +42,7 @@ import { ruleToConf } from "../util/rule.ts"
 import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
 import { formatSecond } from "../util/util.ts"
 import { runWithConcurrency } from "../util/concurrency.ts"
-import { generateServersPort, serverTestSpeed } from "../util/serverSpeed.ts"
+import { generateServersPort, serverSpeedTest } from "../util/serverSpeed.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 
 let SPEED_TEST_SERVERS_CACHE = {}
@@ -64,7 +64,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             if (d) {
                 const list = d as ServerList
                 setServerList(list)
-                serverAllTestSpeed(list)
+                serverAllSpeedTest(list)
             } else {
                 setServerList([])
                 setErrorMsg('暂无服务器')
@@ -73,9 +73,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
     useEffect(() => readList(), [])
 
-    const serverAllTestSpeed = (serverList: ServerList) => {
+    const serverAllSpeedTest = (serverList: ServerList) => {
         if (Date.now() - SPEED_TEST_LAST_DATE < 1000 * 60 * 5) return // 更新频率，不要超过 5 分钟
-        serversTestSpeed(serverList)
+        serversSpeedTest(serverList)
         SPEED_TEST_LAST_DATE = Date.now()
     }
 
@@ -260,17 +260,17 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
-    // ============================== test speed ==============================
-    const handleTestSpeed = async () => {
+    // ============================== speed test ==============================
+    const handleSpeedTest = async () => {
         if (selectedServers.length < 1 || !serverList) return
 
         const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
-        serversTestSpeed(testServerList)
+        serversSpeedTest(testServerList)
         clearSelected()
         SPEED_TEST_LAST_DATE = Date.now()
     }
 
-    const serversTestSpeed = useDebounce(async (serverList: ServerList) => {
+    const serversSpeedTest = useDebounce(async (serverList: ServerList) => {
         if (serverList.length < 1) return
         await initConfig()
         const servers = await generateServersPort(serverList)
@@ -279,7 +279,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }, 300)
 
     const [testList, setTestList] = useState<Record<string, string>>(SPEED_TEST_SERVERS_CACHE)
-    const setServersTestSpeed = (id: string, value: string) => {
+    const setServersSpeedTest = (id: string, value: string) => {
         setTestList(prev => {
             const newVal = {...prev, [id]: value}
             SPEED_TEST_SERVERS_CACHE = newVal
@@ -288,13 +288,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const testServerSpeed = async (server: ServerRow, port: number) => {
-        setServersTestSpeed(server.id, 'testStart')
-        const endTime = await serverTestSpeed(server, appDir, port)
+        setServersSpeedTest(server.id, 'testStart')
+        const endTime = await serverSpeedTest(server, appDir, port)
         if (endTime > 10000) {
-            setServersTestSpeed(server.id, 'testError')
+            setServersSpeedTest(server.id, 'testError')
             return
         } else {
-            setServersTestSpeed(server.id, formatSecond(endTime))
+            setServersSpeedTest(server.id, formatSecond(endTime))
         }
     }
 
@@ -406,7 +406,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             {showAction && (<>
                 <Button variant="contained" color="info" startIcon={<FileDownloadIcon/>} onClick={handleExport}>导出</Button>
                 <Button variant="contained" color="error" onClick={handleBatchDelete}>批量删除</Button>
-                <Button variant="contained" color="warning" onClick={handleTestSpeed}>测速</Button>
+                <Button variant="contained" color="warning" onClick={handleSpeedTest}>测速</Button>
             </>)}
         </Stack>
         {!serverList ? (

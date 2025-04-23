@@ -1,6 +1,6 @@
-import { checkPortAvailable, fetchGetGenerate, log, saveTestConf, TestSpeedRay } from "./invoke.ts"
+import { checkPortAvailable, fetchGetGenerate, log, saveTestConf, SpeedTestRay } from "./invoke.ts"
 import { getRandomNumber, sleep } from "./util.ts"
-import { getTestSpeedConf } from "./serverConf.ts"
+import { getSpeedTestConf } from "./serverConf.ts"
 
 export async function generateServersPort(serverList: ServerList) {
     let port = getRandomNumber(25000, 35000)
@@ -23,11 +23,11 @@ export async function generateServersPort(serverList: ServerList) {
     return servers
 }
 
-export async function serverTestSpeed(server: ServerRow, appDir: string, port: number) {
+export async function serverSpeedTest(server: ServerRow, appDir: string, port: number) {
     const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
-    const conf = getTestSpeedConf(server, appDir, port)
+    const conf = getSpeedTestConf(server, appDir, port)
     await saveTestConf(filename, conf)
-    await TestSpeedRay(filename)
+    await SpeedTestRay(filename)
 
     await sleep(500)
     const startTime = Date.now()

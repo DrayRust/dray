@@ -48,12 +48,12 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
-export async function TestSpeedRay(filename: string) {
+export async function SpeedTestRay(filename: string) {
     if (!isTauri) return
     try {
         await invoke('test_speed_ray', {filename})
     } catch (err) {
-        log.error('Failed to TestSpeedRay:', err)
+        log.error('Failed to SpeedTestRay:', err)
     }
 }
 

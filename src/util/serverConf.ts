@@ -10,7 +10,7 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     return conf
 }
 
-export function getTestSpeedConf(row: ServerRow, appDir: string, port: number): any {
+export function getSpeedTestConf(row: ServerRow, appDir: string, port: number): any {
     return {
         log: !appDir ? {} : {
             loglevel: "debug",
