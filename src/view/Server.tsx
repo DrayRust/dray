@@ -43,6 +43,7 @@ import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
 import { formatSecond } from "../util/util.ts"
 import { runWithConcurrency } from "../util/concurrency.ts"
 import { generateServersPort, serverTestSpeed } from "../util/serverSpeed.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -60,7 +61,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             if (d) {
                 const list = d as ServerList
                 setServerList(list)
-                await serversTestSpeed(list)
+                serversTestSpeed(list)
             } else {
                 setServerList([])
                 setErrorMsg('暂无服务器')
@@ -254,18 +255,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const handleTestSpeed = async () => {
         if (selectedServers.length < 1 || !serverList) return
 
-        clearSelected()
         const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
-        await serversTestSpeed(testServerList)
+        serversTestSpeed(testServerList)
+        clearSelected()
     }
 
-    const serversTestSpeed = async (serverList: ServerList) => {
+    const serversTestSpeed = useDebounce(async (serverList: ServerList) => {
         if (serverList.length < 1) return
         await initConfig()
         const servers = await generateServersPort(serverList)
         const tasks = servers.map((row) => () => testServerSpeed(row.server, row.port))
         await runWithConcurrency(tasks, 5)
-    }
+    }, 300)
 
     const [testList, setTestList] = useState<Record<string, string>>({})
     const testServerSpeed = async (server: ServerRow, port: number) => {
