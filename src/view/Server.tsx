@@ -74,7 +74,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => readList(), [])
 
     const serverAllSpeedTest = (serverList: ServerList) => {
-        if (Date.now() - SPEED_TEST_LAST_DATE < 1000 * 60 * 5) return // 更新频率，不要超过 5 分钟
+        if (Date.now() - SPEED_TEST_LAST_DATE < 1000 * 60 * 30) return // 更新频率，不要超过 30 分钟
         serversSpeedTest(serverList)
         SPEED_TEST_LAST_DATE = Date.now()
     }

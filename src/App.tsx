@@ -60,7 +60,7 @@ const App: React.FC = () => {
     }
 
     const subscribeUpdate = useDebounce(async () => {
-        if (Date.now() - subscribeLastUpdate < 1000 * 60 * 5) return // 更新频率，不要超过 5 分钟
+        if (Date.now() - subscribeLastUpdate < 1000 * 60 * 10) return // 更新频率，不要超过 10 分钟
 
         const subList = await readSubscriptionList() as SubscriptionList
         if (subList) {
