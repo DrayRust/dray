@@ -40,7 +40,8 @@ import {
 import { dnsToConf } from "../util/dns.ts"
 import { ruleToConf } from "../util/rule.ts"
 import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
-import { sleep } from "../util/util.ts"
+import { formatSecond, sleep } from "../util/util.ts"
+import { runWithConcurrency } from "../util/concurrency.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -114,10 +115,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const updateServerList = (newServerList: ServerList) => {
         setServerList(newServerList)
-        resetSelected()
+        clearSelected()
     }
 
-    const resetSelected = () => {
+    const clearSelected = () => {
         setSelectedServers([])
         setSelectedAll(false)
         setShowAction(false)
@@ -247,6 +248,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ============================== test speed ==============================
+    const [testList, setTestList] = useState<Record<string, string>>({})
     const handleTestSpeed = async () => {
         if (selectedServers.length < 1 || !serverList) return
 
@@ -254,30 +256,43 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
         let port = 25000
         let errNum = 0
+        let servers = []
         for (const server of testServerList) {
             for (let i = 0; i < 10; i++) {
-                const portOk = await checkPortAvailable(port)
-                if (portOk) {
+                const ok = await checkPortAvailable(port)
+                if (ok) {
                     break
                 } else {
                     errNum++
                     port++
                 }
             }
-
-            const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
-            const conf = getTestSpeedConf(server, appDir, port)
-            await saveTestConf(filename, conf)
-            await TestSpeedRay(filename)
-
-            await sleep(500)
-            const startTime = Date.now()
-            await fetchGetGenerate(port)
-            const endTime = Date.now() - startTime
-            console.log(`${server.host} 测试速度耗时：${endTime}ms`)
+            servers.push({server, port})
             port++
         }
-        resetSelected()
+        clearSelected()
+        const tasks = servers.map((row) => () => testServerSpeed(row.server, row.port))
+        await runWithConcurrency(tasks, 5)
+    }
+
+    const testServerSpeed = async (server: ServerRow, port: number) => {
+        setTestList(prev => ({...prev, [server.id]: 'testStart'}))
+
+        const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
+        const conf = getTestSpeedConf(server, appDir, port)
+        await saveTestConf(filename, conf)
+        await TestSpeedRay(filename)
+
+        await sleep(500)
+        const startTime = Date.now()
+        await fetchGetGenerate(port)
+        const endTime = Date.now() - startTime
+        if (endTime > 10000) {
+            setTestList(prev => ({...prev, [server.id]: `testError`}))
+            return
+        } else {
+            setTestList(prev => ({...prev, [server.id]: formatSecond(endTime)}))
+        }
     }
 
     // ============================== drag sort ==============================
@@ -424,10 +439,21 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                         onChange={(e) => handleSelectServer(key, e.target.checked)}/>
                                 </TableCell>
                                 <TableCell component="th" scope="row">
-                                    {row.ps}
-                                    {isMediumScreen && (
-                                        <Typography color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography></Typography>
-                                    )}
+                                    <div className="flex-between">
+                                        <div>
+                                            {row.ps}
+                                            {isMediumScreen && (
+                                                <Typography color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography></Typography>
+                                            )}
+                                        </div>
+                                        {testList[row.id] === 'testStart' ? (
+                                            <Chip label="测速中" color="warning" size="small"/>
+                                        ) : testList[row.id] === 'testError' ? (
+                                            <Chip label="测速失败" color="error" size="small"/>
+                                        ) : testList[row.id] && (
+                                            <Chip label={testList[row.id]} color="success" size="small"/>
+                                        )}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex-between">

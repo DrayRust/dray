@@ -24,6 +24,10 @@ export const sizeToUnit = (size: number): string => {
     return `${size.toFixed(decimalPlaces)} ${units[unitIndex]}`
 }
 
+export function formatSecond(duration: number): string {
+    return duration >= 1000 ? `${(duration / 1000).toFixed(2)}s` : `${duration}ms`
+}
+
 export function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
