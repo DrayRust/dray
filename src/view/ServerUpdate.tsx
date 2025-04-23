@@ -22,9 +22,9 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const key = Number(searchParams.get('key'))
 
     const [serverList, setServerList] = useState<ServerList>()
+    const [serverRow, setServerRow] = useState<ServerRow>()
     const [serverType, setServerType] = useState('')
     const [ps, setPs] = useState('')
-    const [itemOn, setItemOn] = useState<0 | 1>(0)
 
     const [vmessForm, setVmessForm] = useState<VmessRow>()
     const [vlessForm, setVlessForm] = useState<VlessRow>()
@@ -37,20 +37,20 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
             let serverList = await readServerList()
             if (serverList) {
                 setServerList(serverList)
-                if (serverList[key]) {
-                    let item = serverList[key]
-                    setServerType(item.type)
-                    setPs(item.ps)
-                    setItemOn(item.on)
+                let row = serverList[key]
+                if (row) {
+                    setServerRow(row)
+                    setServerType(row.type)
+                    setPs(row.ps)
 
-                    if (item.type === 'vmess') {
-                        setVmessForm(item.data as VmessRow)
-                    } else if (item.type === 'vless') {
-                        setVlessForm(item.data as VlessRow)
-                    } else if (item.type === 'ss') {
-                        setSsForm(item.data as SsRow)
-                    } else if (item.type === 'trojan') {
-                        setTrojanForm(item.data as TrojanRow)
+                    if (row.type === 'vmess') {
+                        setVmessForm(row.data as VmessRow)
+                    } else if (row.type === 'vless') {
+                        setVlessForm(row.data as VlessRow)
+                    } else if (row.type === 'ss') {
+                        setSsForm(row.data as SsRow)
+                    } else if (row.type === 'trojan') {
+                        setTrojanForm(row.data as TrojanRow)
                     }
                 } else {
                     setErrorMsg('服务器不存在')
@@ -108,10 +108,11 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
         if (!isValid) return
 
         let netServerList = serverList ? [...serverList] : []
-        if (netServerList[key]) {
+        if (netServerList[key] && serverRow) {
             const newServer: ServerRow = {
+                id: serverRow.id,
                 ps: ps,
-                on: itemOn,
+                on: serverRow.on,
                 type: serverType,
                 host: `${data.add}:${data.port}`,
                 scy: getScy(data),
