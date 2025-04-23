@@ -160,14 +160,14 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                     <Stack spacing={2}>
                         <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline size="small" label="设置临时代理" value={getProxySetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="设置临时代理 “环境变量‌”" value={getProxySetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'SetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('SetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
                             </Stack>
 
                             <Stack direction="row" spacing={1} alignItems="center">
-                                <TextField fullWidth multiline size="small" label="移除临时代理" value={getProxyUnsetEnv()}/>
+                                <TextField fullWidth multiline size="small" label="移除临时代理 “环境变量‌”" value={getProxyUnsetEnv()}/>
                                 <Tooltip arrow placement="right" title={copiedType === 'UnsetEnv' ? '已复制' : '点击复制'}>
                                     <IconButton onClick={() => handleCommandCopy('UnsetEnv')}><ContentCopyIcon/></IconButton>
                                 </Tooltip>
@@ -184,14 +184,14 @@ ${cmd} all_proxy=socks5://${ray_host}:${ray_socks_port}`
                         {(osType === 'macOS' || osType === 'linux') && (
                             <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="设置永久代理" value={getProxyWriteEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="设置永久代理 “环境变量‌”" value={getProxyWriteEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'WriteEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('WriteEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="移除永久代理" value={getProxyDeleteEnv()}/>
+                                    <TextField fullWidth multiline size="small" label="移除永久代理 “环境变量‌”" value={getProxyDeleteEnv()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'DeleteEnv' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('DeleteEnv')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
