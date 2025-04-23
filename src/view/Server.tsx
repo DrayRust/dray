@@ -25,9 +25,9 @@ import { useServerImport } from "../component/useServerImport.tsx"
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
     restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain,
-    readRuleModeList, readDnsConfig, readDnsModeList, checkPortAvailable, saveTestConf, TestSpeedRay, fetchGetGenerate
+    readRuleModeList, readDnsConfig, readDnsModeList,
 } from "../util/invoke.ts"
-import { getConf, getTestSpeedConf } from "../util/serverConf.ts"
+import { getConf } from "../util/serverConf.ts"
 import {
     DEFAULT_APP_CONFIG,
     DEFAULT_DNS_CONFIG,
@@ -40,8 +40,9 @@ import {
 import { dnsToConf } from "../util/dns.ts"
 import { ruleToConf } from "../util/rule.ts"
 import { clipboardReadText, clipboardWriteText } from "../util/tauri.ts"
-import { formatSecond, sleep } from "../util/util.ts"
+import { formatSecond } from "../util/util.ts"
 import { runWithConcurrency } from "../util/concurrency.ts"
+import { generateServersPort, serverTestSpeed } from "../util/serverSpeed.ts"
 
 const Server: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -254,22 +255,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
         await initConfig()
         const testServerList = serverList.filter((_, index) => selectedServers.includes(index)) || []
-        let port = 25000
-        let errNum = 0
-        let servers = []
-        for (const server of testServerList) {
-            for (let i = 0; i < 10; i++) {
-                const ok = await checkPortAvailable(port)
-                if (ok) {
-                    break
-                } else {
-                    errNum++
-                    port++
-                }
-            }
-            servers.push({server, port})
-            port++
-        }
+        const servers = await generateServersPort(testServerList)
         clearSelected()
         const tasks = servers.map((row) => () => testServerSpeed(row.server, row.port))
         await runWithConcurrency(tasks, 5)
@@ -278,15 +264,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const testServerSpeed = async (server: ServerRow, port: number) => {
         setTestList(prev => ({...prev, [server.id]: 'testStart'}))
 
-        const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
-        const conf = getTestSpeedConf(server, appDir, port)
-        await saveTestConf(filename, conf)
-        await TestSpeedRay(filename)
-
-        await sleep(500)
-        const startTime = Date.now()
-        await fetchGetGenerate(port)
-        const endTime = Date.now() - startTime
+        const endTime = await serverTestSpeed(server, appDir, port)
         if (endTime > 10000) {
             setTestList(prev => ({...prev, [server.id]: `testError`}))
             return

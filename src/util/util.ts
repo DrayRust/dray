@@ -28,6 +28,10 @@ export function formatSecond(duration: number): string {
     return duration >= 1000 ? `${(duration / 1000).toFixed(2)}s` : `${duration}ms`
 }
 
+export function getRandomNumber(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 export function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
