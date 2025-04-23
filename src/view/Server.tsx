@@ -191,10 +191,10 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleEnable = async () => {
-        if (serverList?.[selectedKey]?.on) {
-            handleMenuClose()
-            return
-        }
+        // if (serverList?.[selectedKey]?.on) {
+        //     handleMenuClose()
+        //     return
+        // }
 
         await getServerConf(async (conf) => {
             const ok = await saveRayConfig(conf)
