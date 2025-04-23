@@ -11,6 +11,10 @@ pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
 }
 
 pub async fn fetch_get_generate(port: u32) -> String {
+    // http://cp.cloudflare.com/generate_204
+    // http://www.msftconnecttest.com/connecttest.txt
+    // http://captive.apple.com/hotspot-detect.htm
+    // http://www.google.com/generate_204
     fetch_get_by_proxy_socks("http://www.gstatic.com/generate_204", true, "127.0.0.1", port).await
 }
 
