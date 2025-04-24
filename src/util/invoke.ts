@@ -210,12 +210,12 @@ async function saveConf(filename: string, content: any) {
     }
 }
 
-export async function saveTestConf(filename: string, content: any) {
+export async function saveSpeedTestConf(filename: string, content: any) {
     if (!isTauri) return false
     try {
-        return invoke<Boolean>('save_test_conf', {filename, 'content': JSON.stringify(content, null, 2)})
+        return invoke<Boolean>('save_speed_test_conf', {filename, 'content': JSON.stringify(content, null, 2)})
     } catch (err) {
-        log.error('Failed to saveTestConf:', err)
+        log.error('Failed to saveSpeedTestConf:', err)
         return false
     }
 }
