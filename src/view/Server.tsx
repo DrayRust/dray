@@ -449,7 +449,8 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                             {!isMediumScreen ? row.ps : (<>
                                                 <Typography>{row.ps}</Typography>
                                                 <Typography variant="body2" color="warning">{row.host}</Typography>
-                                                <Typography variant="body2" color="secondary">{row.type}<Typography color="info" component="span" ml={1}>{row.scy}</Typography>
+                                                <Typography variant="body2" color="secondary">{row.type}
+                                                    <Typography color="info" component="span" ml={1}>{row.scy}</Typography>
                                                 </Typography>
                                             </>)}
                                         </div>
