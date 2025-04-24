@@ -79,14 +79,20 @@ fn format_timestamp(modified_time: std::time::SystemTime) -> String {
 
 pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Value {
     debug!("read: {}, reverse: {}, start_position: {}", filename, reverse, start_position);
-    const DEFAULT_ERROR_JSON: &str = r#"{"content":"","start":0,"end":0}"#;
     // const DEFAULT_READ_SIZE: u64 = 1024 * 100; // 100KB
     const DEFAULT_READ_SIZE: u64 = 1000 * 100; // 100KB
+
+    let default_json = json!({
+        "content": "",
+        "start": 0,
+        "end": 0,
+        "size": 0
+    });
 
     // 过滤文件名，只允许英文字母、数字、_、-、.
     if filename.chars().any(|c| !c.is_ascii_alphanumeric() && c != '_' && c != '-' && c != '.') {
         error!("Invalid filename: {}", filename);
-        return json!(DEFAULT_ERROR_JSON);
+        return json!({"content": "", "start": 0, "end": 0});
     }
 
     let file_path = dirs::get_dray_logs_dir().unwrap().join(filename);
@@ -95,7 +101,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Valu
         Ok(file) => file,
         Err(e) => {
             error!("Failed to open log file {}: {}", file_path.display(), e);
-            return json!(DEFAULT_ERROR_JSON);
+            return default_json;
         }
     };
 
@@ -103,13 +109,13 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Valu
         Ok(size) => size,
         Err(e) => {
             error!("Failed to get file size: {}", e);
-            return json!(DEFAULT_ERROR_JSON);
+            return default_json;
         }
     };
 
     // 如果文件为空，直接返回空内容
     if file_size == 0 {
-        return json!(DEFAULT_ERROR_JSON);
+        return default_json;
     }
 
     // 确保 start_position 在文件范围内
@@ -138,7 +144,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Valu
     // 读取文件内容
     if let Err(e) = file.seek(SeekFrom::Start(read_start)) {
         error!("Failed to seek file: {}", e);
-        return json!(DEFAULT_ERROR_JSON);
+        return default_json;
     }
 
     let mut buffer = vec![0; (read_end - read_start) as usize];
@@ -146,7 +152,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Valu
         Ok(size) => size,
         Err(e) => {
             error!("Failed to read file: {}", e);
-            return json!(DEFAULT_ERROR_JSON);
+            return default_json;
         }
     };
     buffer.truncate(bytes_read);
@@ -155,7 +161,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Valu
         Ok(s) => s,
         Err(e) => {
             error!("Failed to convert bytes to string: {}", e);
-            return json!(DEFAULT_ERROR_JSON);
+            return default_json;
         }
     };
 
