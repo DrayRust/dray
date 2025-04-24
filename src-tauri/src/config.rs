@@ -247,17 +247,17 @@ pub fn save_conf(filename: &str, content: &str) -> bool {
     }
 }
 
-pub fn save_test_conf(filename: &str, content: &str) -> bool {
+pub fn save_speed_test_conf(filename: &str, content: &str) -> bool {
     let re = Regex::new(r"^[\w.-]+$").unwrap();
     if !re.is_match(filename) {
         error!("Error filename: {}", filename);
         return false;
     }
 
-    let dir = dirs::get_dray_conf_dir().unwrap().join("test_speed");
+    let dir = dirs::get_dray_conf_dir().unwrap().join("speed_test");
     if !dir.exists() {
         if let Err(e) = fs::create_dir_all(&dir) {
-            error!("Failed to create test speed config directory: {}", e);
+            error!("Failed to create config directory: {}", e);
             return false;
         }
     }
