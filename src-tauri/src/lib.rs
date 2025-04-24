@@ -102,8 +102,8 @@ async fn fetch_get(url: String, is_proxy: bool) -> String {
 }
 
 #[tauri::command]
-async fn fetch_get_generate(port: u32) -> String {
-    http::fetch_get_generate(port).await
+async fn fetch_get_with_proxy(url: String, proxy_url: String) -> String {
+    http::fetch_get_with_proxy(&url, &proxy_url).await
 }
 
 #[tauri::command]
@@ -240,7 +240,7 @@ pub fn run() {
             save_proxy_pac,
             save_text_file,
             fetch_get,
-            fetch_get_generate,
+            fetch_get_with_proxy,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,

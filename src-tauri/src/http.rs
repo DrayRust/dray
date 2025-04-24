@@ -5,24 +5,24 @@ use reqwest::Client;
 use reqwest::Proxy;
 use std::time::Duration;
 
-pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
+fn get_default_proxy_url() -> Option<String> {
     let config = config::get_config();
-    fetch_get_by_proxy_socks(url, is_proxy, &config.ray_host, config.ray_socks_port).await
+    Some(format!("socks5://{}:{}", config.ray_host, config.ray_socks_port))
 }
 
-pub async fn fetch_get_generate(port: u32) -> String {
-    // http://cp.cloudflare.com/generate_204
-    // http://www.msftconnecttest.com/connecttest.txt
-    // http://captive.apple.com/hotspot-detect.htm
-    // http://www.google.com/generate_204
-    fetch_get_by_proxy_socks("http://www.gstatic.com/generate_204", true, "127.0.0.1", port).await
+pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
+    let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
+    get_with_proxy(url, proxy_url.as_deref()).await
 }
 
-pub async fn fetch_get_by_proxy_socks(url: &str, is_proxy: bool, ray_host: &str, ray_socks_port: u32) -> String {
+pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> String {
+    get_with_proxy(url, Some(proxy_url)).await
+}
+
+async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> String {
     let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
-    let client_builder = if is_proxy {
-        let proxy_url = format!("socks5://{}:{}", ray_host, ray_socks_port);
+    let client_builder = if let Some(proxy_url) = proxy_url {
         debug!("Proxy URL: {}", proxy_url);
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
