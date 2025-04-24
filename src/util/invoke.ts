@@ -71,7 +71,7 @@ export async function stopSpeedTestServer(port: number) {
 export async function fetchGet(url: string, isProxy: boolean = false) {
     if (!isTauri) return ''
     try {
-        return await invoke<string>('fetch_get', {url, isProxy})
+        return await invoke<string>('fetch_get', {url, isProxy}) as string
     } catch (err) {
         log.error('Failed to fetchGet:', err)
         return ''
