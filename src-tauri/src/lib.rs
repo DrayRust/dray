@@ -118,8 +118,7 @@ fn get_dirs_json() -> Value {
 }
 
 #[tauri::command]
-fn get_sys_info_json() -> String {
-    debug!("get_sys_info_json triggered");
+fn get_sys_info_json() -> Value {
     sys_info::get_sys_info_json()
 }
 

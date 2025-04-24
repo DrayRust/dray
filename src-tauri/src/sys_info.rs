@@ -1,5 +1,5 @@
 use serde::Serialize;
-use serde_json::json;
+use serde_json::{json, Value};
 use sysinfo::{Components, Disks, System};
 
 #[derive(Serialize)]
@@ -29,7 +29,7 @@ struct ComponentInfo {
     temperature: String,
 }
 
-pub fn get_sys_info_json() -> String {
+pub fn get_sys_info_json() -> Value {
     let mut sys = System::new_all();
     sys.refresh_all();
 
@@ -65,7 +65,7 @@ pub fn get_sys_info_json() -> String {
         components: component_info,
     };
 
-    serde_json::to_string(&json!({
+    json!({
         "os": sys_info.os,
         "kernel_version": sys_info.kernel_version,
         "hostname": sys_info.hostname,
@@ -76,6 +76,5 @@ pub fn get_sys_info_json() -> String {
         "swap_used": sys_info.swap_used,
         "disks": sys_info.disks,
         "components": sys_info.components,
-    }))
-    .unwrap()
+    })
 }
