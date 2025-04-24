@@ -107,7 +107,7 @@ async fn fetch_get(url: String, is_proxy: bool) -> String {
 }
 
 #[tauri::command]
-async fn fetch_get_with_proxy(url: String, proxy_url: String) -> String {
+async fn fetch_get_with_proxy(url: String, proxy_url: String) -> serde_json::Value {
     http::fetch_get_with_proxy(&url, &proxy_url).await
 }
 

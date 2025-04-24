@@ -3,6 +3,7 @@ use logger::{debug, error};
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Proxy;
+use serde_json::json;
 use std::time::Duration;
 
 fn get_default_proxy_url() -> Option<String> {
@@ -12,14 +13,20 @@ fn get_default_proxy_url() -> Option<String> {
 
 pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
     let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
-    get_with_proxy(url, proxy_url.as_deref()).await
+    match get_with_proxy(url, proxy_url.as_deref()).await {
+        Ok(html) => html.to_string(),
+        Err(_) => String::new(),
+    }
 }
 
-pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> String {
-    get_with_proxy(url, Some(proxy_url)).await
+pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> serde_json::Value {
+    match get_with_proxy(url, Some(proxy_url)).await {
+        Ok(html) => json!({"success": true, "html": html.to_string()}),
+        Err(e) => json!({"success": false, "msg": e}),
+    }
 }
 
-async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> String {
+async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
     let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
     let client_builder = if let Some(proxy_url) = proxy_url {
@@ -38,8 +45,9 @@ async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> String {
     let client = match client_builder.build() {
         Ok(client) => client,
         Err(e) => {
-            error!("Failed to create HTTP client: {}", e);
-            return String::new();
+            let err = format!("Failed to create HTTP client: {}", e);
+            error!("{}", err);
+            return Err(err);
         }
     };
 
@@ -55,25 +63,28 @@ async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> String {
     {
         Ok(response) => response,
         Err(e) => {
-            error!("Failed to send HTTP request: {}", e);
-            return String::new();
+            let err = format!("Failed to send HTTP request: {}", e);
+            error!("{}", err);
+            return Err(err);
         }
     };
 
-    if !response.status().is_success() {
-        let status = response.status();
-        error!("Failed to fetch HTML page, status: {}", status);
-        return String::new();
+    let status = response.status();
+    if !status.is_success() {
+        let err = format!("Failed to fetch HTML page, status: {}", status);
+        error!("{}", err);
+        return Err(err);
     }
 
     match response.text().await {
         Ok(html) => {
-            debug!("Successfully fetched HTML content from: {}", url);
-            html
+            debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
+            Ok(html)
         }
         Err(e) => {
-            error!("Failed to parse response body: {}", e);
-            String::new()
+            let err = format!("Failed to parse response body: {}", e);
+            error!("{}", err);
+            Err(err)
         }
     }
 }
