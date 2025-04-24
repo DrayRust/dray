@@ -1,6 +1,6 @@
 use dirs;
 use once_cell::sync::Lazy;
-use serde_json;
+use serde_json::{json, Value};
 use std::env;
 
 static APP_DATA_DIR: Lazy<Option<std::path::PathBuf>> = Lazy::new(|| dirs::data_dir().map(|dir| dir.join("dray")));
@@ -43,8 +43,8 @@ pub fn get_dray_ray_dir() -> Option<std::path::PathBuf> {
     }
 }*/
 
-pub fn get_dirs_json() -> String {
-    serde_json::json!({
+pub fn get_dirs_json() -> Value {
+    json!({
         "executable_path": env::current_exe().ok(),
         "current_dir": env::current_dir().ok(),
         "home_dir": dirs::home_dir(),
@@ -60,5 +60,4 @@ pub fn get_dirs_json() -> String {
         "public_dir": dirs::public_dir(),
         "video_dir": dirs::video_dir(),
     })
-    .to_string()
 }

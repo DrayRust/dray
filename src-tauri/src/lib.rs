@@ -11,6 +11,7 @@ mod setup;
 mod sys_info;
 mod web;
 use logger::{debug, info};
+use serde_json::Value;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -107,12 +108,12 @@ async fn fetch_get(url: String, is_proxy: bool) -> String {
 }
 
 #[tauri::command]
-async fn fetch_get_with_proxy(url: String, proxy_url: String) -> serde_json::Value {
+async fn fetch_get_with_proxy(url: String, proxy_url: String) -> Value {
     http::fetch_get_with_proxy(&url, &proxy_url).await
 }
 
 #[tauri::command]
-fn get_dirs_json() -> String {
+fn get_dirs_json() -> Value {
     dirs::get_dirs_json()
 }
 
