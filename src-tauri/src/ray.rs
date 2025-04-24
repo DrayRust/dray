@@ -130,8 +130,10 @@ pub fn force_kill() -> bool {
     trace!("Sysinfo time elapsed: {:?}", start.elapsed());
 
     let mut success = true;
+    let mut n = 0;
     for (pid, process) in sys.processes() {
         if process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned()).ends_with(DRAY_XRAY) {
+            n += 1;
             if process.kill() {
                 info!("Killed xray process with PID: {}", pid);
             } else {
@@ -140,7 +142,7 @@ pub fn force_kill() -> bool {
             }
         }
     }
-    trace!("Sysinfo killed time elapsed: {:?}, processes len: {}", start.elapsed(), sys.processes().len());
+    trace!("Time elapsed: {:?}, Processes: {}, Rays: {}", start.elapsed(), sys.processes().len(), n);
     // *CHILD_PROCESS.lock().unwrap() = None;
     success
 }
