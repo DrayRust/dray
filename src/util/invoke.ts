@@ -57,15 +57,6 @@ export async function SpeedTestRay(filename: string) {
     }
 }
 
-export async function fetchProxyGet(url: string, proxyUrl: string) {
-    if (!isTauri) return
-    try {
-        await invoke('fetch_get_with_proxy', {url, proxyUrl})
-    } catch (err) {
-        log.error('Failed to fetchProxyGet:', err)
-    }
-}
-
 export async function fetchGet(url: string, isProxy: boolean = false) {
     if (!isTauri) return ''
     try {
@@ -73,6 +64,15 @@ export async function fetchGet(url: string, isProxy: boolean = false) {
     } catch (err) {
         log.error('Failed to fetchGet:', err)
         return ''
+    }
+}
+
+export async function fetchProxyGet(url: string, proxyUrl: string) {
+    if (!isTauri) return
+    try {
+        await invoke('fetch_get_with_proxy', {url, proxyUrl})
+    } catch (err) {
+        log.error('Failed to fetchProxyGet:', err)
     }
 }
 
