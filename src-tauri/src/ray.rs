@@ -1,6 +1,7 @@
 use crate::dirs;
 use logger::{debug, error, info, trace, warn};
 use once_cell::sync::Lazy;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
@@ -224,13 +225,22 @@ fn get_ray_config_path() -> String {
     dirs::get_dray_conf_dir().unwrap().join("ray_config.json").to_str().unwrap().to_string()
 }
 
-pub fn read_ray_config() -> String {
+pub fn read_ray_config() -> Value {
     debug!("read_ray_config triggered");
     let config_path = get_ray_config_path();
-    fs::read_to_string(config_path).unwrap_or_else(|e| {
-        error!("Failed to read config file: {}", e);
-        "{}".to_string()
-    })
+    match fs::read_to_string(config_path) {
+        Ok(content) => match serde_json::from_str(&content) {
+            Ok(value) => value,
+            Err(e) => {
+                error!("Failed to parse config file: {}", e);
+                json!(null)
+            }
+        },
+        Err(e) => {
+            error!("Failed to read config file: {}", e);
+            json!(null)
+        }
+    }
 }
 
 pub fn save_ray_config(content: &str) -> bool {

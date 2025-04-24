@@ -2,6 +2,7 @@ use crate::dirs;
 use logger::{debug, error, info};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
@@ -95,12 +96,8 @@ pub fn get_config() -> Config {
     CONFIG.lock().unwrap().clone()
 }
 
-pub fn get_config_json() -> String {
-    let config = get_config();
-    serde_json::to_string_pretty(&config).unwrap_or_else(|e| {
-        error!("Failed to serialize config to JSON: {}", e);
-        "{}".to_string()
-    })
+pub fn get_config_json() -> Value {
+    json!(get_config())
 }
 
 pub fn load_config_from_file(file_path: &str) -> Result<Config, Box<dyn std::error::Error>> {
@@ -201,24 +198,30 @@ fn get_conf_path(filename: &str) -> Result<PathBuf, String> {
     Ok(dirs::get_dray_conf_dir().unwrap().join(filename))
 }
 
-pub fn read_conf(filename: &str) -> String {
+pub fn read_conf(filename: &str) -> Value {
     debug!("Read: {}", filename);
     match get_conf_path(filename) {
         Ok(config_path) => {
             if !config_path.exists() {
-                /* if let Err(e) = fs::File::create(&config_path) {
-                    error!("Failed to create config file: {}", e);
-                } */
-                return "".to_string();
+                return json!(null);
             }
-            fs::read_to_string(&config_path).unwrap_or_else(|e| {
-                error!("Failed to read config file: {}", e);
-                "".to_string()
-            })
+
+            match fs::read_to_string(&config_path) {
+                Ok(content) => match serde_json::from_str(&content) {
+                    Ok(value) => value,
+                    Err(e) => {
+                        error!("Failed to parse config file: {}", e);
+                        json!(null)
+                    }
+                },
+                Err(e) => {
+                    error!("Failed to read config file: {}", e);
+                    json!(null)
+                }
+            }
         }
-        Err(_e) => {
-            // error!("Failed to get config path: {}", _e);
-            "".to_string()
+        Err(_) => {
+            json!(null)
         }
     }
 }

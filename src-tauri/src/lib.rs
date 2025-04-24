@@ -68,7 +68,7 @@ fn restart_ray() -> bool {
 }
 
 #[tauri::command]
-fn read_ray_config() -> String {
+fn read_ray_config() -> Value {
     ray::read_ray_config()
 }
 
@@ -78,7 +78,7 @@ fn save_ray_config(content: String) -> bool {
 }
 
 #[tauri::command]
-fn read_conf(filename: String) -> String {
+fn read_conf(filename: String) -> Value {
     config::read_conf(&filename)
 }
 
@@ -123,7 +123,7 @@ fn get_sys_info_json() -> Value {
 }
 
 #[tauri::command]
-fn get_config_json() -> String {
+fn get_config_json() -> Value {
     debug!("get_config_json triggered");
     config::get_config_json()
 }
