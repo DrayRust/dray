@@ -468,7 +468,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                     <TableCell>{row.scy}</TableCell>
                                 </>)}
                                 <TableCell align="right" sx={{p: '8px'}}>
-                                    {Boolean(row.on) && (<Chip label="启用" color="secondary" size="small" sx={{mr: 1}}/>)}
+                                    {Boolean(row.on) && (<Chip label="启用" color="warning" size="small" sx={{mr: 1}}/>)}
                                     <Tooltip title="排序" arrow placement="top">
                                         <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                     </Tooltip>
