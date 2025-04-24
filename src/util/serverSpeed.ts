@@ -37,9 +37,9 @@ export async function serverSpeedTest(server: ServerRow, appDir: string, port: n
     // https://captive.apple.com/hotspot-detect.htm
     // http://www.msftconnecttest.com/connecttest.txt
     const startTime = Date.now()
-    await fetchProxyGet('http://www.gstatic.com/generate_204', `socks5://127.0.0.1:${port}`)
+    const result = await fetchProxyGet('http://www.gstatic.com/generate_204', `socks5://127.0.0.1:${port}`)
     const elapsed = Date.now() - startTime
 
     await stopSpeedTestServer(port)
-    return elapsed
+    return {result, elapsed}
 }

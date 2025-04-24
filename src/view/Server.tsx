@@ -288,12 +288,11 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const testServerSpeed = async (server: ServerRow, port: number) => {
         setServersSpeedTest(server.id, 'testStart')
-        const endTime = await serverSpeedTest(server, appDir, port)
-        if (endTime > 10000) {
+        const {result, elapsed} = await serverSpeedTest(server, appDir, port)
+        if (elapsed > 10000 || !result?.success) {
             setServersSpeedTest(server.id, 'testError')
-            return
         } else {
-            setServersSpeedTest(server.id, formatSecond(endTime))
+            setServersSpeedTest(server.id, formatSecond(elapsed))
         }
     }
 

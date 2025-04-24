@@ -81,7 +81,7 @@ export async function fetchGet(url: string, isProxy: boolean = false) {
 export async function fetchProxyGet(url: string, proxyUrl: string) {
     if (!isTauri) return
     try {
-        await invoke('fetch_get_with_proxy', {url, proxyUrl})
+        return await invoke('fetch_get_with_proxy', {url, proxyUrl}) as any
     } catch (err) {
         log.error('Failed to fetchProxyGet:', err)
     }
