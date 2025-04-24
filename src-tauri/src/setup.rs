@@ -148,7 +148,7 @@ fn prepare_ray_resources(resource_dir: std::path::PathBuf) -> Result<(), Box<dyn
             #[cfg(unix)] // 适用于 macOS 和 Linux
             {
                 let mut perms = fs::metadata(&dest)?.permissions();
-                if entry.file_name() == "dray-xray" {
+                if entry.file_name() == "xray" {
                     perms.set_mode(0o755);
                 } else {
                     perms.set_mode(0o644);

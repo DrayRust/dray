@@ -8,10 +8,9 @@ use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use std::time::Instant;
 
-const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
-
 // static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
 static CHILD_PROCESS_MAP: Lazy<Mutex<HashMap<u16, Option<Child>>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+const RAY: &str = "xray";
 
 pub fn start() -> bool {
     /* if CHILD_PROCESS.lock().unwrap().is_some() {
@@ -24,7 +23,7 @@ pub fn start() -> bool {
 }
 
 fn run_server() {
-    let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(DRAY_XRAY).to_str().unwrap().to_string();
+    let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string();
     let ray_conf: String = get_ray_config_path();
     debug!("ray_path: {}", ray_path);
     debug!("ray_conf: {}", ray_conf);
@@ -96,7 +95,7 @@ pub fn start_speed_test_server(port: u16, filename: &str) -> bool {
         return false;
     }
 
-    let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(DRAY_XRAY).to_str().unwrap().to_string();
+    let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string();
     let ray_config = ray_conf.to_str().unwrap().to_string();
     debug!("Speed test server ray_path: {}", ray_path);
     debug!("Speed test server ray_conf: {}", ray_config);
@@ -145,6 +144,7 @@ pub fn stop_speed_test_server(port: u16) -> bool {
     }
 }
 
+// 开发过程中，经常自动停止并编译程序，导致无法停止 Command 运行的进程
 /* pub fn stop() -> bool {
     let child_process = CHILD_PROCESS.lock().unwrap().take();
     if let Some(mut child) = child_process {
@@ -160,11 +160,12 @@ pub fn stop_speed_test_server(port: u16) -> bool {
         info!("Ray Server stopped successfully");
         true
     } else {
-        error!("Ray Server is not running, no need to stop");
+        error!("Failed to take child process");
         false
     }
 } */
 
+// 通过遍历的方式停止进程，保证完全停止进程
 pub fn force_kill() -> bool {
     let start = Instant::now();
     let mut sys = sysinfo::System::new_all();
@@ -174,13 +175,19 @@ pub fn force_kill() -> bool {
     let mut success = true;
     let mut n = 0;
     for (pid, process) in sys.processes() {
-        if process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned()).ends_with(DRAY_XRAY) {
-            n += 1;
-            if process.kill() {
-                info!("Killed xray process with PID: {}", pid);
-            } else {
-                error!("Failed to kill xray process with PID: {}", pid);
-                success = false;
+        // 特别注意：linux 系统下 name 获取的名字不会超过 15 个字符
+        if process.name() == RAY {
+            println!("Process: {:?}", process.name());
+            // 防止误杀非 dray 运行的进程
+            let ray_exe = process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned());
+            if ray_exe.ends_with(RAY) && ray_exe.contains("dray") {
+                n += 1;
+                if process.kill() {
+                    info!("Killed xray process with PID: {}", pid);
+                } else {
+                    error!("Failed to kill xray process with PID: {}", pid);
+                    success = false;
+                }
             }
         }
     }
