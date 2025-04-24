@@ -23,7 +23,7 @@ pub fn start() -> bool {
 }
 
 fn run_server() {
-    let ray_path = dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string();
+    let ray_path = get_ray_exe();
     let ray_conf = get_ray_config_path();
     debug!("ray_path: {}", ray_path);
     debug!("ray_conf: {}", ray_conf);
@@ -95,7 +95,7 @@ pub fn start_speed_test_server(port: u16, filename: &str) -> bool {
         return false;
     }
 
-    let ray_path = dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string();
+    let ray_path = get_ray_exe();
     let ray_conf = ray_conf.to_str().unwrap().to_string();
     debug!("Speed test server ray_path: {}", ray_path);
     debug!("Speed test server ray_conf: {}", ray_conf);
@@ -214,6 +214,10 @@ pub fn restart() -> bool {
         error!("Ray Server restart failed");
     }
     success
+}
+
+fn get_ray_exe() -> String {
+    dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string()
 }
 
 fn get_ray_config_path() -> String {
