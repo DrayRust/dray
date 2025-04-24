@@ -66,17 +66,21 @@ export function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
 
 export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (c.log) {
             c.log.loglevel = value
             const ok = await saveRayConfig(c) // 保存 Ray 配置
-            ok && await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+            if (ok) restartRay() // 重启 Ray 服务
         }
     })()
 }
 
 export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c) return
 
@@ -89,10 +93,7 @@ export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommon
             c = {...c, ...getStatsConf()}
         }
         const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
@@ -143,6 +144,8 @@ export function rayHttpPortChange(port: number) {
 
 export function raySocksEnabledChange(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
 
@@ -152,15 +155,14 @@ export function raySocksEnabledChange(value: boolean, config: AppConfig, rayComm
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
         }
         const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
 
@@ -170,15 +172,14 @@ export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommo
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
         }
         const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
 
@@ -193,15 +194,14 @@ export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConf
             }
         }
         const ok = await saveRayConfig(c)
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
 
@@ -215,15 +215,14 @@ export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommo
             }
         }
         const ok = await saveRayConfig(c)
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function raySocksDestOverrideChange(value: string[], rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
 
@@ -236,15 +235,13 @@ export function raySocksDestOverrideChange(value: string[], rayCommonConfig: Ray
             }
         }
         const ok = await saveRayConfig(c)
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
         let c = await readRayConfig()
         if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
 
@@ -264,15 +261,14 @@ export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommon
             }
         }
         const ok = await saveRayConfig(c)
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
 
 export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: RayCommonConfig) {
     (async () => {
+        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+
         let c = await readRayConfig()
         if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
 
@@ -288,9 +284,6 @@ export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: Ra
             }
         }
         const ok = await saveRayConfig(c)
-        if (ok) {
-            await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-            restartRay() // 重启 Ray 服务
-        }
+        if (ok) restartRay() // 重启 Ray 服务
     })()
 }
