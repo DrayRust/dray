@@ -1,14 +1,17 @@
 use crate::dirs;
-use logger::{debug, error, info, trace};
+use logger::{debug, error, info, trace, warn};
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
+use std::sync::Mutex;
 use std::time::Instant;
-// use std::sync::Mutex;
 
 const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
 
 // static CHILD_PROCESS: Mutex<Option<Child>> = Mutex::new(None);
+static CHILD_PROCESS_MAP: Lazy<Mutex<HashMap<u16, Option<Child>>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub fn start() -> bool {
     /* if CHILD_PROCESS.lock().unwrap().is_some() {
@@ -22,12 +25,12 @@ pub fn start() -> bool {
 
 fn run_server() {
     let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(DRAY_XRAY).to_str().unwrap().to_string();
-    let ray_config_path: String = get_ray_config_path();
+    let ray_conf: String = get_ray_config_path();
     debug!("ray_path: {}", ray_path);
-    debug!("ray_conf: {}", ray_config_path);
+    debug!("ray_conf: {}", ray_conf);
 
     let mut child = match Command::new(&ray_path)
-        .args(&["run", "-c", &ray_config_path])
+        .args(&["run", "-c", &ray_conf])
         .stdout(Stdio::piped()) // 捕获标准输出
         .stderr(Stdio::piped()) // 捕获标准错误
         .spawn()
@@ -80,27 +83,66 @@ fn run_server() {
     info!("Ray Server exited");
 }
 
-pub fn run_test_server(filename: &str) {
-    let ray_conf = dirs::get_dray_conf_dir().unwrap().join("test_speed").join(filename);
+pub fn start_speed_test_server(port: u16, filename: &str) -> bool {
+    let mut map = CHILD_PROCESS_MAP.lock().unwrap();
+    if map.contains_key(&port) {
+        warn!("Speed test server is already running, port: {}", port);
+        return false;
+    }
+
+    let ray_conf = dirs::get_dray_conf_dir().unwrap().join("speed_test").join(filename);
     if !ray_conf.exists() {
         error!("Failed to filename not exist: {}", filename);
-        return;
+        return false;
     }
 
     let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(DRAY_XRAY).to_str().unwrap().to_string();
     let ray_config = ray_conf.to_str().unwrap().to_string();
-    debug!("Test ray_path: {}", ray_path);
-    debug!("Test ray_conf: {}", ray_config);
+    debug!("Speed test server ray_path: {}", ray_path);
+    debug!("Speed test server ray_conf: {}", ray_config);
 
-    let mut child = match Command::new(&ray_path).args(&["run", "-c", &ray_config]).spawn() {
+    let child = match Command::new(&ray_path).args(&["run", "-c", &ray_config]).spawn() {
         Ok(child) => child,
         Err(e) => {
-            error!("Failed to start Ray Server: {:?}", e);
-            return;
+            error!("Failed to start speed test server: {:?}", e);
+            return false;
         }
     };
 
-    info!("Test ray Server started with PID: {}", child.id());
+    info!("Speed test server started with PID: {}", child.id());
+
+    map.insert(port, Some(child));
+    true
+}
+
+pub fn stop_speed_test_server(port: u16) -> bool {
+    let mut map = CHILD_PROCESS_MAP.lock().unwrap();
+    if !map.contains_key(&port) {
+        warn!("Speed test server is not running, port: {}", port);
+        return false;
+    }
+
+    if let Some(child_option) = map.remove(&port) {
+        if let Some(mut child) = child_option {
+            if let Err(e) = child.kill() {
+                error!("Failed to kill speed test server: {}", e);
+                map.insert(port, Some(child)); // 如果 kill 失败，将子进程重新插入到 map 中
+                return false;
+            }
+            if let Err(e) = child.wait() {
+                error!("Failed to wait for speed test server to terminate: {}", e);
+                return false;
+            }
+            info!("Speed test server stopped successfully");
+            true
+        } else {
+            error!("Failed to retrieve child process from map, port: {}", port);
+            false
+        }
+    } else {
+        error!("Failed to remove server from map, port: {}", port);
+        false
+    }
 }
 
 /* pub fn stop() -> bool {

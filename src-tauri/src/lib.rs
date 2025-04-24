@@ -52,8 +52,13 @@ fn send_log(content: String) -> bool {
 }
 
 #[tauri::command]
-fn test_speed_ray(filename: String) {
-    ray::run_test_server(&filename)
+fn start_speed_test_server(port: u16, filename: String) -> bool {
+    ray::start_speed_test_server(port, &filename)
+}
+
+#[tauri::command]
+fn stop_speed_test_server(port: u16) -> bool {
+    ray::stop_speed_test_server(port)
 }
 
 #[tauri::command]
@@ -230,7 +235,8 @@ pub fn run() {
             read_log_file,
             clear_log_all,
             send_log,
-            test_speed_ray,
+            start_speed_test_server,
+            stop_speed_test_server,
             restart_ray,
             read_ray_config,
             save_ray_config,

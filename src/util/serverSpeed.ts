@@ -1,4 +1,4 @@
-import { checkPortAvailable, fetchProxyGet, log, saveSpeedTestConf, SpeedTestRay } from "./invoke.ts"
+import { checkPortAvailable, fetchProxyGet, log, saveSpeedTestConf, startSpeedTestServer, stopSpeedTestServer } from "./invoke.ts"
 import { getRandomNumber, sleep } from "./util.ts"
 import { getSpeedTestConf } from "./serverConf.ts"
 
@@ -24,13 +24,11 @@ export async function generateServersPort(serverList: ServerList) {
 }
 
 export async function serverSpeedTest(server: ServerRow, appDir: string, port: number) {
-    const filename = server.host.replace(/[^\d.]/g, '_') + `-${server.id}.json`
+    const filename = server.host.replace(/[^\w.]/g, '_') + `-${server.id}.json`
     const conf = getSpeedTestConf(server, appDir, port)
     await saveSpeedTestConf(filename, conf)
-    await SpeedTestRay(filename)
-
+    await startSpeedTestServer(port, filename)
     await sleep(500)
-    const startTime = Date.now()
 
     // 目前测试 http 比 https 快 100-500ms
     // https://www.gstatic.com/generate_204
@@ -38,7 +36,10 @@ export async function serverSpeedTest(server: ServerRow, appDir: string, port: n
     // https://cp.cloudflare.com/generate_204
     // https://captive.apple.com/hotspot-detect.htm
     // http://www.msftconnecttest.com/connecttest.txt
+    const startTime = Date.now()
     await fetchProxyGet('http://www.gstatic.com/generate_204', `socks5://127.0.0.1:${port}`)
+    const elapsed = Date.now() - startTime
 
-    return Date.now() - startTime
+    await stopSpeedTestServer(port)
+    return elapsed
 }

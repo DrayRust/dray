@@ -48,12 +48,23 @@ export async function checkPortAvailable(port: number) {
     }
 }
 
-export async function SpeedTestRay(filename: string) {
+export async function startSpeedTestServer(port: number, filename: string) {
     if (!isTauri) return
     try {
-        await invoke('test_speed_ray', {filename})
+        return await invoke<boolean>('start_speed_test_server', {port, filename})
     } catch (err) {
-        log.error('Failed to SpeedTestRay:', err)
+        log.error('Failed to startSpeedTestServer:', err)
+        return false
+    }
+}
+
+export async function stopSpeedTestServer(port: number) {
+    if (!isTauri) return false
+    try {
+        return await invoke<boolean>('stop_speed_test_server', {port})
+    } catch (err) {
+        log.error('Failed to stopSpeedTestServer:', err)
+        return false
     }
 }
 
