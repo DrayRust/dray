@@ -2,6 +2,7 @@ use crate::config;
 use crate::dirs;
 use chrono::{Local, TimeZone};
 use logger::{debug, error};
+use serde_json::{json, Value};
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufWriter, Read, Seek, SeekFrom, Write};
 
@@ -39,7 +40,7 @@ pub fn write_web_interface_log(log_msg: &str) -> bool {
     }
 }
 
-pub fn read_log_list() -> String {
+pub fn read_log_list() -> Value {
     let mut logs = Vec::new();
 
     // 读取目录下的所有文件
@@ -50,7 +51,7 @@ pub fn read_log_list() -> String {
                 let path = entry.path();
                 if path.is_file() && path.extension().map_or(false, |ext| ext == "log") {
                     if let Ok(metadata) = fs::metadata(&path) {
-                        logs.push(serde_json::json!({
+                        logs.push(json!({
                             "filename": path.file_name().unwrap().to_string_lossy(),
                             "size": metadata.len(),
                             "last_modified": metadata.modified().map_or("0000-00-00 00:00:00".to_string(), |t| format_timestamp(t)),
@@ -63,7 +64,7 @@ pub fn read_log_list() -> String {
         }
     }
 
-    serde_json::json!(logs).to_string()
+    json!(logs)
 }
 
 fn format_timestamp(modified_time: std::time::SystemTime) -> String {
@@ -76,7 +77,7 @@ fn format_timestamp(modified_time: std::time::SystemTime) -> String {
     }
 }
 
-pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> String {
+pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Value {
     debug!("read: {}, reverse: {}, start_position: {}", filename, reverse, start_position);
     const DEFAULT_ERROR_JSON: &str = r#"{"content":"","start":0,"end":0}"#;
     // const DEFAULT_READ_SIZE: u64 = 1024 * 100; // 100KB
@@ -85,7 +86,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
     // 过滤文件名，只允许英文字母、数字、_、-、.
     if filename.chars().any(|c| !c.is_ascii_alphanumeric() && c != '_' && c != '-' && c != '.') {
         error!("Invalid filename: {}", filename);
-        return DEFAULT_ERROR_JSON.to_string();
+        return json!(DEFAULT_ERROR_JSON);
     }
 
     let file_path = dirs::get_dray_logs_dir().unwrap().join(filename);
@@ -94,7 +95,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
         Ok(file) => file,
         Err(e) => {
             error!("Failed to open log file {}: {}", file_path.display(), e);
-            return DEFAULT_ERROR_JSON.to_string();
+            return json!(DEFAULT_ERROR_JSON);
         }
     };
 
@@ -102,13 +103,13 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
         Ok(size) => size,
         Err(e) => {
             error!("Failed to get file size: {}", e);
-            return DEFAULT_ERROR_JSON.to_string();
+            return json!(DEFAULT_ERROR_JSON);
         }
     };
 
     // 如果文件为空，直接返回空内容
     if file_size == 0 {
-        return DEFAULT_ERROR_JSON.to_string();
+        return json!(DEFAULT_ERROR_JSON);
     }
 
     // 确保 start_position 在文件范围内
@@ -137,7 +138,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
     // 读取文件内容
     if let Err(e) = file.seek(SeekFrom::Start(read_start)) {
         error!("Failed to seek file: {}", e);
-        return DEFAULT_ERROR_JSON.to_string();
+        return json!(DEFAULT_ERROR_JSON);
     }
 
     let mut buffer = vec![0; (read_end - read_start) as usize];
@@ -145,7 +146,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
         Ok(size) => size,
         Err(e) => {
             error!("Failed to read file: {}", e);
-            return DEFAULT_ERROR_JSON.to_string();
+            return json!(DEFAULT_ERROR_JSON);
         }
     };
     buffer.truncate(bytes_read);
@@ -154,7 +155,7 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
         Ok(s) => s,
         Err(e) => {
             error!("Failed to convert bytes to string: {}", e);
-            return DEFAULT_ERROR_JSON.to_string();
+            return json!(DEFAULT_ERROR_JSON);
         }
     };
 
@@ -178,13 +179,12 @@ pub fn read_log_file(filename: &str, reverse: bool, start_position: i64) -> Stri
         }
     };
 
-    serde_json::json!({
+    json!({
         "content": processed_content,
         "start": actual_start,
         "end": actual_end,
         "size": file_size
     })
-    .to_string()
 }
 
 pub fn clear_log_all() -> bool {

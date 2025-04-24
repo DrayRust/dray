@@ -28,12 +28,12 @@ fn quit() -> String {
 }
 
 #[tauri::command]
-fn read_log_list() -> String {
+fn read_log_list() -> Value {
     log::read_log_list()
 }
 
 #[tauri::command]
-fn read_log_file(filename: String, reverse: bool, start: i64) -> String {
+fn read_log_file(filename: String, reverse: bool, start: i64) -> Value {
     log::read_log_file(&filename, reverse, start)
 }
 
