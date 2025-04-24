@@ -170,7 +170,7 @@ pub fn force_kill() -> bool {
     let start = Instant::now();
     let mut sys = sysinfo::System::new_all();
     sys.refresh_all();
-    trace!("Sysinfo new and refresh all time elapsed: {:?}", start.elapsed());
+    trace!("Sysinfo new and refresh all, time elapsed: {:?}", start.elapsed());
 
     let mut success = true;
     let mut n = 0;
@@ -178,8 +178,14 @@ pub fn force_kill() -> bool {
         // 特别注意：linux 系统下 name 获取的名字不会超过 15 个字符
         if process.name() == RAY {
             // 防止误杀非 dray 运行的进程
-            let ray_exe = process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned());
-            if ray_exe.ends_with(RAY) && ray_exe.contains("dray") {
+            let ray_exe = process.exe().map_or_else(
+                || {
+                    warn!("Failed to get executable path for process with PID: {}", pid);
+                    "".to_string()
+                },
+                |v| v.to_string_lossy().into_owned(),
+            );
+            if ray_exe == "" || (ray_exe.ends_with(RAY) && ray_exe.contains("dray")) {
                 n += 1;
                 if process.kill() {
                     info!("Killed xray process with PID: {}", pid);
@@ -190,7 +196,7 @@ pub fn force_kill() -> bool {
             }
         }
     }
-    trace!("Time elapsed: {:?}, Processes: {}, Rays: {}", start.elapsed(), sys.processes().len(), n);
+    trace!("Time elapsed: {:?}, processes: {}, rays: {}", start.elapsed(), sys.processes().len(), n);
     // *CHILD_PROCESS.lock().unwrap() = None;
     success
 }
