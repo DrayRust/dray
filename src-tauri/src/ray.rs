@@ -96,11 +96,16 @@ pub fn start_speed_test_server(port: u16, filename: &str) -> bool {
     }
 
     let ray_path: String = dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string();
-    let ray_config = ray_conf.to_str().unwrap().to_string();
+    let ray_conf = ray_conf.to_str().unwrap().to_string();
     debug!("Speed test server ray_path: {}", ray_path);
-    debug!("Speed test server ray_conf: {}", ray_config);
+    debug!("Speed test server ray_conf: {}", ray_conf);
 
-    let child = match Command::new(&ray_path).args(&["run", "-c", &ray_config]).spawn() {
+    let child = match Command::new(&ray_path)
+        .args(&["run", "-c", &ray_conf])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
         Ok(child) => child,
         Err(e) => {
             error!("Failed to start speed test server: {:?}", e);
