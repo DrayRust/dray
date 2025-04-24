@@ -182,9 +182,7 @@ export async function clearLogAll() {
 export async function readLogList(): Promise<LogList | undefined> {
     if (!isTauri) return
     try {
-        let s = await invoke('read_log_list') as string
-        s = s.trim()
-        if (s) return JSON.parse(s) as LogList
+        return await invoke('read_log_list') as LogList
     } catch (err) {
         log.error('Failed to readLogList:', err)
     }
@@ -193,8 +191,7 @@ export async function readLogList(): Promise<LogList | undefined> {
 export async function readLogFile(filename: string, reverse: boolean = true, start: number = -1): Promise<LogContent | undefined> {
     if (!isTauri) return
     try {
-        const s = await invoke('read_log_file', {filename, reverse, start}) as string
-        return JSON.parse(s) as LogContent
+        return await invoke('read_log_file', {filename, reverse, start}) as LogContent
     } catch (err) {
         log.error('Failed to readLogFile:', err)
     }
