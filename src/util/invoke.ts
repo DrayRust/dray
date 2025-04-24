@@ -99,8 +99,7 @@ export function restartRay() {
 export async function readAppConfig(): Promise<AppConfig | undefined> {
     if (!isTauri) return
     try {
-        const s = await invoke('get_config_json') as string
-        return JSON.parse(s) as AppConfig
+        return await invoke('get_config_json') as AppConfig
     } catch (err) {
         log.error('Failed to readConfig:', err)
     }
@@ -121,9 +120,7 @@ export function setAppConfig(cmd: string, value: string | number | boolean) {
 export async function readRayConfig(): Promise<any> {
     if (!isTauri) return
     try {
-        let s = await invoke('read_ray_config') as string
-        s = s.trim()
-        if (s) return JSON.parse(s)
+        return await invoke('read_ray_config') as any
     } catch (err) {
         log.error('Failed to readRayConfig:', err)
     }
@@ -200,9 +197,7 @@ export async function readLogFile(filename: string, reverse: boolean = true, sta
 async function readConf(filename: string) {
     if (!isTauri) return
     try {
-        let s = await invoke('read_conf', {filename}) as string
-        s = s.trim()
-        if (s) return JSON.parse(s)
+        return await invoke('read_conf', {filename}) as any
     } catch (err) {
         log.error('Failed to readConf:', err)
     }
