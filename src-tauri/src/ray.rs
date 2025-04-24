@@ -3,6 +3,7 @@ use logger::{debug, error, info, trace};
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
+use std::time::Instant;
 // use std::sync::Mutex;
 
 const DRAY_XRAY: &str = "dray-xray"; // 专用文件名，防止误杀其他 xray 进程
@@ -123,8 +124,10 @@ pub fn run_test_server(filename: &str) {
 } */
 
 pub fn force_kill() -> bool {
+    let start = Instant::now();
     let mut sys = sysinfo::System::new_all();
     sys.refresh_all();
+    trace!("Sysinfo time elapsed: {:?}", start.elapsed());
 
     let mut success = true;
     for (pid, process) in sys.processes() {
@@ -137,6 +140,7 @@ pub fn force_kill() -> bool {
             }
         }
     }
+    trace!("Sysinfo killed time elapsed: {:?}, processes len: {}", start.elapsed(), sys.processes().len());
     // *CHILD_PROCESS.lock().unwrap() = None;
     success
 }
