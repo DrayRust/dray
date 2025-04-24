@@ -170,14 +170,13 @@ pub fn force_kill() -> bool {
     let start = Instant::now();
     let mut sys = sysinfo::System::new_all();
     sys.refresh_all();
-    trace!("Sysinfo time elapsed: {:?}", start.elapsed());
+    trace!("Sysinfo new and refresh all time elapsed: {:?}", start.elapsed());
 
     let mut success = true;
     let mut n = 0;
     for (pid, process) in sys.processes() {
         // 特别注意：linux 系统下 name 获取的名字不会超过 15 个字符
         if process.name() == RAY {
-            println!("Process: {:?}", process.name());
             // 防止误杀非 dray 运行的进程
             let ray_exe = process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned());
             if ray_exe.ends_with(RAY) && ray_exe.contains("dray") {
