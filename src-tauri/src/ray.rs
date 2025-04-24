@@ -132,7 +132,7 @@ pub fn stop_speed_test_server(port: u16) -> bool {
                 error!("Failed to wait for speed test server to terminate: {}", e);
                 return false;
             }
-            info!("Speed test server stopped successfully");
+            info!("Speed test server stopped successfully, map len: {}", map.len());
             true
         } else {
             error!("Failed to retrieve child process from map, port: {}", port);
