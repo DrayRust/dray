@@ -13,20 +13,20 @@ fn get_default_proxy_url() -> Option<String> {
 
 pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
     let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
-    match get_with_proxy(url, proxy_url.as_deref(), true).await {
+    match get_with_proxy(url, proxy_url.as_deref()).await {
         Ok(html) => html.to_string(),
         Err(_) => String::new(),
     }
 }
 
 pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> serde_json::Value {
-    match get_with_proxy(url, Some(proxy_url), false).await {
+    match get_with_proxy(url, Some(proxy_url)).await {
         Ok(html) => json!({"success": true, "html": html.to_string()}),
         Err(e) => json!({"success": false, "msg": e}),
     }
 }
 
-async fn get_with_proxy(url: &str, proxy_url: Option<&str>, is_recovery: bool) -> Result<String, String> {
+async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
     let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
     let client_builder = if let Some(proxy_url) = proxy_url {
@@ -36,10 +36,7 @@ async fn get_with_proxy(url: &str, proxy_url: Option<&str>, is_recovery: bool) -
             Err(e) => {
                 let err = format!("Failed to set proxy: {}", e);
                 error!("{}", err);
-                if !is_recovery {
-                    return Err(err);
-                }
-                client_builder
+                return Err(err);
             }
         }
     } else {
