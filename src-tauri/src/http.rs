@@ -25,37 +25,25 @@ pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
 pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
     match get_with_proxy(url, Some(proxy_url)).await {
         Ok(html) => json!({"success": true, "html": html.to_string()}),
-        Err(e) => json!({"success": false, "msg": e}),
+        Err(e) => {
+            error!("{}", e);
+            json!({"success": false, "msg": e})
+        }
     }
 }
 
 pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
-    let client_builder = Client::builder().timeout(Duration::from_secs(10));
+    let mut client_builder = Client::builder().timeout(Duration::from_secs(10));
 
-    let client_builder = if let Some(proxy_url) = proxy_url {
-        debug!("Proxy URL: {}", proxy_url);
-        match Proxy::all(proxy_url) {
-            Ok(proxy) => client_builder.proxy(proxy),
-            Err(e) => {
-                let err = format!("Failed to set proxy: {}", e);
-                error!("{}", err);
-                return Err(err);
-            }
-        }
-    } else {
-        client_builder
-    };
+    if let Some(proxy_url) = proxy_url {
+        client_builder = Proxy::all(proxy_url)
+            .map(|proxy| client_builder.proxy(proxy))
+            .map_err(|e| format!("Failed to set proxy: {}", e))?
+    }
 
-    let client = match client_builder.build() {
-        Ok(client) => client,
-        Err(e) => {
-            let err = format!("Failed to create HTTP client: {}", e);
-            error!("{}", err);
-            return Err(err);
-        }
-    };
+    let client = client_builder.build().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
-    let response = match client
+    let response = client
         .get(url)
         .header(
             header::USER_AGENT,
@@ -64,33 +52,16 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
         )
         .send()
         .await
-    {
-        Ok(response) => response,
-        Err(e) => {
-            let err = format!("Failed to send HTTP request: {}", e);
-            error!("{}", err);
-            return Err(err);
-        }
-    };
+        .map_err(|e| format!("Failed to send HTTP request: {}", e))?;
 
     let status = response.status();
     if !status.is_success() {
-        let err = format!("Failed to fetch HTML page, status: {}", status);
-        error!("{}", err);
-        return Err(err);
+        return Err(format!("Failed to fetch HTML page, status: {}", response.status()));
     }
 
-    match response.text().await {
-        Ok(html) => {
-            debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
-            Ok(html)
-        }
-        Err(e) => {
-            let err = format!("Failed to parse response body: {}", e);
-            error!("{}", err);
-            Err(err)
-        }
-    }
+    let html = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e));
+    debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
+    html
 }
 
 pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
