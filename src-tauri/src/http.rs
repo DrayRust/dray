@@ -95,10 +95,14 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     let mut file = File::create(filepath).map_err(|e| format!("Failed to create local file: {}", e))?;
 
     let mut stream = response.bytes_stream();
+    let mut total_size = 0;
     while let Some(chunk) = stream.next().await {
         let chunk = chunk.map_err(|e| format!("Failed to read chunk: {}", e))?;
         file.write_all(&chunk).map_err(|e| format!("Failed to write chunk to file: {}", e))?;
+        total_size += chunk.len();
     }
+
+    debug!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
 
     Ok(())
 }
