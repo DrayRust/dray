@@ -33,13 +33,15 @@ pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
 }
 
 pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
-    let mut client_builder = Client::builder().timeout(Duration::from_secs(10));
+    let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
-    if let Some(proxy_url) = proxy_url {
-        client_builder = Proxy::all(proxy_url)
+    let client_builder = if let Some(proxy_url) = proxy_url {
+        Proxy::all(proxy_url)
             .map(|proxy| client_builder.proxy(proxy))
             .map_err(|e| format!("Failed to set proxy: {}", e))?
-    }
+    } else {
+        client_builder
+    };
 
     let client = client_builder.build().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
@@ -56,12 +58,16 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
 
     let status = response.status();
     if !status.is_success() {
-        return Err(format!("Failed to fetch HTML page, status: {}", response.status()));
+        return Err(format!("Failed to fetch HTML page, status: {}", status));
     }
 
-    let html = response.text().await.map_err(|e| format!("Failed to parse response body: {}", e));
-    debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
-    html
+    match response.text().await {
+        Ok(html) => {
+            debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
+            Ok(html)
+        }
+        Err(e) => Err(format!("Failed to parse response body: {}", e)),
+    }
 }
 
 pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
