@@ -94,14 +94,41 @@ pub fn get_disks_json() -> Value {
 pub fn get_networks_json() -> Value {
     let mut network_vec = Vec::new();
     let networks = Networks::new_with_refreshed_list();
+
     for (interface_name, data) in &networks {
+        let interface_type = identify_interface_type(interface_name);
         network_vec.push(json!({
             "name": interface_name,
+            "type": interface_type,
             "up": data.total_transmitted(),
             "down": data.total_received(),
         }));
     }
     json!(network_vec)
+}
+
+fn identify_interface_type(name: &str) -> &'static str {
+    match name {
+        // macOS
+        "lo0" => "Loopback",
+        "en0" | "en1" => "Ethernet",
+        "awdl0" => "Apple Wireless Direct Link",
+        "utun0" | "utun1" | "utun2" => "Virtual Tunnel",
+
+        // Linux
+        "lo" => "Loopback",
+        "eth0" | "eth1" => "Ethernet",
+        "wlan0" | "wlan1" => "Wireless",
+        "tun0" | "tap0" => "Virtual Tunnel",
+
+        // Windows
+        "Loopback Pseudo-Interface" => "Loopback",
+        "Ethernet" => "Ethernet",
+        "Wi-Fi" => "Wireless",
+        "Local Area Connection" => "Ethernet",
+
+        _ => "Unknown",
+    }
 }
 
 pub fn get_components_json() -> Value {
