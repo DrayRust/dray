@@ -128,6 +128,31 @@ fn get_sys_info_json() -> Value {
 }
 
 #[tauri::command]
+fn get_load_average_json() -> Value {
+    sys_info::get_load_average_json()
+}
+
+#[tauri::command]
+fn get_processes_json() -> Value {
+    sys_info::get_processes_json()
+}
+
+#[tauri::command]
+fn get_disks_json() -> Value {
+    sys_info::get_disks_json()
+}
+
+#[tauri::command]
+fn get_networks_json() -> Value {
+    sys_info::get_networks_json()
+}
+
+#[tauri::command]
+fn get_components_json() -> Value {
+    sys_info::get_components_json()
+}
+
+#[tauri::command]
 fn get_config_json() -> Value {
     debug!("get_config_json triggered");
     config::get_config_json()
@@ -256,6 +281,11 @@ pub fn run() {
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
+            get_load_average_json,
+            get_processes_json,
+            get_disks_json,
+            get_networks_json,
+            get_components_json,
             get_config_json,
             set_app_log_level,
             set_web_server_enable,

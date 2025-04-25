@@ -307,3 +307,23 @@ async function getJson(apiName: string) {
 export async function getSysInfoJson() {
     return getJson('get_sys_info_json')
 }
+
+export async function getLoadAverageJson() {
+    return getJson('get_load_average_json')
+}
+
+export async function getProcessesJson() {
+    return getJson('get_processes_json')
+}
+
+export async function getDisksJson() {
+    return getJson('get_disks_json')
+}
+
+export async function getNetworksJson() {
+    return getJson('get_networks_json')
+}
+
+export async function getComponentsJson() {
+    return getJson('get_components_json')
+}
