@@ -26,7 +26,7 @@ pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> serde_json::Val
     }
 }
 
-async fn get_with_proxy(url: &str, proxy_url: Option<&str>, isRecovery: bool) -> Result<String, String> {
+async fn get_with_proxy(url: &str, proxy_url: Option<&str>, is_recovery: bool) -> Result<String, String> {
     let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
     let client_builder = if let Some(proxy_url) = proxy_url {
@@ -36,10 +36,10 @@ async fn get_with_proxy(url: &str, proxy_url: Option<&str>, isRecovery: bool) ->
             Err(e) => {
                 let err = format!("Failed to set proxy: {}", e);
                 error!("{}", err);
-                if isRecovery {
-                    return client_builder;
+                if !is_recovery {
+                    return Err(err);
                 }
-                return Err(err);
+                client_builder
             }
         }
     } else {
