@@ -1,9 +1,12 @@
 use crate::config;
+use futures_util::StreamExt;
 use logger::{debug, error};
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Proxy;
-use serde_json::json;
+use serde_json::{json, Value};
+use std::fs::File;
+use std::io::Write;
 use std::time::Duration;
 
 fn get_default_proxy_url() -> Option<String> {
@@ -19,14 +22,14 @@ pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
     }
 }
 
-pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> serde_json::Value {
+pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
     match get_with_proxy(url, Some(proxy_url)).await {
         Ok(html) => json!({"success": true, "html": html.to_string()}),
         Err(e) => json!({"success": false, "msg": e}),
     }
 }
 
-async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
+pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, String> {
     let client_builder = Client::builder().timeout(Duration::from_secs(10));
 
     let client_builder = if let Some(proxy_url) = proxy_url {
@@ -88,4 +91,34 @@ async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String, St
             Err(err)
         }
     }
+}
+
+pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
+    match stream_download(&url, &filepath, timeout).await {
+        Ok(()) => json!({"success": true}),
+        Err(e) => json!({"success": false, "msg": e}),
+    }
+}
+
+pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<(), String> {
+    let client = Client::builder()
+        .timeout(Duration::from_secs(timeout))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+
+    let response = client.get(url).send().await.map_err(|e| format!("Failed to send HTTP request: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("Failed to download file, status: {}", response.status()));
+    }
+
+    let mut file = File::create(filepath).map_err(|e| format!("Failed to create local file: {}", e))?;
+
+    let mut stream = response.bytes_stream();
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk.map_err(|e| format!("Failed to read chunk: {}", e))?;
+        file.write_all(&chunk).map_err(|e| format!("Failed to write chunk to file: {}", e))?;
+    }
+
+    Ok(())
 }

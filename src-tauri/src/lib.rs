@@ -113,6 +113,11 @@ async fn fetch_get_with_proxy(url: String, proxy_url: String) -> Value {
 }
 
 #[tauri::command]
+async fn download_large_file(url: String, filepath: String, timeout: u64) -> Value {
+    http::download_large_file(&url, &filepath, timeout).await
+}
+
+#[tauri::command]
 fn get_dirs_json() -> Value {
     dirs::get_dirs_json()
 }
@@ -247,6 +252,7 @@ pub fn run() {
             save_text_file,
             fetch_get,
             fetch_get_with_proxy,
+            download_large_file,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
