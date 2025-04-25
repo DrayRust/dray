@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use serde_json::{json, Value};
 use std::sync::Mutex;
 use std::time::Instant;
-use sysinfo::{Components, Disks, Networks, System};
+use sysinfo::{Components, Disks, Networks, System, Users};
 
 static SYS: Lazy<Mutex<Option<System>>> = Lazy::new(|| Mutex::new(None));
 
@@ -50,17 +50,22 @@ pub fn get_processes_json() -> Value {
     let mut sys = get_or_init_system();
     sys.as_mut().map(|sys| sys.refresh_all());
     let sys = sys.as_ref().unwrap();
+    let users = Users::new_with_refreshed_list();
 
     let process_vec = sys
         .processes()
         .iter()
         .map(|(pid, process)| {
+            let username = process.user_id().and_then(|user_id| {
+                users.get_user_by_id(user_id).map(|user| user.name().to_string())
+            }).unwrap_or_default();
+
             json!({
                 "pid": pid.as_u32(),
                 "status": process.status().to_string(),
                 "memory": process.memory(),
                 "virtual_memory": process.virtual_memory(),
-                "user_id": process.user_id().map_or("".to_string(), |v| v.to_string()),
+                "user": username,
                 "cpu_usage": process.cpu_usage(),
                 "start_time": process.start_time(),
                 "name": process.name().to_string_lossy().to_string(),
