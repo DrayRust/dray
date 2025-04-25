@@ -413,13 +413,13 @@ export const Dns = () => {
                                             <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                         </TableCell>
                                         <TableCell align="right" width="140" sx={{p: 0}}>
-                                            <Tooltip title="设置" arrow placement="top">
+                                            <Tooltip arrow title="设置" placement="top">
                                                 <IconButton color="primary" onClick={() => handleDnsModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="查看配置" arrow placement="top">
+                                            <Tooltip arrow title="查看配置" placement="top">
                                                 <IconButton color="info" onClick={() => handleDnsModeViewConf(key)}><VisibilityIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="删除" arrow placement="top">
+                                            <Tooltip arrow title="删除" placement="top">
                                                 <IconButton color="error" onClick={() => handleDnsModeDelete(key, row.name)}><DeleteIcon/></IconButton>
                                             </Tooltip>
                                         </TableCell>

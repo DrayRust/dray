@@ -409,13 +409,13 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                             {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
                                             {row.isProxy && <Chip size="small" label="代理更新" color="warning" sx={{mr: 1}}/>}
                                             {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
-                                            <Tooltip title="排序" arrow placement="top">
+                                            <Tooltip arrow title="排序" placement="top">
                                                 <IconButton color="info" onClick={e => handleSubSortStart(e, key)}><OpenWithIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="设置" arrow placement="top">
+                                            <Tooltip arrow title="设置" placement="top">
                                                 <IconButton color="primary" onClick={() => handleUpdate(key)}><SettingsSuggestIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="删除" arrow placement="top">
+                                            <Tooltip arrow title="删除" placement="top">
                                                 <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
                                             </Tooltip>
                                         </div>

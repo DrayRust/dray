@@ -365,13 +365,13 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                                 {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
                                             <TableCell sx={{p: '4px 8px'}} width="150" align="right">
-                                                <Tooltip title="排序" arrow placement="top">
+                                                <Tooltip arrow title="排序" placement="top">
                                                     <IconButton color="info" onClick={e => handleHostSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="修改" arrow placement="top">
+                                                <Tooltip arrow title="修改" placement="top">
                                                     <IconButton color="primary" onClick={() => handleHostUpdate(key)}><EditSquareIcon/></IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="删除" arrow placement="top">
+                                                <Tooltip arrow title="删除" placement="top">
                                                     <IconButton color="error" onClick={() => handleHostDelete(key, row.name)}><DeleteIcon/></IconButton>
                                                 </Tooltip>
                                             </TableCell>
@@ -402,13 +402,13 @@ export const DnsModeEditor = ({dnsModeRow, handleUpdateSubmit, handleBack}: {
                                                 {row.note && <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>}
                                             </TableCell>
                                             <TableCell sx={{p: '4px 8px'}} width="150" align="right">
-                                                <Tooltip title="排序" arrow placement="top">
+                                                <Tooltip arrow title="排序" placement="top">
                                                     <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="修改" arrow placement="top">
+                                                <Tooltip arrow title="修改" placement="top">
                                                     <IconButton color="primary" onClick={() => handleServerUpdate(key)}><EditSquareIcon/></IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="删除" arrow placement="top">
+                                                <Tooltip arrow title="删除" placement="top">
                                                     <IconButton color="error" onClick={() => handleServerDelete(key, row.name)}><DeleteIcon/></IconButton>
                                                 </Tooltip>
                                             </TableCell>

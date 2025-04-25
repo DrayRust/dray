@@ -388,13 +388,13 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                     </TableCell>
                                     <TableCell sx={{p: '4px'}} width="240" align="right">
                                         <Chip size="small" sx={{mr: 2}} label={outboundTagList[row.outboundTag]} color={oTagColors[row.outboundTag] as any}/>
-                                        <Tooltip title="排序" arrow placement="top">
+                                        <Tooltip arrow title="排序" placement="top">
                                             <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
                                         </Tooltip>
-                                        <Tooltip title="修改" arrow placement="top">
+                                        <Tooltip arrow title="修改" placement="top">
                                             <IconButton color="primary" onClick={() => handleRuleUpdate(key)}><EditSquareIcon/></IconButton>
                                         </Tooltip>
-                                        <Tooltip title="删除" arrow placement="top">
+                                        <Tooltip arrow title="删除" placement="top">
                                             <IconButton color="error" onClick={() => handleRuleDelete(key, row.name)}><DeleteIcon/></IconButton>
                                         </Tooltip>
                                     </TableCell>

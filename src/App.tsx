@@ -100,7 +100,7 @@ const App: React.FC = () => {
             <Router>
                 <Box sx={{position: 'fixed', left: 0, bottom: 15, width: 130, zIndex: 1}}>
                     <Stack spacing={0} sx={{justifyContent: "center", alignItems: "center"}}>
-                        <Tooltip title="退出程序">
+                        <Tooltip arrow title="退出程序">
                             <Fab color="error" size="medium" aria-label="logout" onClick={() => invoke('quit')}>
                                 <LogoutIcon/>
                             </Fab>

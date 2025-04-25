@@ -310,13 +310,13 @@ export const DnsTable = () => {
                     <div className="flex-between">
                         <Typography variant="h6">{key + 1}. {row.name}</Typography>
                         <div>
-                            <Tooltip title="排序" arrow placement="top">
+                            <Tooltip arrow title="排序" placement="top">
                                 <IconButton color="info" onClick={e => handleSortStart(e, key)}><OpenWithIcon/></IconButton>
                             </Tooltip>
-                            <Tooltip title="修改" arrow placement="top">
+                            <Tooltip arrow title="修改" placement="top">
                                 <IconButton color="primary" onClick={() => handleUpdate(key)}><EditSquareIcon/></IconButton>
                             </Tooltip>
-                            <Tooltip title="删除" arrow placement="top">
+                            <Tooltip arrow title="删除" placement="top">
                                 <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
                             </Tooltip>
                         </div>

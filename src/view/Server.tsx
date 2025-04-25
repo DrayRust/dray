@@ -469,7 +469,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                                 </>)}
                                 <TableCell align="right" sx={{p: '8px'}}>
                                     {Boolean(row.on) && (<Chip label="启用" color="warning" size="small" sx={{mr: 1}}/>)}
-                                    <Tooltip title="排序" arrow placement="top">
+                                    <Tooltip arrow title="排序" placement="top">
                                         <IconButton color="info" onClick={e => handleServerSortStart(e, key)}><OpenWithIcon/></IconButton>
                                     </Tooltip>
                                     <IconButton onClick={(e) => handleMenuClick(e, key)}><MoreVertIcon/></IconButton>
@@ -491,7 +491,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack sx={{p: 1, width: 660}} spacing={2}>
                 <div className="flex-between">
                     <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
-                    <Tooltip title={isCopied ? '已复制' : '点击复制'}>
+                    <Tooltip arrow title={isCopied ? '已复制' : '点击复制'}>
                         <IconButton onClick={handleCopyJson}><ContentCopyIcon/></IconButton>
                     </Tooltip>
                 </div>

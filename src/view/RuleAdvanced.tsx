@@ -351,7 +351,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                 </>) : action === 'export' ? (<>
                     <div className="flex-between">
                         <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                        <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制导出内容'}>
+                        <Tooltip arrow placement="left" title={isCopied ? '已复制' : '复制导出内容'}>
                             <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeExportData)}><ContentCopyIcon/></IconButton>
                         </Tooltip>
                     </div>
@@ -362,7 +362,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                     <div className="flex-between">
                         <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
                         {ruleModeConf && (
-                            <Tooltip placement="left" arrow title={isCopied ? '已复制' : '复制规则配置'}>
+                            <Tooltip arrow placement="left" title={isCopied ? '已复制' : '复制规则配置'}>
                                 <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
                             </Tooltip>
                         )}
@@ -395,13 +395,13 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                                             <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                         </TableCell>
                                         <TableCell align="right">
-                                            <Tooltip title="设置" arrow placement="top">
+                                            <Tooltip arrow title="设置" placement="top">
                                                 <IconButton color="primary" onClick={() => handleRuleModeUpdate(key)}><SettingsSuggestIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="查看配置" arrow placement="top">
+                                            <Tooltip arrow title="查看配置" placement="top">
                                                 <IconButton color="info" onClick={() => handleRuleModeViewConf(key)}><VisibilityIcon/></IconButton>
                                             </Tooltip>
-                                            <Tooltip title="删除" arrow placement="top">
+                                            <Tooltip arrow title="删除" placement="top">
                                                 <IconButton color="error" onClick={() => handleRuleModeDelete(key, row.name)}><DeleteIcon/></IconButton>
                                             </Tooltip>
                                         </TableCell>
