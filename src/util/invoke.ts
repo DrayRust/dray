@@ -294,3 +294,16 @@ export async function readDnsTableList(): Promise<DnsTableList | undefined> {
 export async function saveDnsTableList(content: DnsTableList) {
     return saveConf('dns_table_list.json', content)
 }
+
+async function getJson(apiName: string) {
+    if (!isTauri) return
+    try {
+        return invoke(apiName) as any
+    } catch (err) {
+        log.error('Failed to getJson:', err)
+    }
+}
+
+export async function getSysInfoJson() {
+    return getJson('get_sys_info_json')
+}

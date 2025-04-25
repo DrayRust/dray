@@ -8,6 +8,7 @@ import WysiwygIcon from '@mui/icons-material/Wysiwyg'
 import SpeedIcon from '@mui/icons-material/Speed'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
+import SysInfo from "./SysInfo.tsx"
 import { readAppConfig, readRayCommonConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
@@ -278,7 +279,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
                         </Stack>
                     </Stack>
                 </>)}
-                {action === 'system' && (<></>)}
+                {action === 'system' && (<SysInfo/>)}
                 {action === 'speed' && (<></>)}
             </Card>
         </Paper>
