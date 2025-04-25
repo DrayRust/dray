@@ -64,7 +64,7 @@ pub fn get_processes_json() -> Value {
                 "pid": pid.as_u32(),
                 "status": process.status().to_string(),
                 "memory": process.memory(),
-                "virtual_memory": process.virtual_memory(),
+                // "virtual_memory": process.virtual_memory(),
                 "user": username,
                 "cpu_usage": process.cpu_usage(),
                 "start_time": process.start_time(),
