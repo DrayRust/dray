@@ -153,6 +153,11 @@ fn get_components_json() -> Value {
 }
 
 #[tauri::command]
+fn kill_process_by_pid(pid: u32) -> bool {
+    sys_info::kill_process_by_pid(pid)
+}
+
+#[tauri::command]
 fn get_config_json() -> Value {
     debug!("get_config_json triggered");
     config::get_config_json()
@@ -286,6 +291,7 @@ pub fn run() {
             get_disks_json,
             get_networks_json,
             get_components_json,
+            kill_process_by_pid,
             get_config_json,
             set_app_log_level,
             set_web_server_enable,

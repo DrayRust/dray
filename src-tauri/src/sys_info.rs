@@ -1,9 +1,9 @@
-use logger::trace;
+use logger::{error, trace};
 use once_cell::sync::Lazy;
 use serde_json::{json, Value};
 use std::sync::Mutex;
 use std::time::Instant;
-use sysinfo::{Components, Disks, Networks, System, Users};
+use sysinfo::{Components, Disks, Networks, Pid, System, Users};
 
 static SYS: Lazy<Mutex<Option<System>>> = Lazy::new(|| Mutex::new(None));
 
@@ -142,4 +142,24 @@ pub fn get_components_json() -> Value {
         })
         .collect::<Vec<_>>();
     json!(components)
+}
+
+pub fn kill_process_by_pid(pid: u32) -> bool {
+    let mut sys = get_or_init_system();
+    sys.as_mut().map(|sys| sys.refresh_all());
+    let sys = sys.as_ref().unwrap();
+
+    let pid = Pid::from_u32(pid);
+    if let Some(process) = sys.process(pid) {
+        if process.kill() {
+            trace!("Successfully killed process with PID {}", pid);
+            true
+        } else {
+            error!("Failed to kill process with PID {}", pid);
+            false
+        }
+    } else {
+        error!("Process with PID {} not found", pid);
+        false
+    }
 }
