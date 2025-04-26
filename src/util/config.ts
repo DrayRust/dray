@@ -687,9 +687,9 @@ export const DEFAULT_DNS_TABLE_LIST: DnsTableList = [
         "DoT": ""
     },
     {
-        "name": "知道创宇DNS",
+        "name": "知道创宇 DNS",
         "note": "安全防护型DNS，拦截钓鱼网站",
-        "hash": "1902ad820d2bef0cdd13613684e33014f557bb1f29df70566c52a2b233c6915d",
+        "hash": "374d59909cc0425bd7619b85b0c1d1b50b0b02e1268cd0b73787384dd2d40734",
         "IPv4": "1.1.8.8\n1.0.8.8",
         "IPv6": "",
         "DoH": "",
