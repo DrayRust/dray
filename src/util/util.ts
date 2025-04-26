@@ -14,7 +14,7 @@ export const sizeToUnit = (size: number, base: number = 1024): string => {
     size = Number(size) || 0
     if (size <= 0) return '0 B'
 
-    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    const units = ['B', 'K', 'M', 'G', 'T', 'P', 'E']
     let unitIndex = 0
     while (size >= base && unitIndex < units.length - 1) {
         size /= base

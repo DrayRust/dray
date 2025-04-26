@@ -21,6 +21,9 @@ export const SysInfo = () => {
     const [network, setNetwork] = useState<any>([])
     const [components, setComponents] = useState<any>([])
 
+    const prevNetworkRef = useRef({up: 0, down: 0})
+    const [networkSpeed, setNetworkSpeed] = useState({upSpeed: 0, downSpeed: 0})
+
     const loadData = useDebounce(async () => {
         // console.log('loadData', new Date().toISOString())
         let info = await getSysInfoJson()
@@ -37,8 +40,14 @@ export const SysInfo = () => {
         let disks = await getDisksJson()
         if (disks) setDisk(sumDiskSpaces(disks))
 
-        let networks = await getNetworksJson()
-        if (networks) setNetwork(sumNetworks(networks))
+        let currentNetwork = await getNetworksJson()
+        if (currentNetwork) {
+            const net = sumNetworks(currentNetwork)
+            setNetwork(net)
+            const speed = calculateNetworkSpeed(prevNetworkRef.current, net)
+            setNetworkSpeed(speed)
+            prevNetworkRef.current = net
+        }
     }, 300)
 
     // 可见时，自动刷新数据
@@ -65,6 +74,23 @@ export const SysInfo = () => {
             down += net.down || 0
         }
         return {up, down}
+    }
+
+    /**
+     * 计算每秒的上传和下载速率
+     * @param prev 上一次的上传和下载总量
+     * @param current 当前的上传和下载总量
+     * @param interval 时间间隔（秒），默认值为 1
+     * @returns 每秒的上传和下载速率（单位：字节/秒）
+     */
+    const calculateNetworkSpeed = (
+        prev: { up: number; down: number },
+        current: { up: number; down: number },
+        interval: number = 1
+    ): { upSpeed: number; downSpeed: number } => {
+        const upSpeed = (current.up - prev.up) / interval
+        const downSpeed = (current.down - prev.down) / interval
+        return {upSpeed: Math.max(upSpeed, 0), downSpeed: Math.max(downSpeed, 0)}
     }
 
     const sumDiskSpaces = (disks: any[]) => {
@@ -168,13 +194,28 @@ export const SysInfo = () => {
             <TableContainer elevation={4} component={Card}>
                 <Table size="small">
                     <TableBody>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell>网络上传总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.up)}</TableCell>
                         </TableRow>
                         <TableRow sx={lastSx}>
                             <TableCell>网络下载总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <TableContainer elevation={4} component={Card}>
+                <Table size="small">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>当前上传速率</TableCell>
+                            <TableCell align="right">{sizeToUnit(networkSpeed.upSpeed)}/s</TableCell>
+                        </TableRow>
+                        <TableRow sx={lastSx}>
+                            <TableCell>当前下载速率</TableCell>
+                            <TableCell align="right">{sizeToUnit(networkSpeed.downSpeed)}/s</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
