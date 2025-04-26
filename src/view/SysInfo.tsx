@@ -70,6 +70,7 @@ export const SysInfo = () => {
         let up = 0
         let down = 0
         for (const net of networks) {
+            if (net.type === 'Loopback') continue // 忽略回环
             up += net.up || 0
             down += net.down || 0
         }
