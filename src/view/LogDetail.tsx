@@ -202,7 +202,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
             </Stack>
         </Stack>
         <Paper elevation={5} sx={{p: 1, pr: 0, height: 'calc(100vh - 65px)', overflow: 'hidden', position: 'fixed', bottom: 10, left: 140, right: 10}}>
-            <List className="scr-w1" ref={listRef} onScroll={handleListScroll} itemCount={logList.length} itemSize={20}
+            <List className="log-view scr-w1" ref={listRef} onScroll={handleListScroll} itemCount={logList.length} itemSize={20}
                   width="100%" height={listHeight}>
                 {Row}
             </List>
