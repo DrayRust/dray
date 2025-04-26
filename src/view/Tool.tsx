@@ -12,7 +12,7 @@ import SysInfo from "./SysInfo.tsx"
 import { readAppConfig, readRayCommonConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
-import { isLinux, isMacOS, isWindows } from "../util/util.ts"
+import { IS_LINUX, IS_MAC_OS, IS_WINDOWS } from "../util/util.ts"
 
 const Tool: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(5), [setNavState])
@@ -29,9 +29,9 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
             let newRayConfig = await readRayCommonConfig()
             if (newRayConfig) setRayConfig(newRayConfig)
 
-            if (isMacOS()) setOsType('macOS')
-            if (isLinux()) setOsType('linux')
-            if (isWindows()) setOsType('windows')
+            if (IS_WINDOWS) setOsType('windows')
+            if (IS_MAC_OS) setOsType('macOS')
+            if (IS_LINUX) setOsType('linux')
         })()
     }, [])
 

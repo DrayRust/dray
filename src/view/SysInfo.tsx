@@ -8,11 +8,9 @@ import HelpIcon from '@mui/icons-material/Help'
 import { getComponentsJson, getDisksJson, getLoadAverageJson, getNetworksJson, getSysInfoJson } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
-import { calcPct, formatFloat, formatTime, isLinux, isMacOS, sizeToUnit } from "../util/util.ts"
+import { IS_LINUX, IS_MAC_OS, calcPct, formatFloat, formatTime, sizeToUnit } from "../util/util.ts"
 
-const IS_MAC_OS = isMacOS()
-const IS_Linux = isLinux()
-const SHOW_LOAD_AVERAGE = IS_MAC_OS || IS_Linux
+const SHOW_LOAD_AVERAGE = IS_MAC_OS || IS_LINUX
 const BASE = IS_MAC_OS ? 1000 : 1024
 
 export const SysInfo = () => {
