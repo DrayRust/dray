@@ -10,18 +10,50 @@ export function debounce<T extends (...args: any[]) => any>(func: T, wait: numbe
     }
 }
 
-export const sizeToUnit = (size: number): string => {
+export const sizeToUnit = (size: number, base: number = 1024): string => {
+    size = Number(size) || 0
     if (size <= 0) return '0 B'
 
     const units = ['B', 'KB', 'MB', 'GB', 'TB']
     let unitIndex = 0
-    while (size >= 1024 && unitIndex < units.length - 1) {
-        size /= 1024
+    while (size >= base && unitIndex < units.length - 1) {
+        size /= base
         unitIndex++
     }
 
     const decimalPlaces = unitIndex === 0 ? 0 : 2
     return `${size.toFixed(decimalPlaces)} ${units[unitIndex]}`
+}
+
+export const calcPct = (used: number, total: number): string => {
+    used = Number(used) || 0
+    total = Number(total) || 0
+    if (total === 0) return '0%'
+    const percentage = ((used / total) * 100).toFixed(1)
+    return `${percentage}%`
+}
+
+const padZero = (num: number) => (Number(num) || 0).toString().padStart(2, '0')
+
+export const formatTime = (seconds: number): string => {
+    seconds = Number(seconds) || 0
+    const days = Math.floor(seconds / (3600 * 24))
+    const hours = Math.floor((seconds % (3600 * 24)) / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    const parts = []
+    if (days > 0) parts.push(`${padZero(days)} 天`)
+    if (hours > 0 || days > 0) parts.push(`${padZero(hours)} 小时`)
+    if (mins > 0 || hours > 0 || days > 0) parts.push(`${padZero(mins)} 分钟`)
+    parts.push(`${padZero(secs)} 秒`)
+    return parts.join(' ')
+}
+
+export const formatFloat = (num: number, decimal: number = 2): string => {
+    num = Number(num) || 0
+    if (num < 0) num = 0
+    return num.toFixed(decimal)
 }
 
 export function formatSecond(duration: number): string {
