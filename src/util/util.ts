@@ -29,7 +29,7 @@ export const calcPct = (used: number, total: number): string => {
     used = Number(used) || 0
     total = Number(total) || 0
     if (total === 0) return '0%'
-    const percentage = ((used / total) * 100).toFixed(1)
+    const percentage = Math.min(((used / total) * 100), 100).toFixed(1)
     return `${percentage}%`
 }
 
