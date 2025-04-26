@@ -11,7 +11,8 @@ import { useVisibility } from "../hook/useVisibility.ts"
 import { calcPct, formatFloat, formatTime, isLinux, isMacOS, sizeToUnit } from "../util/util.ts"
 
 const IS_MAC_OS = isMacOS()
-const IS_SHOW_LOAD_AVERAGE = IS_MAC_OS || isLinux()
+const IS_Linux = isLinux()
+const SHOW_LOAD_AVERAGE = IS_MAC_OS || IS_Linux
 const BASE = IS_MAC_OS ? 1000 : 1024
 
 export const SysInfo = () => {
@@ -29,7 +30,7 @@ export const SysInfo = () => {
         let info = await getSysInfoJson()
         if (info) setSysInfo(info)
 
-        if (IS_SHOW_LOAD_AVERAGE) {
+        if (SHOW_LOAD_AVERAGE) {
             let la = await getLoadAverageJson()
             if (la) setLoadAverage(la)
         }
@@ -174,7 +175,7 @@ export const SysInfo = () => {
                 </Table>
             </TableContainer>
 
-            {IS_SHOW_LOAD_AVERAGE && <TableContainer elevation={4} component={Card}>
+            {SHOW_LOAD_AVERAGE && <TableContainer elevation={4} component={Card}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
