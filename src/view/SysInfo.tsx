@@ -104,7 +104,7 @@ export const SysInfo = () => {
             total_space += disk.total_space
             available_space += disk.available_space
         }
-        return {total_space: total_space, used_space: total_space - available_space}
+        return {total_space, available_space, used_space: total_space - available_space}
     }
 
     const lastSx = {'&:last-child td, &:last-child th': {border: 0}}
@@ -134,6 +134,7 @@ export const SysInfo = () => {
                         <TableRow>
                             <TableCell>硬盘 (disks)</TableCell>
                             <TableCell align="right">
+                                <Typography variant="body2" component="span" color="info" sx={{pr: 2}}>{sizeToUnit(disk.available_space, BASE)} 可用</Typography>
                                 {sizeToUnit(disk.used_space, BASE)} / {sizeToUnit(disk.total_space, BASE)}
                                 <Typography variant="body2" component="span" color="warning" sx={{pl: 2}}>{calcPct(disk.used_space, disk.total_space)}</Typography>
                             </TableCell>
