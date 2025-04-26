@@ -1,9 +1,9 @@
 import { checkPortAvailable, fetchProxyGet, log, saveSpeedTestConf, startSpeedTestServer, stopSpeedTestServer } from "./invoke.ts"
-import { getRandomNumber, sleep } from "./util.ts"
+import { getRandom, sleep } from "./util.ts"
 import { getSpeedTestConf } from "./serverConf.ts"
 
 export async function generateServersPort(serverList: ServerList) {
-    let port = getRandomNumber(25000, 35000)
+    let port = getRandom(25000, 35000)
     let errNum = 0
     let servers = []
     for (const server of serverList) {
