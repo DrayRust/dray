@@ -20,7 +20,7 @@ import { processDomain, processIP, processPort } from "../util/util.ts"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { hashJson } from "../util/crypto.ts"
-import { DEFAULT_RULE } from "../util/config.ts"
+import { DEFAULT_RULE_ROW } from "../util/config.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',
@@ -85,12 +85,22 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
 
     // ====================================== create ======================================
     const [action, setAction] = useState('')
-    const [ruleRow, setRuleRow] = useState<RuleRow>(DEFAULT_RULE)
+    const [ruleRow, setRuleRow] = useState<RuleRow>(DEFAULT_RULE_ROW)
     const handleRuleCreate = () => {
         setAction('create')
-        setRuleRow(DEFAULT_RULE)
+        setRuleRow(DEFAULT_RULE_ROW)
     }
 
+    // ====================================== update ======================================
+    const [ruleUpdateKey, setRuleUpdateKey] = useState(-1)
+    const handleRuleUpdate = (key: number) => {
+        setAction('update')
+        setRuleUpdateKey(key)
+        const item = ruleModeList[ruleModeKey].rules[key]
+        if (item) setRuleRow({...DEFAULT_RULE_ROW, ...item})
+    }
+
+    // ====================================== change ======================================
     const [nameError, setNameError] = useState(false)
     const handleRuleChange = (type: keyof RuleRow) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setRuleRow(prev => {
@@ -120,6 +130,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         })
     }
 
+    // ====================================== submit ======================================
     const [domainError, setDomainError] = useState(false)
     const [ipError, setIpError] = useState(false)
     const handleSubmit = async () => {
@@ -194,15 +205,6 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
         const ok = await saveRuleModeList(ruleModeList)
         if (ok) setRuleModeList([...ruleModeList])
         return ok
-    }
-
-    // ====================================== update ======================================
-    const [ruleUpdateKey, setRuleUpdateKey] = useState(-1)
-    const handleRuleUpdate = (key: number) => {
-        setAction('update')
-        setRuleUpdateKey(key)
-        const item = ruleModeList[ruleModeKey].rules[key]
-        if (item) setRuleRow(item)
     }
 
     // ====================================== delete ======================================

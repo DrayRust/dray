@@ -45,7 +45,7 @@ export const DEFAULT_RULE_DOMAIN: RuleDomain = {
 
 // https://xtls.github.io/config/routing.html#ruleobject
 // https://www.v2fly.org/config/routing.html#ruleobject
-export const DEFAULT_RULE: RuleRow = {
+export const DEFAULT_RULE_ROW: RuleRow = {
     name: '',
     note: '',
     outboundTag: 'proxy',
@@ -63,11 +63,11 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "中国大陆模式",
         "note": "专为中国大陆网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "e085c319f010c08e502bfbc8bcdf3e3d28a1f93ed10488a6819be2064f174d99",
+        "hash": "abc8cf1e3e68a9f76ab40b27e2e903760a58ebb02283aa2724bec7b3624f458b",
         "rules": [
             {
                 "name": "中国大陆 DNS 服务器",
-                "note": "排除中国大陆常用 DNS 服务器",
+                "note": "直连中国大陆常用 DNS 服务器",
                 "outboundTag": "direct",
                 "ruleType": "multi",
                 "domain": "domain:114dns.com\ndomain:360.cn\ndomain:alidns.com\ndomain:chinamobile.com\ndomain:chinatelecom.com.cn\ndomain:chinaunicom.com\ndomain:cnnic.cn\ndomain:dns.360.cn\ndomain:dns.alidns.com\ndomain:dns.baidu.com\ndomain:dnspod.cn\ndomain:dnspod.com\ndomain:doh.360.cn\ndomain:doh.pub\ndomain:dot.360.cn\ndomain:dot.pub\ndomain:onedns.net\ndomain:tsinghua.edu.cn",
@@ -90,6 +90,18 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
+                "name": "BT 流量",
+                "note": "阻止 BT 流量走代理服务器，否则可能导致代理服务器被封",
+                "outboundTag": "reject",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": "bittorrent"
+            },
+            {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
                 "outboundTag": "reject",
@@ -102,20 +114,20 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
-                "name": "屏蔽 BT 流量",
-                "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "reject",
-                "ruleType": "multi",
-                "domain": "",
+                "name": "GFW 屏蔽域名",
+                "note": "代理域名数据库中被 GFW 屏蔽的域名",
+                "outboundTag": "proxy",
+                "ruleType": "domain",
+                "domain": "geosite:gfw",
                 "ip": "",
                 "port": "",
                 "sourcePort": "",
                 "network": "",
-                "protocol": "bittorrent"
+                "protocol": ""
             },
             {
-                "name": "私有IP",
-                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "name": "私有 IP",
+                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -127,7 +139,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有域名",
-                "note": "排除代理服务器无法访问的私有域名 如: localhost",
+                "note": "直连代理服务器无法访问的私有域名 如: localhost",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:private",
@@ -139,7 +151,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "中国大陆 IP",
-                "note": "排除 IP 数据库中的所有中国大陆 IP",
+                "note": "直连 IP 数据库中所有的中国大陆 IP",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -151,7 +163,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "中国大陆域名",
-                "note": "排除域名数据库中的中国大陆常见域名",
+                "note": "直连域名数据库中的中国大陆常见域名",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:cn",
@@ -167,7 +179,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "俄罗斯模式",
         "note": "专为俄罗斯网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "2326c8c982f75314cac9269f249c45655cc207841dedac3024b8ef9529cb460e",
+        "hash": "d9c5da88b22d63df8cc8812d4b08c1c3f2bd266e3219a2e55d175c28f840cb8a",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -182,6 +194,18 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
+                "name": "BT 流量",
+                "note": "阻止 BT 流量走代理服务器，否则可能导致代理服务器被封",
+                "outboundTag": "reject",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": "bittorrent"
+            },
+            {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
                 "outboundTag": "reject",
@@ -194,20 +218,8 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
-                "name": "屏蔽 BT 流量",
-                "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "reject",
-                "ruleType": "multi",
-                "domain": "",
-                "ip": "",
-                "port": "",
-                "sourcePort": "",
-                "network": "",
-                "protocol": "bittorrent"
-            },
-            {
-                "name": "私有IP",
-                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "name": "私有 IP",
+                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -219,7 +231,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有域名",
-                "note": "排除代理服务器无法访问的私有域名 如: localhost",
+                "note": "直连代理服务器无法访问的私有域名 如: localhost",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:private",
@@ -231,7 +243,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "俄罗斯 IP",
-                "note": "排除 IP 数据库中的所有俄罗斯 IP",
+                "note": "直连 IP 数据库中所有的俄罗斯 IP",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -247,7 +259,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "伊朗模式",
         "note": "专为伊朗网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "94f55a409977848dfb3206d564ff75a41bb580c5c143192eb8a01242562eeca1",
+        "hash": "90d533cc5c201aebe8057b3bd9d5bcc23019e33c694bbf71e2585c612a5b1cb7",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -262,6 +274,18 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
+                "name": "BT 流量",
+                "note": "阻止 BT 流量走代理服务器，否则可能导致代理服务器被封",
+                "outboundTag": "reject",
+                "ruleType": "multi",
+                "domain": "",
+                "ip": "",
+                "port": "",
+                "sourcePort": "",
+                "network": "",
+                "protocol": "bittorrent"
+            },
+            {
                 "name": "广告域名",
                 "note": "屏蔽热心网友整理的广告域名和广告商域名",
                 "outboundTag": "reject",
@@ -274,20 +298,8 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
                 "protocol": ""
             },
             {
-                "name": "屏蔽 BT 流量",
-                "note": "屏蔽 BT 流量走代理服务器，否则可能导致代理服务器被封",
-                "outboundTag": "reject",
-                "ruleType": "multi",
-                "domain": "",
-                "ip": "",
-                "port": "",
-                "sourcePort": "",
-                "network": "",
-                "protocol": "bittorrent"
-            },
-            {
-                "name": "私有IP",
-                "note": "排除代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "name": "私有 IP",
+                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -299,7 +311,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有域名",
-                "note": "排除代理服务器无法访问的私有域名 如: localhost",
+                "note": "直连代理服务器无法访问的私有域名 如: localhost",
                 "outboundTag": "direct",
                 "ruleType": "domain",
                 "domain": "geosite:private",
@@ -311,7 +323,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "伊朗 IP",
-                "note": "排除 IP 数据库中的所有伊朗 IP",
+                "note": "直连 IP 数据库中所有的伊朗 IP",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
