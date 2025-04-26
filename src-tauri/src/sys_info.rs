@@ -29,6 +29,7 @@ pub fn get_sys_info_json() -> Value {
         "cpu_arch": System::cpu_arch(), // CPU 架构信息
         "cpu_len": sys.cpus().len(), // CPU 核数
         "process_len": sys.processes().len(), // 进程数
+        "global_cpu_usage": sys.global_cpu_usage(),
         "total_memory": sys.total_memory(),
         "used_memory": sys.used_memory(),
         "total_swap": sys.total_swap(),
