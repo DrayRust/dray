@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Card, Stack, Typography, Tooltip,
+    Card, Dialog, Stack, Typography, Tooltip,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material'
 import HelpIcon from '@mui/icons-material/Help'
 
+import Process from "./Process.tsx"
 import { getComponentsJson, getDisksJson, getLoadAverageJson, getNetworksJson, getSysInfoJson } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
@@ -22,6 +23,9 @@ export const SysInfo = () => {
 
     const prevNetworkRef = useRef({up: 0, down: 0})
     const [networkSpeed, setNetworkSpeed] = useState({upSpeed: 0, downSpeed: 0})
+    const [open, setOpen] = useState(false)
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
 
     const loadData = useDebounce(async () => {
         // console.log('loadData', new Date().toISOString())
@@ -54,9 +58,9 @@ export const SysInfo = () => {
     const isVisibility = useVisibility()
     useEffect(() => {
         loadData()
-        if (isVisibility) intervalRef.current = setInterval(loadData, 1000)
+        if (isVisibility && !open) intervalRef.current = setInterval(loadData, 1000)
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility])
+    }, [isVisibility, open])
 
     const formatComponentsLabel = (label: string) => {
         if (label === 'PECI CPU') return 'CPU 核心'
@@ -114,7 +118,11 @@ export const SysInfo = () => {
     }
 
     const lastSx = {'&:last-child td, &:last-child th': {border: 0}}
-    return (
+    return (<>
+        <Dialog fullScreen open={open} onClose={handleClose}>
+            <Process handleClose={handleClose}/>
+        </Dialog>
+
         <Stack spacing={2}>
             <TableContainer elevation={4} component={Card}>
                 <Table size="small">
@@ -137,7 +145,7 @@ export const SysInfo = () => {
                         <TableRow>
                             <TableCell>进程数</TableCell>
                             <TableCell align="right">
-                                <Typography variant="body2" component="span" color="secondary">{sysInfo.process_len}</Typography>
+                                <Typography variant="body2" component="span" color="secondary" onClick={handleOpen}>{sysInfo.process_len}</Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -262,7 +270,7 @@ export const SysInfo = () => {
                 </Table>
             </TableContainer>
         </Stack>
-    )
+    </>)
 }
 
 export default SysInfo
