@@ -124,7 +124,9 @@ export const SysInfo = () => {
                         </TableRow>
                         <TableRow>
                             <TableCell>已运行</TableCell>
-                            <TableCell align="right"><Typography component="span" color="info">{formatTime(sysInfo.uptime)}</Typography></TableCell>
+                            <TableCell align="right">
+                                <Typography variant="body2" component="span" color="info">{formatTime(sysInfo.uptime)}</Typography>
+                            </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>进程数</TableCell><TableCell align="right">{sysInfo.process_len}</TableCell>
@@ -133,14 +135,14 @@ export const SysInfo = () => {
                             <TableCell>硬盘 (disks)</TableCell>
                             <TableCell align="right">
                                 {sizeToUnit(disk.used_space, BASE)} / {sizeToUnit(disk.total_space, BASE)}
-                                <Typography component="span" color="warning" sx={{pl: 2}}>{calcPct(disk.used_space, disk.total_space)}</Typography>
+                                <Typography variant="body2" component="span" color="warning" sx={{pl: 2}}>{calcPct(disk.used_space, disk.total_space)}</Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>内存 (memory)</TableCell>
                             <TableCell align="right">
                                 {sizeToUnit(sysInfo.used_memory)} / {sizeToUnit(sysInfo.total_memory)}
-                                <Typography component="span" color="warning" sx={{pl: 2}}>{calcPct(sysInfo.used_memory, sysInfo.total_memory)}</Typography>
+                                <Typography variant="body2" component="span" color="warning" sx={{pl: 2}}>{calcPct(sysInfo.used_memory, sysInfo.total_memory)}</Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -148,14 +150,14 @@ export const SysInfo = () => {
                             <TableCell align="right">
                                 {sysInfo.total_swap > 0 ? (<>
                                     {sizeToUnit(sysInfo.used_swap)} / {sizeToUnit(sysInfo.total_swap)}
-                                    <Typography component="span" color="warning" sx={{pl: 2}}>{calcPct(sysInfo.used_swap, sysInfo.total_swap)}</Typography>
+                                    <Typography variant="body2" component="span" color="warning" sx={{pl: 2}}>{calcPct(sysInfo.used_swap, sysInfo.total_swap)}</Typography>
                                 </>) : '-'}
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>CPU 使用</TableCell>
                             <TableCell align="right">
-                                <Typography component="span" color="warning">{formatFloat(sysInfo.global_cpu_usage, 1)}%</Typography>
+                                <Typography variant="body2" component="span" color="warning">{formatFloat(sysInfo.global_cpu_usage, 1)}%</Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>
