@@ -68,12 +68,19 @@ export const SysInfo = () => {
     const sumNetworks = (networks: any[]) => {
         let up = 0
         let down = 0
+        let loUp = 0
+        let loDown = 0
         for (const net of networks) {
-            if (net.type === 'Loopback') continue // 忽略回环
-            up += net.up || 0
-            down += net.down || 0
+            if (net.type === 'Loopback') {
+                // 回环地址不计入网络流量统计
+                loUp += net.up || 0
+                loDown += net.down || 0
+            } else {
+                up += net.up || 0
+                down += net.down || 0
+            }
         }
-        return {up, down}
+        return {up, down, loUp, loDown}
     }
 
     /**
@@ -128,7 +135,10 @@ export const SysInfo = () => {
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>进程数</TableCell><TableCell align="right">{sysInfo.process_len}</TableCell>
+                            <TableCell>进程数</TableCell>
+                            <TableCell align="right">
+                                <Typography variant="body2" component="span" color="secondary">{sysInfo.process_len}</Typography>
+                            </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>硬盘 (disks)</TableCell>
@@ -211,6 +221,14 @@ export const SysInfo = () => {
                         <TableRow sx={lastSx}>
                             <TableCell>网络下载总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>回环流出总量</TableCell>
+                            <TableCell align="right">{sizeToUnit(network.loUp)}</TableCell>
+                        </TableRow>
+                        <TableRow sx={lastSx}>
+                            <TableCell>回环流入总量</TableCell>
+                            <TableCell align="right">{sizeToUnit(network.loDown)}</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
