@@ -63,7 +63,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "中国大陆模式",
         "note": "专为中国大陆网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "abc8cf1e3e68a9f76ab40b27e2e903760a58ebb02283aa2724bec7b3624f458b",
+        "hash": "4bb4ab84e6886266c7633ecde57af1d025f1c1c69d0cdae4ed78788c1db402c5",
         "rules": [
             {
                 "name": "中国大陆 DNS 服务器",
@@ -127,7 +127,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有 IP",
-                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "note": "直连代理服务器无法访问的私有 IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -179,7 +179,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "俄罗斯模式",
         "note": "专为俄罗斯网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "d9c5da88b22d63df8cc8812d4b08c1c3f2bd266e3219a2e55d175c28f840cb8a",
+        "hash": "d72a14c2761cd31333c99308cd17ee5de31d6dbcc4c4f341efc72c487cbdbfe9",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -219,7 +219,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有 IP",
-                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "note": "直连代理服务器无法访问的私有 IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",
@@ -259,7 +259,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
         "name": "伊朗模式",
         "note": "专为伊朗网络环境优化的访问规则",
         "domainStrategy": "IPIfNonMatch",
-        "hash": "90d533cc5c201aebe8057b3bd9d5bcc23019e33c694bbf71e2585c612a5b1cb7",
+        "hash": "60c1cbf0c71c80995516be816b2ddf8b7de4bfc9c6fdc9454db5353c3233cc2b",
         "rules": [
             {
                 "name": "UDP 443 流量",
@@ -299,7 +299,7 @@ export const DEFAULT_RULE_MODE_LIST: RuleModeList = [
             },
             {
                 "name": "私有 IP",
-                "note": "直连代理服务器无法访问的私有IP 如: 192.168.1.1",
+                "note": "直连代理服务器无法访问的私有 IP 如: 192.168.1.1",
                 "outboundTag": "direct",
                 "ruleType": "ip",
                 "domain": "",

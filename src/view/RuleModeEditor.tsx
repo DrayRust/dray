@@ -200,7 +200,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
     }
 
     const updateHashAndRule = async (rules: RuleRow[]) => {
-        ruleModeList[ruleModeKey].rules = rules
+        ruleModeList[ruleModeKey].rules = rules.map(item => ({...DEFAULT_RULE_ROW, ...item}))
         ruleModeList[ruleModeKey].hash = await hashJson(rules)
         const ok = await saveRuleModeList(ruleModeList)
         if (ok) setRuleModeList([...ruleModeList])
