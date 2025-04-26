@@ -83,7 +83,7 @@ body, html {
     user-select: auto;
 }
 
-.drag-grab {
+/*.drag-grab {
     cursor: grab;
     transition: all 0.2s ease-in-out;
 }
@@ -92,7 +92,7 @@ body, html {
     cursor: grabbing;
     opacity: 0.6;
     transform: scale(0.999);
-}
+}*/
 
 .server-type button {
     text-transform: capitalize !important;
