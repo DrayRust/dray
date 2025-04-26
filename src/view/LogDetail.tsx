@@ -9,7 +9,7 @@ import {
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 import { useSnackbar } from '../component/useSnackbar.tsx'
-import { useWindowFocused } from '../hook/useWindowFocused.ts'
+import { useVisibility } from "../hook/useVisibility.ts"
 import { readLogFile } from '../util/invoke.ts'
 import { formatLogName } from "../util/util.ts"
 import highlightLog from '../util/highlightLog'
@@ -25,7 +25,6 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const navigate = useNavigate()
-    const isWindowFocused = useWindowFocused()
 
     const [reverse, setReverse] = useState(true)
     const [autoRefresh, setAutoRefresh] = useState(true)
@@ -81,17 +80,18 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
 
     // 自动刷新日志内容
     const intervalRef = useRef<number>(0)
+    const isVisibility = useVisibility()
     useEffect(() => {
         // 只有在查看日志文件末尾时，才开启自动刷新日志
         // 只在窗口可视时才自动刷新日志，以减小资源消耗
-        if (reverse && isWindowFocused && autoRefresh && filename) {
+        if (reverse && isVisibility && autoRefresh && filename) {
             intervalRef.current = setInterval(() => {
                 fetchLogContent(true, -1)
-            }, 5000)
+            }, 3000)
         }
 
         return () => clearInterval(intervalRef.current)
-    }, [isWindowFocused, autoRefresh, filename])
+    }, [isVisibility, autoRefresh, filename])
 
     const isScrollingRef = useRef(false)
     const scrollTo = (position: 'top' | 'bottom') => {
