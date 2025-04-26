@@ -40,12 +40,12 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     const filterProcesses = (processes: any[], searchText: string) => {
         if (!searchText) return processes
         return processes.filter((process) =>
-            process.exe.toLowerCase().includes(searchText.toLowerCase())
+            process.exe.toLowerCase().includes(searchText)
         )
     }
 
     const handleSearch = (text: string) => {
-        setSearchText(text)
+        setSearchText(text.toLowerCase())
         setFilteredProcesses(filterProcesses(processes, text))
     }
 
