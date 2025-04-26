@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export const useWindowFocus = () => {
+export const useWindowFocused = () => {
     const [isWindowFocused, setIsWindowFocused] = useState(true)
 
     useEffect(() => {

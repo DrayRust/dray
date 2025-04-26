@@ -9,7 +9,7 @@ import {
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
 import { useSnackbar } from '../component/useSnackbar.tsx'
-import { useWindowFocus } from '../hook/useWindowFocus.ts'
+import { useWindowFocused } from '../hook/useWindowFocused.ts'
 import { readLogFile } from '../util/invoke.ts'
 import { formatLogName } from "../util/util.ts"
 import highlightLog from '../util/highlightLog'
@@ -25,7 +25,7 @@ const LogDetail: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const navigate = useNavigate()
-    const isWindowFocused = useWindowFocus()
+    const isWindowFocused = useWindowFocused()
 
     const [reverse, setReverse] = useState(true)
     const [autoRefresh, setAutoRefresh] = useState(true)

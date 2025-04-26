@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material'
 
 import { ThemeProvider } from './context/ThemeProvider.tsx'
-import { useWindowFocus } from './hook/useWindowFocus.ts'
+import { useWindowFocused } from './hook/useWindowFocused.ts'
 
 import Home from "./view/Home.tsx"
 import Server from "./view/Server.tsx"
@@ -73,11 +73,11 @@ const App: React.FC = () => {
         subscribeLastUpdate = Date.now()
     }, 2000)
 
-    const isFocus = useWindowFocus()
+    const isWindowFocused = useWindowFocused()
     useEffect(() => {
         setTimeout(async () => {
             try {
-                if (isFocus) {
+                if (isWindowFocused) {
                     // await getCurrentWindow().show()
                     await getCurrentWindow().setFocus()
                 } else {
@@ -89,7 +89,7 @@ const App: React.FC = () => {
         }, 0)
 
         setTimeout(subscribeUpdate, 0)
-    }, [isFocus])
+    }, [isWindowFocused])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
