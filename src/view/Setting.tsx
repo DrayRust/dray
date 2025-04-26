@@ -354,7 +354,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Tab label="Web 设置"/>
                 </Tabs>
             </Paper>
-            <Box className="scrollbar-none" sx={{p: 2, m: '0 auto', maxWidth: 660, height: 'calc(100% - 48px)', overflow: 'auto'}}>
+            <Box className="scr-none" sx={{p: 2, m: '0 auto', maxWidth: 660, height: 'calc(100% - 48px)', overflow: 'auto'}}>
                 {activeTab === 0 ? (
                     <Card>
                         <div className="flex-between p2">
