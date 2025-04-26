@@ -223,7 +223,7 @@ export const Dns = () => {
     }
 
     const handleUpdateSubmit = async (row: DnsModeRow) => {
-        let item: DnsModeRow = {...row}
+        let item: DnsModeRow = {...DEFAULT_DNS_MODE_ROW, ...row}
         item.hash = ''
         item.hash = await hashJson(item)
         dnsModeList[dnsModeUpdateKey] = item
