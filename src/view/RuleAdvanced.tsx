@@ -48,18 +48,14 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
     const [ruleModeList, setRuleModeList] = useState<RuleModeList>(DEFAULT_RULE_MODE_LIST)
     const [ruleModeKey, setRuleModeKey] = useState(-1)
 
-    useEffect(() => {
-        (async () => {
-            const list = await readRuleModeList() as RuleModeList
-            if (list) {
-                const mergedList = (list).map(item => ({
-                    ...DEFAULT_RULE_MODE_ROW,
-                    ...item
-                }))
-                setRuleModeList(mergedList)
-            }
-        })()
-    }, [])
+    const loadData = useDebounce(async () => {
+        const list = await readRuleModeList() as RuleModeList
+        if (list) {
+            const mergedList = (list).map(item => ({...DEFAULT_RULE_MODE_ROW, ...item}))
+            setRuleModeList(mergedList)
+        }
+    }, 100)
+    useEffect(loadData, [])
 
     // ============================== setting ==============================
     const handleRuleConfigChange = (name: keyof RuleConfig) => (e: React.ChangeEvent<HTMLInputElement>) => {
