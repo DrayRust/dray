@@ -26,14 +26,13 @@ pub fn get_sys_info_json() -> Value {
         "host_name": System::host_name(), // 系统主机名
         "uptime": System::uptime(), // 系统运行时间（以秒为单位）
         "physical_core_count": System::physical_core_count(), // CPU 物理核心数量
-        "cpus": sys.cpus().len(), // CPU 核数
         "cpu_arch": System::cpu_arch(), // CPU 架构信息
-        "memory": {
-            "total_memory": sys.total_memory(),
-            "used_memory": sys.used_memory(),
-            "total_swap": sys.total_swap(),
-            "used_swap": sys.used_swap(),
-        }
+        "cpu_len": sys.cpus().len(), // CPU 核数
+        "process_len": sys.processes().len(), // 进程数
+        "total_memory": sys.total_memory(),
+        "used_memory": sys.used_memory(),
+        "total_swap": sys.total_swap(),
+        "used_swap": sys.used_swap(),
     })
 }
 
@@ -94,7 +93,6 @@ pub fn get_disks_json() -> Value {
 pub fn get_networks_json() -> Value {
     let mut network_vec = Vec::new();
     let networks = Networks::new_with_refreshed_list();
-
     for (interface_name, data) in &networks {
         let interface_type = identify_interface_type(interface_name);
         network_vec.push(json!({
