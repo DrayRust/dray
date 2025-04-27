@@ -82,25 +82,20 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 }}
             >
                 <TextField
-                    fullWidth
                     size="small"
                     variant="outlined"
                     placeholder="搜索..."
                     value={searchText}
                     onChange={(e) => handleSearch(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon/>
-                            </InputAdornment>
-                        ),
-                        endAdornment: searchText && (
-                            <InputAdornment position="end">
-                                <IconButton onClick={handleClear} size="small">
-                                    <CloseIcon/>
-                                </IconButton>
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start"><SearchIcon/></InputAdornment>
+                            ),
+                            endAdornment: searchText && (
+                                <InputAdornment position="end"><IconButton onClick={handleClear} size="small"><CloseIcon/></IconButton></InputAdornment>
+                            ),
+                        },
                     }}
                     sx={{maxWidth: 400}}
                 />
