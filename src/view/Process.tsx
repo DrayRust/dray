@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
+import { useDialog } from "../component/useDialog.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
@@ -21,7 +22,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     const loadData = useDebounce(async (searchText: string, sortField: string) => {
         let arr = await getProcessesJson(searchText)
         if (arr) setProcesses(sortProcesses(arr, sortField))
-    }, 300)
+    }, 100)
 
     // 可见时，自动刷新数据
     const intervalRef = useRef<number>(0)
@@ -41,7 +42,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         setSearchText(searchText)
     }
 
-    const handleSortFieldChange = (sortField: string) => {
+    const handleSortChange = (sortField: string) => {
         setSortField(sortField)
     }
 
@@ -71,13 +72,13 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     }
 
     const handleKillPid = async () => {
-        if (selectedPid > -1) {
+        if (selectedPid < 0) return
+
+        dialogConfirm('确认结束进程', `确定要结束这个进程吗？`, async () => {
+            setSelectedPid(-1)
             let ok = await killProcessByPid(selectedPid)
-            if (ok) {
-                setSelectedPid(-1)
-                loadData(searchText, sortField)
-            }
-        }
+            if (ok) loadData(searchText, sortField)
+        })
     }
 
     const TableCellN = styled(TableCell)({
@@ -88,7 +89,9 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
 
+    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
+        <DialogComponent/>
         <Box sx={{backgroundColor: 'background.paper', p: 1, display: 'flex', alignItems: 'center'}}>
             <TextField
                 size="small" variant="outlined" placeholder="搜索..." sx={{width: 300}}
@@ -108,7 +111,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
             <TextField
                 select size="small" label="排序" value={sortField}
-                onChange={(e) => handleSortFieldChange(e.target.value)}
+                onChange={(e) => handleSortChange(e.target.value)}
                 sx={{width: '120px', ml: 1}}>
                 <MenuItem value="pid">PID</MenuItem>
                 <MenuItem value="cpu_usage">CPU</MenuItem>
