@@ -93,8 +93,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     })
 
     const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
-
     const maxHeight = 'calc(100vh - 72px)'
+
     const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <DialogComponent/>
