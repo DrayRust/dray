@@ -1,3 +1,4 @@
+use crate::config;
 use crate::dirs;
 use logger::{debug, error, info, trace, warn};
 use once_cell::sync::Lazy;
@@ -208,6 +209,11 @@ pub fn force_kill() -> bool {
 }
 
 pub fn restart() -> bool {
+    let config = config::get_config();
+    if !config.ray_enable {
+        return false;
+    }
+
     let success = force_kill() && start();
     if success {
         info!("Ray Server restarted successfully");

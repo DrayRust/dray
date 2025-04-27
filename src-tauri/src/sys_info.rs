@@ -63,14 +63,15 @@ pub fn get_processes_json(keyword: &str) -> Value {
             }
 
             /*let username = process
-                .user_id()
-                .and_then(|user_id| {
-                    users
-                        .get_user_by_id(user_id)
-                        .map(|user| user.name().to_string())
-                        .or_else(|| Some(user_id.to_string()))
-                })
-                .unwrap_or_default();*/
+            .user_id()
+            .and_then(|user_id| {
+                users
+                    .get_user_by_id(user_id)
+                    .map(|user| user.name().to_string())
+                    .or_else(|| Some(user_id.to_string()))
+            })
+            .unwrap_or_default();*/
+
             let username = process
                 .user_id()
                 .and_then(|user_id| users.get_user_by_id(user_id).map(|user| user.name().to_string()))
