@@ -8,7 +8,6 @@ import SearchIcon from '@mui/icons-material/Search'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
-import { useDialog } from "../component/useDialog.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 import { useFullHeight } from "../hook/useFullHeight.ts"
@@ -79,12 +78,9 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const handleKillPid = async () => {
         if (selectedPid < 0) return
-
-        dialogConfirm('确认 Kill', `确定要结束这个进程吗？`, async () => {
-            setSelectedPid(-1)
-            let ok = await killProcessByPid(selectedPid)
-            if (ok) loadData(searchText, sortField)
-        })
+        setSelectedPid(-1)
+        let ok = await killProcessByPid(selectedPid)
+        if (ok) loadData(searchText, sortField)
     }
 
     const ROW_HEIGHT = 30
@@ -121,9 +117,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         </>)
     }
 
-    const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
-        <DialogComponent/>
         <Box sx={{backgroundColor: 'background.paper', p: 1, display: 'flex', alignItems: 'center'}}>
             <TextField
                 size="small" variant="outlined" placeholder="搜索..." sx={{width: 300}}
@@ -157,7 +151,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
             <TextField disabled size="small" label="总进程数" value={processes.length} sx={{width: '90px', ml: 1}}></TextField>
 
-            {selectedPid > -1 && <Button variant="contained" onClick={handleKillPid} sx={{ml: 1}}>结束进程</Button>}
+            {selectedPid > -1 && <Button variant="contained" color="error" onClick={handleKillPid} sx={{ml: 1}}>结束进程</Button>}
 
             <IconButton
                 aria-label="close" onClick={handleClose}
