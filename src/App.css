@@ -176,9 +176,41 @@ body, html {
 }
 
 .process-row > div {
-    flex: 1;
     padding: 4px 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.process-row > div:nth-child(1) {
+    flex: 0 0 80px;
+}
+
+.process-row > div:nth-child(2) {
+    flex: 0 0 100px;
+}
+
+.process-row > div:nth-child(3) {
+    flex: 0 0 100px;
+}
+
+.process-row > div:nth-child(4) {
+    flex: 0 0 100px;
+}
+
+.process-row > div:nth-child(5) {
+    flex: 0 0 70px;
+}
+
+.process-row > div:nth-child(6) {
+    flex: 0 0 150px;
+}
+
+.process-row > div:nth-child(7) {
+    flex: 0 0 350px;
+}
+
+.process-row > div:nth-child(8) {
+    flex: 1;
 }
