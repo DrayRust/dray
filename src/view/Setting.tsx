@@ -32,6 +32,7 @@ import {
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { reloadProxyPAC } from "../util/proxy.ts"
 import { isAutoStartEnabled, saveAutoStart } from "../util/tauri.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(6), [setNavState])
@@ -131,23 +132,23 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [rayHttpPortError, setRayHttpPortError] = useState(false)
     const [rayHttpPortErrorText, setRayHttpPortErrorText] = useState('')
 
-    const debouncedSetRayHost = useMemo(() => debounce(async (value: string) => {
+    const saveRayHostDebounce = useDebounce(async (value: string) => {
         let c = await readAppConfig()
         if (c?.ray_host !== value) {
             setConfig(prevConfig => ({...prevConfig, ray_host: value}))
             setAppConfig('set_ray_host', value)
-            saveRayHost(value)
+            await saveRayHost(value)
         }
-    }, 1000), [])
-    const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value.trim()
+    }, 1000)
+    const handleRayHost = (value: string) => {
+        value = value.trim()
         setConfig(prevConfig => ({...prevConfig, ray_host: value}))
         const ok = validateIp(value)
         setRayIpError(!ok)
-        if (ok) debouncedSetRayHost(value)
+        if (ok) saveRayHostDebounce(value)
     }
 
-    const debouncedSetRaySocksPort = useMemo(() => debounce(async (value: number) => {
+    const saveRaySocksPortDebounce = useDebounce(async (value: number) => {
         let c = await readAppConfig()
         if (c?.ray_socks_port !== value) {
             const ok = await checkPortAvailable(value)
@@ -157,10 +158,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setRaySocksPortErrorText('')
                 setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
                 setAppConfig('set_ray_socks_port', value)
-                saveRaySocksPort(value)
+                await saveRaySocksPort(value)
             }
         }
-    }, 1500), [])
+    }, 1500)
     const handleRaySocksPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, ray_socks_port: value || ""}))
@@ -168,10 +169,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const ok = validatePort(value)
         setRaySocksPortError(!ok)
         !ok && setRaySocksPortErrorText('请输入有效的端口号 (1-65535)')
-        if (ok) debouncedSetRaySocksPort(value)
+        if (ok) saveRaySocksPortDebounce(value)
     }
 
-    const debouncedSetRayHttpPort = useMemo(() => debounce(async (value: number) => {
+    const saveRayHttpPortDebounce = useDebounce(async (value: number) => {
         let c = await readAppConfig()
         if (c?.ray_http_port !== value) {
             const ok = await checkPortAvailable(value)
@@ -181,10 +182,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setRayHttpPortErrorText('')
                 setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
                 setAppConfig('set_ray_http_port', value)
-                saveRayHttpPort(value)
+                await saveRayHttpPort(value)
             }
         }
-    }, 1500), [])
+    }, 1500)
     const handleRayHttpPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, ray_http_port: value || ""}))
@@ -192,7 +193,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const ok = validatePort(value)
         setRayHttpPortError(!ok)
         !ok && setRayHttpPortErrorText('请输入有效的端口号 (1-65535)')
-        if (ok) debouncedSetRayHttpPort(value)
+        if (ok) saveRayHttpPortDebounce(value)
     }
 
     // ================================== ray socks & http ==================================
@@ -420,7 +421,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 label="本机地址"
                                 variant="standard"
                                 value={config.ray_host}
-                                onChange={handleRayHost}
+                                onChange={e => handleRayHost(e.target.value)}
                                 error={rayIpError}
                                 helperText={rayIpError ? "请输入有效的IP地址" : ""}
                                 sx={{flex: 'auto'}}
