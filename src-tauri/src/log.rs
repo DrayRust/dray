@@ -208,9 +208,9 @@ pub fn clear_log_all() -> bool {
         "dray.log",
         "web_interface.log",
         "web_server.log",
-        "ray_server.log",
         "xray_access.log",
         "xray_error.log",
+        "xray_server.log",
     ];
 
     if let Ok(entries) = fs::read_dir(log_dir) {
