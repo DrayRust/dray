@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Box, Card, IconButton, styled, TextField, InputAdornment, MenuItem, Stack,
+    Box, Button, Card, IconButton, styled, TextField, InputAdornment, MenuItem, Stack,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -9,7 +9,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
 import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useDebounce } from "../hook/useDebounce.ts"
-import { getProcessesJson } from "../util/invoke.ts"
+import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 import { formatFloat, formatTimestamp, sizeToUnit } from "../util/util.ts"
 
@@ -60,8 +60,24 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         })
     }
 
-    const handleOpenDir = async (path: string) => {
+    const handleOpenDir = async (e: any, path: string) => {
+        e.stopPropagation()
         if (path) await revealItemInDir(path)
+    }
+
+    const [selectedPid, setSelectedPid] = useState<number>(-1)
+    const handleRowClick = (pid: number) => {
+        setSelectedPid(pid === selectedPid ? -1 : pid)
+    }
+
+    const handleKillPid = async () => {
+        if (selectedPid > -1) {
+            let ok = await killProcessByPid(selectedPid)
+            if (ok) {
+                setSelectedPid(-1)
+                loadData(searchText, sortField)
+            }
+        }
     }
 
     const TableCellN = styled(TableCell)({
@@ -104,6 +120,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <MenuItem value="start_time">运行时间</MenuItem>
             </TextField>
 
+            {selectedPid > -1 && <Button variant="contained" onClick={handleKillPid} sx={{ml: 1}}>结束进程</Button>}
+
             <IconButton
                 aria-label="close" onClick={handleClose}
                 sx={{position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500]}}>
@@ -129,7 +147,14 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                         </TableHead>
                         <TableBody>
                             {processes?.length > 0 && processes.map((row: any, key: number) => (
-                                <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                <TableRow
+                                    key={key}
+                                    onClick={() => handleRowClick(row.pid)}
+                                    sx={{
+                                        '&:last-child td, &:last-child th': {border: 0},
+                                        backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit',
+                                    }}
+                                >
                                     <TableCellN>{row.pid}</TableCellN>
                                     <TableCellN>{row.user}</TableCellN>
                                     <TableCellN>{row.status}</TableCellN>
@@ -139,7 +164,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                                     <TableCellN>{row.name}</TableCellN>
                                     <TableCellN>
                                         <Stack direction="row" alignItems="center">
-                                            <FolderOpenIcon onClick={() => handleOpenDir(row.exe)} sx={openSx}/>
+                                            <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
                                             {row.exe}
                                         </Stack>
                                     </TableCellN>

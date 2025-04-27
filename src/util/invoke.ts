@@ -327,3 +327,7 @@ export async function getNetworksJson() {
 export async function getComponentsJson() {
     return getJson('get_components_json')
 }
+
+export async function killProcessByPid(pid: number) {
+    return getJson('kill_process_by_pid', {pid})
+}
