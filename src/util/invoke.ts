@@ -57,7 +57,7 @@ export async function fetchGet(url: string, isProxy: boolean = false) {
 }
 
 export async function fetchProxyGet(url: string, proxyUrl: string) {
-    return await invokeString('fetch_get_with_proxy', {url, proxyUrl})
+    return await invokeBool('fetch_get_with_proxy', {url, proxyUrl})
 }
 
 export function restartRay() {
@@ -92,7 +92,7 @@ export async function readRayConfig(): Promise<any> {
 }
 
 export async function saveRayConfig(content: any) {
-    return await safeInvoke('save_ray_config', {content: jsonStringify(content)})
+    return await invokeBool('save_ray_config', {content: jsonStringify(content)})
 }
 
 export async function saveProxyPac(content: string) {
