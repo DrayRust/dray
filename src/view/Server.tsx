@@ -200,7 +200,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             const ok = await saveRayConfig(conf)
             if (ok) {
                 const setOk = await setServerEnable(selectedKey)
-                setOk && restartRay()
+                setOk && await restartRay()
             }
         })
         handleMenuClose()
