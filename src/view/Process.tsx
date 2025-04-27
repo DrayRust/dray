@@ -7,11 +7,11 @@ import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
-import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useDebounce } from "../hook/useDebounce.ts"
 import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 import { formatFloat, formatTimestamp, sizeToUnit } from "../util/util.ts"
+import { openDir } from "../util/tauri.ts"
 
 export const Process = ({handleClose}: { handleClose: () => void }) => {
     const [processes, setProcesses] = useState<any[]>([])
@@ -62,7 +62,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const handleOpenDir = async (e: any, path: string) => {
         e.stopPropagation()
-        if (path) await revealItemInDir(path)
+        if (path) await openDir(path)
     }
 
     const [selectedPid, setSelectedPid] = useState<number>(-1)

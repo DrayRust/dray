@@ -1,5 +1,6 @@
 import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager'
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { IS_TAURI, log } from "./invoke.ts"
 
 export async function clipboardWriteText(text: string) {
@@ -36,3 +37,15 @@ export async function saveAutoStart(value: boolean) {
         return false
     }
 }
+
+export async function openDir(path: string) {
+    if (!IS_TAURI) return false
+    try {
+        revealItemInDir(path)
+        return true
+    } catch (err) {
+        log.error('Failed to revealItemInDir:', err)
+        return false
+    }
+}
+

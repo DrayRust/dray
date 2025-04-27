@@ -6,12 +6,12 @@ import {
 } from '@mui/material'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { revealItemInDir } from '@tauri-apps/plugin-opener'
 
-import { clearLogAll, getDrayAppDir, readLogList } from "../util/invoke.ts"
-import { sizeToUnit, formatLogName } from "../util/util.ts"
 import { LoadingCard, ErrorCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
+import { clearLogAll, getDrayAppDir, readLogList } from "../util/invoke.ts"
+import { sizeToUnit, formatLogName } from "../util/util.ts"
+import { openDir } from "../util/tauri.ts"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
@@ -41,7 +41,7 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
 
     const handleOpenLogDir = async () => {
         let dir = await getDrayAppDir()
-        if (dir) await revealItemInDir(`${dir}/logs/`)
+        if (dir) await openDir(`${dir}/logs/`)
     }
 
     const {DialogComponent, dialogConfirm} = useDialog()
