@@ -64,6 +64,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }, [])
 
     const handleAutoStart = async (value: boolean) => {
+        setAutoStart(value)
         await saveAutoStart(value)
     }
 
