@@ -294,6 +294,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (ok) setWebServerPortDebounce(value)
     }
 
+    const wSx = {m: '0 auto', maxWidth: 660}
     const destOverride = rayCommonConfig.socks_sniffing_dest_override
     return (
         <Paper elevation={3} sx={{borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
@@ -305,9 +306,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Tab label="Web 设置"/>
                 </Tabs>
             </Paper>
-            <Box className="scr-none" sx={{p: 2, m: '0 auto', maxWidth: 660, height: 'calc(100% - 48px)', overflow: 'auto'}}>
+
+            <Box className="scr-none" sx={{p: 2, height: 'calc(100% - 48px)', overflow: 'auto'}}>
                 {activeTab === 0 ? (
-                    <Card>
+                    <Card sx={wSx}>
                         <div className="flex-between p2">
                             <Typography variant="body1">外观</Typography>
                             <ButtonGroup variant="contained">
@@ -337,7 +339,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </div>
                     </Card>
                 ) : activeTab === 1 ? (
-                    <Card>
+                    <Card sx={wSx}>
                         <Typography variant="h6" sx={{p: 2, pl: 3, pb: 1.5}}>自动设置</Typography>
                         <Divider/>
                         <ListItem disablePadding>
@@ -374,7 +376,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </ListItem>
                     </Card>
                 ) : activeTab === 2 ? (
-                    <Card>
+                    <Card sx={wSx}>
                         <div className="flex-between p2">
                             <Typography variant="body1">Ray 日志级别</Typography>
                             <FormControl sx={{minWidth: 120}} size="small">
@@ -508,7 +510,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         </>)}
                     </Card>
                 ) : activeTab === 3 && (
-                    <Card>
+                    <Card sx={wSx}>
                         <div className="flex-between p2">
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
                             <Switch checked={config.web_server_enable} onChange={e => handleWebServerEnable(e.target.checked)}/>
