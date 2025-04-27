@@ -197,41 +197,29 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ================================== ray socks & http ==================================
-    const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['socks_enable']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, socks_enable: value}
-            saveRaySocksEnable(value, config, updatedConfig)
-            return updatedConfig
-        })
+    const handleRaySocksEnabled = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, socks_enable: value}
+        setRayCommonConfig(newConf)
+        await saveRaySocksEnable(value, config, newConf)
     }
 
-    const handleRayHttpEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['http_enable']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, http_enable: value}
-            saveRayHttpEnable(value, config, updatedConfig)
-            return updatedConfig
-        })
+    const handleRayHttpEnabled = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, http_enable: value}
+        setRayCommonConfig(newConf)
+        await saveRayHttpEnable(value, config, newConf)
     }
 
     // ================================== ray socks more ==================================
-    const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['socks_udp']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, socks_udp: value}
-            saveRaySocksUdp(value, updatedConfig)
-            return updatedConfig
-        })
+    const handleRaySocksUdp = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, socks_udp: value}
+        setRayCommonConfig(newConf)
+        await saveRaySocksUdp(value, newConf)
     }
 
-    const handleRaySocksSniffing = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['socks_sniffing']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, socks_sniffing: value}
-            saveRaySocksSniffing(value, updatedConfig)
-            return updatedConfig
-        })
+    const handleRaySocksSniffing = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, socks_sniffing: value}
+        setRayCommonConfig(newConf)
+        await saveRaySocksSniffing(value, newConf)
     }
 
     const handleDestOverride = async (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
@@ -450,23 +438,23 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>SOCKS 服务</Typography>
-                            <Switch checked={rayCommonConfig.socks_enable} onChange={handleRaySocksEnabled} disabled/>
+                            <Switch disabled checked={rayCommonConfig.socks_enable} onChange={e => handleRaySocksEnabled(e.target.checked)}/>
                         </div>
                         <Divider/>
                         <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>HTTP 服务</Typography>
-                            <Switch checked={rayCommonConfig.http_enable} onChange={handleRayHttpEnabled}/>
+                            <Switch checked={rayCommonConfig.http_enable} onChange={e => handleRayHttpEnabled(e.target.checked)}/>
                         </div>
                         {rayCommonConfig.socks_enable && (<>
                             <Divider/>
                             <div className="flex-between p1">
                                 <Typography variant="body1" sx={{pl: 1}}>UDP 协议</Typography>
-                                <Switch checked={rayCommonConfig.socks_udp} onChange={handleRaySocksUdp}/>
+                                <Switch checked={rayCommonConfig.socks_udp} onChange={e => handleRaySocksUdp(e.target.checked)}/>
                             </div>
                             <Divider/>
                             <div className="flex-between p1">
                                 <Typography variant="body1" sx={{pl: 1}}>Sniffing 探测</Typography>
-                                <Switch checked={rayCommonConfig.socks_sniffing} onChange={handleRaySocksSniffing}/>
+                                <Switch checked={rayCommonConfig.socks_sniffing} onChange={e => handleRaySocksSniffing(e.target.checked)}/>
                             </div>
                             {rayCommonConfig.socks_sniffing && (<>
                                 <Divider/>
