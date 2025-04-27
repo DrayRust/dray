@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
@@ -15,6 +16,7 @@ import { formatFloat, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { openDir } from "../util/tauri.ts"
 
 export const Process = ({handleClose}: { handleClose: () => void }) => {
+    const [loading, setLoading] = useState(true)
     const [processes, setProcesses] = useState<any[]>([])
     const [searchText, setSearchText] = useState('')
     const [sortField, setSortField] = useState<string>('memory')
@@ -22,6 +24,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     const loadData = useDebounce(async (searchText: string, sortField: string) => {
         let arr = await getProcessesJson(searchText)
         if (arr) setProcesses(sortProcesses(arr, sortField))
+        setLoading(false)
     }, 100)
 
     // 可见时，自动刷新数据
@@ -35,6 +38,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const handleClear = () => {
         setSearchText('')
+        setLoading(true)
     }
 
     const handleSearch = (searchText: string) => {
@@ -44,6 +48,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const handleSortChange = (sortField: string) => {
         setSortField(sortField)
+        setLoading(true)
     }
 
     const sortProcesses = (processes: any[], field: string): any[] => {
@@ -89,6 +94,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
 
+    const maxHeight = 'calc(100vh - 72px)'
     const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
         <DialogComponent/>
@@ -133,50 +139,56 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         </Box>
 
         <Box sx={{p: 1}}>
-            <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
-                <TableContainer sx={{maxHeight: `calc(100vh - 72px)`}}>
-                    <Table size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCellN>PID</TableCellN>
-                                <TableCellN>用户</TableCellN>
-                                <TableCellN>状态</TableCellN>
-                                <TableCellN>内存</TableCellN>
-                                <TableCellN>CPU</TableCellN>
-                                <TableCellN>运行时间</TableCellN>
-                                <TableCellN>进程名称</TableCellN>
-                                <TableCellN>程序路径</TableCellN>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {processes?.length > 0 && processes.map((row: any, key: number) => (
-                                <TableRow
-                                    key={key}
-                                    onClick={() => handleRowClick(row.pid)}
-                                    sx={{
-                                        '&:last-child td, &:last-child th': {border: 0},
-                                        backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit',
-                                    }}
-                                >
-                                    <TableCellN>{row.pid}</TableCellN>
-                                    <TableCellN>{row.user}</TableCellN>
-                                    <TableCellN>{row.status}</TableCellN>
-                                    <TableCellN>{sizeToUnit(row.memory)}</TableCellN>
-                                    <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
-                                    <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
-                                    <TableCellN>{row.name}</TableCellN>
-                                    <TableCellN>
-                                        <Stack direction="row" alignItems="center">
-                                            <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
-                                            {row.exe}
-                                        </Stack>
-                                    </TableCellN>
+            {loading ? (
+                <LoadingCard height={maxHeight}/>
+            ) : processes.length == 0 ? (
+                <ErrorCard height={maxHeight} errorMsg="暂无相关进程"/>
+            ) : (
+                <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
+                    <TableContainer sx={{height: maxHeight}}>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCellN>PID</TableCellN>
+                                    <TableCellN>用户</TableCellN>
+                                    <TableCellN>状态</TableCellN>
+                                    <TableCellN>内存</TableCellN>
+                                    <TableCellN>CPU</TableCellN>
+                                    <TableCellN>运行时间</TableCellN>
+                                    <TableCellN>进程名称</TableCellN>
+                                    <TableCellN>程序路径</TableCellN>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Card>
+                            </TableHead>
+                            <TableBody>
+                                {processes?.length > 0 && processes.map((row: any, key: number) => (
+                                    <TableRow
+                                        key={key}
+                                        onClick={() => handleRowClick(row.pid)}
+                                        sx={{
+                                            '&:last-child td, &:last-child th': {border: 0},
+                                            backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit',
+                                        }}
+                                    >
+                                        <TableCellN>{row.pid}</TableCellN>
+                                        <TableCellN>{row.user}</TableCellN>
+                                        <TableCellN>{row.status}</TableCellN>
+                                        <TableCellN>{sizeToUnit(row.memory)}</TableCellN>
+                                        <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
+                                        <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
+                                        <TableCellN>{row.name}</TableCellN>
+                                        <TableCellN>
+                                            <Stack direction="row" alignItems="center">
+                                                <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
+                                                {row.exe}
+                                            </Stack>
+                                        </TableCellN>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Card>
+            )}
         </Box>
     </>)
 }
