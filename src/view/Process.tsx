@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Box, Card, IconButton, styled, TextField, InputAdornment,
+    Box, Card, IconButton, styled, TextField, InputAdornment, MenuItem,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -14,39 +14,42 @@ import { formatFloat, formatTimestamp, sizeToUnit } from "../util/util.ts"
 export const Process = ({handleClose}: { handleClose: () => void }) => {
     const [processes, setProcesses] = useState<any[]>([])
     const [searchText, setSearchText] = useState('')
-    const [filteredProcesses, setFilteredProcesses] = useState<any[]>([])
+    const [sortField, setSortField] = useState<string>('memory')
 
-    const loadData = useDebounce(async (searchText: string) => {
-        let r = await getProcessesJson()
-        if (r) {
-            setProcesses(r)
-            setFilteredProcesses(filterProcesses(r, searchText))
-        }
+    const loadData = useDebounce(async (searchText: string, sortField: string) => {
+        let arr = await getProcessesJson(searchText)
+        if (arr) setProcesses(sortProcesses(arr, sortField))
     }, 300)
 
     // 可见时，自动刷新数据
     const intervalRef = useRef<number>(0)
     const isVisibility = useVisibility()
     useEffect(() => {
-        loadData(searchText)
-        if (isVisibility) intervalRef.current = setInterval(() => loadData(searchText), 5000)
+        loadData(searchText, sortField)
+        if (isVisibility) intervalRef.current = setInterval(() => loadData(searchText, sortField), 5000)
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, searchText])
+    }, [isVisibility, searchText, sortField])
 
     const handleClear = () => {
         setSearchText('')
     }
 
-    const filterProcesses = (processes: any[], searchText: string) => {
-        if (!searchText) return processes
-        return processes.filter((process) =>
-            process.exe.toLowerCase().includes(searchText)
-        )
+    const handleSearch = (searchText: string) => {
+        searchText = searchText.toLowerCase()
+        setSearchText(searchText)
     }
 
-    const handleSearch = (text: string) => {
-        setSearchText(text.toLowerCase())
-        setFilteredProcesses(filterProcesses(processes, text))
+    const handleSortFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const sortField = event.target.value as string
+        setSortField(sortField)
+    }
+
+    const sortProcesses = (processes: any[], field: string): any[] => {
+        return processes.sort((a, b) => {
+            if (a[field] < b[field]) return 1
+            if (a[field] > b[field]) return -1
+            return 0
+        })
     }
 
     const TableCellN = styled(TableCell)({
@@ -95,6 +98,24 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                     sx={{maxWidth: 400}}
                 />
 
+                <TextField
+                    select
+                    size="small"
+                    label="排序"
+                    value={sortField}
+                    onChange={handleSortFieldChange}
+                    sx={{width: '120px', ml: 1}}
+                >
+                    <MenuItem value="pid">PID</MenuItem>
+                    <MenuItem value="cpu_usage">CPU</MenuItem>
+                    <MenuItem value="memory">内存</MenuItem>
+                    <MenuItem value="name">进程名称</MenuItem>
+                    <MenuItem value="exe">程序路径</MenuItem>
+                    <MenuItem value="user">用户</MenuItem>
+                    <MenuItem value="status">状态</MenuItem>
+                    <MenuItem value="start_time">运行时间</MenuItem>
+                </TextField>
+
                 <IconButton
                     aria-label="close" onClick={handleClose}
                     sx={{position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500]}}>
@@ -117,7 +138,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredProcesses?.length > 0 && filteredProcesses.map((row: any, key: number) => (
+                        {processes?.length > 0 && processes.map((row: any, key: number) => (
                             <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
                                 <TableCellN>{row.pid}</TableCellN>
                                 <TableCellN>{row.user}</TableCellN>
