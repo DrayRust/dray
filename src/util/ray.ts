@@ -46,20 +46,18 @@ export async function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDoma
     }
 }
 
-export function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
-    (async () => {
-        const rayConfig = await readRayConfig()
-        if (rayConfig) {
-            let conf = {...rayConfig}
-            if (dnsConfig.enable) {
-                const row = dnsModeList[dnsConfig.mode]
-                if (row) conf.dns = dnsModeToConf(row)
-            } else {
-                delete conf.dns
-            }
-            await saveAndRestart(conf)
+export async function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
+    const rayConfig = await readRayConfig()
+    if (rayConfig) {
+        let conf = {...rayConfig}
+        if (dnsConfig.enable) {
+            const row = dnsModeList[dnsConfig.mode]
+            if (row) conf.dns = dnsModeToConf(row)
+        } else {
+            delete conf.dns
         }
-    })()
+        await saveAndRestart(conf)
+    }
 }
 
 export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {

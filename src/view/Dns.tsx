@@ -64,7 +64,7 @@ export const Dns = () => {
                 return
             }
 
-            rayDnsChange(dnsConfig, dnsModeList)
+            await rayDnsChange(dnsConfig, dnsModeList)
         })()
     }
 
