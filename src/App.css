@@ -243,6 +243,6 @@ body, html {
     flex: 0 0 300px;
 }
 
-.process-row > div:nth-child(8) {
+.process-row > div:last-child {
     flex: 1;
 }
