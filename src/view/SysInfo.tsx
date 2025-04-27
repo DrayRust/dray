@@ -206,7 +206,7 @@ export const SysInfo = () => {
                             <TableCell component="th" scope="row">
                                 <div className="flex-center-gap1">
                                     系统负载平均值
-                                    <Tooltip arrow placement="top" title="当超过 CPU 核数，则表示超载运行">
+                                    <Tooltip arrow placement="top" title="当超过 CPU 核数，则表示超负荷运行">
                                         <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
                                     </Tooltip>
                                 </div>
