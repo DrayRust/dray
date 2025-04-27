@@ -133,8 +133,8 @@ fn get_load_average_json() -> Value {
 }
 
 #[tauri::command]
-fn get_processes_json() -> Value {
-    sys_info::get_processes_json()
+fn get_processes_json(keyword: String) -> Value {
+    sys_info::get_processes_json(&keyword)
 }
 
 #[tauri::command]

@@ -46,7 +46,7 @@ pub fn get_load_average_json() -> Value {
     })
 }
 
-pub fn get_processes_json() -> Value {
+pub fn get_processes_json(keyword: &str) -> Value {
     let mut sys = get_or_init_system();
     sys.as_mut().map(|sys| sys.refresh_all());
     let sys = sys.as_ref().unwrap();
@@ -55,13 +55,19 @@ pub fn get_processes_json() -> Value {
     let process_vec = sys
         .processes()
         .iter()
-        .map(|(pid, process)| {
+        .filter_map(|(pid, process)| {
+            let exe = process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned());
+
+            if !keyword.is_empty() && !exe.to_lowercase().contains(&keyword.to_lowercase()) {
+                return None;
+            }
+
             let username = process
                 .user_id()
                 .and_then(|user_id| users.get_user_by_id(user_id).map(|user| user.name().to_string()))
                 .unwrap_or_default();
 
-            json!({
+            Some(json!({
                 "pid": pid.as_u32(),
                 "status": process.status().to_string(),
                 "memory": process.memory(),
@@ -70,8 +76,8 @@ pub fn get_processes_json() -> Value {
                 "cpu_usage": process.cpu_usage(),
                 "start_time": process.start_time(),
                 "name": process.name().to_string_lossy().to_string(),
-                "exe": process.exe().map_or("".to_string(), |v| v.to_string_lossy().into_owned()),
-            })
+                "exe": exe,
+            }))
         })
         .collect::<Vec<_>>();
     json!(process_vec)
