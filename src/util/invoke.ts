@@ -295,10 +295,10 @@ export async function saveDnsTableList(content: DnsTableList) {
     return saveConf('dns_table_list.json', content)
 }
 
-async function getJson(apiName: string) {
+async function getJson(apiName: string, options: any = {}) {
     if (!isTauri) return
     try {
-        return invoke(apiName) as any
+        return invoke(apiName, options) as any
     } catch (err) {
         log.error('Failed to getJson:', err)
     }
@@ -312,8 +312,8 @@ export async function getLoadAverageJson() {
     return getJson('get_load_average_json')
 }
 
-export async function getProcessesJson() {
-    return getJson('get_processes_json')
+export async function getProcessesJson(keyword: string) {
+    return getJson('get_processes_json', {keyword})
 }
 
 export async function getDisksJson() {
