@@ -223,16 +223,11 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const handleDestOverride = async (option: "http" | "tls" | "quic" | "fakedns" | "fakedns+others") => {
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {
-                ...prevConfig,
-                socks_sniffing_dest_override: prevConfig.socks_sniffing_dest_override.includes(option)
-                    ? prevConfig.socks_sniffing_dest_override.filter(item => item !== option)
-                    : [...prevConfig.socks_sniffing_dest_override, option]
-            }
-            saveRaySocksDestOverride(updatedConfig.socks_sniffing_dest_override, updatedConfig)
-            return updatedConfig
-        })
+        const oldValue = rayCommonConfig.socks_sniffing_dest_override
+        const newValue = oldValue.includes(option) ? oldValue.filter(item => item !== option) : [...oldValue, option]
+        const newConf = {...rayCommonConfig, socks_sniffing_dest_override: newValue}
+        setRayCommonConfig(newConf)
+        await saveRaySocksDestOverride(newValue, newConf)
     }
 
     const handleRayOutboundsMux = async (event: React.ChangeEvent<HTMLInputElement>) => {
