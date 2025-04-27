@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, SyntheticEvent } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
     Paper, Box, Card, Divider,
     Tabs, Tab,
@@ -14,16 +14,9 @@ import HelpIcon from '@mui/icons-material/Help'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
-import {
-    enable as autoStartEnable,
-    isEnabled as autoStartIsEnabled,
-    disable as autoStartDisable,
-} from '@tauri-apps/plugin-autostart'
-
 import { useTheme } from '../context/ThemeProvider.tsx'
 import { debounce, validateIp, validatePort } from '../util/util.ts'
 import {
-    log, isTauri,
     checkPortAvailable,
     readAppConfig, setAppConfig, readRayCommonConfig,
     openWebServerDir,
@@ -38,6 +31,7 @@ import {
 } from "../util/ray.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { reloadProxyPAC } from "../util/proxy.ts"
+import { isAutoStartEnabled, saveAutoStart } from "../util/tauri.ts"
 
 const Setting: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(6), [setNavState])
@@ -50,44 +44,28 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
 
     // 用于记录当前激活的选项卡索引，初始值为0（即第一个选项卡）
     const [activeTab, setActiveTab] = useState(0)
-    const handleTab = (_event: SyntheticEvent, newValue: number) => {
-        setActiveTab(newValue)
+    const handleTab = (value: number) => {
+        setActiveTab(value)
     }
 
-    // 用于记录当前开机自动启动的设置，初始值为false（即未设置自动启动）
     const [autoStart, setAutoStart] = useState(false)
-    useEffect(() => {
-        if (!isTauri) return
-        (async () => {
-            try {
-                setAutoStart(await autoStartIsEnabled())
-            } catch (err) {
-                log.error('Failed to autoStartIsEnabled:', err)
-            }
-        })()
-    }, [])
-    const handleAutoStart = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        let checked = event.target.checked
-        setAutoStart(checked)
-        if (!isTauri) return
-        try {
-            checked ? await autoStartEnable() : await autoStartDisable()
-        } catch (err) {
-            log.error('Failed to handleAutoStart:', err)
-        }
-    }
-
-    // 从配置文件中读取配置信息
     const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     useEffect(() => {
         (async () => {
+            setAutoStart(await isAutoStartEnabled())
+
             const newConfig = await readAppConfig()
-            if (newConfig) setConfig({...config, ...newConfig})
+            if (newConfig) setConfig({...DEFAULT_APP_CONFIG, ...newConfig})
+
             const newRayCommonConfig = await readRayCommonConfig()
-            if (newRayCommonConfig) setRayCommonConfig({...rayCommonConfig, ...newRayCommonConfig})
+            if (newRayCommonConfig) setRayCommonConfig({...DEFAULT_RAY_COMMON_CONFIG, ...newRayCommonConfig})
         })()
     }, [])
+
+    const handleAutoStart = async (value: boolean) => {
+        await saveAutoStart(value)
+    }
 
     const handleAppLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as AppConfig['app_log_level']
@@ -346,7 +324,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     return (
         <Paper elevation={3} sx={{borderRadius: 2, height: 'calc(100vh - 20px)', overflow: 'visible'}}>
             <Paper elevation={1} sx={{display: 'flex', justifyContent: 'center', borderRadius: '8px 8px 0 0'}}>
-                <Tabs value={activeTab} onChange={handleTab} aria-label="设置导航">
+                <Tabs value={activeTab} onChange={(_, newValue) => handleTab(newValue)} aria-label="设置导航">
                     <Tab label="基本设置"/>
                     <Tab label="代理设置"/>
                     <Tab label="Ray 设置"/>
@@ -367,7 +345,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <div className="flex-between p2">
                             <Typography variant="body1">开机启动</Typography>
-                            <Switch checked={autoStart} onChange={handleAutoStart}/>
+                            <Switch checked={autoStart} onChange={e => handleAutoStart(e.target.checked)}/>
                         </div>
                         <Divider/>
                         <div className="flex-between p2">

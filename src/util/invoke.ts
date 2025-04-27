@@ -1,6 +1,6 @@
-import { invoke, isTauri as isTauriFn } from '@tauri-apps/api/core'
+import { invoke, isTauri } from '@tauri-apps/api/core'
 
-export const isTauri = isTauriFn()
+export const IS_TAURI = isTauri()
 export const log = {
     error: (message: string, ...args: any[]) => {
         console.log(`[ERROR] ${message}`, ...args)
@@ -22,7 +22,7 @@ function sendLog(content: string) {
 }
 
 export async function safeInvoke(apiName: string, options: any = {}) {
-    if (!isTauri) return
+    if (!IS_TAURI) return
     try {
         return invoke(apiName, options) as any
     } catch (err) {
