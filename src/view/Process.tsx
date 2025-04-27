@@ -70,6 +70,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         textOverflow: 'ellipsis',
     })
 
+    const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
+
     return (<>
         <Box sx={{backgroundColor: 'background.paper', p: 1, display: 'flex', alignItems: 'center'}}>
             <TextField
@@ -137,7 +139,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                                     <TableCellN>{row.name}</TableCellN>
                                     <TableCellN>
                                         <Stack direction="row" alignItems="center">
-                                            <FolderOpenIcon onClick={() => handleOpenDir(row.exe)} sx={{mr: 1}}/>
+                                            <FolderOpenIcon onClick={() => handleOpenDir(row.exe)} sx={openSx}/>
                                             {row.exe}
                                         </Stack>
                                     </TableCellN>
