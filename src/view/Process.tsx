@@ -46,8 +46,15 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const sortProcesses = (processes: any[], field: string): any[] => {
         return processes.sort((a, b) => {
-            if (a[field] < b[field]) return 1
-            if (a[field] > b[field]) return -1
+            if (['pid', 'cpu_usage', 'memory', 'start_time'].includes(field)) {
+                // 倒序
+                if (a[field] < b[field]) return 1
+                if (a[field] > b[field]) return -1
+            } else {
+                // 正序
+                if (a[field] > b[field]) return 1
+                if (a[field] < b[field]) return -1
+            }
             return 0
         })
     }
