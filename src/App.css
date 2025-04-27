@@ -169,3 +169,16 @@ body, html {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* process */
+.process-row {
+    display: flex;
+}
+
+.process-row > div {
+    flex: 1;
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

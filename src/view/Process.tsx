@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
+import { FixedSizeList as List } from 'react-window'
 import {
-    Box, Button, Card, IconButton, styled, TextField, InputAdornment, MenuItem, Stack,
-    TableContainer, Table, TableBody, TableCell, TableHead, TableRow,
+    Box, Button, Card, IconButton, TextField, InputAdornment, MenuItem, Stack,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
@@ -10,8 +10,9 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
+import { useFullHeight } from "../hook/useFullHeight.ts"
+import { getProcessesJson, killProcessByPid } from "../util/invoke.ts"
 import { formatFloat, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { openDir } from "../util/tauri.ts"
 
@@ -86,14 +87,39 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         })
     }
 
-    const TableCellN = styled(TableCell)({
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-    })
+    const ROW_HEIGHT = 30
+    const fullHeight = useFullHeight()
+    const [listHeight, setListHeight] = useState(0)
+    useEffect(() => {
+        setListHeight(fullHeight - 75 - 30)
+    }, [fullHeight])
 
     const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
-    const maxHeight = 'calc(100vh - 72px)'
+    const maxHeight = 'calc(100vh - 75px)'
+
+    const Row = ({index, style}: { index: number, style: any }) => {
+        const row = processes[index]
+        return (<>
+            <div className="process-row"
+                 style={{...style, backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit'}}
+                 onClick={() => handleRowClick(row.pid)}
+            >
+                <div>{row.pid}</div>
+                <div>{row.user}</div>
+                <div>{row.status}</div>
+                <div>{sizeToUnit(row.memory)}</div>
+                <div>{formatFloat(row.cpu_usage, 1)}%</div>
+                <div>{formatTimestamp(row.start_time)}</div>
+                <div>{row.name}</div>
+                <div>
+                    <Stack direction="row" alignItems="center">
+                        <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
+                        {row.exe}
+                    </Stack>
+                </div>
+            </div>
+        </>)
+    }
 
     const {DialogComponent, dialogConfirm} = useDialog()
     return (<>
@@ -147,48 +173,17 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <ErrorCard height={maxHeight} errorMsg="暂无相关进程"/>
             ) : (
                 <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
-                    <TableContainer sx={{height: maxHeight}}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCellN>PID</TableCellN>
-                                    <TableCellN>用户</TableCellN>
-                                    <TableCellN>状态</TableCellN>
-                                    <TableCellN>内存</TableCellN>
-                                    <TableCellN>CPU</TableCellN>
-                                    <TableCellN>运行时间</TableCellN>
-                                    <TableCellN>进程名称</TableCellN>
-                                    <TableCellN>程序路径</TableCellN>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {processes?.length > 0 && processes.map((row: any, key: number) => (
-                                    <TableRow
-                                        key={key}
-                                        onClick={() => handleRowClick(row.pid)}
-                                        sx={{
-                                            '&:last-child td, &:last-child th': {border: 0},
-                                            backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit',
-                                        }}
-                                    >
-                                        <TableCellN>{row.pid}</TableCellN>
-                                        <TableCellN>{row.user}</TableCellN>
-                                        <TableCellN>{row.status}</TableCellN>
-                                        <TableCellN>{sizeToUnit(row.memory)}</TableCellN>
-                                        <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
-                                        <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
-                                        <TableCellN>{row.name}</TableCellN>
-                                        <TableCellN>
-                                            <Stack direction="row" alignItems="center">
-                                                <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
-                                                {row.exe}
-                                            </Stack>
-                                        </TableCellN>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <div className="process-row">
+                        <div>PID</div>
+                        <div>用户</div>
+                        <div>状态</div>
+                        <div>内存</div>
+                        <div>CPU</div>
+                        <div>运行时间</div>
+                        <div>进程名称</div>
+                        <div>程序路径</div>
+                    </div>
+                    <List height={listHeight} itemCount={processes.length} itemSize={ROW_HEIGHT} width="100%">{Row}</List>
                 </Card>
             )}
         </Box>
