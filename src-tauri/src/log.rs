@@ -64,6 +64,13 @@ pub fn read_log_list() -> Value {
         }
     }
 
+    // 根据 filename 进行排序
+    logs.sort_by(|a, b| {
+        let a_filename = a["filename"].as_str().unwrap_or("");
+        let b_filename = b["filename"].as_str().unwrap_or("");
+        a_filename.cmp(b_filename)
+    });
+
     json!(logs)
 }
 
