@@ -36,16 +36,14 @@ async function saveAndRestart(conf: any) {
     }
 }
 
-export function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
-    (async () => {
-        const rayConfig = await readRayConfig()
-        if (rayConfig) {
-            // 生成配置文件
-            const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
-            const conf = {...rayConfig, ...routing}
-            await saveAndRestart(conf)
-        }
-    })()
+export async function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
+    const rayConfig = await readRayConfig()
+    if (rayConfig) {
+        // 生成配置文件
+        const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+        const conf = {...rayConfig, ...routing}
+        await saveAndRestart(conf)
+    }
 }
 
 export function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {

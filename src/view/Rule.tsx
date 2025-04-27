@@ -88,7 +88,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     let ruleModeList: RuleModeList
     const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
         if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
-        rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
+        await rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
     }
 
     // ============================== advanced ==============================

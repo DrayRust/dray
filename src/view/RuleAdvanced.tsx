@@ -70,7 +70,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
         }
 
         await updateProxyPAC(ruleConfig, ruleDomain)
-        rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
+        await rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
         showChip('设置成功', 'success')
     }
 
