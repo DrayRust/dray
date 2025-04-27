@@ -34,10 +34,9 @@ import LogDetail from "./view/LogDetail.tsx"
 import Tool from "./view/Tool.tsx"
 import Setting from "./view/Setting.tsx"
 
-import { invoke } from "@tauri-apps/api/core"
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
-import { readSubscriptionList } from "./util/invoke.ts"
+import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 
@@ -101,7 +100,7 @@ const App: React.FC = () => {
                 <Box sx={{position: 'fixed', left: 0, bottom: 15, width: 130, zIndex: 1}}>
                     <Stack spacing={0} sx={{justifyContent: "center", alignItems: "center"}}>
                         <Tooltip arrow title="退出程序">
-                            <Fab color="error" size="medium" aria-label="logout" onClick={() => invoke('quit')}>
+                            <Fab color="error" size="medium" aria-label="logout" onClick={() => safeInvoke('quit')}>
                                 <LogoutIcon/>
                             </Fab>
                         </Tooltip>
