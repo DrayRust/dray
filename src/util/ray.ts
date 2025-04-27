@@ -29,6 +29,13 @@ export function getHttpConf(config: AppConfig) {
     }
 }
 
+async function saveAndRestart(conf: any) {
+    const ok = await saveRayConfig(conf)
+    if (ok) {
+        await restartRay()
+    }
+}
+
 export function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
     (async () => {
         const rayConfig = await readRayConfig()
@@ -36,10 +43,7 @@ export function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ru
             // 生成配置文件
             const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
             const conf = {...rayConfig, ...routing}
-            const ok = await saveRayConfig(conf)
-            if (ok) {
-                restartRay()
-            }
+            await saveAndRestart(conf)
         }
     })()
 }
@@ -55,11 +59,7 @@ export function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
             } else {
                 delete conf.dns
             }
-
-            const ok = await saveRayConfig(conf)
-            if (ok) {
-                restartRay()
-            }
+            await saveAndRestart(conf)
         }
     })()
 }
@@ -71,8 +71,7 @@ export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfi
         let c = await readRayConfig()
         if (c.log) {
             c.log.loglevel = value
-            const ok = await saveRayConfig(c) // 保存 Ray 配置
-            if (ok) restartRay() // 重启 Ray 服务
+            await saveAndRestart(c)
         }
     })()
 }
@@ -92,8 +91,7 @@ export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommon
         } else {
             c = {...c, ...getStatsConf()}
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -107,8 +105,7 @@ export function rayHostChange(host: string) {
                 c.inbounds[i].listen = host // 修改监听地址
             }
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        ok && restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -122,8 +119,7 @@ export function raySocksPortChange(port: number) {
                 c.inbounds[i].port = port // 修改端口
             }
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        ok && restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -137,8 +133,7 @@ export function rayHttpPortChange(port: number) {
                 c.inbounds[i].port = port // 修改端口
             }
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        ok && restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -154,8 +149,7 @@ export function raySocksEnabledChange(value: boolean, config: AppConfig, rayComm
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -171,8 +165,7 @@ export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommo
         } else {
             c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
         }
-        const ok = await saveRayConfig(c) // 保存 Ray 配置
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -193,8 +186,7 @@ export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConf
                 // break
             }
         }
-        const ok = await saveRayConfig(c)
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -214,8 +206,7 @@ export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommo
                 // break
             }
         }
-        const ok = await saveRayConfig(c)
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -234,8 +225,7 @@ export function raySocksDestOverrideChange(value: string[], rayCommonConfig: Ray
                 // break
             }
         }
-        const ok = await saveRayConfig(c)
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -260,8 +250,7 @@ export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommon
                 c.outbounds[i] = outbound
             }
         }
-        const ok = await saveRayConfig(c)
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
 
@@ -283,7 +272,6 @@ export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: Ra
                 c.outbounds[i] = outbound
             }
         }
-        const ok = await saveRayConfig(c)
-        if (ok) restartRay() // 重启 Ray 服务
+        await saveAndRestart(c)
     })()
 }
