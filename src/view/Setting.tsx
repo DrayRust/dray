@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Paper, Box, Card, Divider,
     Tabs, Tab,
@@ -15,7 +15,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 import { useTheme } from '../context/ThemeProvider.tsx'
-import { debounce, validateIp, validatePort } from '../util/util.ts'
+import { validateIp, validatePort } from '../util/util.ts'
 import {
     checkPortAvailable,
     readAppConfig, setAppConfig, readRayCommonConfig,
@@ -230,24 +230,19 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         await saveRaySocksDestOverride(newValue, newConf)
     }
 
-    const handleRayOutboundsMux = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['outbounds_mux']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, outbounds_mux: value}
-            saveRayOutboundsMux(value, updatedConfig)
-            return updatedConfig
-        })
+    const handleRayOutboundsMux = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, outbounds_mux: value}
+        setRayCommonConfig(newConf)
+        await saveRayOutboundsMux(value, newConf)
     }
 
-    const debouncedRayOutboundsConcurrency = useMemo(() => debounce(async (value: number, updatedConfig: RayCommonConfig) => {
-        saveRayOutboundsConcurrency(value, updatedConfig)
-    }, 1000), [])
+    const saveRayOutboundsConcurrencyDebounce = useDebounce(async (value: number, updatedConfig: RayCommonConfig) => {
+        await saveRayOutboundsConcurrency(value, updatedConfig)
+    }, 1000)
     const handleRayOutboundsConcurrency = async (value: number) => {
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, outbounds_concurrency: value}
-            debouncedRayOutboundsConcurrency(value, updatedConfig)
-            return updatedConfig
-        })
+        const newConf = {...rayCommonConfig, outbounds_concurrency: value}
+        setRayCommonConfig(newConf)
+        saveRayOutboundsConcurrencyDebounce(value, newConf)
     }
 
     // ================================== web setting ==================================
@@ -262,13 +257,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_web_server_enable', value)
     }
 
-    const debouncedSetWebServerHost = useMemo(() => debounce(async (value: string) => {
+    const debouncedSetWebServerHost = useDebounce(async (value: string) => {
         const c = await readAppConfig()
         if (c?.web_server_host !== value) {
             setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
             setAppConfig('set_web_server_host', value)
         }
-    }, 1000), [])
+    }, 1000)
     const handleWebIp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.trim()
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
@@ -277,7 +272,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (ok) debouncedSetWebServerHost(value)
     }
 
-    const debouncedSetWebServerPort = useMemo(() => debounce(async (value: number) => {
+    const debouncedSetWebServerPort = useDebounce(async (value: number) => {
         const c = await readAppConfig()
         if (c?.web_server_port !== value) {
             const ok = await checkPortAvailable(value)
@@ -289,7 +284,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setAppConfig('set_web_server_port', value)
             }
         }
-    }, 1500), [])
+    }, 1500)
     const handleWebPort = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value) || 0
         setConfig(prevConfig => ({...prevConfig, web_server_port: value || ""}))
@@ -499,7 +494,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                     <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
                                 </Tooltip>
                             </div>
-                            <Switch checked={rayCommonConfig.outbounds_mux} onChange={handleRayOutboundsMux}/>
+                            <Switch checked={rayCommonConfig.outbounds_mux} onChange={e => handleRayOutboundsMux(e.target.checked)}/>
                         </div>
                         {rayCommonConfig.outbounds_mux && (<>
                             <Divider/>
@@ -507,7 +502,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 <Typography variant="body2">并发数</Typography>
                                 <Box sx={{p: '15px 10px 0'}}>
                                     <Slider value={rayCommonConfig.outbounds_concurrency}
-                                            onChange={(_, value) => handleRayOutboundsConcurrency(value as number)}
+                                            onChange={(_, value) => handleRayOutboundsConcurrency(value)}
                                             min={1} max={128} aria-label="Concurrency" valueLabelDisplay="auto"/>
                                 </Box>
                             </Stack>
