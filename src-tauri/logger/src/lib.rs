@@ -139,7 +139,7 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
             let file_stem = log_filepath.file_stem().and_then(|stem| stem.to_str()).unwrap_or("log");
             let extension = log_filepath.extension().and_then(|ext| ext.to_str()).unwrap_or("log");
             let timestamp = Local::now().format("%Y%m%d_%H%M%S_%3f");
-            let bak_filepath = log_filepath.with_file_name(format!("{}_{}.{}", file_stem, timestamp, extension));
+            let bak_filepath = log_filepath.with_file_name(format!("{}.{}.{}", file_stem, timestamp, extension));
             fs::rename(log_filepath, bak_filepath)?;
             set_log_writer(log_filepath)?;
         }
