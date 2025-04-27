@@ -16,211 +16,119 @@ export const log = {
     },
 }
 
+// window?.__TAURI__?.core // 全局变量，增加了安全性风险，性能影响，页面加载变慢
 function sendLog(content: string) {
+    safeInvoke('send_log', {content}).catch(_ => 0)
+}
+
+export async function safeInvoke(apiName: string, options: any = {}) {
     if (!isTauri) return
     try {
-        // window?.__TAURI__?.core // 全局变量，增加了安全性风险，性能影响，页面加载变慢
-        invoke('send_log', {content}).catch((e) => {
-            console.error('Failed to send log:', e)
-        })
-    } catch (e) {
-        console.log('[Failed to sendLog]', e)
+        return invoke(apiName, options) as any
+    } catch (err) {
+        log.error('Failed to invoke:', err)
+        return
     }
+}
+
+export function jsonStringify(data: any): string {
+    try {
+        return JSON.stringify(data, null, 2)
+    } catch (e) {
+        log.error('JSON.stringify failed:', e)
+        return '{}'
+    }
+}
+
+export async function invokeBool(apiName: string, options: any = {}) {
+    return Boolean(await safeInvoke(apiName, options))
+}
+
+export async function invokeString(apiName: string, options: any = {}) {
+    return String(await safeInvoke(apiName, options))
 }
 
 export async function getDrayAppDir(): Promise<string> {
-    if (!isTauri) return ''
-    try {
-        return await invoke('get_dray_app_dir')
-    } catch (err) {
-        log.error('Failed to get dray app dir:', err)
-        return ''
-    }
-}
-
-export async function checkPortAvailable(port: number) {
-    if (!isTauri) return false
-    try {
-        return await invoke<boolean>('check_port_available', {port})
-    } catch (err) {
-        log.error('Failed to check port availability:', err)
-        return false
-    }
-}
-
-export async function startSpeedTestServer(port: number, filename: string) {
-    if (!isTauri) return
-    try {
-        return await invoke<boolean>('start_speed_test_server', {port, filename})
-    } catch (err) {
-        log.error('Failed to startSpeedTestServer:', err)
-        return false
-    }
-}
-
-export async function stopSpeedTestServer(port: number) {
-    if (!isTauri) return false
-    try {
-        return await invoke<boolean>('stop_speed_test_server', {port})
-    } catch (err) {
-        log.error('Failed to stopSpeedTestServer:', err)
-        return false
-    }
+    return invokeString('get_dray_app_dir')
 }
 
 export async function fetchGet(url: string, isProxy: boolean = false) {
-    if (!isTauri) return ''
-    try {
-        return await invoke<string>('fetch_get', {url, isProxy}) as string
-    } catch (err) {
-        log.error('Failed to fetchGet:', err)
-        return ''
-    }
+    return await invokeString('fetch_get', {url, isProxy})
 }
 
 export async function fetchProxyGet(url: string, proxyUrl: string) {
-    if (!isTauri) return
-    try {
-        return await invoke('fetch_get_with_proxy', {url, proxyUrl}) as any
-    } catch (err) {
-        log.error('Failed to fetchProxyGet:', err)
-    }
+    return await invokeString('fetch_get_with_proxy', {url, proxyUrl})
 }
 
 export function restartRay() {
-    if (!isTauri) return
-    try {
-        invoke('restart_ray')
-    } catch (err) {
-        log.error('Failed to restartRay:', err)
-    }
+    return invokeBool('restart_ray')
+}
+
+export async function checkPortAvailable(port: number) {
+    return await invokeBool('check_port_available', {port})
+}
+
+export async function startSpeedTestServer(port: number, filename: string) {
+    return await invokeBool('start_speed_test_server', {port, filename})
+}
+
+export async function stopSpeedTestServer(port: number) {
+    return await invokeBool('stop_speed_test_server', {port})
 }
 
 export async function readAppConfig(): Promise<AppConfig | undefined> {
-    if (!isTauri) return
-    try {
-        return await invoke('get_config_json') as AppConfig
-    } catch (err) {
-        log.error('Failed to readConfig:', err)
-    }
+    return await safeInvoke('get_config_json')
 }
 
 export function setAppConfig(cmd: string, value: string | number | boolean) {
-    if (!isTauri) return
     (async () => {
-        try {
-            const ok = await invoke<boolean>(cmd, {value})
-            !ok && log.warn(`Failed to setConfig ${cmd}:`, value)
-        } catch (err) {
-            log.error('Failed to setConfig:', err)
-        }
+        const ok = await invokeBool(cmd, {value})
+        !ok && log.warn(`Failed to setConfig ${cmd}:`, value)
     })()
 }
 
 export async function readRayConfig(): Promise<any> {
-    if (!isTauri) return
-    try {
-        return await invoke('read_ray_config') as any
-    } catch (err) {
-        log.error('Failed to readRayConfig:', err)
-    }
+    return await safeInvoke('read_ray_config')
 }
 
 export async function saveRayConfig(content: any) {
-    if (!isTauri) return false
-    try {
-        return await invoke<Boolean>('save_ray_config', {'content': JSON.stringify(content, null, 2)})
-    } catch (err) {
-        log.error('Failed to saveRayConfig:', err)
-        return false
-    }
+    return await safeInvoke('save_ray_config', {content: jsonStringify(content)})
 }
 
 export async function saveProxyPac(content: string) {
-    if (!isTauri) return false
-    try {
-        return await invoke<Boolean>('save_proxy_pac', {content})
-    } catch (err) {
-        log.error('Failed to saveProxyPac:', err)
-        return false
-    }
+    return await invokeBool('save_proxy_pac', {content})
 }
 
 export async function saveTextFile(path: string, content: string) {
-    if (!isTauri) return false
-    try {
-        return await invoke<Boolean>('save_text_file', {path, content})
-    } catch (err) {
-        log.error('Failed to saveTextFile:', err)
-        return false
-    }
+    return await invokeBool('save_text_file', {path, content})
 }
 
 export async function openWebServerDir() {
-    if (!isTauri) return false
-    try {
-        return await invoke<boolean>('open_web_server_dir')
-    } catch (err) {
-        log.error('Failed to clearLogAll:', err)
-        return false
-    }
+    return await invokeBool('open_web_server_dir')
 }
 
 export async function clearLogAll() {
-    if (!isTauri) return false
-    try {
-        return await invoke<boolean>('clear_log_all')
-    } catch (err) {
-        log.error('Failed to clearLogAll:', err)
-        return false
-    }
+    return await invokeBool('clear_log_all')
 }
 
 export async function readLogList(): Promise<LogList | undefined> {
-    if (!isTauri) return
-    try {
-        return await invoke('read_log_list') as LogList
-    } catch (err) {
-        log.error('Failed to readLogList:', err)
-    }
+    return await safeInvoke('read_log_list')
 }
 
 export async function readLogFile(filename: string, reverse: boolean = true, start: number = -1): Promise<LogContent | undefined> {
-    if (!isTauri) return
-    try {
-        return await invoke('read_log_file', {filename, reverse, start}) as LogContent
-    } catch (err) {
-        log.error('Failed to readLogFile:', err)
-    }
+    return await safeInvoke('read_log_file', {filename, reverse, start})
 }
 
 async function readConf(filename: string) {
-    if (!isTauri) return
-    try {
-        return await invoke('read_conf', {filename}) as any
-    } catch (err) {
-        log.error('Failed to readConf:', err)
-    }
+    return await safeInvoke('read_conf', {filename})
 }
 
 async function saveConf(filename: string, content: any) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_conf', {filename, 'content': JSON.stringify(content, null, 2)})
-    } catch (err) {
-        log.error('Failed to saveConf:', err)
-        return false
-    }
+    return await invokeBool('save_conf', {filename, content: jsonStringify(content)})
 }
 
 export async function saveSpeedTestConf(filename: string, content: any) {
-    if (!isTauri) return false
-    try {
-        return invoke<Boolean>('save_speed_test_conf', {filename, 'content': JSON.stringify(content, null, 2)})
-    } catch (err) {
-        log.error('Failed to saveSpeedTestConf:', err)
-        return false
-    }
+    return await invokeBool('save_speed_test_conf', {filename, content: jsonStringify(content)})
 }
 
 export async function readRayCommonConfig(): Promise<RayCommonConfig | undefined> {
@@ -295,39 +203,30 @@ export async function saveDnsTableList(content: DnsTableList) {
     return saveConf('dns_table_list.json', content)
 }
 
-async function getJson(apiName: string, options: any = {}) {
-    if (!isTauri) return
-    try {
-        return invoke(apiName, options) as any
-    } catch (err) {
-        log.error('Failed to getJson:', err)
-    }
-}
-
 export async function getSysInfoJson() {
-    return getJson('get_sys_info_json')
+    return safeInvoke('get_sys_info_json')
 }
 
 export async function getLoadAverageJson() {
-    return getJson('get_load_average_json')
+    return safeInvoke('get_load_average_json')
 }
 
 export async function getProcessesJson(keyword: string) {
-    return getJson('get_processes_json', {keyword})
+    return safeInvoke('get_processes_json', {keyword})
 }
 
 export async function getDisksJson() {
-    return getJson('get_disks_json')
+    return safeInvoke('get_disks_json')
 }
 
 export async function getNetworksJson() {
-    return getJson('get_networks_json')
+    return safeInvoke('get_networks_json')
 }
 
 export async function getComponentsJson() {
-    return getJson('get_components_json')
+    return safeInvoke('get_components_json')
 }
 
 export async function killProcessByPid(pid: number) {
-    return getJson('kill_process_by_pid', {pid})
+    return invokeBool('kill_process_by_pid', {pid})
 }
