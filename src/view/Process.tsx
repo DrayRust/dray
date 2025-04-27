@@ -95,10 +95,11 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
 
     const Row = ({index, style}: { index: number, style: any }) => {
         const row = processes[index]
-        return (<>
-            <div className="process-row"
-                 style={{...style, backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit'}}
-                 onClick={() => handleRowClick(row.pid)}
+        return (
+            <div
+                className="process-row"
+                style={{...style, backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit'}}
+                onClick={() => handleRowClick(row.pid)}
             >
                 <div>{row.pid}</div>
                 <div>{row.user}</div>
@@ -114,7 +115,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                     </Stack>
                 </div>
             </div>
-        </>)
+        )
     }
 
     return (<>
