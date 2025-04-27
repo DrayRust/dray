@@ -25,7 +25,7 @@ import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/cry
 import { clipboardWriteText } from "../util/tauri.ts"
 import { DEFAULT_DNS_CONFIG, DEFAULT_DNS_MODE_LIST, DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 import { dnsModeToConf } from "../util/dns.ts"
-import { rayDnsChange } from "../util/ray.ts"
+import { saveRayDns } from "../util/ray.ts"
 
 export const Dns = () => {
     const [loading, setLoading] = useState(true)
@@ -64,7 +64,7 @@ export const Dns = () => {
                 return
             }
 
-            await rayDnsChange(dnsConfig, dnsModeList)
+            await saveRayDns(dnsConfig, dnsModeList)
         })()
     }
 

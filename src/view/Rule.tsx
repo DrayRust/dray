@@ -20,7 +20,7 @@ import { useDebounce } from "../hook/useDebounce.ts"
 import { DEFAULT_RULE_CONFIG, DEFAULT_RULE_DOMAIN, DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { processDomain } from "../util/util.ts"
 import { updateProxyPAC } from "../util/proxy.ts"
-import { rayRuleChange } from "../util/ray.ts"
+import { saveRayRule } from "../util/ray.ts"
 
 const Rule: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(3), [setNavState])
@@ -88,7 +88,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     let ruleModeList: RuleModeList
     const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
         if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
-        await rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
+        await saveRayRule(ruleConfig, ruleDomain, ruleModeList)
     }
 
     // ============================== advanced ==============================

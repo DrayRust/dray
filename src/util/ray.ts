@@ -36,20 +36,17 @@ async function saveAndRestart(conf: any) {
     }
 }
 
-export async function rayRuleChange(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
-    const rayConfig = await readRayConfig()
-    if (rayConfig) {
-        // 生成配置文件
+export async function saveRayRule(ruleConfig: RuleConfig, ruleDomain: RuleDomain, ruleModeList: RuleModeList) {
+    const conf = await readRayConfig()
+    if (conf) {
         const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
-        const conf = {...rayConfig, ...routing}
-        await saveAndRestart(conf)
+        await saveAndRestart({...conf, ...routing})
     }
 }
 
-export async function rayDnsChange(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
-    const rayConfig = await readRayConfig()
-    if (rayConfig) {
-        let conf = {...rayConfig}
+export async function saveRayDns(dnsConfig: DnsConfig, dnsModeList: DnsModeList) {
+    const conf = await readRayConfig()
+    if (conf) {
         if (dnsConfig.enable) {
             const row = dnsModeList[dnsConfig.mode]
             if (row) conf.dns = dnsModeToConf(row)

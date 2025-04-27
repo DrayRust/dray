@@ -26,7 +26,7 @@ import { DEFAULT_RULE_MODE_LIST } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { ruleModeToConf } from "../util/rule.ts"
-import { rayRuleChange } from "../util/ray.ts"
+import { saveRayRule } from "../util/ray.ts"
 import { updateProxyPAC } from "../util/proxy.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
 
@@ -70,7 +70,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
         }
 
         await updateProxyPAC(ruleConfig, ruleDomain)
-        await rayRuleChange(ruleConfig, ruleDomain, ruleModeList)
+        await saveRayRule(ruleConfig, ruleDomain, ruleModeList)
         showChip('设置成功', 'success')
     }
 
