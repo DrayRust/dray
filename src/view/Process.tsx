@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Box, Card, IconButton, styled, TextField, InputAdornment, MenuItem,
+    Box, Card, IconButton, styled, TextField, InputAdornment, MenuItem, Stack,
     TableContainer, Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import SearchIcon from '@mui/icons-material/Search'
+import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useDebounce } from "../hook/useDebounce.ts"
 import { getProcessesJson } from "../util/invoke.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
@@ -56,6 +58,10 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
             }
             return 0
         })
+    }
+
+    const handleOpenDir = async (path: string) => {
+        if (path) await revealItemInDir(path)
     }
 
     const TableCellN = styled(TableCell)({
@@ -129,7 +135,12 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                                     <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
                                     <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
                                     <TableCellN>{row.name}</TableCellN>
-                                    <TableCellN>{row.exe}</TableCellN>
+                                    <TableCellN>
+                                        <Stack direction="row" alignItems="center">
+                                            <FolderOpenIcon onClick={() => handleOpenDir(row.exe)} sx={{mr: 1}}/>
+                                            {row.exe}
+                                        </Stack>
+                                    </TableCellN>
                                 </TableRow>
                             ))}
                         </TableBody>
