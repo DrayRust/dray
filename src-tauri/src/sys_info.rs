@@ -79,11 +79,15 @@ pub fn get_processes_json(keyword: &str) -> Value {
 
             Some(json!({
                 "pid": pid.as_u32(),
+                // "parent": process.parent(),
                 "status": process.status().to_string(),
                 "memory": process.memory(),
                 // "virtual_memory": process.virtual_memory(),
                 "user": username,
                 "cpu_usage": process.cpu_usage(),
+                // "accumulated_cpu_time": process.accumulated_cpu_time(),
+                // "disk_usage": process.disk_usage(),
+                // "exists": process.exists(),
                 "start_time": process.start_time(),
                 "name": process.name().to_string_lossy().to_string(),
                 "exe": exe,
