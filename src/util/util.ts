@@ -49,6 +49,17 @@ export const calcPct = (used: number, total: number): string => {
     return `${percentage}%`
 }
 
+export function getCurrentYMDHIS(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
+    return `${year}${month}${day}_${hours}${minutes}${seconds}`
+}
+
 export const formatTimestamp = (timestamp: number): string => {
     timestamp = Number(timestamp) || 0
     if (timestamp === 0) return '-'
@@ -116,17 +127,6 @@ export function generateUUID(): string {
 export function isValidUUID(uuid: string): boolean {
     const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     return regex.test(uuid)
-}
-
-export function getCurrentYMDHIS(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    const hours = String(now.getHours()).padStart(2, '0')
-    const minutes = String(now.getMinutes()).padStart(2, '0')
-    const seconds = String(now.getSeconds()).padStart(2, '0')
-    return `${year}${month}${day}_${hours}${minutes}${seconds}`
 }
 
 const logNameMap: Record<string, string> = {
