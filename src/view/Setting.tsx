@@ -111,22 +111,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ================================== ray setting ==================================
-    const handleRayLogLevel = (event: SelectChangeEvent) => {
+    const handleRayLogLevel = async (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['ray_log_level']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, ray_log_level: value}
-            saveRayLogLevel(value, updatedConfig)
-            return updatedConfig
-        })
+        const newConf = {...rayCommonConfig, ray_log_level: value}
+        setRayCommonConfig(newConf)
+        await saveRayLogLevel(value, newConf)
     }
 
-    const handleRayStatsEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked as RayCommonConfig['stats_enable']
-        setRayCommonConfig(prevConfig => {
-            const updatedConfig = {...prevConfig, stats_enable: value}
-            saveRayStatsEnable(value, updatedConfig)
-            return updatedConfig
-        })
+    const handleRayStatsEnable = async (value: boolean) => {
+        const newConf = {...rayCommonConfig, stats_enable: value}
+        setRayCommonConfig(newConf)
+        await saveRayStatsEnable(value, newConf)
     }
 
     // ================================== ray host & port ==================================
@@ -417,7 +412,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                         <Divider/>
                         <div className="flex-between p1">
                             <Typography variant="body1" sx={{pl: 1}}>流量统计</Typography>
-                            <Switch checked={rayCommonConfig.stats_enable} onChange={handleRayStatsEnabled}/>
+                            <Switch checked={rayCommonConfig.stats_enable} onChange={e => handleRayStatsEnable(e.target.checked)}/>
                         </div>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
