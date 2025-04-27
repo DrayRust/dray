@@ -79,7 +79,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     const handleKillPid = async () => {
         if (selectedPid < 0) return
 
-        dialogConfirm('确认结束进程', `确定要结束这个进程吗？`, async () => {
+        dialogConfirm('确认 Kill', `确定要结束这个进程吗？`, async () => {
             setSelectedPid(-1)
             let ok = await killProcessByPid(selectedPid)
             if (ok) loadData(searchText, sortField)
@@ -128,6 +128,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <MenuItem value="status">状态</MenuItem>
                 <MenuItem value="start_time">运行时间</MenuItem>
             </TextField>
+
+            <TextField disabled size="small" label="总进程数" value={processes.length} sx={{width: '90px', ml: 1}}></TextField>
 
             {selectedPid > -1 && <Button variant="contained" onClick={handleKillPid} sx={{ml: 1}}>结束进程</Button>}
 
