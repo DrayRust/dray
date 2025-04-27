@@ -12,15 +12,15 @@ import OpenWithIcon from '@mui/icons-material/OpenWith'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 
-import { openUrl } from '@tauri-apps/plugin-opener'
+import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useAlertDialog } from '../component/useAlertDialog.tsx'
 import { useDialog } from "../component/useDialog.tsx"
 import { saveRuleModeList } from "../util/invoke.ts"
 import { processDomain, processIP, processPort } from "../util/util.ts"
-import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { hashJson } from "../util/crypto.ts"
 import { DEFAULT_RULE_ROW } from "../util/config.ts"
+import { openUrl } from "../util/tauri.ts"
 
 const outboundTagList: Record<string, string> = {
     proxy: '代理访问',

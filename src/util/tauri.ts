@@ -1,6 +1,6 @@
 import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager'
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
-import { revealItemInDir } from '@tauri-apps/plugin-opener'
+import { revealItemInDir, openUrl as openUrlTauri } from '@tauri-apps/plugin-opener'
 import { IS_TAURI, log } from "./invoke.ts"
 
 export async function clipboardWriteText(text: string) {
@@ -49,3 +49,13 @@ export async function openDir(path: string) {
     }
 }
 
+export async function openUrl(path: string) {
+    if (!IS_TAURI) return false
+    try {
+        openUrlTauri(path)
+        return true
+    } catch (err) {
+        log.error('Failed to openUrl:', err)
+        return false
+    }
+}
