@@ -57,214 +57,191 @@ export async function saveRayDns(dnsConfig: DnsConfig, dnsModeList: DnsModeList)
     }
 }
 
-export function rayLogLevelChange(value: string, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+export async function saveRayLogLevel(value: string, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        let c = await readRayConfig()
-        if (c.log) {
-            c.log.loglevel = value
-            await saveAndRestart(c)
-        }
-    })()
-}
-
-export function rayStatsEnabledChange(value: boolean, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-
-        let c = await readRayConfig()
-        if (!c) return
-
-        if (!value) {
-            delete c.stats
-            delete c.metrics
-            delete c.policy
-            // delete c?.policy?.system
-        } else {
-            c = {...c, ...getStatsConf()}
-        }
+    let c = await readRayConfig()
+    if (c.log) {
+        c.log.loglevel = value
         await saveAndRestart(c)
-    })()
+    }
 }
 
-export function rayHostChange(host: string) {
-    (async () => {
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+export async function saveRayStatsEnable(value: boolean, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].listen) {
-                c.inbounds[i].listen = host // 修改监听地址
+    let c = await readRayConfig()
+    if (!c) return
+
+    if (!value) {
+        delete c.stats
+        delete c.metrics
+        delete c.policy
+        // delete c?.policy?.system
+    } else {
+        c = {...c, ...getStatsConf()}
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRayHost(host: string) {
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        if (c.inbounds[i].listen) {
+            c.inbounds[i].listen = host
+        }
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRaySocksPort(port: number) {
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        if (c.inbounds[i].protocol === "socks") {
+            c.inbounds[i].port = port
+        }
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRayHttpPort(port: number) {
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        if (c.inbounds[i].protocol === "http") {
+            c.inbounds[i].port = port
+        }
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRaySocksEnable(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
+
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    if (value) {
+        c.inbounds.push(getSocksConf(config, rayCommonConfig))
+    } else {
+        c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRayHttpEnable(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
+
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    if (value) {
+        c.inbounds.push(getHttpConf(config))
+    } else {
+        c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
+    }
+    await saveAndRestart(c)
+}
+
+export async function saveRaySocksUdp(value: boolean, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
+
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        if (c.inbounds[i].protocol === "socks") {
+            if (c.inbounds[i].settings && typeof c.inbounds[i].settings === 'object') {
+                c.inbounds[i].settings.udp = value
+            } else {
+                c.inbounds[i].settings = {udp: value}
             }
+            // break
         }
-        await saveAndRestart(c)
-    })()
+    }
+    await saveAndRestart(c)
 }
 
-export function raySocksPortChange(port: number) {
-    (async () => {
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+export async function saveRaySocksSniffing(value: boolean, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].protocol === "socks") {
-                c.inbounds[i].port = port // 修改端口
-            }
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        const inbounds = c.inbounds[i]
+        if (inbounds.protocol === "socks") {
+            if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {}
+            inbounds.sniffing.enabled = value
+            inbounds.sniffing.destOverride = rayCommonConfig.socks_sniffing_dest_override
+            // break
         }
-        await saveAndRestart(c)
-    })()
+    }
+    await saveAndRestart(c)
 }
 
-export function rayHttpPortChange(port: number) {
-    (async () => {
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+export async function saveRaySocksDestOverride(value: string[], rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].protocol === "http") {
-                c.inbounds[i].port = port // 修改端口
-            }
+    let c = await readRayConfig()
+    if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+
+    for (let i = 0; i < c.inbounds.length; i++) {
+        const inbounds = c.inbounds[i]
+        if (inbounds.protocol === "socks") {
+            if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {enabled: rayCommonConfig.socks_sniffing}
+            inbounds.sniffing.destOverride = value
+            // break
         }
-        await saveAndRestart(c)
-    })()
+    }
+    await saveAndRestart(c)
 }
 
-export function raySocksEnabledChange(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+export async function saveRayOutboundsMux(value: boolean, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+    let c = await readRayConfig()
+    if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
 
-        if (value) {
-            c.inbounds.push(getSocksConf(config, rayCommonConfig))
-        } else {
-            c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "socks")
-        }
-        await saveAndRestart(c)
-    })()
-}
-
-export function rayHttpEnabledChange(value: boolean, config: AppConfig, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
-
-        if (value) {
-            c.inbounds.push(getHttpConf(config))
-        } else {
-            c.inbounds = c.inbounds.filter((item: any) => item.protocol !== "http")
-        }
-        await saveAndRestart(c)
-    })()
-}
-
-export function raySocksUdpChange(value: boolean, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
-
-        for (let i = 0; i < c.inbounds.length; i++) {
-            if (c.inbounds[i].protocol === "socks") {
-                if (c.inbounds[i].settings && typeof c.inbounds[i].settings === 'object') {
-                    c.inbounds[i].settings.udp = value // 修改是否启用 UDP 协议转发
-                } else {
-                    c.inbounds[i].settings = {udp: value} // 初始化 settings 对象
+    for (let i = 0; i < c.outbounds.length; i++) {
+        const outbound = c.outbounds[i]
+        if (outbound.tag === "proxy") {
+            if (typeof outbound.mux === 'object') {
+                outbound.mux.enabled = value
+                outbound.mux.concurrency = rayCommonConfig.outbounds_concurrency
+            } else {
+                outbound.mux = {
+                    enabled: value,
+                    concurrency: rayCommonConfig.outbounds_concurrency
                 }
-                // break
             }
+            c.outbounds[i] = outbound
         }
-        await saveAndRestart(c)
-    })()
+    }
+    await saveAndRestart(c)
 }
 
-export function raySocksSniffingChange(value: boolean, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
+export async function saveRayOutboundsConcurrency(value: number, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
 
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
+    let c = await readRayConfig()
+    if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
 
-        for (let i = 0; i < c.inbounds.length; i++) {
-            const inbounds = c.inbounds[i]
-            if (inbounds.protocol === "socks") {
-                if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {}
-                inbounds.sniffing.enabled = value
-                inbounds.sniffing.destOverride = rayCommonConfig.socks_sniffing_dest_override
-                // break
+    for (let i = 0; i < c.outbounds.length; i++) {
+        const outbound = c.outbounds[i]
+        if (outbound.tag === "proxy") {
+            if (typeof outbound.mux === 'object') {
+                outbound.mux.concurrency = value
+            } else {
+                outbound.mux = {enabled: rayCommonConfig.outbounds_mux, concurrency: value}
             }
+            c.outbounds[i] = outbound
         }
-        await saveAndRestart(c)
-    })()
-}
-
-export function raySocksDestOverrideChange(value: string[], rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-
-        let c = await readRayConfig()
-        if (!c || !c.inbounds || !Array.isArray(c.inbounds)) return
-
-        for (let i = 0; i < c.inbounds.length; i++) {
-            const inbounds = c.inbounds[i]
-            if (inbounds.protocol === "socks") {
-                if (typeof inbounds.sniffing !== 'object') inbounds.sniffing = {enabled: rayCommonConfig.socks_sniffing}
-                inbounds.sniffing.destOverride = value
-                // break
-            }
-        }
-        await saveAndRestart(c)
-    })()
-}
-
-export function rayOutboundsMuxChange(value: boolean, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-        let c = await readRayConfig()
-        if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
-
-        for (let i = 0; i < c.outbounds.length; i++) {
-            const outbound = c.outbounds[i]
-            if (outbound.tag === "proxy") {
-                if (typeof outbound.mux === 'object') {
-                    outbound.mux.enabled = value
-                    outbound.mux.concurrency = rayCommonConfig.outbounds_concurrency
-                } else {
-                    outbound.mux = {
-                        enabled: value,
-                        concurrency: rayCommonConfig.outbounds_concurrency
-                    }
-                }
-                c.outbounds[i] = outbound
-            }
-        }
-        await saveAndRestart(c)
-    })()
-}
-
-export function rayOutboundsConcurrencyChange(value: number, rayCommonConfig: RayCommonConfig) {
-    (async () => {
-        await saveRayCommonConfig(rayCommonConfig) // 保存 Ray Common 配置
-
-        let c = await readRayConfig()
-        if (!c || !c.outbounds || !Array.isArray(c.outbounds)) return
-
-        for (let i = 0; i < c.outbounds.length; i++) {
-            const outbound = c.outbounds[i]
-            if (outbound.tag === "proxy") {
-                if (typeof outbound.mux === 'object') {
-                    outbound.mux.concurrency = value
-                } else {
-                    outbound.mux = {enabled: rayCommonConfig.outbounds_mux, concurrency: value}
-                }
-                c.outbounds[i] = outbound
-            }
-        }
-        await saveAndRestart(c)
-    })()
+    }
+    await saveAndRestart(c)
 }

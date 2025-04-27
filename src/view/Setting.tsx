@@ -29,12 +29,12 @@ import {
     openWebServerDir,
 } from '../util/invoke.ts'
 import {
-    rayLogLevelChange, rayStatsEnabledChange,
-    rayHostChange, raySocksPortChange, rayHttpPortChange,
-    raySocksEnabledChange, rayHttpEnabledChange,
-    raySocksUdpChange,
-    raySocksSniffingChange, raySocksDestOverrideChange,
-    rayOutboundsMuxChange, rayOutboundsConcurrencyChange
+    saveRayLogLevel, saveRayStatsEnable,
+    saveRayHost, saveRaySocksPort, saveRayHttpPort,
+    saveRaySocksEnable, saveRayHttpEnable,
+    saveRaySocksUdp,
+    saveRaySocksSniffing, saveRaySocksDestOverride,
+    saveRayOutboundsMux, saveRayOutboundsConcurrency
 } from "../util/ray.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { reloadProxyPAC } from "../util/proxy.ts"
@@ -136,7 +136,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.value as RayCommonConfig['ray_log_level']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, ray_log_level: value}
-            rayLogLevelChange(value, updatedConfig)
+            saveRayLogLevel(value, updatedConfig)
             return updatedConfig
         })
     }
@@ -145,7 +145,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['stats_enable']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, stats_enable: value}
-            rayStatsEnabledChange(value, updatedConfig)
+            saveRayStatsEnable(value, updatedConfig)
             return updatedConfig
         })
     }
@@ -162,7 +162,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (c?.ray_host !== value) {
             setConfig(prevConfig => ({...prevConfig, ray_host: value}))
             setAppConfig('set_ray_host', value)
-            rayHostChange(value)
+            saveRayHost(value)
         }
     }, 1000), [])
     const handleRayHost = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,7 +183,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setRaySocksPortErrorText('')
                 setConfig(prevConfig => ({...prevConfig, ray_socks_port: value}))
                 setAppConfig('set_ray_socks_port', value)
-                raySocksPortChange(value)
+                saveRaySocksPort(value)
             }
         }
     }, 1500), [])
@@ -207,7 +207,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                 setRayHttpPortErrorText('')
                 setConfig(prevConfig => ({...prevConfig, ray_http_port: value}))
                 setAppConfig('set_ray_http_port', value)
-                rayHttpPortChange(value)
+                saveRayHttpPort(value)
             }
         }
     }, 1500), [])
@@ -226,7 +226,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['socks_enable']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, socks_enable: value}
-            raySocksEnabledChange(value, config, updatedConfig)
+            saveRaySocksEnable(value, config, updatedConfig)
             return updatedConfig
         })
     }
@@ -235,7 +235,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['http_enable']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, http_enable: value}
-            rayHttpEnabledChange(value, config, updatedConfig)
+            saveRayHttpEnable(value, config, updatedConfig)
             return updatedConfig
         })
     }
@@ -245,7 +245,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['socks_udp']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, socks_udp: value}
-            raySocksUdpChange(value, updatedConfig)
+            saveRaySocksUdp(value, updatedConfig)
             return updatedConfig
         })
     }
@@ -254,7 +254,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['socks_sniffing']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, socks_sniffing: value}
-            raySocksSniffingChange(value, updatedConfig)
+            saveRaySocksSniffing(value, updatedConfig)
             return updatedConfig
         })
     }
@@ -267,7 +267,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     ? prevConfig.socks_sniffing_dest_override.filter(item => item !== option)
                     : [...prevConfig.socks_sniffing_dest_override, option]
             }
-            raySocksDestOverrideChange(updatedConfig.socks_sniffing_dest_override, updatedConfig)
+            saveRaySocksDestOverride(updatedConfig.socks_sniffing_dest_override, updatedConfig)
             return updatedConfig
         })
     }
@@ -276,13 +276,13 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const value = event.target.checked as RayCommonConfig['outbounds_mux']
         setRayCommonConfig(prevConfig => {
             const updatedConfig = {...prevConfig, outbounds_mux: value}
-            rayOutboundsMuxChange(value, updatedConfig)
+            saveRayOutboundsMux(value, updatedConfig)
             return updatedConfig
         })
     }
 
     const debouncedRayOutboundsConcurrency = useMemo(() => debounce(async (value: number, updatedConfig: RayCommonConfig) => {
-        rayOutboundsConcurrencyChange(value, updatedConfig)
+        saveRayOutboundsConcurrency(value, updatedConfig)
     }, 1000), [])
     const handleRayOutboundsConcurrency = async (value: number) => {
         setRayCommonConfig(prevConfig => {
