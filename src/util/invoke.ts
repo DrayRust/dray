@@ -57,7 +57,7 @@ export async function fetchGet(url: string, isProxy: boolean = false) {
 }
 
 export async function fetchProxyGet(url: string, proxyUrl: string) {
-    return await invokeBool('fetch_get_with_proxy', {url, proxyUrl})
+    return await safeInvoke('fetch_get_with_proxy', {url, proxyUrl})
 }
 
 export function restartRay() {
