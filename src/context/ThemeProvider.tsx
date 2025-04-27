@@ -31,6 +31,13 @@ export const ThemeProvider = ({children}: { children: React.ReactNode }) => {
 
     useEffect(() => localStorage.setItem('themeMode', mode), [mode])
 
+    useEffect(() => {
+        const htmlElement = document.documentElement
+        const paletteMode = mode === 'system' ? (prefersDarkMode ? 'dark' : 'light') : mode
+        htmlElement.classList.remove('light', 'dark')
+        htmlElement.classList.add(paletteMode)
+    }, [mode, prefersDarkMode])
+
     const toggleMode = (newMode: ThemeMode) => {
         setMode((prevMode) => (prevMode === newMode ? 'system' : newMode))
     }
