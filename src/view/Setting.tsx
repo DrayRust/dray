@@ -251,13 +251,12 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [webPortError, setWebPortError] = useState(false)
     const [webPortErrorText, setWebPortErrorText] = useState('')
 
-    const handleWebServerEnable = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = event.target.checked
+    const handleWebServerEnable = (value: boolean) => {
         setConfig(prevConfig => ({...prevConfig, web_server_enable: value}))
         setAppConfig('set_web_server_enable', value)
     }
 
-    const debouncedSetWebServerHost = useDebounce(async (value: string) => {
+    const setWebServerHostDebounce = useDebounce(async (value: string) => {
         const c = await readAppConfig()
         if (c?.web_server_host !== value) {
             setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
@@ -269,10 +268,10 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setConfig(prevConfig => ({...prevConfig, web_server_host: value}))
         const ok = validateIp(value)
         setWebIpError(!ok)
-        if (ok) debouncedSetWebServerHost(value)
+        if (ok) setWebServerHostDebounce(value)
     }
 
-    const debouncedSetWebServerPort = useDebounce(async (value: number) => {
+    const setWebServerPortDebounce = useDebounce(async (value: number) => {
         const c = await readAppConfig()
         if (c?.web_server_port !== value) {
             const ok = await checkPortAvailable(value)
@@ -292,7 +291,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const ok = validatePort(value)
         setWebPortError(!ok)
         !ok && setWebPortErrorText('请输入有效的端口号 (1-65535)')
-        if (ok) debouncedSetWebServerPort(value)
+        if (ok) setWebServerPortDebounce(value)
     }
 
     const destOverride = rayCommonConfig.socks_sniffing_dest_override
@@ -512,7 +511,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     <Card>
                         <div className="flex-between p2">
                             <Typography variant="body1" sx={{pl: 1}}>Web 服务</Typography>
-                            <Switch checked={config.web_server_enable} onChange={handleWebServerEnable}/>
+                            <Switch checked={config.web_server_enable} onChange={e => handleWebServerEnable(e.target.checked)}/>
                         </div>
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
