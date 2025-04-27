@@ -133,9 +133,9 @@ const logNameMap: Record<string, string> = {
     'dray.log': 'Dray 运行日志',
     'web_interface.log': 'Dray 交互日志',
     'web_server.log': 'Web 访问日志',
-    'ray_server.log': 'Xray 启动日志',
     'xray_access.log': 'Xray 请求日志',
     'xray_error.log': 'Xray 运行日志',
+    'xray_server.log': 'Xray 启动日志',
 }
 
 export const formatLogName = (filename: string, showFull: boolean = false): string => {
