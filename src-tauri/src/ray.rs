@@ -44,7 +44,7 @@ fn run_server() {
 
     info!("Ray Server started with PID: {}", child.id());
 
-    let log_file_path = dirs::get_dray_logs_dir().unwrap().join("ray_server.log");
+    let log_file_path = dirs::get_dray_logs_dir().unwrap().join("xray_server.log");
     let mut log_file = match fs::OpenOptions::new().create(true).write(true).truncate(true).open(log_file_path) {
         Ok(file) => file,
         Err(e) => {
