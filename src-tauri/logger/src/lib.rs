@@ -136,11 +136,12 @@ pub fn log(level: LogLevel, message: &str) -> Result<(), io::Error> {
         // 判断文件大小是否超过最大值
         let metadata = fs::metadata(log_filepath)?;
         if metadata.len() > config.log_max_size {
-            let extension = log_filepath.extension().and_then(|ext| ext.to_str()).unwrap_or("");
-            let timestamp = Local::now().format("%Y%m%d%H%M%S%.3f");
-            let bak_filepath = log_filepath.with_extension(format!("{}.{}", timestamp, extension));
-            fs::rename(log_filepath, bak_filepath)?; // 重命名文件，备份旧文件
-            set_log_writer(log_filepath)?; // 打开新的文件
+            let file_stem = log_filepath.file_stem().and_then(|stem| stem.to_str()).unwrap_or("log");
+            let extension = log_filepath.extension().and_then(|ext| ext.to_str()).unwrap_or("log");
+            let timestamp = Local::now().format("%Y%m%d_%H%M%S_%3f");
+            let bak_filepath = log_filepath.with_file_name(format!("{}_{}.{}", file_stem, timestamp, extension));
+            fs::rename(log_filepath, bak_filepath)?;
+            set_log_writer(log_filepath)?;
         }
     }
 
