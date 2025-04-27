@@ -104,7 +104,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         </Box>
 
         <Box sx={{p: 1}}>
-            <Card elevation={2} sx={{overflow: 'hidden'}}>
+            <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
                 <TableContainer sx={{maxHeight: `calc(100vh - 72px)`}}>
                     <Table size="small">
                         <TableHead>

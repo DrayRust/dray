@@ -119,7 +119,7 @@ export const SysInfo = () => {
 
     const lastSx = {'&:last-child td, &:last-child th': {border: 0}}
     return (<>
-        <Dialog className="scr-w2" fullScreen open={open} onClose={handleClose}>
+        <Dialog fullScreen open={open} onClose={handleClose}>
             <Process handleClose={handleClose}/>
         </Dialog>
 
