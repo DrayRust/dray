@@ -97,8 +97,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         const row = processes[index]
         return (
             <div
-                className="process-row"
-                style={{...style, backgroundColor: row.pid === selectedPid ? 'ActiveBorder' : 'inherit'}}
+                className={'process-row' + (row.pid === selectedPid ? ' active' : '')}
+                style={style}
                 onClick={() => handleRowClick(row.pid)}
             >
                 <div>{row.pid}</div>
@@ -168,7 +168,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <ErrorCard height={maxHeight} errorMsg="暂无相关进程"/>
             ) : (
                 <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
-                    <div className="process-row">
+                    <div className="process-row header">
                         <div>PID</div>
                         <div>用户</div>
                         <div>状态</div>
