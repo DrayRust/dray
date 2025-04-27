@@ -81,7 +81,6 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     useEffect(() => {
-        if (!isTauri) return
         (async () => {
             const newConfig = await readAppConfig()
             if (newConfig) setConfig({...config, ...newConfig})
