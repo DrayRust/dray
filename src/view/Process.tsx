@@ -39,8 +39,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         setSearchText(searchText)
     }
 
-    const handleSortFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const sortField = event.target.value as string
+    const handleSortFieldChange = (sortField: string) => {
         setSortField(sortField)
     }
 
@@ -65,98 +64,80 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         textOverflow: 'ellipsis',
     })
 
-    return (
-        <Box sx={{p: 1}}>
-            <Box
-                sx={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1000,
-                    backgroundColor: 'background.paper',
-                    boxShadow: 1,
-                    p: 1,
-                    display: 'flex',
-                    alignItems: 'center',
+    return (<>
+        <Box sx={{backgroundColor: 'background.paper', p: 1, display: 'flex', alignItems: 'center'}}>
+            <TextField
+                size="small" variant="outlined" placeholder="搜索..." sx={{width: 300}}
+                value={searchText}
+                onChange={(e) => handleSearch(e.target.value)}
+                slotProps={{
+                    input: {
+                        startAdornment: (
+                            <InputAdornment position="start"><SearchIcon/></InputAdornment>
+                        ),
+                        endAdornment: searchText && (
+                            <InputAdornment position="end"><IconButton onClick={handleClear} size="small"><CloseIcon/></IconButton></InputAdornment>
+                        ),
+                    },
                 }}
-            >
-                <TextField
-                    size="small"
-                    variant="outlined"
-                    placeholder="搜索..."
-                    value={searchText}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    slotProps={{
-                        input: {
-                            startAdornment: (
-                                <InputAdornment position="start"><SearchIcon/></InputAdornment>
-                            ),
-                            endAdornment: searchText && (
-                                <InputAdornment position="end"><IconButton onClick={handleClear} size="small"><CloseIcon/></IconButton></InputAdornment>
-                            ),
-                        },
-                    }}
-                    sx={{maxWidth: 400}}
-                />
+            />
 
-                <TextField
-                    select
-                    size="small"
-                    label="排序"
-                    value={sortField}
-                    onChange={handleSortFieldChange}
-                    sx={{width: '120px', ml: 1}}
-                >
-                    <MenuItem value="pid">PID</MenuItem>
-                    <MenuItem value="cpu_usage">CPU</MenuItem>
-                    <MenuItem value="memory">内存</MenuItem>
-                    <MenuItem value="name">进程名称</MenuItem>
-                    <MenuItem value="exe">程序路径</MenuItem>
-                    <MenuItem value="user">用户</MenuItem>
-                    <MenuItem value="status">状态</MenuItem>
-                    <MenuItem value="start_time">运行时间</MenuItem>
-                </TextField>
+            <TextField
+                select size="small" label="排序" value={sortField}
+                onChange={(e) => handleSortFieldChange(e.target.value)}
+                sx={{width: '120px', ml: 1}}>
+                <MenuItem value="pid">PID</MenuItem>
+                <MenuItem value="cpu_usage">CPU</MenuItem>
+                <MenuItem value="memory">内存</MenuItem>
+                <MenuItem value="name">进程名称</MenuItem>
+                <MenuItem value="exe">程序路径</MenuItem>
+                <MenuItem value="user">用户</MenuItem>
+                <MenuItem value="status">状态</MenuItem>
+                <MenuItem value="start_time">运行时间</MenuItem>
+            </TextField>
 
-                <IconButton
-                    aria-label="close" onClick={handleClose}
-                    sx={{position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500]}}>
-                    <CloseIcon/>
-                </IconButton>
-            </Box>
-
-            <TableContainer elevation={2} component={Card} sx={{mt: '56px'}}>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCellN>PID</TableCellN>
-                            <TableCellN>用户</TableCellN>
-                            <TableCellN>状态</TableCellN>
-                            <TableCellN>内存</TableCellN>
-                            <TableCellN>CPU</TableCellN>
-                            <TableCellN>运行时间</TableCellN>
-                            <TableCellN>进程名称</TableCellN>
-                            <TableCellN>程序路径</TableCellN>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {processes?.length > 0 && processes.map((row: any, key: number) => (
-                            <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                                <TableCellN>{row.pid}</TableCellN>
-                                <TableCellN>{row.user}</TableCellN>
-                                <TableCellN>{row.status}</TableCellN>
-                                <TableCellN>{sizeToUnit(row.memory)}</TableCellN>
-                                <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
-                                <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
-                                <TableCellN>{row.name}</TableCellN>
-                                <TableCellN>{row.exe}</TableCellN>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <IconButton
+                aria-label="close" onClick={handleClose}
+                sx={{position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500]}}>
+                <CloseIcon/>
+            </IconButton>
         </Box>
-    )
+
+        <Box sx={{p: 1}}>
+            <Card elevation={2} sx={{overflow: 'hidden'}}>
+                <TableContainer sx={{maxHeight: `calc(100vh - 72px)`}}>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCellN>PID</TableCellN>
+                                <TableCellN>用户</TableCellN>
+                                <TableCellN>状态</TableCellN>
+                                <TableCellN>内存</TableCellN>
+                                <TableCellN>CPU</TableCellN>
+                                <TableCellN>运行时间</TableCellN>
+                                <TableCellN>进程名称</TableCellN>
+                                <TableCellN>程序路径</TableCellN>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {processes?.length > 0 && processes.map((row: any, key: number) => (
+                                <TableRow key={key} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                                    <TableCellN>{row.pid}</TableCellN>
+                                    <TableCellN>{row.user}</TableCellN>
+                                    <TableCellN>{row.status}</TableCellN>
+                                    <TableCellN>{sizeToUnit(row.memory)}</TableCellN>
+                                    <TableCellN>{formatFloat(row.cpu_usage, 1)}%</TableCellN>
+                                    <TableCellN>{formatTimestamp(row.start_time)}</TableCellN>
+                                    <TableCellN>{row.name}</TableCellN>
+                                    <TableCellN>{row.exe}</TableCellN>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Card>
+        </Box>
+    </>)
 }
 
 export default Process
