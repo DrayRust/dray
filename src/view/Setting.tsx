@@ -74,7 +74,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_app_log_level', value)
     }
 
-    // ======================================================================================================
+    // ================================== system proxy ==================================
     const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
@@ -110,7 +110,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_auto_setup_https', value)
     }
 
-    // ======================================================================================================
+    // ================================== ray setting ==================================
     const handleRayLogLevel = (event: SelectChangeEvent) => {
         const value = event.target.value as RayCommonConfig['ray_log_level']
         setRayCommonConfig(prevConfig => {
@@ -129,7 +129,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
-    // ======================================================================================================
+    // ================================== ray host & port ==================================
     const [rayIpError, setRayIpError] = useState(false)
     const [raySocksPortError, setRaySocksPortError] = useState(false)
     const [raySocksPortErrorText, setRaySocksPortErrorText] = useState('')
@@ -200,7 +200,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         if (ok) debouncedSetRayHttpPort(value)
     }
 
-    // ======================================================================================================
+    // ================================== ray socks & http ==================================
     const handleRaySocksEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_enable']
         setRayCommonConfig(prevConfig => {
@@ -219,7 +219,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
-    // ======================================================================================================
+    // ================================== ray socks more ==================================
     const handleRaySocksUdp = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked as RayCommonConfig['socks_udp']
         setRayCommonConfig(prevConfig => {
@@ -271,7 +271,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         })
     }
 
-    // ======================================================================================================
+    // ================================== web setting ==================================
     // 用于记录当前 Web 服务的设置
     const [webIpError, setWebIpError] = useState(false)
     const [webPortError, setWebPortError] = useState(false)
