@@ -122,22 +122,23 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
     const headRef = useRef<HTMLElement>(null)
     const handleListScroll = () => {
         if (!listRef.current) return
+        // TODO: 实现美观宽度，需遍历计算宽度，重新赋值
     }
 
-    const handleScroll = () => {
+    const handleViewScroll = () => {
         if (!viewRef.current || !headRef.current) return
 
         const left = Math.max(0, viewRef.current.scrollLeft)
         headRef.current.style.left = `${-left}px`
     }
 
-    const handleRendered = () => {
+    const handleViewRendered = () => {
         viewRef.current = document.querySelector('.process-view') as HTMLElement
         headRef.current = document.querySelector('.process-head') as HTMLElement
         if (!viewRef.current || !headRef.current) return
 
-        viewRef.current.removeEventListener('scroll', handleScroll)
-        viewRef.current.addEventListener('scroll', handleScroll)
+        viewRef.current.removeEventListener('scroll', handleViewScroll)
+        viewRef.current.addEventListener('scroll', handleViewScroll)
     }
 
     return (<>
@@ -201,7 +202,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                         <div>程序路径</div>
                     </div>
                     <List className="process-view" ref={listRef}
-                          onScroll={handleListScroll} onItemsRendered={handleRendered}
+                          onScroll={handleListScroll}
+                          onItemsRendered={handleViewRendered}
                           height={listHeight} itemCount={processes.length}
                           itemSize={ROW_HEIGHT} width="100%">{Row}</List>
                 </Card>
