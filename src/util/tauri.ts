@@ -1,4 +1,4 @@
-import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager'
+import { writeText, readText, readImage } from '@tauri-apps/plugin-clipboard-manager'
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
 import { revealItemInDir, openUrl as openUrlTauri } from '@tauri-apps/plugin-opener'
 import { IS_TAURI, log } from "./invoke.ts"
@@ -15,6 +15,10 @@ export async function clipboardWriteText(text: string) {
 
 export async function clipboardReadText() {
     return await readText()
+}
+
+export async function clipboardReadImage() {
+    return await readImage()
 }
 
 export async function isAutoStartEnabled() {
