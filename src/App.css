@@ -215,7 +215,7 @@ body, html {
     background-color: var(--row-odd-bg);
 }
 
-.process-row.active {
+.process-view .process-row.active {
     background-color: #007bff;
     color: white;
 }
