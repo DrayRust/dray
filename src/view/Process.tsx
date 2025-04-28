@@ -90,7 +90,6 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         setListHeight(fullHeight - 75 - 30)
     }, [fullHeight])
 
-    const openSx = {mr: 0.6, transform: 'scale(.9)', '&:hover': {cursor: 'pointer', opacity: 0.6, transform: 'scale(1)'}}
     const maxHeight = 'calc(100vh - 75px)'
 
     const Row = ({index, style}: { index: number, style: any }) => {
@@ -110,7 +109,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <div>{row.name}</div>
                 <div>
                     <Stack direction="row" alignItems="center">
-                        <FolderOpenIcon onClick={(e) => handleOpenDir(e, row.exe)} sx={openSx}/>
+                        <FolderOpenIcon className="process-open-dir-but" onClick={(e) => handleOpenDir(e, row.exe)}/>
                         {row.exe}
                     </Stack>
                 </div>
