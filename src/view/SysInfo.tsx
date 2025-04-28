@@ -145,7 +145,7 @@ export const SysInfo = () => {
                         <TableRow>
                             <TableCell>进程数</TableCell>
                             <TableCell align="right">
-                                <Typography variant="body2" component="span" color="secondary" onClick={handleOpen}>{sysInfo.process_len}</Typography>
+                                <Typography className="process-but" variant="body2" color="secondary" onClick={handleOpen}>{sysInfo.process_len}</Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>

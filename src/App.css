@@ -185,6 +185,18 @@ body, html {
 }
 
 /* process */
+.process-but {
+    display: inline;
+    cursor: pointer;
+    text-decoration: none;
+    transition: text-decoration 0.3s ease, filter 0.3s ease;
+}
+
+.process-but:hover {
+    text-decoration: underline;
+    filter: brightness(1.2) contrast(1.1);
+}
+
 .process-row {
     display: flex;
 }
