@@ -131,8 +131,9 @@ body, html {
 }
 
 #qr-video {
+    display: block;
     width: 520px;
-    height: 300px;
+    height: 292px;
     background: #121212;
 }
 

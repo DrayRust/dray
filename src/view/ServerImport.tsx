@@ -84,18 +84,17 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         if (!videoEl) return
 
         try {
-            if (!scanner.current) {
-                scanner.current = new QrScanner(videoEl, (r: any) => {
-                    setText(r.data)
-                    handleStopCamera()
-                }, {
-                    onDecodeError: (() => {
-                    }),
-                    maxScansPerSecond: 20,
-                    highlightScanRegion: true,
-                    highlightCodeOutline: true,
-                })
-            }
+            scanner.current = new QrScanner(videoEl, (r: any) => {
+                setText(r.data)
+                handleStopCamera()
+            }, {
+                onDecodeError: (_e => {
+                    // console.log('Decode error', _e, new Date().toLocaleString())
+                }),
+                maxScansPerSecond: 10,
+                highlightScanRegion: true,
+                highlightCodeOutline: true,
+            })
             // scanner.current.setInversionMode('both')
             scanner.current.start()
         } catch (e) {
@@ -110,11 +109,11 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         <SnackbarComponent/>
         <AppBarComponent/>
         <Dialog open={open} onClose={handleStopCamera}>
-            <DialogContent>
+            <DialogContent sx={{p: 2, pb: 0}}>
                 <video id="qr-video"></video>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleStopCamera}>取消</Button>
+            <DialogActions sx={{px: 2, py: 1}}>
+                <Button variant="contained" onClick={handleStopCamera}>取消</Button>
             </DialogActions>
         </Dialog>
         <Card sx={{p: 2, mt: 1}}>
