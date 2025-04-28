@@ -197,6 +197,11 @@ body, html {
     filter: brightness(1.2) contrast(1.1);
 }
 
+.process-head {
+    position: relative;
+    left: 0;
+}
+
 .process-row {
     display: flex;
 }
@@ -210,15 +215,11 @@ body, html {
     min-width: max-content;
 }
 
-.process-row:nth-child(odd) {
+.process-view .process-row:nth-child(odd) {
     background-color: var(--row-odd-bg);
 }
 
-.process-row:nth-child(even) {
-    background-color: var(--row-even-bg);
-}
-
-.process-row.header {
+.process-view .process-row:nth-child(even) {
     background-color: var(--row-even-bg);
 }
 

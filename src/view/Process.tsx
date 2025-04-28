@@ -117,6 +117,29 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
         )
     }
 
+    const listRef = useRef<List>(null)
+    const viewRef = useRef<HTMLElement>(null)
+    const headRef = useRef<HTMLElement>(null)
+    const handleListScroll = () => {
+        if (!listRef.current) return
+    }
+
+    const handleScroll = () => {
+        if (!viewRef.current || !headRef.current) return
+
+        const left = Math.max(0, viewRef.current.scrollLeft)
+        headRef.current.style.left = `${-left}px`
+    }
+
+    const handleRendered = () => {
+        viewRef.current = document.querySelector('.process-view') as HTMLElement
+        headRef.current = document.querySelector('.process-head') as HTMLElement
+        if (!viewRef.current || !headRef.current) return
+
+        viewRef.current.removeEventListener('scroll', handleScroll)
+        viewRef.current.addEventListener('scroll', handleScroll)
+    }
+
     return (<>
         <Box sx={{backgroundColor: 'background.paper', p: 1, display: 'flex', alignItems: 'center'}}>
             <TextField
@@ -167,7 +190,7 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <ErrorCard height={maxHeight} errorMsg="暂无相关进程"/>
             ) : (
                 <Card elevation={2} sx={{overflow: 'hidden'}} className="scr-w2">
-                    <div className="process-row header">
+                    <div className="process-row process-head">
                         <div>PID</div>
                         <div>用户</div>
                         <div>状态</div>
@@ -177,7 +200,10 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                         <div>进程名称</div>
                         <div>程序路径</div>
                     </div>
-                    <List height={listHeight} itemCount={processes.length} itemSize={ROW_HEIGHT} width="100%">{Row}</List>
+                    <List className="process-view" ref={listRef}
+                          onScroll={handleListScroll} onItemsRendered={handleRendered}
+                          height={listHeight} itemCount={processes.length}
+                          itemSize={ROW_HEIGHT} width="100%">{Row}</List>
                 </Card>
             )}
         </Box>
