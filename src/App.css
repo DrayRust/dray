@@ -4,19 +4,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    --row-odd-bg: #ffffff;
-    --row-even-bg: #e0e0e0;
-
     --scrollbar-thumb: #888;
     --scrollbar-thumb-hover: #555;
+    --row-odd-bg: #ffffff;
 }
 
 html.dark {
-    --row-odd-bg: #1e1e1e;
-    --row-even-bg: #2a2a2a;
-
     --scrollbar-thumb: #555;
     --scrollbar-thumb-hover: #888;
+    --row-odd-bg: #1e1e1e;
 }
 
 ::-webkit-scrollbar {
@@ -210,17 +206,13 @@ body, html {
     font-size: 14px;
     padding: 4px 8px;
     white-space: nowrap;
-    overflow: visible;
-    /*text-overflow: ellipsis;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-width: max-content;
 }
 
 .process-view .process-row:nth-child(odd) {
     background-color: var(--row-odd-bg);
-}
-
-.process-view .process-row:nth-child(even) {
-    background-color: var(--row-even-bg);
 }
 
 .process-row.active {
