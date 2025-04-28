@@ -108,6 +108,14 @@ body, html {
     text-transform: capitalize !important;
 }
 
+.qr-box {
+    width: 266px;
+    height: 266px;
+    margin: 0 auto;
+    padding: 5px;
+    background: #fff;
+}
+
 .flex-between {
     display: flex;
     justify-content: space-between;
