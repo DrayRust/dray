@@ -71,7 +71,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         setOpen(false)
         if (scanner.current) {
             scanner.current.stop()
-            scanner.current.destroy()
+            // scanner.current.destroy()
         }
     }
     const handleStartCamera = () => {
@@ -83,17 +83,25 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         const videoEl = document.getElementById('qr-video') as HTMLVideoElement
         if (!videoEl) return
 
-        scanner.current = new QrScanner(videoEl, (r: any) => {
-            setText(r.data)
-            handleStopCamera()
-        }, {
-            onDecodeError: (() => {
-            }),
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-        })
-        scanner.current.setInversionMode('both')
-        scanner.current.start()
+        try {
+            if (!scanner.current) {
+                scanner.current = new QrScanner(videoEl, (r: any) => {
+                    setText(r.data)
+                    handleStopCamera()
+                }, {
+                    onDecodeError: (() => {
+                    }),
+                    maxScansPerSecond: 20,
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                })
+            }
+            // scanner.current.setInversionMode('both')
+            scanner.current.start()
+        } catch (e) {
+            showSnackbar('无法访问摄像头', 'error')
+            return
+        }
     }
 
     const {SnackbarComponent, showSnackbar, handleCloseSnackbar} = useSnackbar()
