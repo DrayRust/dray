@@ -60,7 +60,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 showSnackbar('没有识别到内容', 'error')
             }
         } catch (e) {
-            showSnackbar('从剪切板没有读取到内容', 'error')
+            showSnackbar('没有从剪切板读取到内容', 'error')
         }
     }
 
@@ -76,7 +76,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                         <Button variant="contained" color="secondary">选择二维码图片</Button>
                         <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleClose} onChange={handleFileChange}/>
                     </div>
-                    <Button variant="contained" color="success" onClick={handleReadClipboard}>读取剪切板图片</Button>
+                    <Button variant="contained" color="success" onClick={handleReadClipboard}>识别剪切板内的图片</Button>
                     <Button variant="contained" color="warning">通过摄像头识别</Button>
                 </Stack>
                 <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={text}
