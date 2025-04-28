@@ -116,6 +116,20 @@ body, html {
     background: #fff;
 }
 
+.qr-upload-but {
+    position: relative;
+}
+
+.qr-upload-but > input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
 .flex-between {
     display: flex;
     justify-content: space-between;
