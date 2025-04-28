@@ -23,18 +23,30 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     // =============== file import ===============
     const fileInputRef = useRef<HTMLInputElement>(null)
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
-            QrScanner.scanImage(file, {alsoTryWithoutScanRegion: true}).then(sr => {
-                setText(sr.data)
-            }).catch(() => {
-                showSnackbar('未识别到内容', 'warning')
-            })
+        setError(false)
+        const files = event.target.files
+        if (!files || files.length < 1) return
+
+        let ok = 0
+        let err = 0
+        let s = ''
+        for (const file of files) {
+            if (!file.type.startsWith('image/')) return
+            try {
+                let r = await QrScanner.scanImage(file, {alsoTryWithoutScanRegion: true})
+                s += r.data + '\n'
+                ok++
+            } catch (e) {
+                err++
+            }
         }
+
+        setText(s)
+        if (err > 0) showSnackbar(`识别失败 ${err} 张, 成功 ${ok} 张`, 'warning')
         event.target.value = ''
     }
 
-    const {SnackbarComponent, showSnackbar} = useSnackbar()
+    const {SnackbarComponent, showSnackbar, handleClose} = useSnackbar()
     const {AppBarComponent} = useAppBar('/server', '导入')
     return (<>
         <SnackbarComponent/>
@@ -44,7 +56,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
                     <div className="qr-upload-but">
                         <Button variant="contained" color="secondary">选择二维码图片</Button>
-                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange}/>
+                        <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleClose} onChange={handleFileChange}/>
                     </div>
                     <Button variant="contained" color="success">读取剪切板图片</Button>
                     <Button variant="contained" color="warning">通过摄像头识别</Button>
