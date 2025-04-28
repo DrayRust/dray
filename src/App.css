@@ -130,6 +130,12 @@ body, html {
     cursor: pointer;
 }
 
+#qr-video {
+    width: 520px;
+    height: 300px;
+    background: #121212;
+}
+
 .flex-between {
     display: flex;
     justify-content: space-between;

@@ -35,5 +35,5 @@ export const useSnackbar = (position?: 'br' | 'tr' | 'top') => {
         </Snackbar>
     )
 
-    return {SnackbarComponent, showSnackbar, handleClose}
+    return {SnackbarComponent, showSnackbar, handleCloseSnackbar: handleClose}
 }

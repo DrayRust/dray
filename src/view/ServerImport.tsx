@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import QrScanner from 'qr-scanner'
-import { Card, TextField, Button, Stack } from '@mui/material'
+import { Card, TextField, Button, Stack, Dialog, DialogContent, DialogActions } from '@mui/material'
 import { useDebounce } from '../hook/useDebounce.ts'
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { useAppBar } from "../component/useAppBar.tsx"
@@ -64,20 +64,60 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const {SnackbarComponent, showSnackbar, handleClose} = useSnackbar()
+    // =============== camera import ===============
+    const [open, setOpen] = useState(false)
+    let scanner = useRef<QrScanner | null>(null)
+    const handleStopCamera = () => {
+        setOpen(false)
+        if (scanner.current) {
+            scanner.current.stop()
+            scanner.current.destroy()
+        }
+    }
+    const handleStartCamera = () => {
+        setOpen(true)
+        setTimeout(() => startCamera(), 1000)
+    }
+
+    const startCamera = () => {
+        const videoEl = document.getElementById('qr-video') as HTMLVideoElement
+        if (!videoEl) return
+
+        scanner.current = new QrScanner(videoEl, (r: any) => {
+            setText(r.data)
+            handleStopCamera()
+        }, {
+            onDecodeError: (() => {
+            }),
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+        })
+        scanner.current.setInversionMode('both')
+        scanner.current.start()
+    }
+
+    const {SnackbarComponent, showSnackbar, handleCloseSnackbar} = useSnackbar()
     const {AppBarComponent} = useAppBar('/server', '导入')
     return (<>
         <SnackbarComponent/>
         <AppBarComponent/>
+        <Dialog open={open} onClose={handleStopCamera}>
+            <DialogContent>
+                <video id="qr-video"></video>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleStopCamera}>取消</Button>
+            </DialogActions>
+        </Dialog>
         <Card sx={{p: 2, mt: 1}}>
             <Stack spacing={2}>
                 <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
                     <div className="qr-upload-but">
                         <Button variant="contained" color="secondary">选择二维码图片</Button>
-                        <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleClose} onChange={handleFileChange}/>
+                        <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
                     </div>
                     <Button variant="contained" color="success" onClick={handleReadClipboard}>识别剪切板内的图片</Button>
-                    <Button variant="contained" color="warning">通过摄像头识别</Button>
+                    <Button variant="contained" color="warning" onClick={handleStartCamera}>通过摄像头识别</Button>
                 </Stack>
                 <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={text}
                            placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
