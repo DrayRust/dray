@@ -15,6 +15,10 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     // =============== text import ===============
     const [text, setText] = useState('')
     const [error, setError] = useState(false)
+    const handleTextChange = (value: string) => {
+        setError(false)
+        setText(value)
+    }
     const handleSubmit = useDebounce(async () => {
         await useServerImport(text, showSnackbar, setError, () => {
             setTimeout(() => navigate('/server'), 1000)
@@ -169,7 +173,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 </Stack>
                 <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={text}
                            placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
-                           onChange={(e) => setText(e.target.value)}/>
+                           onChange={(e) => handleTextChange(e.target.value)}/>
                 <Stack direction="row" spacing={1}>
                     <Button variant="contained" onClick={handleSubmit} disabled={!text}>确认</Button>
                 </Stack>
