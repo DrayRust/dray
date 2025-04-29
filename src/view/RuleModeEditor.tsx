@@ -385,7 +385,7 @@ export const RuleModeEditor = ({ruleModeList, setRuleModeList, ruleModeKey, setR
                                     className={sortKey > -1 ? (sortKey === key ? 'sort-current' : 'sort-target') : ''}
                                     onClick={() => handleSortEnd(key)}>
                                     <TableCell sx={{p: '6px 12px', maxWidth: '500px'}} component="th" scope="row">
-                                        <Typography variant="body1" component="div">{row.name}</Typography>
+                                        <Typography variant="body1" component="div">{key + 1}. {row.name}</Typography>
                                         <Typography variant="body2" sx={{color: 'text.secondary'}}>{row.note}</Typography>
                                     </TableCell>
                                     <TableCell sx={{p: '4px'}} width="240" align="right">
