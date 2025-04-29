@@ -226,7 +226,7 @@ export const SysInfo = () => {
                             <TableCell>网络上传总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.up)}</TableCell>
                         </TableRow>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell>网络下载总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
                         </TableRow>
