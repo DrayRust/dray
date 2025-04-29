@@ -112,7 +112,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             // scanner.current.setInversionMode('both')
             scanner.current.start()
         } catch (e) {
-            showSnackbar('访问摄像头失败', 'error')
+            setCameraState(-2)
             return
         }
     }
@@ -128,8 +128,10 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                     <div className="camera-box">正在检测摄像头</div>
                 ) : cameraState === 0 ? (
                     <div className="camera-box">未检测到摄像头，请检查设备或权限</div>
-                ) : cameraState === 1 && (
+                ) : cameraState === 1 ? (
                     <video id="camera-video"></video>
+                ) : cameraState === -2 && (
+                    <div className="camera-box">启用摄像头失败</div>
                 )}
             </DialogContent>
             <DialogActions sx={{px: 2, py: 1}}>
