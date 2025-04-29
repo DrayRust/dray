@@ -11,14 +11,13 @@ import FileCopyIcon from '@mui/icons-material/FileCopy'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SaveAltIcon from '@mui/icons-material/SaveAlt'
 
-import { save } from '@tauri-apps/plugin-dialog'
 import { useAppBar } from "../component/useAppBar.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
-import { log, readServerList, saveTextFile } from "../util/invoke.ts"
+import { readServerList, saveTextFile } from "../util/invoke.ts"
 import { serverRowToBase64Uri, serverRowToUri } from "../util/server.ts"
 import { getCurrentYMDHIS } from "../util/util.ts"
-import { clipboardWriteImage, clipboardWriteText, createImage } from "../util/tauri.ts"
+import { clipboardWriteImage, clipboardWriteText, createImage, showSaveDialog } from "../util/tauri.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 
 const ServerExport: React.FC<NavProps> = ({setNavState}) => {
@@ -87,7 +86,12 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
 
     // ==================== export text ====================
     const handleExportTextFile = async () => {
-        const path = await showSaveDialog()
+        const path = await showSaveDialog({
+            title: "Export Backup File",
+            filters: [{name: 'Text File', extensions: ['txt']}],
+            defaultPath: `dray_servers_${getCurrentYMDHIS()}.txt`,
+            canCreateDirectories: true,
+        })
         if (!path) return
 
         let content: string
@@ -99,20 +103,6 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
         }
         const ok = await saveTextFile(path, content)
         if (!ok) showSnackbar(`保存文件失败`, 'error')
-    }
-
-    const showSaveDialog = async () => {
-        try {
-            const path = await save({
-                title: "Export Backup File",
-                defaultPath: `dray_servers_${getCurrentYMDHIS()}.txt`,
-                filters: [{name: 'Text File', extensions: ['txt']}],
-            })
-            return path || ''
-        } catch (e) {
-            log.error(`Tauri save dialog error: ${e}`)
-            return ''
-        }
     }
 
     // ==================== copy uri ====================

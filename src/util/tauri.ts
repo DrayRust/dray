@@ -2,7 +2,19 @@ import { writeText, readText, readImage, writeImage } from '@tauri-apps/plugin-c
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
 import { revealItemInDir, openUrl as openUrlTauri } from '@tauri-apps/plugin-opener'
 import { Image } from '@tauri-apps/api/image'
+import { save, SaveDialogOptions } from '@tauri-apps/plugin-dialog'
 import { IS_TAURI, log } from "./invoke.ts"
+
+export async function showSaveDialog(options?: SaveDialogOptions) {
+    if (!IS_TAURI) return false
+    try {
+        const path = await save(options)
+        return path || ''
+    } catch (e) {
+        log.error(`Tauri save dialog error: ${e}`)
+        return ''
+    }
+}
 
 export async function createImage(rgba: number[] | Uint8Array | ArrayBuffer, width: number, height: number) {
     if (!IS_TAURI) return false
