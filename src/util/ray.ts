@@ -89,6 +89,7 @@ export async function saveRayStatsPort(rayConfig: any, rayCommonConfig: RayCommo
     if (typeof rayConfig === 'object' && rayConfig?.metrics?.listen) {
         rayConfig.metrics.listen = "127.0.0.1:" + rayCommonConfig.stats_port
     }
+    // rayConfig.metrics = {listen: "127.0.0.1:" + rayCommonConfig.stats_port}
     await saveAndRestart(rayConfig)
 }
 
