@@ -103,8 +103,8 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                 <div>{row.pid}</div>
                 <div>{row.user}</div>
                 <div>{row.status}</div>
-                <div>{sizeToUnit(row.memory)}</div>
                 <div>{formatFloat(row.cpu_usage, 1)}%</div>
+                <div>{sizeToUnit(row.memory)}</div>
                 <div>{formatTimestamp(row.start_time)}</div>
                 <div>{row.name}</div>
                 <div>
@@ -195,9 +195,9 @@ export const Process = ({handleClose}: { handleClose: () => void }) => {
                         <div>PID</div>
                         <div>用户</div>
                         <div>状态</div>
-                        <div>内存</div>
                         <div>CPU</div>
-                        <div>运行时间</div>
+                        <div>内存</div>
+                        <div>启动时间</div>
                         <div>进程名称</div>
                         <div>程序路径</div>
                     </div>

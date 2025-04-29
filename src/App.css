@@ -262,11 +262,11 @@ body, html {
 }
 
 .process-row > div:nth-child(4) {
-    flex: 0 0 100px;
+    flex: 0 0 70px;
 }
 
 .process-row > div:nth-child(5) {
-    flex: 0 0 70px;
+    flex: 0 0 100px;
 }
 
 .process-row > div:nth-child(6) {
