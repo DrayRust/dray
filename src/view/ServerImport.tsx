@@ -66,6 +66,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
 
     // =============== camera import ===============
     const [open, setOpen] = useState(false)
+    const [cameraState, setCameraState] = useState(-1)
     let scanner = useRef<QrScanner | null>(null)
     const handleStopCamera = () => {
         setOpen(false)
@@ -74,13 +75,26 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             // scanner.current.destroy()
         }
     }
-    const handleStartCamera = () => {
+    const handleStartCamera = async () => {
         setOpen(true)
-        setTimeout(() => startCamera(), 1000)
+
+        setCameraState(-1)
+        const hasCamera = await checkHasCamera()
+        setCameraState(hasCamera ? 1 : 0)
+
+        setTimeout(startCamera, 200)
+    }
+
+    const checkHasCamera = async () => {
+        try {
+            return await QrScanner.hasCamera()
+        } catch (e) {
+            return false
+        }
     }
 
     const startCamera = () => {
-        const videoEl = document.getElementById('qr-video') as HTMLVideoElement
+        const videoEl = document.getElementById('camera-video') as HTMLVideoElement
         if (!videoEl) return
 
         try {
@@ -98,7 +112,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             // scanner.current.setInversionMode('both')
             scanner.current.start()
         } catch (e) {
-            showSnackbar('无法访问摄像头', 'error')
+            showSnackbar('访问摄像头失败', 'error')
             return
         }
     }
@@ -110,7 +124,13 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         <AppBarComponent/>
         <Dialog open={open} onClose={handleStopCamera}>
             <DialogContent sx={{p: 2, pb: 0}}>
-                <video id="qr-video"></video>
+                {cameraState === -1 ? (
+                    <div className="camera-box">正在检测摄像头</div>
+                ) : cameraState === 0 ? (
+                    <div className="camera-box">未检测到摄像头，请检查设备或权限</div>
+                ) : cameraState === 1 && (
+                    <video id="camera-video"></video>
+                )}
             </DialogContent>
             <DialogActions sx={{px: 2, py: 1}}>
                 <Button variant="contained" onClick={handleStopCamera}>取消</Button>
@@ -123,8 +143,8 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                         <Button variant="contained" color="secondary">选择二维码图片</Button>
                         <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
                     </div>
-                    <Button variant="contained" color="success" onClick={handleReadClipboard}>识别剪切板内的图片</Button>
-                    <Button variant="contained" color="warning" onClick={handleStartCamera}>通过摄像头识别</Button>
+                    <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
+                    <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
                 </Stack>
                 <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={text}
                            placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}

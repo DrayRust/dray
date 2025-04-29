@@ -130,11 +130,14 @@ body, html {
     cursor: pointer;
 }
 
-#qr-video {
-    display: block;
+#camera-video, .camera-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 520px;
     height: 292px;
     background: #121212;
+    color: #fff;
 }
 
 .flex-between {
