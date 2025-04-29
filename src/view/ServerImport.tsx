@@ -141,10 +141,10 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         <Card sx={{p: 2, mt: 1}}>
             <Stack spacing={2}>
                 <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
-                    <div className="qr-upload-but">
-                        <Button variant="contained" color="secondary">选择二维码图片</Button>
+                    <Button variant="contained" color="secondary" className="qr-upload-but">
                         <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
-                    </div>
+                        选择二维码图片
+                    </Button>
                     <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
                     <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
                 </Stack>
