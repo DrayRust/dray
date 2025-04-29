@@ -4,6 +4,9 @@ import {
     Card, Paper, Stack, Typography, Switch,
     TableContainer, Table, TableBody, TableCell, TableRow,
 } from '@mui/material'
+import InputIcon from '@mui/icons-material/Input'
+import OutputIcon from '@mui/icons-material/Output'
+
 import { fetchGet, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { sizeToUnit } from "../util/util.ts"
@@ -105,8 +108,8 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={2}
                                   value={boundType}
                                   onChange={(_, v) => setBoundType(v)}>
-                    <BottomNavigationAction value="inbound" label="传入流量"/>
-                    <BottomNavigationAction value="outbound" label="传出流量"/>
+                    <BottomNavigationAction value="inbound" label="流入数据" icon={<InputIcon/>}/>
+                    <BottomNavigationAction value="outbound" label="流出数据" icon={<OutputIcon/>}/>
                 </BottomNavigation>
 
                 {boundType === 'inbound' && inbound && (
