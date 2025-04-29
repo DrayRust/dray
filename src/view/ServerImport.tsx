@@ -50,9 +50,15 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     // =============== clipboard import ===============
     const handleReadClipboard = async () => {
         try {
-            const clipboardImage = await clipboardReadImage()
-            const blob = new Blob([await clipboardImage.rgba()], {type: 'image'})
-            const url = URL.createObjectURL(blob)
+            const image = await clipboardReadImage()
+            const imgRgba = await image.rgba()
+            const imgSize = await image.size()
+            const url = createImageFromRGBA(imgRgba, imgSize.width, imgSize.height)
+            if (!url) {
+                showSnackbar('转 canvas 出错', 'error')
+                return
+            }
+
             try {
                 let r = await QrScanner.scanImage(url, {alsoTryWithoutScanRegion: true})
                 setText(r.data)
@@ -62,6 +68,18 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         } catch (e) {
             showSnackbar('没有从剪切板读取到内容', 'error')
         }
+    }
+
+    const createImageFromRGBA = (rgbaData: Uint8Array, width: number, height: number) => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return ''
+
+        canvas.width = width
+        canvas.height = height
+        const imageData = new ImageData(new Uint8ClampedArray(rgbaData), width, height)
+        ctx.putImageData(imageData, 0, 0)
+        return canvas.toDataURL('image/png')
     }
 
     // =============== camera import ===============
@@ -140,6 +158,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         </Dialog>
         <Card sx={{p: 2, mt: 1}}>
             <Stack spacing={2}>
+                <div id="abc"></div>
                 <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
                     <Button variant="contained" color="secondary" className="qr-upload-but">
                         <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
