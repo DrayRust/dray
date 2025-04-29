@@ -1,7 +1,18 @@
-import { writeText, readText, readImage } from '@tauri-apps/plugin-clipboard-manager'
+import { writeText, readText, readImage, writeImage } from '@tauri-apps/plugin-clipboard-manager'
 import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
 import { revealItemInDir, openUrl as openUrlTauri } from '@tauri-apps/plugin-opener'
+import { Image } from '@tauri-apps/api/image'
 import { IS_TAURI, log } from "./invoke.ts"
+
+export async function createImage(rgba: number[] | Uint8Array | ArrayBuffer, width: number, height: number) {
+    if (!IS_TAURI) return false
+    try {
+        return await Image.new(rgba, width, height)
+    } catch (err) {
+        log.error('Failed to createImage:', err)
+        return false
+    }
+}
 
 export async function clipboardWriteText(text: string) {
     if (!IS_TAURI) return false
@@ -9,6 +20,18 @@ export async function clipboardWriteText(text: string) {
         await writeText(text)
         return true
     } catch (err) {
+        log.error('Failed to clipboardWriteText:', err)
+        return false
+    }
+}
+
+export async function clipboardWriteImage(image: string | Image | Uint8Array | ArrayBuffer | number[]) {
+    if (!IS_TAURI) return false
+    try {
+        await writeImage(image)
+        return true
+    } catch (err) {
+        log.error('Failed to clipboardWriteImage:', err)
         return false
     }
 }
