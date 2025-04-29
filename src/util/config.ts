@@ -18,7 +18,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
 
 export const DEFAULT_RAY_COMMON_CONFIG: RayCommonConfig = {
     ray_log_level: "warning",
+
     stats_enable: true,
+    stats_port: 18688,
 
     socks_enable: true,
     http_enable: true,

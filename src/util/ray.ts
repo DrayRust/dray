@@ -79,9 +79,17 @@ export async function saveRayStatsEnable(value: boolean, rayCommonConfig: RayCom
         delete c.policy
         // delete c?.policy?.system
     } else {
-        c = {...c, ...getStatsConf()}
+        c = {...c, ...getStatsConf(Number(rayCommonConfig.stats_port))}
     }
     await saveAndRestart(c)
+}
+
+export async function saveRayStatsPort(rayConfig: any, rayCommonConfig: RayCommonConfig) {
+    await saveRayCommonConfig(rayCommonConfig)
+    if (typeof rayConfig === 'object' && rayConfig?.metrics?.listen) {
+        rayConfig.metrics.listen = "127.0.0.1:" + rayCommonConfig.stats_port
+    }
+    await saveAndRestart(rayConfig)
 }
 
 export async function saveRayHost(host: string) {

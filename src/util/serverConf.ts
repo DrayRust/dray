@@ -6,7 +6,7 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     conf.log = getLogConf(appDir, rayConfig)
     conf.inbounds = getInboundsConf(config, rayConfig)
     conf.outbounds = getOutboundsConf(row, rayConfig)
-    if (rayConfig.stats_enable) conf = {...conf, ...getStatsConf()}
+    if (rayConfig.stats_enable) conf = {...conf, ...getStatsConf(Number(rayConfig.stats_port))}
     return conf
 }
 
@@ -65,7 +65,7 @@ export function getOutboundsConf(row: ServerRow, rayConfig: RayCommonConfig) {
     ]
 }
 
-export function getStatsConf() {
+export function getStatsConf(statsPort: number) {
     return {
         // https://xtls.github.io/config/stats.html
         "stats": {},
@@ -75,9 +75,8 @@ export function getStatsConf() {
         // 命令行 curl http://127.0.0.1:11111/debug/vars
         // https://xtls.github.io/config/metrics.html
         "metrics": {
-            // "tag": "api",
             // "tag": "Metrics",
-            "listen": "127.0.0.1:11111"
+            "listen": "127.0.0.1:" + statsPort
         },
 
         // https://xtls.github.io/config/policy.html

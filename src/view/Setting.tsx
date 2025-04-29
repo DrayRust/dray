@@ -19,10 +19,10 @@ import { validateIp, validatePort } from '../util/util.ts'
 import {
     checkPortAvailable,
     readAppConfig, setAppConfig, readRayCommonConfig,
-    openWebServerDir,
+    openWebServerDir, readRayConfig,
 } from '../util/invoke.ts'
 import {
-    saveRayLogLevel, saveRayStatsEnable,
+    saveRayLogLevel, saveRayStatsEnable, saveRayStatsPort,
     saveRayHost, saveRaySocksPort, saveRayHttpPort,
     saveRaySocksEnable, saveRayHttpEnable,
     saveRaySocksUdp,
@@ -123,6 +123,32 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const newConf = {...rayCommonConfig, stats_enable: value}
         setRayCommonConfig(newConf)
         await saveRayStatsEnable(value, newConf)
+    }
+
+    const [rayStatsPortError, setRayStatsPortError] = useState(false)
+    const [rayStatsPortErrorText, setRayStatsPortErrorText] = useState('')
+    const saveRayStatsPortDebounce = useDebounce(async (value: number, rayCommonConfig: RayCommonConfig) => {
+        let rayConfig = await readRayConfig()
+        if (rayConfig?.stats_port !== value) {
+            const ok = await checkPortAvailable(value)
+            setRayStatsPortError(!ok)
+            !ok && setRayStatsPortErrorText('本机端口不可用')
+            if (ok) {
+                setRayStatsPortErrorText('')
+                if (value) await saveRayStatsPort(rayConfig, rayCommonConfig)
+            }
+        }
+    }, 1500)
+    const handleRayStatsPort = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(event.target.value) || 0
+        const newConf = {...rayCommonConfig, stats_port: value || ""} as RayCommonConfig
+        setRayCommonConfig(newConf)
+
+        setRayStatsPortErrorText('')
+        const ok = validatePort(value)
+        setRayStatsPortError(!ok)
+        !ok && setRayStatsPortErrorText('请输入有效的端口号 (1-65535)')
+        if (ok) saveRayStatsPortDebounce(value, newConf)
     }
 
     // ================================== ray host & port ==================================
@@ -394,6 +420,19 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <Typography variant="body1" sx={{pl: 1}}>流量统计</Typography>
                             <Switch checked={rayCommonConfig.stats_enable} onChange={e => handleRayStatsEnable(e.target.checked)}/>
                         </div>
+                        {rayCommonConfig.stats_enable && (
+                            <Stack direction="row" sx={{p: 2, pt: 0}}>
+                                <TextField
+                                    fullWidth
+                                    label="API 端口"
+                                    variant="standard"
+                                    value={rayCommonConfig.stats_port}
+                                    onChange={handleRayStatsPort}
+                                    error={rayStatsPortError}
+                                    helperText={rayStatsPortErrorText}
+                                />
+                            </Stack>
+                        )}
                         <Divider/>
                         <Stack direction="row" spacing={2} sx={{p: 2}}>
                             <TextField
@@ -406,7 +445,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                                 sx={{flex: 'auto'}}
                             />
                         </Stack>
-                        <Stack direction="row" spacing={2} sx={{p: 2, pt: 1}}>
+                        <Stack direction="row" spacing={2} sx={{p: 2, pt: 0}}>
                             <TextField
                                 label="SOCKS 端口"
                                 variant="standard"
