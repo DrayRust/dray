@@ -279,6 +279,12 @@ export const Dns = () => {
         setTimeout(() => setIsCopied(false), 2000)
     }
 
+    // ============================== close dialog ==============================
+    const handleClose = (_?: any, reason?: string) => {
+        if (reason === 'backdropClick') return
+        handleBack()
+    }
+
     const widthSx = {p: 2, minWidth: 580}
 
     const {AlertDialogComponent, showAlertDialog} = useAlertDialog()
@@ -325,7 +331,7 @@ export const Dns = () => {
                 </Alert>
             </Stack>
         </> : dnsNav === 1 ? <>
-            <Dialog open={action !== ''}>
+            <Dialog open={action !== ''} onClose={handleClose}>
                 {action === 'create' ? (
                     <Stack spacing={2} sx={widthSx}>
                         <Stack spacing={2} component={Card} elevation={5} sx={{p: 1}}>
