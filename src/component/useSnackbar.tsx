@@ -7,8 +7,8 @@ export const useSnackbar = (position?: 'br' | 'tr' | 'top') => {
     const [autoHideDuration, setAutoHideDuration] = useState<number>(3000)
     const [severity, setSeverity] = useState<'success' | 'info' | 'warning' | 'error'>('info')
 
-    const handleClose = (_?: any, _reason?: string) => {
-        // if (_reason === 'clickaway') return
+    const handleClose = (_?: any, reason?: string) => {
+        if (reason === 'clickaway') return
         setOpen(false)
     }
 
