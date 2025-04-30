@@ -37,17 +37,19 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
-    const rayConfRef = useRef<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
+    const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const initConf = useDebounce(async () => {
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
         setRayEnable(rayEnable)
 
-        const rayConf = await readRayCommonConfig()
+        let rayConf = await readRayCommonConfig()
         if (rayConf) {
-            rayConfRef.current = rayConf
-            if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port)
+            setRayCommonConfig(rayConf)
+        } else {
+            rayConf = rayCommonConfig
         }
+        if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port)
 
         await getSysInfo()
         await getNetworkData()
@@ -93,8 +95,8 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
                 await getNetworkData()
 
-                if (rayEnable && rayConfRef.current.stats_enable) {
-                    await loadStats(rayConfRef.current.stats_port)
+                if (rayEnable && rayCommonConfig.stats_enable) {
+                    await loadStats(rayCommonConfig.stats_port)
                 }
             }, 1000)
         }
@@ -192,12 +194,12 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     </Table>
                 </TableContainer>
 
-                {rayEnable && (<>
+                {rayEnable && rayCommonConfig.stats_enable && (<>
                     <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={2}
                                       value={boundType}
                                       onChange={(_, v) => setBoundType(v)}>
-                        <BottomNavigationAction value="inbound" label="流入数据" icon={<InputIcon/>}/>
-                        <BottomNavigationAction value="outbound" label="流出数据" icon={<OutputIcon/>}/>
+                        <BottomNavigationAction value="inbound" label="入站数据" icon={<InputIcon/>}/>
+                        <BottomNavigationAction value="outbound" label="出站数据" icon={<OutputIcon/>}/>
                     </BottomNavigation>
 
                     {boundType === 'inbound' && (
