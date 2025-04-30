@@ -25,7 +25,7 @@ import { useServerImport } from "../component/useServerImport.tsx"
 import {
     readAppConfig, readRayCommonConfig, saveRayConfig, getDrayAppDir,
     restartRay, readServerList, saveServerList, readRuleConfig, readRuleDomain,
-    readRuleModeList, readDnsConfig, readDnsModeList,
+    readRuleModeList, readDnsConfig, readDnsModeList, setAppConfig,
 } from "../util/invoke.ts"
 import { getConf } from "../util/serverConf.ts"
 import {
@@ -149,7 +149,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setSelectedKey(-1)
     }
 
-    // ============================== enable ==============================
+    // ============================== init config ==============================
     // 必须放内部，否则不会读取最新配置文件
     let appDir = useRef<string>('')
     let config = useRef<AppConfig | null>(null)
@@ -193,6 +193,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    // ============================== enable ==============================
     const handleEnable = async () => {
         // if (serverList?.[selectedKey]?.on) {
         //     handleMenuClose()
@@ -201,9 +202,20 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
         await getServerConf(async (conf) => {
             const ok = await saveRayConfig(conf)
-            if (ok) {
-                const setOk = await setServerEnable(selectedKey)
-                setOk && await restartRay()
+            if (!ok) return
+
+            const setOk = await setServerEnable(selectedKey)
+            if (setOk) {
+                const conf = config.current
+                if (!conf) return
+
+                if (conf.ray_enable) {
+                    // 如果开启，则重启服务
+                    await restartRay()
+                } else {
+                    // 如果没有开启，则开启
+                    setAppConfig('set_ray_enable', true)
+                }
             }
         })
         handleMenuClose()
