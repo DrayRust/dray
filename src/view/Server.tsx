@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery,
@@ -153,34 +153,34 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     // ============================== enable ==============================
     // 必须放内部，否则不会读取最新配置文件
-    let appDir: string
-    let config: AppConfig
-    let rayCommonConfig: RayCommonConfig
-    let ruleConfig: RuleConfig
-    let ruleDomain: RuleDomain
-    let ruleModeList: RuleModeList
-    let dnsConfig: DnsConfig
-    let dnsModeList: DnsModeList
+    let appDir = useRef<string>('')
+    let config = useRef<AppConfig>(DEFAULT_APP_CONFIG)
+    let rayCommonConfig = useRef<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
+    let ruleConfig = useRef<RuleConfig>(DEFAULT_RULE_CONFIG)
+    let ruleDomain = useRef<RuleDomain>(DEFAULT_RULE_DOMAIN)
+    let ruleModeList = useRef<RuleModeList>(DEFAULT_RULE_MODE_LIST)
+    let dnsConfig = useRef<DnsConfig>(DEFAULT_DNS_CONFIG)
+    let dnsModeList = useRef<DnsModeList>(DEFAULT_DNS_MODE_LIST)
     const initConfig = async () => {
-        if (!appDir) appDir = await getDrayAppDir()
-        if (!config) config = await readAppConfig() || DEFAULT_APP_CONFIG
-        if (!rayCommonConfig) rayCommonConfig = await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
+        if (!appDir.current) appDir.current = await getDrayAppDir()
+        if (!config.current) config.current = await readAppConfig() || DEFAULT_APP_CONFIG
+        if (!rayCommonConfig.current) rayCommonConfig.current = await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
 
-        if (!ruleConfig) ruleConfig = await readRuleConfig() || DEFAULT_RULE_CONFIG
-        if (!ruleDomain) ruleDomain = await readRuleDomain() || DEFAULT_RULE_DOMAIN
-        if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
+        if (!ruleConfig.current) ruleConfig.current = await readRuleConfig() || DEFAULT_RULE_CONFIG
+        if (!ruleDomain.current) ruleDomain.current = await readRuleDomain() || DEFAULT_RULE_DOMAIN
+        if (!ruleModeList.current) ruleModeList.current = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
 
-        if (!dnsConfig) dnsConfig = await readDnsConfig() || DEFAULT_DNS_CONFIG
-        if (!dnsModeList) dnsModeList = await readDnsModeList() || DEFAULT_DNS_MODE_LIST
+        if (!dnsConfig.current) dnsConfig.current = await readDnsConfig() || DEFAULT_DNS_CONFIG
+        if (!dnsModeList.current) dnsModeList.current = await readDnsModeList() || DEFAULT_DNS_MODE_LIST
     }
 
     const getServerConf = async (callback: (conf: any) => void) => {
         await initConfig()
-        if (serverList?.[selectedKey] && appDir && config && rayCommonConfig) {
-            const conf = getConf(serverList[selectedKey], appDir, config, rayCommonConfig)
+        if (serverList?.[selectedKey] && appDir.current && config.current && rayCommonConfig.current) {
+            const conf = getConf(serverList[selectedKey], appDir.current, config.current, rayCommonConfig.current)
             if (conf) {
-                const dns = dnsToConf(dnsConfig, dnsModeList)
-                const routing = ruleToConf(ruleConfig, ruleDomain, ruleModeList)
+                const dns = dnsToConf(dnsConfig.current, dnsModeList.current)
+                const routing = ruleToConf(ruleConfig.current, ruleDomain.current, ruleModeList.current)
                 callback({...conf, ...dns, ...routing})
             } else {
                 showSnackbar('生成 conf 失败', 'error')
@@ -288,7 +288,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const testServerSpeed = async (server: ServerRow, port: number) => {
         setServersSpeedTest(server.id, 'testStart')
-        const {result, elapsed} = await serverSpeedTest(server, appDir, port)
+        const {result, elapsed} = await serverSpeedTest(server, appDir.current, port)
         if (!result?.ok) {
             setServersSpeedTest(server.id, 'testError')
         } else {
