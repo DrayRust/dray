@@ -14,11 +14,14 @@ fn get_default_proxy_url() -> Option<String> {
     Some(format!("socks5://{}:{}", config.ray_host, config.ray_socks_port))
 }
 
-pub async fn fetch_get(url: &str, is_proxy: bool) -> String {
+pub async fn fetch_get(url: &str, is_proxy: bool) -> Value {
     let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
     match get_with_proxy(url, proxy_url.as_deref()).await {
-        Ok(html) => html.to_string(),
-        Err(_) => String::new(),
+        Ok(html) => json!({"success": true, "html": html.to_string()}),
+        Err(e) => {
+            error!("{}", e);
+            json!({"success": false, "msg": e})
+        }
     }
 }
 
