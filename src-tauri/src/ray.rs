@@ -233,7 +233,7 @@ pub fn get_ray_version() -> String {
         Ok(output) => {
             if output.status.success() {
                 let stdout = String::from_utf8_lossy(&output.stdout);
-                trace!("Ray version output: {}", stdout);
+                // trace!("Ray version output: {}", stdout);
                 stdout.lines().next().unwrap_or("").trim().to_string()
             } else {
                 let stderr = String::from_utf8_lossy(&output.stderr);
