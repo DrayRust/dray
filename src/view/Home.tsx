@@ -37,21 +37,32 @@ interface XrayVersionInfo {
     go: string;
 }
 
+let versionInfo = {
+    dray: '',
+    rust: '',
+    xray: '',
+    go: ''
+}
+
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
-
-    const [version, setVersion] = useState<any>({})
-    const [rayVersion, setRayVersion] = useState<XrayVersionInfo>()
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const initConf = useDebounce(async () => {
-        const version = await safeInvoke('get_version')
-        if (version) setVersion(version)
+        if (!versionInfo.dray) {
+            const version = await safeInvoke('get_version')
+            if (version) {
+                versionInfo.dray = version.dray || ''
+                versionInfo.rust = getRustVersion(version.rustc || '')
+            }
 
-        const rayVersion = await invokeString('get_ray_version')
-        if (rayVersion) setRayVersion(parseXrayVersion(rayVersion))
+            const rayVersion = await invokeString('get_ray_version')
+            if (rayVersion) {
+                versionInfo = {...versionInfo, ...parseXrayVersion(rayVersion)}
+            }
+        }
 
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
@@ -188,10 +199,10 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell>CPU 架构</TableCell><TableCell align="right">{sysInfo.cpu_arch}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>Dray 版本</TableCell><TableCell align="right">{version.dray}</TableCell>
+                                <TableCell>Dray 版本</TableCell><TableCell align="right">{versionInfo.dray}</TableCell>
                             </TableRow>
                             <TableRow sx={lastSx}>
-                                <TableCell>Rust 版本</TableCell><TableCell align="right">{getRustVersion(version.rustc || '')}</TableCell>
+                                <TableCell>Rust 版本</TableCell><TableCell align="right">{versionInfo.rust}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -321,10 +332,10 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                         <Table size="small">
                             <TableBody>
                                 <TableRow>
-                                    <TableCell>Xray 版本</TableCell><TableCell align="right">{rayVersion?.xray}</TableCell>
+                                    <TableCell>Xray 版本</TableCell><TableCell align="right">{versionInfo.xray}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell>Golang 版本</TableCell><TableCell align="right">{rayVersion?.go}</TableCell>
+                                    <TableCell>Golang 版本</TableCell><TableCell align="right">{versionInfo.go}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>当前内存使用</TableCell>
