@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
     BottomNavigation, BottomNavigationAction,
     Card, Paper, Stack, Typography, Switch,
@@ -7,9 +7,10 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { fetchGet, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
+import { fetchGet, getNetworksJson, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { sizeToUnit } from "../util/util.ts"
+import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -40,6 +41,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         const appConf = await readAppConfig()
         if (appConf) setRayEnable(appConf.ray_enable)
 
+        await getNetworkData()
         await statsData()
     }, 100)
     useEffect(initConf, [])
@@ -58,6 +60,22 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             console.log(obj.stats)
         } catch (err) {
             log.error(`Failed to debug vars json parse:`, err)
+        }
+    }
+
+    // ==================================== network ====================================
+    const [network, setNetwork] = useState<any>([])
+    const [networkSpeed, setNetworkSpeed] = useState({upSpeed: 0, downSpeed: 0})
+    const prevNetworkRef = useRef({up: 0, down: 0})
+
+    const getNetworkData = async () => {
+        let currentNetwork = await getNetworksJson()
+        if (currentNetwork) {
+            const net = sumNetworks(currentNetwork)
+            setNetwork(net)
+            const speed = calculateNetworkSpeed(prevNetworkRef.current, net)
+            setNetworkSpeed(speed)
+            prevNetworkRef.current = net
         }
     }
 
@@ -104,6 +122,44 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
                     <Switch checked={rayEnable} onChange={handleRayEnable} sx={{transform: 'scale(1.3)'}}/>
                 </Stack>
+
+                <TableContainer elevation={2} component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>当前上传速率</TableCell>
+                                <TableCell align="right">{sizeToUnit(networkSpeed.upSpeed)}/s</TableCell>
+                            </TableRow>
+                            <TableRow sx={lastSx}>
+                                <TableCell>当前下载速率</TableCell>
+                                <TableCell align="right">{sizeToUnit(networkSpeed.downSpeed)}/s</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                <TableContainer elevation={2} component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>网络上传总量</TableCell>
+                                <TableCell align="right">{sizeToUnit(network.up)}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>网络下载总量</TableCell>
+                                <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>回环流出总量</TableCell>
+                                <TableCell align="right">{sizeToUnit(network.loUp)}</TableCell>
+                            </TableRow>
+                            <TableRow sx={lastSx}>
+                                <TableCell>回环流入总量</TableCell>
+                                <TableCell align="right">{sizeToUnit(network.loDown)}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={2}
                                   value={boundType}
