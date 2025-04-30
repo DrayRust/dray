@@ -50,7 +50,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
-    const initConf = useDebounce(async () => {
+    const loadConfig = useDebounce(async () => {
         if (!versionInfo.dray) {
             const version = await safeInvoke('get_version')
             if (version) {
@@ -79,7 +79,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         await getSysInfo()
         await getNetworkData()
     }, 100)
-    useEffect(initConf, [])
+    useEffect(loadConfig, [])
 
     // ==================================== version ====================================
     const getRustVersion = (input: string): string => {
