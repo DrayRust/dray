@@ -53,7 +53,7 @@ export async function getDrayAppDir(): Promise<string> {
 }
 
 export async function fetchGet(url: string, isProxy: boolean = false) {
-    return await invokeString('fetch_get', {url, isProxy})
+    return await safeInvoke('fetch_get', {url, isProxy})
 }
 
 export async function fetchProxyGet(url: string, proxyUrl: string) {

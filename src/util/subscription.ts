@@ -4,13 +4,13 @@ import { hashJson } from "./crypto.ts"
 import { generateUniqueId } from "./util.ts"
 
 export async function getSubscription(row: SubscriptionRow) {
-    const s = await fetchGet(row.url, row.isProxy)
-    if (s) {
+    const r = await fetchGet(row.url, row.isProxy)
+    if (r && r.ok) {
         if (row.isHtml) {
-            await parseHtml(s, row.name)
+            await parseHtml(r.text, row.name)
         } else {
             try {
-                const obj = JSON.parse(s)
+                const obj = JSON.parse(r.text)
                 await parseJson(obj, row.name)
             } catch (err) {
                 log.error(`${row.name}, failed to subscription parseJson:`, err)
