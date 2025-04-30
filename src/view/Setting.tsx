@@ -52,17 +52,16 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     const [autoStart, setAutoStart] = useState(false)
     const [config, setConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
-    useEffect(() => {
-        (async () => {
-            setAutoStart(await isAutoStartEnabled())
+    const loadConfig = useDebounce(async () => {
+        setAutoStart(await isAutoStartEnabled())
 
-            const newConfig = await readAppConfig()
-            if (newConfig) setConfig({...DEFAULT_APP_CONFIG, ...newConfig})
+        const newConfig = await readAppConfig()
+        if (newConfig) setConfig({...DEFAULT_APP_CONFIG, ...newConfig})
 
-            const newRayCommonConfig = await readRayCommonConfig()
-            if (newRayCommonConfig) setRayCommonConfig({...DEFAULT_RAY_COMMON_CONFIG, ...newRayCommonConfig})
-        })()
-    }, [])
+        const newRayCommonConfig = await readRayCommonConfig()
+        if (newRayCommonConfig) setRayCommonConfig({...DEFAULT_RAY_COMMON_CONFIG, ...newRayCommonConfig})
+    }, 100)
+    useEffect(loadConfig, [])
 
     const handleAutoStart = async (value: boolean) => {
         setAutoStart(value)

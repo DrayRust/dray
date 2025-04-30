@@ -97,6 +97,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             // scanner.current.destroy()
         }
     }
+
     const handleStartCamera = async () => {
         setOpen(true)
 

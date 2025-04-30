@@ -21,6 +21,7 @@ import { formatUrl, isValidUrl } from "../util/util.ts"
 import { getSubscription } from "../util/subscription.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const DEFAULT_SUBSCRIPTION_ROW: SubscriptionRow = {
     name: '',
@@ -40,13 +41,12 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
     const [loading, setLoading] = useState(true)
     const [subscriptionList, setSubscriptionList] = useState<SubscriptionList>([])
     const [subscriptionChecked, setSubscriptionChecked] = useState<number[]>([])
-    useEffect(() => {
-        (async () => {
-            const tableList = await readSubscriptionList() as SubscriptionList
-            if (tableList) setSubscriptionList(tableList)
-            setLoading(false)
-        })()
-    }, [])
+    const loadList = useDebounce(async () => {
+        const tableList = await readSubscriptionList() as SubscriptionList
+        if (tableList) setSubscriptionList(tableList)
+        setLoading(false)
+    }, 100)
+    useEffect(loadList, [])
 
     const [action, setAction] = useState('')
     const [row, setRow] = useState<SubscriptionRow>(DEFAULT_SUBSCRIPTION_ROW)
