@@ -17,20 +17,20 @@ fn get_default_proxy_url() -> Option<String> {
 pub async fn fetch_get(url: &str, is_proxy: bool) -> Value {
     let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
     match get_with_proxy(url, proxy_url.as_deref()).await {
-        Ok(html) => json!({"success": true, "html": html.to_string()}),
+        Ok(html) => json!({"ok": true, "html": html.to_string()}),
         Err(e) => {
             error!("{}", e);
-            json!({"success": false, "msg": e})
+            json!({"ok": false, "errMsg": e})
         }
     }
 }
 
 pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
     match get_with_proxy(url, Some(proxy_url)).await {
-        Ok(html) => json!({"success": true, "html": html.to_string()}),
+        Ok(html) => json!({"ok": true, "html": html.to_string()}),
         Err(e) => {
             error!("{}", e);
-            json!({"success": false, "msg": e})
+            json!({"ok": false, "errMsg": e})
         }
     }
 }
