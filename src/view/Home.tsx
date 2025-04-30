@@ -7,10 +7,10 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { fetchGet, getNetworksJson, getSysInfoJson, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
+import { getNetworksJson, getSysInfoJson, readAppConfig, readRayCommonConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
-import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
+import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 
 interface Inbound {
@@ -36,32 +36,30 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
-    const [inbound, setInbound] = useState<Inbound | null>()
-    const [outbound, setOutbound] = useState<Outbound | null>()
+    const statsPortRef = useRef(0)
     const initConf = useDebounce(async () => {
         const appConf = await readAppConfig()
-        if (appConf) setRayEnable(appConf.ray_enable)
+        const rayEnable = Boolean(appConf && appConf.ray_enable)
+        setRayEnable(rayEnable)
+
+        const rayConf = await readRayCommonConfig()
+        statsPortRef.current = rayConf?.stats_port || 0
+        if (rayEnable && statsPortRef.current > 0) await loadStats(statsPortRef.current)
 
         await getSysInfo()
         await getNetworkData()
-        await statsData()
     }, 100)
     useEffect(initConf, [])
 
-    async function statsData() {
-        try {
-            const s = await fetchGet('http://127.0.0.1:18686/debug/vars')
-            if (!s) return
-
-            const obj = JSON.parse(s)
-            if (obj.stats) {
-                const {inbound, outbound} = formatStats(obj.stats)
-                setInbound(inbound)
-                setOutbound(outbound)
-            }
-            console.log(obj.stats)
-        } catch (err) {
-            log.error(`Failed to debug vars json parse:`, err)
+    // ==================================== stats ====================================
+    const [boundType, setBoundType] = useState('outbound')
+    const [inbound, setInbound] = useState<Inbound | null>()
+    const [outbound, setOutbound] = useState<Outbound | null>()
+    const loadStats = async (port: number) => {
+        const r = await getStatsData(port) as any
+        if (r) {
+            r.inbound && setInbound(r.inbound)
+            r.outbound && setOutbound(r.outbound)
         }
     }
 
@@ -89,8 +87,8 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 const runTime = Math.floor(Date.now() / 1000) - bootTime
                 setRunTime(Math.max(0, runTime))
 
+                await loadStats(statsPortRef.current)
                 await getNetworkData()
-                await statsData()
             }, 1000)
         }
         return () => clearInterval(intervalRef.current)
@@ -109,35 +107,6 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             const speed = calculateNetworkSpeed(prevNetworkRef.current, net)
             setNetworkSpeed(speed)
             prevNetworkRef.current = net
-        }
-    }
-
-    // ==================================== stats ====================================
-    const [boundType, setBoundType] = useState('outbound')
-    const formatStats = (input: any) => {
-        const safeGet = (obj: any, path: string) => {
-            return path.split('.').reduce((acc, part) => {
-                return acc && acc[part] !== undefined ? acc[part] : 0
-            }, obj)
-        }
-
-        return {
-            inbound: {
-                totalUp: safeGet(input, 'inbound.http-in.uplink') + safeGet(input, 'inbound.socks-in.uplink'),
-                totalDown: safeGet(input, 'inbound.http-in.downlink') + safeGet(input, 'inbound.socks-in.downlink'),
-                httpUp: safeGet(input, 'inbound.http-in.uplink'),
-                httpDown: safeGet(input, 'inbound.http-in.downlink'),
-                socksUp: safeGet(input, 'inbound.socks-in.uplink'),
-                socksDown: safeGet(input, 'inbound.socks-in.downlink'),
-            },
-            outbound: {
-                totalUp: safeGet(input, 'outbound.proxy.uplink') + safeGet(input, 'outbound.direct.uplink'),
-                totalDown: safeGet(input, 'outbound.proxy.downlink') + safeGet(input, 'outbound.direct.downlink'),
-                proxyUp: safeGet(input, 'outbound.proxy.uplink'),
-                proxyDown: safeGet(input, 'outbound.proxy.downlink'),
-                directUp: safeGet(input, 'outbound.direct.uplink'),
-                directDown: safeGet(input, 'outbound.direct.downlink'),
-            }
         }
     }
 
@@ -216,78 +185,80 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     </Table>
                 </TableContainer>
 
-                <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={2}
-                                  value={boundType}
-                                  onChange={(_, v) => setBoundType(v)}>
-                    <BottomNavigationAction value="inbound" label="流入数据" icon={<InputIcon/>}/>
-                    <BottomNavigationAction value="outbound" label="流出数据" icon={<OutputIcon/>}/>
-                </BottomNavigation>
+                {rayEnable && (<>
+                    <BottomNavigation sx={{mb: 2}} showLabels component={Paper} elevation={2}
+                                      value={boundType}
+                                      onChange={(_, v) => setBoundType(v)}>
+                        <BottomNavigationAction value="inbound" label="流入数据" icon={<InputIcon/>}/>
+                        <BottomNavigationAction value="outbound" label="流出数据" icon={<OutputIcon/>}/>
+                    </BottomNavigation>
 
-                {boundType === 'inbound' && inbound && (
-                    <TableContainer elevation={2} component={Card}>
-                        <Table size="small">
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>总上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.totalUp)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>总下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.totalDown)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>HTTP 上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.httpUp)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>HTTP 下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.httpDown)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>SOCKS 上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.socksUp)}</TableCell>
-                                </TableRow>
-                                <TableRow sx={lastSx}>
-                                    <TableCell>SOCKS 下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(inbound.socksDown)}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
+                    {boundType === 'inbound' && (
+                        <TableContainer elevation={2} component={Card}>
+                            <Table size="small">
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell>总上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.totalUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>总下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.totalDown || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>HTTP 上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.httpUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>HTTP 下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.httpDown || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>SOCKS 上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.socksUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow sx={lastSx}>
+                                        <TableCell>SOCKS 下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound?.socksDown || 0)}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
 
-                {boundType === 'outbound' && outbound && (
-                    <TableContainer elevation={2} component={Card}>
-                        <Table size="small">
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>总上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.totalUp)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>总下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.totalDown)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>代理上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.proxyUp)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>代理下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.proxyDown)}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>直连上传流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.directUp)}</TableCell>
-                                </TableRow>
-                                <TableRow sx={lastSx}>
-                                    <TableCell>直连下载流量</TableCell>
-                                    <TableCell align="right">{sizeToUnit(outbound.directDown)}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
+                    {boundType === 'outbound' && (
+                        <TableContainer elevation={2} component={Card}>
+                            <Table size="small">
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell>总上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.totalUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>总下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.totalDown || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>代理上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.proxyUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>代理下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.proxyDown || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>直连上传流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.directUp || 0)}</TableCell>
+                                    </TableRow>
+                                    <TableRow sx={lastSx}>
+                                        <TableCell>直连下载流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound?.directDown || 0)}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </>)}
             </Stack>
         </Paper>
     )

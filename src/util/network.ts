@@ -1,3 +1,6 @@
+import { fetchGet } from "./invoke.ts"
+import { safeJsonParse } from "./crypto.ts"
+
 export const sumNetworks = (networks: any[]) => {
     let up = 0
     let down = 0
@@ -31,4 +34,39 @@ export const calculateNetworkSpeed = (
     const upSpeed = (current.up - prev.up) / interval
     const downSpeed = (current.down - prev.down) / interval
     return {upSpeed: Math.max(upSpeed, 0), downSpeed: Math.max(downSpeed, 0)}
+}
+
+export async function getStatsData(port: number) {
+    const r = await fetchGet(`http://127.0.0.1:${port}/debug/vars`)
+    if (!r || !r.ok) return false
+    const obj = safeJsonParse(r.text)
+    if (obj.stats) return formatStats(obj.stats)
+    return false
+}
+
+const formatStats = (input: any): { inbound: any, outbound: any } => {
+    const safeGet = (obj: any, path: string) => {
+        return path.split('.').reduce((acc, part) => {
+            return acc && acc[part] !== undefined ? acc[part] : 0
+        }, obj)
+    }
+
+    return {
+        inbound: {
+            totalUp: safeGet(input, 'inbound.http-in.uplink') + safeGet(input, 'inbound.socks-in.uplink'),
+            totalDown: safeGet(input, 'inbound.http-in.downlink') + safeGet(input, 'inbound.socks-in.downlink'),
+            httpUp: safeGet(input, 'inbound.http-in.uplink'),
+            httpDown: safeGet(input, 'inbound.http-in.downlink'),
+            socksUp: safeGet(input, 'inbound.socks-in.uplink'),
+            socksDown: safeGet(input, 'inbound.socks-in.downlink'),
+        },
+        outbound: {
+            totalUp: safeGet(input, 'outbound.proxy.uplink') + safeGet(input, 'outbound.direct.uplink'),
+            totalDown: safeGet(input, 'outbound.proxy.downlink') + safeGet(input, 'outbound.direct.downlink'),
+            proxyUp: safeGet(input, 'outbound.proxy.uplink'),
+            proxyDown: safeGet(input, 'outbound.proxy.downlink'),
+            directUp: safeGet(input, 'outbound.direct.uplink'),
+            directDown: safeGet(input, 'outbound.direct.downlink'),
+        }
+    }
 }
