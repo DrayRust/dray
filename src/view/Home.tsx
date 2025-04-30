@@ -7,10 +7,11 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { fetchGet, getNetworksJson, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
+import { fetchGet, getNetworksJson, getSysInfoJson, log, readAppConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { sizeToUnit } from "../util/util.ts"
+import { formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
+import { useVisibility } from "../hook/useVisibility.ts"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -41,6 +42,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         const appConf = await readAppConfig()
         if (appConf) setRayEnable(appConf.ray_enable)
 
+        await getSysInfo()
         await getNetworkData()
         await statsData()
     }, 100)
@@ -62,6 +64,37 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             log.error(`Failed to debug vars json parse:`, err)
         }
     }
+
+    // ==================================== system info ====================================
+    const [sysInfo, setSysInfo] = useState<any>({})
+    const [bootTime, setBootTime] = useState(0)
+    const [runTime, setRunTime] = useState(0)
+    const getSysInfo = async () => {
+        let info = await getSysInfoJson()
+        if (info) {
+            setSysInfo(info)
+            if (info.uptime && info.uptime > 0) {
+                const booTime = Math.floor(Date.now() / 1000) - info.uptime
+                setBootTime(Math.max(0, booTime))
+                setRunTime(info.uptime)
+            }
+        }
+    }
+
+    const intervalRef = useRef<number>(0)
+    const isVisibility = useVisibility()
+    useEffect(() => {
+        if (isVisibility) {
+            intervalRef.current = setInterval(async () => {
+                const runTime = Math.floor(Date.now() / 1000) - bootTime
+                setRunTime(Math.max(0, runTime))
+
+                await getNetworkData()
+                await statsData()
+            }, 1000)
+        }
+        return () => clearInterval(intervalRef.current)
+    }, [isVisibility, bootTime])
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])
@@ -122,6 +155,28 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
                     <Switch checked={rayEnable} onChange={handleRayEnable} sx={{transform: 'scale(1.3)'}}/>
                 </Stack>
+
+                <TableContainer elevation={2} component={Card}>
+                    <Table size="small">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>开机时间</TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body2" component="span">{formatTimestamp(bootTime)}</Typography>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>已经运行</TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body2" component="span" color="info">{formatTime(runTime)}</Typography>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow sx={lastSx}>
+                                <TableCell>CPU 架构</TableCell><TableCell align="right">{sysInfo.cpu_arch}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 <TableContainer elevation={2} component={Card}>
                     <Table size="small">
