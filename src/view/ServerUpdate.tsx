@@ -13,6 +13,7 @@ import { VmessForm } from './server/VmessForm.tsx'
 import { VlessForm } from './server/VlessForm.tsx'
 import { SsForm } from './server/SsForm.tsx'
 import { TrojanForm } from './server/TrojanForm.tsx'
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(1), [setNavState])
@@ -32,36 +33,34 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     const [trojanForm, setTrojanForm] = useState<TrojanRow>()
     const [errorMsg, setErrorMsg] = useState('')
 
-    const readList = () => {
-        (async () => {
-            let serverList = await readServerList()
-            if (serverList) {
-                setServerList(serverList)
-                let row = serverList[key]
-                if (row) {
-                    setServerRow(row)
-                    setServerType(row.type)
-                    setPs(row.ps)
+    const loadList = useDebounce(async () => {
+        let serverList = await readServerList()
+        if (serverList) {
+            setServerList(serverList)
+            let row = serverList[key]
+            if (row) {
+                setServerRow(row)
+                setServerType(row.type)
+                setPs(row.ps)
 
-                    if (row.type === 'vmess') {
-                        setVmessForm(row.data as VmessRow)
-                    } else if (row.type === 'vless') {
-                        setVlessForm(row.data as VlessRow)
-                    } else if (row.type === 'ss') {
-                        setSsForm(row.data as SsRow)
-                    } else if (row.type === 'trojan') {
-                        setTrojanForm(row.data as TrojanRow)
-                    }
-                } else {
-                    setErrorMsg('服务器不存在')
+                if (row.type === 'vmess') {
+                    setVmessForm(row.data as VmessRow)
+                } else if (row.type === 'vless') {
+                    setVlessForm(row.data as VlessRow)
+                } else if (row.type === 'ss') {
+                    setSsForm(row.data as SsRow)
+                } else if (row.type === 'trojan') {
+                    setTrojanForm(row.data as TrojanRow)
                 }
             } else {
-                setServerList([])
-                setErrorMsg('暂无服务器')
+                setErrorMsg('服务器不存在')
             }
-        })()
-    }
-    useEffect(() => readList(), [])
+        } else {
+            setServerList([])
+            setErrorMsg('暂无服务器')
+        }
+    }, 100)
+    useEffect(loadList, [])
 
     const [psError, setPsError] = useState(false)
     const [addError, setAddError] = useState(false)

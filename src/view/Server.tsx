@@ -58,20 +58,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     const [selectedAll, setSelectedAll] = useState(false)
     const [showAction, setShowAction] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
-    const readList = () => {
-        (async () => {
-            const d = await readServerList()
-            if (d) {
-                const list = d as ServerList
-                setServerList(list)
-                serverAllSpeedTest(list)
-            } else {
-                setServerList([])
-                setErrorMsg('暂无服务器')
-            }
-        })()
-    }
-    useEffect(() => readList(), [])
+    const loadList = useDebounce(async () => {
+        const d = await readServerList()
+        if (d) {
+            const list = d as ServerList
+            setServerList(list)
+            serverAllSpeedTest(list)
+        } else {
+            setServerList([])
+            setErrorMsg('暂无服务器')
+        }
+    }, 100)
+    useEffect(loadList, [])
 
     const serverAllSpeedTest = (serverList: ServerList) => {
         if (Date.now() - SPEED_TEST_LAST_DATE < 1000 * 60 * 30) return // 更新频率，不要超过 30 分钟
@@ -93,7 +91,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         try {
             const text = await clipboardReadText()
             if (text) {
-                await useServerImport(text, showSnackbar, null, readList)
+                await useServerImport(text, showSnackbar, null, loadList)
             } else {
                 showSnackbar('剪切板没有内容', 'error')
             }

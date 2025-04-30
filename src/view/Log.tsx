@@ -12,6 +12,7 @@ import { useDialog } from "../component/useDialog.tsx"
 import { clearLogAll, getDrayAppDir, readLogList } from "../util/invoke.ts"
 import { sizeToUnit, formatLogName } from "../util/util.ts"
 import { openDir } from "../util/tauri.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const Log: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(4), [setNavState])
@@ -19,23 +20,21 @@ const Log: React.FC<NavProps> = ({setNavState}) => {
 
     const [logList, setLogList] = useState<LogList>()
     const [errorMsg, setErrorMsg] = useState('')
-    const readList = () => {
-        (async () => {
-            let logList = await readLogList()
-            if (logList) {
-                setLogList(logList)
-            } else {
-                setLogList([])
-                setErrorMsg('暂无日志')
-            }
-        })()
-    }
-    useEffect(() => readList(), [])
+    const loadList = useDebounce(async () => {
+        let logList = await readLogList()
+        if (logList) {
+            setLogList(logList)
+        } else {
+            setLogList([])
+            setErrorMsg('暂无日志')
+        }
+    }, 100)
+    useEffect(loadList, [])
 
     const handleClearLogs = () => {
         dialogConfirm('确认清空', `确定要清空所有日志吗？`, async () => {
             const ok = await clearLogAll()
-            ok && readList()
+            ok && loadList()
         })
     }
 
