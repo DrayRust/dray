@@ -83,7 +83,6 @@ export const SysInfo = () => {
         return {total_space, available_space, used_space: total_space - available_space}
     }
 
-    const lastSx = {'&:last-child td, &:last-child th': {border: 0}}
     return (<>
         <Dialog fullScreen open={open} onClose={handleClose}>
             <Process handleClose={handleClose}/>
@@ -91,7 +90,7 @@ export const SysInfo = () => {
 
         <Stack spacing={2}>
             <TableContainer elevation={4} component={Card}>
-                <Table size="small">
+                <Table className="table" size="small">
                     <TableBody>
                         <TableRow>
                             <TableCell>主机名</TableCell><TableCell align="right">{sysInfo.host_name}</TableCell>
@@ -150,7 +149,7 @@ export const SysInfo = () => {
                         <TableRow>
                             <TableCell>CPU 核数</TableCell><TableCell align="right">{sysInfo.cpu_len}</TableCell>
                         </TableRow>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell>CPU 物理核数</TableCell><TableCell align="right">{sysInfo.physical_core_count}</TableCell>
                         </TableRow>
                     </TableBody>
@@ -158,7 +157,7 @@ export const SysInfo = () => {
             </TableContainer>
 
             {SHOW_LOAD_AVERAGE && <TableContainer elevation={4} component={Card}>
-                <Table size="small">
+                <Table className="table" size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
@@ -168,7 +167,7 @@ export const SysInfo = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell component="th" scope="row">
                                 <div className="flex-center-gap1">
                                     系统负载平均值
@@ -186,7 +185,7 @@ export const SysInfo = () => {
             </TableContainer>}
 
             <TableContainer elevation={4} component={Card}>
-                <Table size="small">
+                <Table className="table" size="small">
                     <TableBody>
                         <TableRow>
                             <TableCell>网络上传总量</TableCell>
@@ -200,7 +199,7 @@ export const SysInfo = () => {
                             <TableCell>回环流出总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.loUp)}</TableCell>
                         </TableRow>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell>回环流入总量</TableCell>
                             <TableCell align="right">{sizeToUnit(network.loDown)}</TableCell>
                         </TableRow>
@@ -209,13 +208,13 @@ export const SysInfo = () => {
             </TableContainer>
 
             <TableContainer elevation={4} component={Card}>
-                <Table size="small">
+                <Table className="table" size="small">
                     <TableBody>
                         <TableRow>
                             <TableCell>上传速率</TableCell>
                             <TableCell align="right">{sizeToUnit(networkSpeed.upSpeed)}/s</TableCell>
                         </TableRow>
-                        <TableRow sx={lastSx}>
+                        <TableRow>
                             <TableCell>下载速率</TableCell>
                             <TableCell align="right">{sizeToUnit(networkSpeed.downSpeed)}/s</TableCell>
                         </TableRow>
@@ -224,10 +223,10 @@ export const SysInfo = () => {
             </TableContainer>
 
             <TableContainer elevation={4} component={Card}>
-                <Table size="small">
+                <Table className="table" size="small">
                     <TableBody>
                         {components?.length > 0 && components.map((row: any, key: number) => (
-                            <TableRow key={key} sx={lastSx}>
+                            <TableRow key={key}>
                                 <TableCell>{formatComponentsLabel(row.label)}</TableCell>
                                 <TableCell align="right">{formatFloat(row.temperature, 1)} ℃</TableCell>
                             </TableRow>
