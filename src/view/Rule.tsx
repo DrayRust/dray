@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
     Paper, Card, TextField, ToggleButtonGroup, ToggleButton, Drawer,
     Stack, Button, Alert, Typography, Switch,
@@ -85,10 +85,10 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
         showChip('设置成功', 'success')
     }, 50)
 
-    let ruleModeList: RuleModeList
+    let ruleModeList = useRef<RuleModeList | null>(null)
     const updateRayConfig = async (ruleConfig: RuleConfig, ruleDomain: RuleDomain) => {
-        if (!ruleModeList) ruleModeList = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
-        await saveRayRule(ruleConfig, ruleDomain, ruleModeList)
+        if (!ruleModeList.current) ruleModeList.current = await readRuleModeList() || DEFAULT_RULE_MODE_LIST
+        await saveRayRule(ruleConfig, ruleDomain, ruleModeList.current)
     }
 
     // ============================== advanced ==============================
