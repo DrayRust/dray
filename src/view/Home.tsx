@@ -12,6 +12,7 @@ import { useDebounce } from "../hook/useDebounce.ts"
 import { formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
+import { DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -36,15 +37,17 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
-    const statsPortRef = useRef(0)
+    const rayConfRef = useRef<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const initConf = useDebounce(async () => {
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
         setRayEnable(rayEnable)
 
         const rayConf = await readRayCommonConfig()
-        statsPortRef.current = rayConf?.stats_port || 0
-        if (rayEnable && statsPortRef.current > 0) await loadStats(statsPortRef.current)
+        if (rayConf) {
+            rayConfRef.current = rayConf
+            if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port)
+        }
 
         await getSysInfo()
         await getNetworkData()
@@ -55,8 +58,9 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     const [boundType, setBoundType] = useState('outbound')
     const [inbound, setInbound] = useState<Inbound | null>()
     const [outbound, setOutbound] = useState<Outbound | null>()
-    const loadStats = async (port: number) => {
-        const r = await getStatsData(port) as any
+    const loadStats = async (port: number | '') => {
+        if (!port) return
+        const r = await getStatsData(Number(port)) as any
         if (r) {
             r.inbound && setInbound(r.inbound)
             r.outbound && setOutbound(r.outbound)
@@ -87,8 +91,11 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 const runTime = Math.floor(Date.now() / 1000) - bootTime
                 setRunTime(Math.max(0, runTime))
 
-                await loadStats(statsPortRef.current)
                 await getNetworkData()
+
+                if (rayEnable && rayConfRef.current.stats_enable) {
+                    await loadStats(rayConfRef.current.stats_port)
+                }
             }, 1000)
         }
         return () => clearInterval(intervalRef.current)
