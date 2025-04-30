@@ -16,6 +16,8 @@ export async function getSubscription(row: SubscriptionRow) {
                 log.error(`${row.name}, failed to subscription parseJson:`, err)
             }
         }
+    } else {
+        log.error('Failed to fetch subscription: ' + row.url)
     }
 }
 
