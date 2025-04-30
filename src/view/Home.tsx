@@ -9,7 +9,7 @@ import OutputIcon from '@mui/icons-material/Output'
 
 import { getNetworksJson, getSysInfoJson, readAppConfig, readRayCommonConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
+import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 import { DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
@@ -306,7 +306,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>GC 总耗时</TableCell>
-                                    <TableCell align="right">{memStats.pauseTotalMs} ms</TableCell>
+                                    <TableCell align="right">{formatSecond(memStats.pauseTotalMs)}</TableCell>
                                 </TableRow>
                                 <TableRow sx={lastSx}>
                                     <TableCell>上次 GC 时间</TableCell>

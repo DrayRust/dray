@@ -98,7 +98,7 @@ export const formatFloat = (num: number, decimal: number = 2): string => {
 }
 
 export function formatSecond(duration: number): string {
-    return duration >= 1000 ? `${(duration / 1000).toFixed(2)}s` : `${duration}ms`
+    return duration >= 1000 ? `${(duration / 1000).toFixed(2)} s` : `${duration} ms`
 }
 
 export function getRandom(min: number, max: number): number {
