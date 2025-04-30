@@ -7,12 +7,13 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
+import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, readRayConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
 import { DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
+import { useSnackbar } from "../component/useSnackbar.tsx"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -51,18 +52,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     const [rayEnable, setRayEnable] = useState(false)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const loadConfig = useDebounce(async () => {
-        if (!versionInfo.dray) {
-            const version = await safeInvoke('get_version')
-            if (version) {
-                versionInfo.dray = version.dray || ''
-                versionInfo.rust = getRustVersion(version.rustc || '')
-            }
-
-            const rayVersion = await invokeString('get_ray_version')
-            if (rayVersion) {
-                versionInfo = {...versionInfo, ...parseXrayVersion(rayVersion)}
-            }
-        }
+        await getVersion()
 
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
@@ -82,6 +72,21 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(loadConfig, [])
 
     // ==================================== version ====================================
+    const getVersion = async () => {
+        if (!versionInfo.dray) {
+            const version = await safeInvoke('get_version')
+            if (version) {
+                versionInfo.dray = version.dray || ''
+                versionInfo.rust = getRustVersion(version.rustc || '')
+            }
+
+            const rayVersion = await invokeString('get_ray_version')
+            if (rayVersion) {
+                versionInfo = {...versionInfo, ...parseXrayVersion(rayVersion)}
+            }
+        }
+    }
+
     const getRustVersion = (input: string): string => {
         const match = input.toString().match(/rustc\s+(\d+\.\d+\.\d+)/)
         return match ? match[1] : ''
@@ -129,10 +134,12 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    // ==================================== interval ====================================
+    const [errorMsg, setErrorMsg] = useState(false)
     const intervalRef = useRef<number>(0)
     const isVisibility = useVisibility()
     useEffect(() => {
-        if (isVisibility) {
+        if (isVisibility && !errorMsg) {
             intervalRef.current = setInterval(async () => {
                 const runTime = Math.floor(Date.now() / 1000) - bootTime
                 setRunTime(Math.max(0, runTime))
@@ -145,7 +152,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             }, 1000)
         }
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, bootTime])
+    }, [isVisibility, bootTime, errorMsg])
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])
@@ -166,11 +173,23 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     // ==================================== ray enable ====================================
     const handleRayEnable = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.checked
+        if (value) {
+            let c = await readRayConfig()
+            if (!c || !c.inbounds || !c.outbounds) {
+                setErrorMsg(true)
+                setTimeout(() => setErrorMsg(false), 2500)
+                showSnackbar('无服务器可以启用', 'error', 2000)
+                return
+            }
+        }
+
         setRayEnable(value)
         setAppConfig('set_ray_enable', value)
     }
 
-    return (
+    const {SnackbarComponent, showSnackbar} = useSnackbar()
+    return (<>
+        <SnackbarComponent/>
         <Paper className="scr-none" elevation={5} sx={{
             p: 2, borderRadius: 2, width: '100%', height: `calc(100vh - 20px)`, overflow: 'auto',
             display: 'flex', justifyContent: 'center', alignItems: 'center'
@@ -372,7 +391,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 </>)}
             </Stack>
         </Paper>
-    )
+    </>)
 }
 
 export default Home
