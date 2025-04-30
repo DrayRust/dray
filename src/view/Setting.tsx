@@ -223,12 +223,15 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         const newConf = {...rayCommonConfig, socks_enable: value}
         setRayCommonConfig(newConf)
         await saveRaySocksEnable(value, config, newConf)
+        setTimeout(() => handleAutoSetupSocks(value), 200)
     }
 
     const handleRayHttpEnabled = async (value: boolean) => {
         const newConf = {...rayCommonConfig, http_enable: value}
         setRayCommonConfig(newConf)
         await saveRayHttpEnable(value, config, newConf)
+        setTimeout(() => handleAutoSetupHttp(value), 200)
+        setTimeout(() => handleAutoSetupHttps(value), 400)
     }
 
     // ================================== ray socks more ==================================
