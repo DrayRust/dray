@@ -355,7 +355,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>GC 次数</TableCell>
-                                    <TableCell align="right">{memStats.gcCount}</TableCell>
+                                    <TableCell align="right">{memStats.gcCount || 0}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell>GC 总耗时</TableCell>
