@@ -60,6 +60,10 @@ export async function fetchProxyGet(url: string, proxyUrl: string) {
     return await safeInvoke('fetch_get_with_proxy', {url, proxyUrl})
 }
 
+export async function downloadLargeFile(url: string, filepath: string, timeout: number = 60 * 30) {
+    return await safeInvoke('download_large_file', {url, filepath, timeout})
+}
+
 export function restartRay() {
     return invokeBool('restart_ray')
 }
