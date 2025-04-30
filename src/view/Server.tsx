@@ -154,13 +154,13 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     // ============================== enable ==============================
     // 必须放内部，否则不会读取最新配置文件
     let appDir = useRef<string>('')
-    let config = useRef<AppConfig>(DEFAULT_APP_CONFIG)
-    let rayCommonConfig = useRef<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
-    let ruleConfig = useRef<RuleConfig>(DEFAULT_RULE_CONFIG)
-    let ruleDomain = useRef<RuleDomain>(DEFAULT_RULE_DOMAIN)
-    let ruleModeList = useRef<RuleModeList>(DEFAULT_RULE_MODE_LIST)
-    let dnsConfig = useRef<DnsConfig>(DEFAULT_DNS_CONFIG)
-    let dnsModeList = useRef<DnsModeList>(DEFAULT_DNS_MODE_LIST)
+    let config = useRef<AppConfig | null>(null)
+    let rayCommonConfig = useRef<RayCommonConfig | null>(null)
+    let ruleConfig = useRef<RuleConfig | null>(null)
+    let ruleDomain = useRef<RuleDomain | null>(null)
+    let ruleModeList = useRef<RuleModeList | null>(null)
+    let dnsConfig = useRef<DnsConfig | null>(null)
+    let dnsModeList = useRef<DnsModeList | null>(null)
     const initConfig = async () => {
         if (!appDir.current) appDir.current = await getDrayAppDir()
         if (!config.current) config.current = await readAppConfig() || DEFAULT_APP_CONFIG
@@ -176,17 +176,22 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const getServerConf = async (callback: (conf: any) => void) => {
         await initConfig()
-        if (serverList?.[selectedKey] && appDir.current && config.current && rayCommonConfig.current) {
-            const conf = getConf(serverList[selectedKey], appDir.current, config.current, rayCommonConfig.current)
-            if (conf) {
-                const dns = dnsToConf(dnsConfig.current, dnsModeList.current)
-                const routing = ruleToConf(ruleConfig.current, ruleDomain.current, ruleModeList.current)
-                callback({...conf, ...dns, ...routing})
-            } else {
-                showSnackbar('生成 conf 失败', 'error')
-            }
-        } else {
+
+        if (!appDir.current || !config.current || !rayCommonConfig.current) return
+        if (!ruleConfig.current || !ruleDomain.current || !ruleModeList.current) return
+        if (!dnsConfig.current || !dnsModeList.current) return
+        if (!serverList?.[selectedKey]) {
             showSnackbar('获取配置信息失败', 'error')
+            return
+        }
+
+        const conf = getConf(serverList[selectedKey], appDir.current, config.current, rayCommonConfig.current)
+        if (conf) {
+            const dns = dnsToConf(dnsConfig.current, dnsModeList.current)
+            const routing = ruleToConf(ruleConfig.current, ruleDomain.current, ruleModeList.current)
+            callback({...conf, ...dns, ...routing})
+        } else {
+            showSnackbar('生成 conf 失败', 'error')
         }
     }
 
