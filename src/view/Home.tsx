@@ -81,6 +81,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     }, 100)
     useEffect(initConf, [])
 
+    // ==================================== version ====================================
     const getRustVersion = (input: string): string => {
         const match = input.toString().match(/rustc\s+(\d+\.\d+\.\d+)/)
         return match ? match[1] : ''
@@ -168,7 +169,6 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_ray_enable', value)
     }
 
-    const lastSx = {'&:last-child td, &:last-child th': {border: 0}}
     return (
         <Paper className="scr-none" elevation={5} sx={{
             p: 2, borderRadius: 2, width: '100%', height: `calc(100vh - 20px)`, overflow: 'auto',
@@ -181,7 +181,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 </Stack>
 
                 <TableContainer elevation={2} component={Card}>
-                    <Table size="small">
+                    <Table className="table" size="small">
                         <TableBody>
                             <TableRow>
                                 <TableCell>开机时间</TableCell>
@@ -201,7 +201,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                             <TableRow>
                                 <TableCell>Dray 版本</TableCell><TableCell align="right">{versionInfo.dray}</TableCell>
                             </TableRow>
-                            <TableRow sx={lastSx}>
+                            <TableRow>
                                 <TableCell>Rust 版本</TableCell><TableCell align="right">{versionInfo.rust}</TableCell>
                             </TableRow>
                         </TableBody>
@@ -209,13 +209,13 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 </TableContainer>
 
                 <TableContainer elevation={2} component={Card}>
-                    <Table size="small">
+                    <Table className="table" size="small">
                         <TableBody>
                             <TableRow>
                                 <TableCell>上传速率</TableCell>
                                 <TableCell align="right">{sizeToUnit(networkSpeed.upSpeed)}/s</TableCell>
                             </TableRow>
-                            <TableRow sx={lastSx}>
+                            <TableRow>
                                 <TableCell>下载速率</TableCell>
                                 <TableCell align="right">{sizeToUnit(networkSpeed.downSpeed)}/s</TableCell>
                             </TableRow>
@@ -224,7 +224,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 </TableContainer>
 
                 <TableContainer elevation={2} component={Card}>
-                    <Table size="small">
+                    <Table className="table" size="small">
                         <TableBody>
                             <TableRow>
                                 <TableCell>网络上传总量</TableCell>
@@ -242,7 +242,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 <TableCell>回环流出总量</TableCell>
                                 <TableCell align="right">{sizeToUnit(network.loUp)}</TableCell>
                             </TableRow>
-                            <TableRow sx={lastSx}>
+                            <TableRow>
                                 <TableCell>回环流入总量</TableCell>
                                 <TableCell align="right">{sizeToUnit(network.loDown)}</TableCell>
                             </TableRow>
@@ -260,7 +260,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
                     {boundType === 'inbound' && (
                         <TableContainer elevation={2} component={Card}>
-                            <Table size="small">
+                            <Table className="table" size="small">
                                 <TableBody>
                                     <TableRow>
                                         <TableCell>总上传流量</TableCell>
@@ -282,7 +282,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                         <TableCell>SOCKS 上传流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound?.socksUp || 0)}</TableCell>
                                     </TableRow>
-                                    <TableRow sx={lastSx}>
+                                    <TableRow>
                                         <TableCell>SOCKS 下载流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound?.socksDown || 0)}</TableCell>
                                     </TableRow>
@@ -293,7 +293,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
                     {boundType === 'outbound' && (
                         <TableContainer elevation={2} component={Card}>
-                            <Table size="small">
+                            <Table className="table" size="small">
                                 <TableBody>
                                     <TableRow>
                                         <TableCell>总上传流量</TableCell>
@@ -319,7 +319,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                         <TableCell>直连上传流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(outbound?.directUp || 0)}</TableCell>
                                     </TableRow>
-                                    <TableRow sx={lastSx}>
+                                    <TableRow>
                                         <TableCell>直连下载流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(outbound?.directDown || 0)}</TableCell>
                                     </TableRow>
@@ -329,7 +329,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     )}
 
                     <TableContainer elevation={2} component={Card}>
-                        <Table size="small">
+                        <Table className="table" size="small">
                             <TableBody>
                                 <TableRow>
                                     <TableCell>Xray 版本</TableCell><TableCell align="right">{versionInfo.xray}</TableCell>
@@ -361,7 +361,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                     <TableCell>GC 总耗时</TableCell>
                                     <TableCell align="right">{formatSecond(memStats.pauseTotalMs)}</TableCell>
                                 </TableRow>
-                                <TableRow sx={lastSx}>
+                                <TableRow>
                                     <TableCell>上次 GC 时间</TableCell>
                                     <TableCell align="right">{formatTimestamp(memStats.lastGC)}</TableCell>
                                 </TableRow>

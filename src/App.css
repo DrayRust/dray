@@ -210,6 +210,10 @@ body, html {
     text-overflow: ellipsis;
 }
 
+.table tbody tr:last-child td, .table tbody tr:last-child th {
+    border: 0;
+}
+
 /* process */
 .process-but {
     display: inline;
