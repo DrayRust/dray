@@ -94,13 +94,13 @@ export const SysInfo = () => {
                 <Table size="small">
                     <TableBody>
                         <TableRow>
+                            <TableCell>主机名</TableCell><TableCell align="right">{sysInfo.host_name}</TableCell>
+                        </TableRow>
+                        <TableRow>
                             <TableCell>系统版本</TableCell><TableCell align="right">{sysInfo.long_os_version}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>内核版本</TableCell><TableCell align="right">{sysInfo.kernel_long_version}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>主机名</TableCell><TableCell align="right">{sysInfo.host_name}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>已运行</TableCell>
