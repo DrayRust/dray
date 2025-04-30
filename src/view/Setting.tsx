@@ -76,8 +76,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
     }
 
     // ================================== system proxy ==================================
-    const handleAutoSetupPac = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
+    const handleAutoSetupPac = (value: boolean) => {
         setConfig(prevConfig => ({...prevConfig, auto_setup_pac: value}))
         setAppConfig('set_auto_setup_pac', value)
         if (value) {
@@ -93,20 +92,17 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    const handleAutoSetupSocks = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
+    const handleAutoSetupSocks = (value: boolean) => {
         setConfig(prevConfig => ({...prevConfig, auto_setup_socks: value}))
         setAppConfig('set_auto_setup_socks', value)
     }
 
-    const handleAutoSetupHttp = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
+    const handleAutoSetupHttp = (value: boolean) => {
         setConfig(prevConfig => ({...prevConfig, auto_setup_http: value}))
         setAppConfig('set_auto_setup_http', value)
     }
 
-    const handleAutoSetupHttps = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.checked
+    const handleAutoSetupHttps = (value: boolean) => {
         setConfig(prevConfig => ({...prevConfig, auto_setup_https: value}))
         setAppConfig('set_auto_setup_https', value)
     }
@@ -372,7 +368,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>PAC 自动配置代理</Typography>
-                                    <Switch checked={config.auto_setup_pac} onChange={handleAutoSetupPac}/>
+                                    <Switch checked={config.auto_setup_pac} onChange={e => handleAutoSetupPac(e.target.checked)}/>
                                 </div>
                             </ListItemButton>
                         </ListItem>
@@ -380,7 +376,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>SOCKS 代理</Typography>
-                                    <Switch checked={config.auto_setup_socks} onChange={handleAutoSetupSocks}/>
+                                    <Switch checked={config.auto_setup_socks} onChange={e => handleAutoSetupSocks(e.target.checked)}/>
                                 </div>
                             </ListItemButton>
                         </ListItem>
@@ -388,7 +384,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>HTTP 代理</Typography>
-                                    <Switch checked={config.auto_setup_http} onChange={handleAutoSetupHttp}/>
+                                    <Switch checked={config.auto_setup_http} onChange={e => handleAutoSetupHttp(e.target.checked)}/>
                                 </div>
                             </ListItemButton>
                         </ListItem>
@@ -396,7 +392,7 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                             <ListItemButton sx={{cursor: 'default'}}>
                                 <div className="flex-between w100">
                                     <Typography variant="body1" sx={{pl: 1}}>HTTPS 代理</Typography>
-                                    <Switch checked={config.auto_setup_https} onChange={handleAutoSetupHttps}/>
+                                    <Switch checked={config.auto_setup_https} onChange={e => handleAutoSetupHttps(e.target.checked)}/>
                                 </div>
                             </ListItemButton>
                         </ListItem>
