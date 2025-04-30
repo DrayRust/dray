@@ -13,6 +13,7 @@ import { readAppConfig, readRayCommonConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
 import { IS_LINUX, IS_MAC_OS, IS_WINDOWS } from "../util/util.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const Tool: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(5), [setNavState])
@@ -21,19 +22,18 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
     const [rayConfig, setRayConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const [action, setAction] = useState('term')
     const [osType, setOsType] = useState('macOS')
-    useEffect(() => {
-        (async () => {
-            let newAppConfig = await readAppConfig()
-            if (newAppConfig) setAppConfig(newAppConfig)
+    const loadConfig = useDebounce(async () => {
+        let newAppConfig = await readAppConfig()
+        if (newAppConfig) setAppConfig(newAppConfig)
 
-            let newRayConfig = await readRayCommonConfig()
-            if (newRayConfig) setRayConfig(newRayConfig)
+        let newRayConfig = await readRayCommonConfig()
+        if (newRayConfig) setRayConfig(newRayConfig)
 
-            if (IS_WINDOWS) setOsType('windows')
-            if (IS_MAC_OS) setOsType('macOS')
-            if (IS_LINUX) setOsType('linux')
-        })()
-    }, [])
+        if (IS_WINDOWS) setOsType('windows')
+        if (IS_MAC_OS) setOsType('macOS')
+        if (IS_LINUX) setOsType('linux')
+    }, 100)
+    useEffect(loadConfig, [])
 
     const getProxySetEnv = () => {
         const {ray_host, ray_http_port, ray_socks_port} = appConfig

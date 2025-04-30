@@ -26,46 +26,44 @@ import { clipboardWriteText } from "../util/tauri.ts"
 import { DEFAULT_DNS_CONFIG, DEFAULT_DNS_MODE_LIST, DEFAULT_DNS_MODE_ROW } from "../util/config.ts"
 import { dnsModeToConf } from "../util/dns.ts"
 import { saveRayDns } from "../util/ray.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 export const Dns = () => {
     const [loading, setLoading] = useState(true)
     const [dnsNav, setDnsNav] = useState(0)
     const [dnsConfig, setDnsConfig] = useState<DnsConfig>(DEFAULT_DNS_CONFIG)
     const [dnsModeList, setDnsModeList] = useState<DnsModeList>(DEFAULT_DNS_MODE_LIST)
-    useEffect(() => {
-        (async () => {
-            const newDnsConfig = await readDnsConfig() as DnsConfig
-            if (newDnsConfig) setDnsConfig(newDnsConfig)
+    const loadList = useDebounce(async () => {
+        const newDnsConfig = await readDnsConfig() as DnsConfig
+        if (newDnsConfig) setDnsConfig(newDnsConfig)
 
-            const newDnsModeList = await readDnsModeList() as DnsModeList
-            if (newDnsModeList) setDnsModeList(newDnsModeList)
-            setLoading(false)
-        })()
-    }, [])
+        const newDnsModeList = await readDnsModeList() as DnsModeList
+        if (newDnsModeList) setDnsModeList(newDnsModeList)
+        setLoading(false)
+    }, 100)
+    useEffect(loadList, [])
 
     // ============================== setting ==============================
     const handleDnsEnabled = async (checked: boolean) => {
         const newConf = {...dnsConfig, enable: checked}
         setDnsConfig(newConf)
-        updateDnsConfig(newConf)
+        await updateDnsConfig(newConf)
     }
 
     const handleDnsModeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newConf = {...dnsConfig, mode: Number(e.target.value)}
         setDnsConfig(newConf)
-        updateDnsConfig(newConf)
+        await updateDnsConfig(newConf)
     }
 
-    const updateDnsConfig = (dnsConfig: DnsConfig) => {
-        (async () => {
-            const ok = await saveDnsConfig(dnsConfig)
-            if (!ok) {
-                showAlertDialog('设置失败', 'error')
-                return
-            }
+    const updateDnsConfig = async (dnsConfig: DnsConfig) => {
+        const ok = await saveDnsConfig(dnsConfig)
+        if (!ok) {
+            showAlertDialog('设置失败', 'error')
+            return
+        }
 
-            await saveRayDns(dnsConfig, dnsModeList)
-        })()
+        await saveRayDns(dnsConfig, dnsModeList)
     }
 
     // ============================== base ==============================

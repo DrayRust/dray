@@ -18,6 +18,7 @@ import { processIP } from "../util/util.ts"
 import { decodeBase64, encodeBase64, hashJson, safeJsonParse } from "../util/crypto.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
 import { DEFAULT_DNS_TABLE_LIST } from "../util/config.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
 
 const DEFAULT_DNS_TABLE_ROW: DnsTableRow = {
     name: '',
@@ -32,13 +33,12 @@ const DEFAULT_DNS_TABLE_ROW: DnsTableRow = {
 export const DnsTable = () => {
     const [loading, setLoading] = useState(true)
     const [dnsTableList, setDnsTableList] = useState<DnsTableList>([])
-    useEffect(() => {
-        (async () => {
-            const tableList = await readDnsTableList() as DnsTableList || DEFAULT_DNS_TABLE_LIST
-            setDnsTableList(tableList)
-            setTimeout(() => setLoading(false), 200)
-        })()
-    }, [])
+    const loadList = useDebounce(async () => {
+        const tableList = await readDnsTableList() as DnsTableList || DEFAULT_DNS_TABLE_LIST
+        setDnsTableList(tableList)
+        setTimeout(() => setLoading(false), 200)
+    }, 100)
+    useEffect(loadList, [])
 
     const [action, setAction] = useState('')
     const [row, setRow] = useState<DnsTableRow>(DEFAULT_DNS_TABLE_ROW)

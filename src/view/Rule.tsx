@@ -30,16 +30,15 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
     const [ruleType, setRuleType] = useState(0)
     const [ruleConfig, setRuleConfig] = useState<RuleConfig>(DEFAULT_RULE_CONFIG)
     const [ruleDomain, setRuleDomain] = useState<RuleDomain>(DEFAULT_RULE_DOMAIN)
-    useEffect(() => {
-        (async () => {
-            const newRuleConfig = await readRuleConfig() as RuleConfig
-            if (newRuleConfig) setRuleConfig({...DEFAULT_RULE_CONFIG, ...newRuleConfig})
+    const loadConfig = useDebounce(async () => {
+        const newRuleConfig = await readRuleConfig() as RuleConfig
+        if (newRuleConfig) setRuleConfig({...DEFAULT_RULE_CONFIG, ...newRuleConfig})
 
-            const newRuleDomain = await readRuleDomain() as RuleDomain
-            if (newRuleDomain) setRuleDomain({...DEFAULT_RULE_DOMAIN, ...newRuleDomain})
-            setLoading(false)
-        })()
-    }, [])
+        const newRuleDomain = await readRuleDomain() as RuleDomain
+        if (newRuleDomain) setRuleDomain({...DEFAULT_RULE_DOMAIN, ...newRuleDomain})
+        setLoading(false)
+    }, 100)
+    useEffect(loadConfig, [])
 
     const handleGlobalProxy = (checked: boolean) => {
         setRuleConfig(prev => {
