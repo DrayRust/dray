@@ -7,7 +7,7 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, setAppConfig } from "../util/invoke.ts"
+import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
@@ -40,18 +40,18 @@ interface XrayVersionInfo {
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
 
-    const [version, setVersion] = useState('')
+    const [version, setVersion] = useState<any>({})
     const [rayVersion, setRayVersion] = useState<XrayVersionInfo>()
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const initConf = useDebounce(async () => {
-        const version = await invokeString('get_version')
-        setVersion(version)
+        const version = await safeInvoke('get_version')
+        if (version) setVersion(version)
 
         const rayVersion = await invokeString('get_ray_version')
-        setRayVersion(parseXrayVersion(rayVersion))
+        if (rayVersion) setRayVersion(parseXrayVersion(rayVersion))
 
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
@@ -69,6 +69,11 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         await getNetworkData()
     }, 100)
     useEffect(initConf, [])
+
+    const getRustVersion = (input: string): string => {
+        const match = input.toString().match(/rustc\s+(\d+\.\d+\.\d+)/)
+        return match ? match[1] : ''
+    }
 
     const parseXrayVersion = (input: string): XrayVersionInfo => {
         const xrayRegex = /^Xray\s+(\S+)\s+/i
@@ -182,8 +187,11 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                             <TableRow>
                                 <TableCell>CPU 架构</TableCell><TableCell align="right">{sysInfo.cpu_arch}</TableCell>
                             </TableRow>
+                            <TableRow>
+                                <TableCell>Dray 版本</TableCell><TableCell align="right">{version.dray}</TableCell>
+                            </TableRow>
                             <TableRow sx={lastSx}>
-                                <TableCell>Dray 版本</TableCell><TableCell align="right">{version}</TableCell>
+                                <TableCell>Rust 版本</TableCell><TableCell align="right">{getRustVersion(version.rustc || '')}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
