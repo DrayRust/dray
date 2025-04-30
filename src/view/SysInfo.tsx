@@ -212,11 +212,11 @@ export const SysInfo = () => {
                 <Table size="small">
                     <TableBody>
                         <TableRow>
-                            <TableCell>当前上传速率</TableCell>
+                            <TableCell>上传速率</TableCell>
                             <TableCell align="right">{sizeToUnit(networkSpeed.upSpeed)}/s</TableCell>
                         </TableRow>
                         <TableRow sx={lastSx}>
-                            <TableCell>当前下载速率</TableCell>
+                            <TableCell>下载速率</TableCell>
                             <TableCell align="right">{sizeToUnit(networkSpeed.downSpeed)}/s</TableCell>
                         </TableRow>
                     </TableBody>
