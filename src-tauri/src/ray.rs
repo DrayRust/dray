@@ -223,6 +223,31 @@ pub fn restart() -> bool {
     success
 }
 
+pub fn get_ray_version() -> String {
+    let ray_path = get_ray_exe();
+    trace!("Trying to get Ray version, path: {}", ray_path);
+
+    let output = Command::new(ray_path).arg("version").stdout(Stdio::piped()).stderr(Stdio::piped()).output();
+
+    match output {
+        Ok(output) => {
+            if output.status.success() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                trace!("Ray version output: {}", stdout);
+                stdout.lines().next().unwrap_or("").trim().to_string()
+            } else {
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                error!("Failed to get version, stderr: {}", stderr);
+                String::new()
+            }
+        }
+        Err(e) => {
+            error!("Failed to execute `version` command: {:?}", e);
+            String::new()
+        }
+    }
+}
+
 fn get_ray_exe() -> String {
     dirs::get_dray_ray_dir().unwrap().join(RAY).to_str().unwrap().to_string()
 }

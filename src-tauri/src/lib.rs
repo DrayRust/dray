@@ -233,9 +233,19 @@ fn open_web_server_dir() -> bool {
     web::open_web_server_dir()
 }
 
+#[tauri::command]
+fn get_ray_version() -> String {
+    ray::get_ray_version()
+}
+
+#[tauri::command]
+fn get_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
 fn log_startup_info() {
-    // rustc -Vv
     // rustc_version::version_meta().unwrap().short_version_string
+    // rustc -Vv
     // export RUSTC_VERSION=$(rustc -V)
     // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.profile OR
     // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.zshrc
@@ -307,6 +317,8 @@ pub fn run() {
             set_auto_setup_https,
             check_port_available,
             open_web_server_dir,
+            get_ray_version,
+            get_version,
             quit
         ])
         .run(tauri::generate_context!())

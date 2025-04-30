@@ -7,7 +7,7 @@ import {
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
 
-import { getNetworksJson, getSysInfoJson, readAppConfig, readRayCommonConfig, setAppConfig } from "../util/invoke.ts"
+import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
@@ -32,13 +32,27 @@ interface Outbound {
     directDown: number; // 直连下载
 }
 
+interface XrayVersionInfo {
+    xray: string;
+    go: string;
+}
+
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
+
+    const [version, setVersion] = useState('')
+    const [rayVersion, setRayVersion] = useState<XrayVersionInfo>()
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
     const [rayCommonConfig, setRayCommonConfig] = useState<RayCommonConfig>(DEFAULT_RAY_COMMON_CONFIG)
     const initConf = useDebounce(async () => {
+        const version = await invokeString('get_version')
+        setVersion(version)
+
+        const rayVersion = await invokeString('get_ray_version')
+        setRayVersion(parseXrayVersion(rayVersion))
+
         const appConf = await readAppConfig()
         const rayEnable = Boolean(appConf && appConf.ray_enable)
         setRayEnable(rayEnable)
@@ -55,6 +69,17 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         await getNetworkData()
     }, 100)
     useEffect(initConf, [])
+
+    const parseXrayVersion = (input: string): XrayVersionInfo => {
+        const xrayRegex = /^Xray\s+(\S+)\s+/i
+        const goRegex = /\(go(\S+)\s+[^)]+\)/i
+        const xrayMatch = input.match(xrayRegex)
+        const goMatch = input.match(goRegex)
+        return {
+            xray: xrayMatch?.[1] || '',
+            go: goMatch?.[1] || '',
+        }
+    }
 
     // ==================================== stats ====================================
     const [boundType, setBoundType] = useState('outbound')
@@ -154,8 +179,11 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                     <Typography variant="body2" component="span" color="info">{formatTime(runTime)}</Typography>
                                 </TableCell>
                             </TableRow>
-                            <TableRow sx={lastSx}>
+                            <TableRow>
                                 <TableCell>CPU 架构</TableCell><TableCell align="right">{sysInfo.cpu_arch}</TableCell>
+                            </TableRow>
+                            <TableRow sx={lastSx}>
+                                <TableCell>Dray 版本</TableCell><TableCell align="right">{version}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -284,6 +312,12 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     <TableContainer elevation={2} component={Card}>
                         <Table size="small">
                             <TableBody>
+                                <TableRow>
+                                    <TableCell>Xray 版本</TableCell><TableCell align="right">{rayVersion?.xray}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>Golang 版本</TableCell><TableCell align="right">{rayVersion?.go}</TableCell>
+                                </TableRow>
                                 <TableRow>
                                     <TableCell>当前内存使用</TableCell>
                                     <TableCell align="right">
