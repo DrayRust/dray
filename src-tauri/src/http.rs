@@ -1,6 +1,6 @@
 use crate::config;
 use futures_util::StreamExt;
-use logger::{debug, error};
+use logger::{error, trace};
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Proxy;
@@ -66,7 +66,7 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
 
     match response.text().await {
         Ok(html) => {
-            debug!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
+            trace!("Successfully fetched HTML content from: {}, status: {}", url, status.as_u16());
             Ok(html)
         }
         Err(e) => Err(format!("Failed to parse response body: {}", e)),
@@ -105,7 +105,7 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
         total_size += chunk.len();
     }
 
-    debug!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
+    trace!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
 
     Ok(())
 }
