@@ -60,12 +60,14 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     const [boundType, setBoundType] = useState('outbound')
     const [inbound, setInbound] = useState<Inbound | null>()
     const [outbound, setOutbound] = useState<Outbound | null>()
+    const [memStats, setMemStats] = useState<any>({})
     const loadStats = async (port: number | '') => {
         if (!port) return
         const r = await getStatsData(Number(port)) as any
         if (r) {
             r.inbound && setInbound(r.inbound)
             r.outbound && setOutbound(r.outbound)
+            r.memStats && setMemStats(r.memStats)
         }
     }
 
@@ -176,11 +178,15 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                         <TableBody>
                             <TableRow>
                                 <TableCell>网络上传总量</TableCell>
-                                <TableCell align="right">{sizeToUnit(network.up)}</TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body2" component="span" color="info">{sizeToUnit(network.up)}</Typography>
+                                </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>网络下载总量</TableCell>
-                                <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body2" component="span" color="info">{sizeToUnit(network.down)}</Typography>
+                                </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>回环流出总量</TableCell>
@@ -249,11 +255,15 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>代理上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.proxyUp || 0)}</TableCell>
+                                        <TableCell align="right">
+                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound?.proxyUp || 0)}</Typography>
+                                        </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>代理下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.proxyDown || 0)}</TableCell>
+                                        <TableCell align="right">
+                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound?.proxyDown || 0)}</Typography>
+                                        </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>直连上传流量</TableCell>
@@ -267,6 +277,41 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                             </Table>
                         </TableContainer>
                     )}
+
+                    <TableContainer elevation={2} component={Card}>
+                        <Table size="small">
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>当前内存使用</TableCell>
+                                    <TableCell align="right">
+                                        <Typography variant="body2" component="span" color="info">{sizeToUnit(memStats.currentAlloc)}</Typography>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>系统内存分配</TableCell>
+                                    <TableCell align="right">
+                                        <Typography variant="body2" component="span" color="info">{sizeToUnit(memStats.sys)}</Typography>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>累计内存分配</TableCell>
+                                    <TableCell align="right">{sizeToUnit(memStats.totalAlloc)}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>GC 次数</TableCell>
+                                    <TableCell align="right">{memStats.gcCount}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>GC 总耗时</TableCell>
+                                    <TableCell align="right">{memStats.pauseTotalMs} ms</TableCell>
+                                </TableRow>
+                                <TableRow sx={lastSx}>
+                                    <TableCell>上次 GC 时间</TableCell>
+                                    <TableCell align="right">{formatTimestamp(memStats.lastGC)}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </>)}
             </Stack>
         </Paper>
