@@ -217,6 +217,12 @@ export const DnsTable = () => {
         }
     }
 
+    // ============================== close dialog ==============================
+    const handleClose = (_?: any, reason?: string) => {
+        if (reason === 'backdropClick') return
+        handleBack()
+    }
+
     // ============================== delete ==============================
     const handleDelete = (key: number, name: string) => {
         dialogConfirm('确认删除', `确定要删除 "${name}" 吗？`, async () => {
@@ -244,7 +250,7 @@ export const DnsTable = () => {
     return (<>
         <AlertDialogComponent/>
         <DialogComponent/>
-        <Dialog open={action !== ''}>
+        <Dialog open={action !== ''} onClose={handleClose}>
             <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
                 {action === 'create' || action === 'update' ? <>
                     <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
