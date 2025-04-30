@@ -11,7 +11,7 @@ mod setup;
 mod sys_info;
 mod web;
 use logger::{debug, info};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -239,20 +239,27 @@ fn get_ray_version() -> String {
 }
 
 #[tauri::command]
-fn get_version() -> String {
+fn get_version() -> Value {
+    json!({"dray": get_dray_version(), "rustc": get_rustc_version()})
+}
+
+// rustc -Vv
+// export RUSTC_VERSION=$(rustc -V)
+// echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.profile OR
+// echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.zshrc
+// source ~/.zshrc
+// echo $RUSTC_VERSION
+fn get_rustc_version() -> String {
+    // rustc_version::version_meta().unwrap().short_version_string
+    option_env!("RUSTC_VERSION").unwrap_or("rustc 1.84.0 (9fc6b4312 2025-01-07)").to_string()
+}
+
+fn get_dray_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
 fn log_startup_info() {
-    // rustc_version::version_meta().unwrap().short_version_string
-    // rustc -Vv
-    // export RUSTC_VERSION=$(rustc -V)
-    // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.profile OR
-    // echo 'export RUSTC_VERSION=$(rustc -V)' >> ~/.zshrc
-    // source ~/.zshrc
-    // echo $RUSTC_VERSION
-    let rust_version = option_env!("RUSTC_VERSION").unwrap_or("rustc 1.84.0 (9fc6b4312 2025-01-07)");
-    info!("Dray started v{}, tauri {}, {}", env!("CARGO_PKG_VERSION"), tauri::VERSION, rust_version);
+    info!("Dray started v{}, tauri {}, {}", get_dray_version(), tauri::VERSION, get_rustc_version());
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
