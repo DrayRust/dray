@@ -33,16 +33,16 @@ interface Outbound {
     directDown: number; // 直连下载
 }
 
-interface XrayVersionInfo {
+interface VersionInfo {
+    dray: string;
+    rust: string;
     xray: string;
     go: string;
 }
 
-let versionInfo = {
-    dray: '',
-    rust: '',
-    xray: '',
-    go: ''
+interface XrayVersionInfo {
+    xray: string;
+    go: string;
 }
 
 const Home: React.FC<NavProps> = ({setNavState}) => {
@@ -72,19 +72,25 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(loadConfig, [])
 
     // ==================================== version ====================================
+    const [versionInfo, setVersionInfo] = useState<VersionInfo>({
+        dray: '',
+        rust: '',
+        xray: '',
+        go: ''
+    })
     const getVersion = async () => {
-        if (!versionInfo.dray) {
-            const version = await safeInvoke('get_version')
-            if (version) {
-                versionInfo.dray = version.dray || ''
-                versionInfo.rust = getRustVersion(version.rustc || '')
-            }
-
-            const rayVersion = await invokeString('get_ray_version')
-            if (rayVersion) {
-                versionInfo = {...versionInfo, ...parseXrayVersion(rayVersion)}
-            }
+        let r = {...versionInfo}
+        const version = await safeInvoke('get_version')
+        if (version) {
+            r.dray = version.dray || ''
+            r.rust = getRustVersion(version.rustc || '')
         }
+
+        const rayVersion = await invokeString('get_ray_version')
+        if (rayVersion) {
+            r = {...r, ...parseXrayVersion(rayVersion)}
+        }
+        setVersionInfo(r)
     }
 
     const getRustVersion = (input: string): string => {
