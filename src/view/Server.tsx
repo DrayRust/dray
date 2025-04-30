@@ -277,7 +277,6 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
 
     const serversSpeedTest = useDebounce(async (serverList: ServerList) => {
         if (serverList.length < 1) return
-        await initConfig()
         const servers = await generateServersPort(serverList)
         const tasks = servers.map((row) => () => testServerSpeed(row.server, row.port))
         await runWithConcurrency(tasks, 5)
@@ -292,8 +291,11 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const testServerSpeed = async (server: ServerRow, port: number) => {
+        await initConfig()
+        if (!appDir.current || !rayCommonConfig.current) return
+
         setServersSpeedTest(server.id, 'testStart')
-        const {result, elapsed} = await serverSpeedTest(server, appDir.current, port)
+        const {result, elapsed} = await serverSpeedTest(server, appDir.current, rayCommonConfig.current, port)
         if (!result?.ok) {
             setServersSpeedTest(server.id, 'testError')
         } else {

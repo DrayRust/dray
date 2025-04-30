@@ -23,9 +23,9 @@ export async function generateServersPort(serverList: ServerList) {
     return servers
 }
 
-export async function serverSpeedTest(server: ServerRow, appDir: string, port: number) {
+export async function serverSpeedTest(server: ServerRow, appDir: string, rayConfig: RayCommonConfig, port: number) {
     const filename = server.host.replace(/[^\w.]/g, '_') + `-${server.id}.json`
-    const conf = getSpeedTestConf(server, appDir, port)
+    const conf = getSpeedTestConf(server, appDir, rayConfig, port)
     await saveSpeedTestConf(filename, conf)
     await startSpeedTestServer(port, filename)
     await sleep(500)

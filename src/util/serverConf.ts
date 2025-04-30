@@ -10,10 +10,10 @@ export function getConf(row: ServerRow, appDir: string, config: AppConfig, rayCo
     return conf
 }
 
-export function getSpeedTestConf(row: ServerRow, appDir: string, port: number): any {
+export function getSpeedTestConf(row: ServerRow, appDir: string, rayConfig: RayCommonConfig, port: number): any {
     return {
         log: !appDir ? {} : {
-            loglevel: "debug",
+            loglevel: rayConfig.ray_log_level || "warning",
             access: `${appDir}/logs/xray_speed_test_access.log`,
             error: `${appDir}/logs/xray_speed_test_error.log`
         },
