@@ -190,11 +190,11 @@ export const SysInfo = () => {
                     <TableBody>
                         <TableRow>
                             <TableCell>网络上传总量</TableCell>
-                            <TableCell align="right">{sizeToUnit(network.up)}</TableCell>
+                            <TableCell align="right"><Typography variant="body2" component="span" color="info">{sizeToUnit(network.up)}</Typography></TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>网络下载总量</TableCell>
-                            <TableCell align="right">{sizeToUnit(network.down)}</TableCell>
+                            <TableCell align="right"><Typography variant="body2" component="span" color="info">{sizeToUnit(network.down)}</Typography></TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>回环流出总量</TableCell>
