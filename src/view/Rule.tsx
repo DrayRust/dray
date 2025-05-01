@@ -165,7 +165,7 @@ const Rule: React.FC<NavProps> = ({setNavState}) => {
 
                             <div className="flex-between">
                                 <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
-                                    <Button variant="contained" color="info" onClick={handleSaveRuleDomain}>确认</Button>
+                                    <Button variant="contained" color="info" onClick={handleSaveRuleDomain}>确定</Button>
                                     <ChipComponent/>
                                 </Stack>
                                 <Button variant="contained" onClick={handleOpenAdvanced} startIcon={<SettingsIcon/>}>高级</Button>

@@ -174,7 +174,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                        placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
                        onChange={(e) => handleTextChange(e.target.value)}/>
             <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                <Button variant="contained" onClick={handleSubmit} disabled={!text}>确认</Button>
+                <Button variant="contained" onClick={handleSubmit} disabled={!text}>确定</Button>
             </Stack>
         </Card>
     </>)

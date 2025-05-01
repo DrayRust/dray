@@ -308,7 +308,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                     ))}
                 </TextField>
                 <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
-                    <Button variant="contained" color="info" onClick={handleSubmit}>确认</Button>
+                    <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
                     <ChipComponent/>
                 </Stack>
             </>) : tab === 1 && (<>

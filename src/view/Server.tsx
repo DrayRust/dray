@@ -500,7 +500,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             <MenuItem onClick={handleEnable}><DoneOutlineIcon sx={{mr: 1}} fontSize="small"/>启用</MenuItem>
             <Divider/>
-            <MenuItem onClick={handleUpdate}><EditIcon sx={{mr: 1}} fontSize="small"/>编辑</MenuItem>
+            <MenuItem onClick={handleUpdate}><EditIcon sx={{mr: 1}} fontSize="small"/>修改</MenuItem>
             <MenuItem onClick={handleViewConfig}><VisibilityIcon sx={{mr: 1}} fontSize="small"/>配置</MenuItem>
             <MenuItem onClick={handleDelete}><DeleteIcon sx={{mr: 1}} fontSize="small"/>删除</MenuItem>
         </Menu>
