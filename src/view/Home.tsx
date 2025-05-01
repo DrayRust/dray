@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import {
     BottomNavigation, BottomNavigationAction,
-    Card, Paper, Stack, Typography, Switch,
+    Card, Paper, Stack, Typography, Switch, Tooltip,
     TableContainer, Table, TableBody, TableCell, TableRow,
 } from '@mui/material'
 import InputIcon from '@mui/icons-material/Input'
 import OutputIcon from '@mui/icons-material/Output'
+import HelpIcon from '@mui/icons-material/Help'
 
 import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, readRayConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
@@ -253,6 +254,19 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                     <Table className="table" size="small">
                         <TableBody>
                             <TableRow>
+                                <TableCell>
+                                    <div className="flex-center-gap1">
+                                        网络总量
+                                        <Tooltip arrow placement="right" title="开机以来的总数据">
+                                            <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                        </Tooltip>
+                                    </div>
+                                </TableCell>
+                                <TableCell align="right">
+                                    <Typography variant="body2" component="span" color="warning">{sizeToUnit(network.up + network.down)}</Typography>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
                                 <TableCell>网络上传总量</TableCell>
                                 <TableCell align="right">
                                     <Typography variant="body2" component="span" color="info">{sizeToUnit(network.up)}</Typography>
@@ -284,70 +298,98 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                         <BottomNavigationAction value="outbound" label="出站数据" icon={<OutputIcon/>}/>
                     </BottomNavigation>
 
-                    {boundType === 'inbound' && (
+                    {boundType === 'inbound' && inbound && (
                         <TableContainer elevation={2} component={Card}>
                             <Table className="table" size="small">
                                 <TableBody>
                                     <TableRow>
+                                        <TableCell>总流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.totalUp + inbound.totalDown)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
                                         <TableCell>总上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.totalUp || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.totalUp)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>总下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.totalDown || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.totalDown)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>HTTP 总流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.httpUp + inbound.httpDown)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>HTTP 上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.httpUp || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.httpUp)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>HTTP 下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.httpDown || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.httpDown)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>SOCKS 总流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.socksUp + inbound.socksDown)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>SOCKS 上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.socksUp || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.socksUp)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>SOCKS 下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(inbound?.socksDown || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(inbound.socksDown)}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
                         </TableContainer>
                     )}
 
-                    {boundType === 'outbound' && (
+                    {boundType === 'outbound' && outbound && (
                         <TableContainer elevation={2} component={Card}>
                             <Table className="table" size="small">
                                 <TableBody>
                                     <TableRow>
+                                        <TableCell>总流量</TableCell>
+                                        <TableCell align="right">
+                                            <Typography variant="body2" component="span" color="warning">{sizeToUnit(outbound.totalUp + outbound.totalDown)}</Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
                                         <TableCell>总上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.totalUp || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound.totalUp)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>总下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.totalDown || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound.totalDown)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>代理总流量</TableCell>
+                                        <TableCell align="right">
+                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound.proxyUp + outbound.proxyDown)}</Typography>
+                                        </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>代理上传流量</TableCell>
                                         <TableCell align="right">
-                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound?.proxyUp || 0)}</Typography>
+                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound.proxyUp)}</Typography>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>代理下载流量</TableCell>
                                         <TableCell align="right">
-                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound?.proxyDown || 0)}</Typography>
+                                            <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound.proxyDown)}</Typography>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow>
+                                        <TableCell>直连总流量</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound.directUp + outbound.directDown)}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
                                         <TableCell>直连上传流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.directUp || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound.directUp)}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>直连下载流量</TableCell>
-                                        <TableCell align="right">{sizeToUnit(outbound?.directDown || 0)}</TableCell>
+                                        <TableCell align="right">{sizeToUnit(outbound.directDown)}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
