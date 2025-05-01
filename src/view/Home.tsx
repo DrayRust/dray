@@ -203,7 +203,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         }}>
             <Stack spacing={2} sx={{minWidth: 620, m: 'auto'}}>
                 <Stack direction="row" elevation={2} component={Card} sx={{p: 1, justifyContent: 'space-between', alignItems: 'center'}}>
-                    <Typography variant="body1" sx={{paddingLeft: 1}}>Ray 服务</Typography>
+                    <Typography variant="body1" sx={{paddingLeft: 1}}>Xray 服务</Typography>
                     <Switch checked={rayEnable} onChange={handleRayEnable} sx={{transform: 'scale(1.3)'}}/>
                 </Stack>
 
