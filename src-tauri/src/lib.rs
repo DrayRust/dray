@@ -118,6 +118,16 @@ async fn download_large_file(url: String, filepath: String, timeout: u64) -> Val
 }
 
 #[tauri::command]
+async fn ping_test(url: String, count: usize) -> Value {
+    http::ping_test(&url, count).await
+}
+
+#[tauri::command]
+async fn jitter_test(url: String, count: usize) -> Value {
+    http::jitter_test(&url, count).await
+}
+
+#[tauri::command]
 async fn download_speed_test(url: String) -> Value {
     http::download_speed_test(&url).await
 }
@@ -310,6 +320,8 @@ pub fn run() {
             fetch_get,
             fetch_get_with_proxy,
             download_large_file,
+            ping_test,
+            jitter_test,
             download_speed_test,
             upload_speed_test,
             get_dirs_json,

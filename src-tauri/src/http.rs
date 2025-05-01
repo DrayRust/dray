@@ -111,6 +111,88 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     Ok(())
 }
 
+pub async fn ping_test(url: &str, count: usize) -> Value {
+    let client = Client::new();
+    let mut latencies = Vec::new();
+
+    for _ in 0..count {
+        let start = Instant::now();
+        let res = client.get(url).send().await;
+
+        match res {
+            Ok(_) => {
+                let latency = start.elapsed().as_secs_f64() * 1000.0;
+                latencies.push(latency);
+            }
+            Err(e) => {
+                error!("Ping failed: {:?}", e);
+                return json!({
+                    "ok": false,
+                    "errMsg": e.to_string()
+                });
+            }
+        }
+    }
+
+    if latencies.is_empty() {
+        return json!({
+            "ok": false,
+            "errMsg": "No successful ping responses"
+        });
+    }
+
+    let avg_latency = latencies.iter().sum::<f64>() / latencies.len() as f64;
+
+    json!({
+        "ok": true,
+        "avg_latency_ms": avg_latency,
+        "samples": latencies
+    })
+}
+
+pub async fn jitter_test(url: &str, count: usize) -> Value {
+    let client = Client::new();
+    let mut latencies = Vec::new();
+
+    for _ in 0..count {
+        let start = Instant::now();
+        let res = client.get(url).send().await;
+
+        match res {
+            Ok(_) => {
+                let latency = start.elapsed().as_secs_f64() * 1000.0;
+                latencies.push(latency);
+            }
+            Err(e) => {
+                error!("Jitter ping failed: {:?}", e);
+                return json!({
+                    "ok": false,
+                    "errMsg": e.to_string()
+                });
+            }
+        }
+    }
+
+    if latencies.len() < 2 {
+        return json!({
+            "ok": false,
+            "errMsg": "Insufficient samples to calculate jitter"
+        });
+    }
+
+    let mut diffs = Vec::new();
+    for i in 1..latencies.len() {
+        diffs.push((latencies[i] - latencies[i - 1]).abs());
+    }
+    let jitter = diffs.iter().sum::<f64>() / diffs.len() as f64;
+
+    json!({
+        "ok": true,
+        "jitter_ms": jitter,
+        "samples": latencies
+    })
+}
+
 pub async fn download_speed_test(url: &str) -> Value {
     let client = Client::new();
     let start = Instant::now();
