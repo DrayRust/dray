@@ -75,10 +75,10 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
 
 pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
     match stream_download(&url, &filepath, timeout).await {
-        Ok(()) => json!({"success": true}),
+        Ok(()) => json!({"ok": true}),
         Err(e) => {
             error!("{}", e);
-            json!({"success": false, "msg": e})
+            json!({"ok": false, "msg": e})
         }
     }
 }

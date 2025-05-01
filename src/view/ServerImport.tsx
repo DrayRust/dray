@@ -162,22 +162,19 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             </DialogActions>
         </Dialog>
         <Card sx={{p: 2, mt: 1}}>
-            <Stack spacing={2}>
-                <div id="abc"></div>
-                <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
-                    <Button variant="contained" color="secondary" className="qr-upload-but">
-                        <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
-                        选择二维码图片
-                    </Button>
-                    <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
-                    <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
-                </Stack>
-                <TextField variant="outlined" label="请输入链接(URI)" fullWidth multiline minRows={6} maxRows={20} value={text}
-                           placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
-                           onChange={(e) => handleTextChange(e.target.value)}/>
-                <Stack direction="row" spacing={1}>
-                    <Button variant="contained" onClick={handleSubmit} disabled={!text}>确认</Button>
-                </Stack>
+            <Stack direction="row" spacing={1} sx={{alignItems: 'center', mb: 2.5}}>
+                <Button variant="contained" color="secondary" className="qr-upload-but">
+                    <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
+                    选择二维码图片
+                </Button>
+                <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
+                <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
+            </Stack>
+            <TextField fullWidth multiline variant="outlined" label="请输入链接(URI)" minRows={6} maxRows={20} value={text}
+                       placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
+                       onChange={(e) => handleTextChange(e.target.value)}/>
+            <Stack direction="row" spacing={1} sx={{mt: 2}}>
+                <Button variant="contained" onClick={handleSubmit} disabled={!text}>确认</Button>
             </Stack>
         </Card>
     </>)
