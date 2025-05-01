@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import QrScanner from 'qr-scanner'
+import { Html5Qrcode } from 'html5-qrcode'
 import { Card, TextField, Button, Stack, Dialog, DialogContent, DialogActions } from '@mui/material'
 import { useDebounce } from '../hook/useDebounce.ts'
 import { useSnackbar } from "../component/useSnackbar.tsx"
@@ -38,10 +38,11 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
         for (const file of files) {
             if (!file.type.startsWith('image/')) return
             try {
-                let r = await QrScanner.scanImage(file, {alsoTryWithoutScanRegion: true})
-                s += r.data + '\n'
+                const html5Qr = new Html5Qrcode("hidden-reader")
+                const decodedText = await html5Qr.scanFile(file, true)
+                s += decodedText + '\n'
                 ok++
-            } catch (e) {
+            } catch {
                 err++
             }
         }
@@ -57,86 +58,93 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
             const image = await clipboardReadImage()
             const imgRgba = await image.rgba()
             const imgSize = await image.size()
-            const url = createImageFromRGBA(imgRgba, imgSize.width, imgSize.height)
-            if (!url) {
+            const file = await createImageFromRGBA(imgRgba, imgSize.width, imgSize.height)
+            if (!file) {
                 showSnackbar('转 canvas 出错', 'error')
                 return
             }
 
             try {
-                let r = await QrScanner.scanImage(url, {alsoTryWithoutScanRegion: true})
-                setText(r.data)
-            } catch (e) {
+                const html5Qr = new Html5Qrcode("hidden-reader")
+                const r = await html5Qr.scanFile(file, true)
+                setText(r)
+            } catch {
                 showSnackbar('没有识别到内容', 'error')
             }
-        } catch (e) {
+        } catch {
             showSnackbar('没有从剪切板读取到内容', 'error')
         }
     }
 
-    const createImageFromRGBA = (rgbaData: Uint8Array, width: number, height: number) => {
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-        if (!ctx) return ''
+    const createImageFromRGBA = (rgbaData: Uint8Array, width: number, height: number): Promise<File | null> => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return resolve(null)
 
-        canvas.width = width
-        canvas.height = height
-        const imageData = new ImageData(new Uint8ClampedArray(rgbaData), width, height)
-        ctx.putImageData(imageData, 0, 0)
-        return canvas.toDataURL('image/png')
+            canvas.width = width
+            canvas.height = height
+            const imageData = new ImageData(new Uint8ClampedArray(rgbaData), width, height)
+            ctx.putImageData(imageData, 0, 0)
+
+            canvas.toBlob((blob) => {
+                if (!blob) return resolve(null)
+
+                const file = new File([blob], 'clipboard.png', {type: 'image/png'})
+                resolve(file)
+            }, 'image/png')
+        })
     }
 
     // =============== camera import ===============
     const [open, setOpen] = useState(false)
     const [cameraState, setCameraState] = useState(-1)
-    let scanner = useRef<QrScanner | null>(null)
-    const handleStopCamera = () => {
+    const scannerRef = useRef<Html5Qrcode | null>(null)
+    const handleStopCamera = async () => {
         setOpen(false)
-        if (scanner.current) {
-            scanner.current.stop()
-            // scanner.current.destroy()
+        if (scannerRef.current) {
+            try {
+                await scannerRef.current.stop()
+                scannerRef.current.clear()
+            } catch (e) {
+            }
         }
     }
 
     const handleStartCamera = async () => {
         setOpen(true)
-
         setCameraState(-1)
-        const hasCamera = await checkHasCamera()
-        setCameraState(hasCamera ? 1 : 0)
-
-        setTimeout(startCamera, 200)
-    }
-
-    const checkHasCamera = async () => {
         try {
-            return await QrScanner.hasCamera()
+            const devices = await Html5Qrcode.getCameras()
+            if (!devices || devices.length < 1) {
+                setCameraState(0)
+                return
+            }
+
+            setCameraState(1)
+            setTimeout(() => startCamera(devices[0].id), 200)
         } catch (e) {
-            return false
+            setCameraState(0)
+            return
         }
     }
 
-    const startCamera = () => {
-        const videoEl = document.getElementById('camera-video') as HTMLVideoElement
-        if (!videoEl) return
-
+    const startCamera = async (cameraId: string) => {
         try {
-            scanner.current = new QrScanner(videoEl, (r: any) => {
-                setText(r.data)
-                handleStopCamera()
-            }, {
-                onDecodeError: (_e => {
-                    // console.log('Decode error', _e, new Date().toLocaleString())
-                }),
-                maxScansPerSecond: 10,
-                highlightScanRegion: true,
-                highlightCodeOutline: true,
-            })
-            // scanner.current.setInversionMode('both')
-            scanner.current.start()
-        } catch (e) {
+            const qrScanner = new Html5Qrcode('camera-reader')
+            scannerRef.current = qrScanner
+            await qrScanner.start(
+                cameraId,
+                {fps: 10, qrbox: 250},
+                (decodedText) => {
+                    setText(decodedText)
+                    handleStopCamera()
+                },
+                (_) => {
+                }
+            )
+        } catch {
             setCameraState(-2)
-            return
         }
     }
 
@@ -145,6 +153,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     return (<>
         <SnackbarComponent/>
         <AppBarComponent/>
+        <div id="hidden-reader" style={{display: 'none'}}></div>
         <Dialog open={open} onClose={handleStopCamera}>
             <DialogContent sx={{p: 2, pb: 0}}>
                 {cameraState === -1 ? (
@@ -152,7 +161,7 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 ) : cameraState === 0 ? (
                     <div className="camera-box">未检测到摄像头，请检查设备或权限</div>
                 ) : cameraState === 1 ? (
-                    <video id="camera-video"></video>
+                    <div id="camera-reader" style={{width: 480, height: 360}}/>
                 ) : cameraState === -2 && (
                     <div className="camera-box">启用摄像头失败</div>
                 )}

@@ -128,12 +128,12 @@ body, html {
     cursor: pointer;
 }
 
-#camera-video, .camera-box {
+#camera-reader, .camera-box {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 520px;
-    height: 292px;
+    width: 480px;
+    height: 360px;
     background: #121212;
     color: #fff;
 }
