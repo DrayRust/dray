@@ -111,8 +111,9 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     Ok(())
 }
 
-pub async fn ping_test(url: &str, count: usize) -> Value {
-    let client = Client::new();
+pub async fn ping_test(url: &str, count: usize, timeout: u64) -> Value {
+    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+
     let mut latencies = Vec::new();
 
     for _ in 0..count {
@@ -150,8 +151,9 @@ pub async fn ping_test(url: &str, count: usize) -> Value {
     })
 }
 
-pub async fn jitter_test(url: &str, count: usize) -> Value {
-    let client = Client::new();
+pub async fn jitter_test(url: &str, count: usize, timeout: u64) -> Value {
+    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+
     let mut latencies = Vec::new();
 
     for _ in 0..count {
@@ -193,8 +195,9 @@ pub async fn jitter_test(url: &str, count: usize) -> Value {
     })
 }
 
-pub async fn download_speed_test(url: &str) -> Value {
-    let client = Client::new();
+pub async fn download_speed_test(url: &str, timeout: u64) -> Value {
+    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+
     let start = Instant::now();
 
     let response = client.get(url).send().await;
@@ -229,13 +232,24 @@ pub async fn download_speed_test(url: &str) -> Value {
     }
 }
 
-pub async fn upload_speed_test(url: &str, size: usize) -> Value {
+pub async fn upload_speed_test(url: &str, size: usize, timeout: u64) -> Value {
     let size_bytes = size * 1024 * 1024; // Convert size from MB to bytes
     let buffer = vec![0u8; size_bytes];
-    let client = Client::new();
+
+    let client = Client::builder().timeout(Duration::from_secs(timeout)).build();
+
+    if let Err(e) = client {
+        error!("Failed to build HTTP client: {:?}", e);
+        return json!({
+            "ok": false,
+            "errMsg": e.to_string()
+        });
+    }
+
+    let client = client.unwrap();
     let start = Instant::now();
 
-    let response = client.post(url).body(buffer.clone()).send().await;
+    let response = client.post(url).body(buffer).send().await;
 
     match response {
         Ok(_) => {
@@ -250,7 +264,7 @@ pub async fn upload_speed_test(url: &str, size: usize) -> Value {
             error!("Failed to upload speed test: {:?}", e);
             json!({
                 "ok": false,
-                "errMsg": e.to_string(),
+                "errMsg": e.to_string()
             })
         }
     }
