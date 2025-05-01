@@ -8,6 +8,7 @@ use serde_json::{json, Value};
 use std::fs::File;
 use std::io::Write;
 use std::time::Duration;
+use std::time::Instant;
 
 fn get_default_proxy_url() -> Option<String> {
     let config = config::get_config();
@@ -78,7 +79,7 @@ pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Val
         Ok(()) => json!({"ok": true}),
         Err(e) => {
             error!("{}", e);
-            json!({"ok": false, "msg": e})
+            json!({"ok": false, "errMsg": e})
         }
     }
 }
@@ -108,4 +109,31 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     trace!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
 
     Ok(())
+}
+
+pub async fn upload_speed_test(url: &str, size: usize) -> Value {
+    let size_bytes = size * 1024 * 1024; // Convert size from MB to bytes
+    let buffer = vec![0u8; size_bytes];
+    let client = Client::new();
+    let start = Instant::now();
+
+    let response = client.post(url).body(buffer.clone()).send().await;
+
+    match response {
+        Ok(_) => {
+            let duration = start.elapsed().as_secs_f64();
+            let speed_mbps = (size_bytes as f64 * 8.0) / (duration * 1_000_000.0);
+            json!({
+                "ok": true,
+                "speed": speed_mbps
+            })
+        }
+        Err(e) => {
+            error!("Failed to upload speed test: {:?}", e);
+            json!({
+                "ok": false,
+                "errMsg": e.to_string(),
+            })
+        }
+    }
 }
