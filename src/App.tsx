@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import {
@@ -25,7 +25,7 @@ import Home from "./view/Home.tsx"
 import Server from "./view/Server.tsx"
 import ServerCreate from "./view/ServerCreate.tsx"
 import ServerExport from "./view/ServerExport.tsx"
-import ServerImport from "./view/ServerImport.tsx"
+// import ServerImport from "./view/ServerImport.tsx"
 import ServerUpdate from "./view/ServerUpdate.tsx"
 import Subscription from "./view/Subscription.tsx"
 import Rule from "./view/Rule.tsx"
@@ -33,6 +33,8 @@ import Log from "./view/Log.tsx"
 import LogDetail from "./view/LogDetail.tsx"
 import Tool from "./view/Tool.tsx"
 import Setting from "./view/Setting.tsx"
+
+const ServerImport = lazy(() => import("./view/ServerImport.tsx"))
 
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
