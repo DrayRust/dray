@@ -1,6 +1,6 @@
 use crate::config;
 use futures_util::StreamExt;
-use logger::{error, trace};
+use logger::{error, info, trace};
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Proxy;
@@ -106,9 +106,45 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
         total_size += chunk.len();
     }
 
-    trace!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
+    info!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
 
     Ok(())
+}
+
+pub async fn download_speed_test(url: &str) -> Value {
+    let client = Client::new();
+    let start = Instant::now();
+
+    let response = client.get(url).send().await;
+
+    match response {
+        Ok(resp) => match resp.bytes().await {
+            Ok(bytes) => {
+                let size_bytes = bytes.len();
+                let duration = start.elapsed().as_secs_f64();
+                let speed_mbps = (size_bytes as f64 * 8.0) / (duration * 1_000_000.0);
+
+                json!({
+                    "ok": true,
+                    "speed": speed_mbps
+                })
+            }
+            Err(e) => {
+                error!("Failed to read download body: {:?}", e);
+                json!({
+                    "ok": false,
+                    "errMsg": e.to_string()
+                })
+            }
+        },
+        Err(e) => {
+            error!("Failed to perform download speed test: {:?}", e);
+            json!({
+                "ok": false,
+                "errMsg": e.to_string()
+            })
+        }
+    }
 }
 
 pub async fn upload_speed_test(url: &str, size: usize) -> Value {

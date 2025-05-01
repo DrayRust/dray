@@ -118,6 +118,11 @@ async fn download_large_file(url: String, filepath: String, timeout: u64) -> Val
 }
 
 #[tauri::command]
+async fn download_speed_test(url: String) -> Value {
+    http::download_speed_test(&url).await
+}
+
+#[tauri::command]
 async fn upload_speed_test(url: String, size: usize) -> Value {
     http::upload_speed_test(&url, size).await
 }
@@ -305,6 +310,7 @@ pub fn run() {
             fetch_get,
             fetch_get_with_proxy,
             download_large_file,
+            download_speed_test,
             upload_speed_test,
             get_dirs_json,
             get_dray_app_dir,
