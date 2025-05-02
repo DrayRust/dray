@@ -30,7 +30,7 @@ function GaugePointer() {
 
 export const SpeedGauge: React.FC<SpeedGaugeProps> = ({title, percent, value}) => {
     return (
-        <Stack component={Card} elevation={3} sx={{p: 2, alignItems: 'center'}}>
+        <Stack component={Card} elevation={3} sx={{p: 2, flex: 1, alignItems: 'center'}}>
             <Typography variant="h6">{title}</Typography>
             <GaugeContainer width={300} height={200} startAngle={-110} endAngle={110} value={percent}>
                 <GaugeReferenceArc/>
