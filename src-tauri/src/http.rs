@@ -228,6 +228,7 @@ pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> V
                 match chunk_result {
                     Ok(chunk) => {
                         total_bytes += chunk.len();
+                        trace!("Chunk len: {}, total bytes: {}", chunk.len(), total_bytes);
                     }
                     Err(e) => {
                         error!("Error while reading chunk: {:?}", e);
