@@ -298,7 +298,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                         <BottomNavigationAction value="outbound" label="出站数据" icon={<OutputIcon/>}/>
                     </BottomNavigation>
 
-                    {boundType === 'inbound' && inbound && (
+                    {boundType === 'inbound' && inbound && (<>
                         <TableContainer elevation={2} component={Card}>
                             <Table className="table" size="small">
                                 <TableBody>
@@ -314,6 +314,13 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                         <TableCell>总下载流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound.totalDown)}</TableCell>
                                     </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <TableContainer elevation={2} component={Card}>
+                            <Table className="table" size="small">
+                                <TableBody>
                                     <TableRow>
                                         <TableCell>HTTP 总流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound.httpUp + inbound.httpDown)}</TableCell>
@@ -326,6 +333,13 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                         <TableCell>HTTP 下载流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound.httpDown)}</TableCell>
                                     </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <TableContainer elevation={2} component={Card}>
+                            <Table className="table" size="small">
+                                <TableBody>
                                     <TableRow>
                                         <TableCell>SOCKS 总流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(inbound.socksUp + inbound.socksDown)}</TableCell>
@@ -341,9 +355,9 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                    )}
+                    </>)}
 
-                    {boundType === 'outbound' && outbound && (
+                    {boundType === 'outbound' && outbound && (<>
                         <TableContainer elevation={2} component={Card}>
                             <Table className="table" size="small">
                                 <TableBody>
@@ -361,6 +375,13 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                         <TableCell>总下载流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(outbound.totalDown)}</TableCell>
                                     </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <TableContainer elevation={2} component={Card}>
+                            <Table className="table" size="small">
+                                <TableBody>
                                     <TableRow>
                                         <TableCell>代理总流量</TableCell>
                                         <TableCell align="right">
@@ -379,6 +400,13 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                             <Typography variant="body2" component="span" color="info">{sizeToUnit(outbound.proxyDown)}</Typography>
                                         </TableCell>
                                     </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <TableContainer elevation={2} component={Card}>
+                            <Table className="table" size="small">
+                                <TableBody>
                                     <TableRow>
                                         <TableCell>直连总流量</TableCell>
                                         <TableCell align="right">{sizeToUnit(outbound.directUp + outbound.directDown)}</TableCell>
@@ -394,7 +422,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                    )}
+                    </>)}
 
                     <TableContainer elevation={2} component={Card}>
                         <Table className="table" size="small">
