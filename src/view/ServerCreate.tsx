@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
-import PageHeader from "../component/PageHeader.tsx"
+import { PageHeader } from "../component/PageHeader.tsx"
 import { hashJson } from "../util/crypto.ts"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"

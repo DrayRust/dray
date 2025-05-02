@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
-import { useAppBar } from "../component/useAppBar.tsx"
+import { PageHeader } from "../component/PageHeader.tsx"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { hashJson } from "../util/crypto.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
@@ -138,16 +138,15 @@ const ServerUpdate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar()
-    const {AppBarComponent} = useAppBar('/server', '修改')
     return !serverList ? (
         <LoadingCard/>
     ) : errorMsg ? (
         <ErrorCard errorMsg={errorMsg}/>
     ) : (<>
         <SnackbarComponent/>
-        <AppBarComponent/>
-        <Card sx={{p: 2, mt: 1}}>
-            <Grid container spacing={2} sx={{maxWidth: 800, m: 'auto'}}>
+        <Card>
+            <PageHeader title="修改" backLink="/server"/>
+            <Grid container spacing={2} sx={{p: 2, maxWidth: 800, m: 'auto'}}>
                 <Grid size={12}>
                     <ToggleButtonGroup exclusive value={serverType} className="server-type">
                         <ToggleButton value="vmess">Vmess</ToggleButton>

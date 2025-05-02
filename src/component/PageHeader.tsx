@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Stack, Paper, Button, Typography } from '@mui/material'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 
-const PageHeader = ({title, backLink}: { title: string, backLink: string }) => {
+export const PageHeader = ({title, backLink}: { title: string, backLink: string }) => {
     const navigate = useNavigate()
     return (
         <Stack direction="row" component={Paper} elevation={1} sx={{p: 1, borderRadius: '8px 8px 0 0', alignItems: 'center'}}>
@@ -18,5 +18,3 @@ const PageHeader = ({title, backLink}: { title: string, backLink: string }) => {
         </Stack>
     )
 }
-
-export default PageHeader

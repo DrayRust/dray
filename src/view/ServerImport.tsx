@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Html5Qrcode } from 'html5-qrcode'
-import { Card, TextField, Button, Stack, Dialog, DialogContent, DialogActions } from '@mui/material'
+import { Box, Card, TextField, Button, Stack, Dialog, DialogContent, DialogActions } from '@mui/material'
 import { useDebounce } from '../hook/useDebounce.ts'
 import { useSnackbar } from "../component/useSnackbar.tsx"
-import { useAppBar } from "../component/useAppBar.tsx"
+import { PageHeader } from "../component/PageHeader.tsx"
 import { useServerImport } from "../component/useServerImport.tsx"
 import { clipboardReadImage } from "../util/tauri.ts"
 
@@ -149,10 +149,8 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar, handleCloseSnackbar} = useSnackbar()
-    const {AppBarComponent} = useAppBar('/server', '导入')
     return (<>
         <SnackbarComponent/>
-        <AppBarComponent/>
         <div id="hidden-reader" style={{display: 'none'}}></div>
         <Dialog open={open} onClose={handleStopCamera}>
             <DialogContent sx={{p: 2, pb: 0}}>
@@ -170,21 +168,24 @@ const ServerImport: React.FC<NavProps> = ({setNavState}) => {
                 <Button variant="contained" onClick={handleStopCamera}>取消</Button>
             </DialogActions>
         </Dialog>
-        <Card sx={{p: 2, mt: 1}}>
-            <Stack direction="row" spacing={1} sx={{alignItems: 'center', mb: 2.5}}>
-                <Button variant="contained" color="secondary" className="qr-upload-but">
-                    <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
-                    选择二维码图片
-                </Button>
-                <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
-                <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
-            </Stack>
-            <TextField fullWidth multiline variant="outlined" label="请输入链接(URI)" minRows={6} maxRows={20} value={text}
-                       placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
-                       onChange={(e) => handleTextChange(e.target.value)}/>
-            <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                <Button variant="contained" onClick={handleSubmit} disabled={!text}>确定</Button>
-            </Stack>
+        <Card>
+            <PageHeader title="导入" backLink="/server"/>
+            <Box sx={{p: 2}}>
+                <Stack direction="row" spacing={1} sx={{alignItems: 'center', mb: 2.5}}>
+                    <Button variant="contained" color="secondary" className="qr-upload-but">
+                        <input multiple type="file" accept="image/*" ref={fileInputRef} onClick={handleCloseSnackbar} onChange={handleFileChange}/>
+                        选择二维码图片
+                    </Button>
+                    <Button variant="contained" color="success" onClick={handleReadClipboard}>从剪切板提取二维码</Button>
+                    <Button variant="contained" color="warning" onClick={handleStartCamera}>摄像头扫描二维码</Button>
+                </Stack>
+                <TextField fullWidth multiline variant="outlined" label="请输入链接(URI)" minRows={6} maxRows={20} value={text}
+                           placeholder="每行一条，例如：vless://xxxxxx 或 ss://xxxxxx" autoFocus={true} error={error}
+                           onChange={(e) => handleTextChange(e.target.value)}/>
+                <Stack direction="row" spacing={1} sx={{mt: 2}}>
+                    <Button variant="contained" onClick={handleSubmit} disabled={!text}>确定</Button>
+                </Stack>
+            </Box>
         </Card>
     </>)
 }
