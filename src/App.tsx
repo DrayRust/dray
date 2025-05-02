@@ -31,10 +31,11 @@ import Subscription from "./view/Subscription.tsx"
 import Rule from "./view/Rule.tsx"
 import Log from "./view/Log.tsx"
 import LogDetail from "./view/LogDetail.tsx"
-import Tool from "./view/Tool.tsx"
+// import Tool from "./view/Tool.tsx"
 import Setting from "./view/Setting.tsx"
 
 const ServerImport = lazy(() => import("./view/ServerImport.tsx"))
+const Tool = lazy(() => import("./view/Tool.tsx"))
 
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
