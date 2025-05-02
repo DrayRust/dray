@@ -118,8 +118,8 @@ async fn download_large_file(url: String, filepath: String, timeout: u64) -> Val
 }
 
 #[tauri::command]
-async fn ping_test(url: String, count: usize, timeout: u64) -> Value {
-    http::ping_test(&url, count, timeout).await
+async fn ping_test(url: String, user_agent: String, count: usize, timeout: u64) -> Value {
+    http::ping_test(&url, &user_agent, count, timeout).await
 }
 
 #[tauri::command]

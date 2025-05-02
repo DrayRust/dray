@@ -1,6 +1,6 @@
 use crate::config;
 use futures_util::StreamExt;
-use logger::{error, info, trace};
+use logger::{error, info, trace, warn};
 use reqwest::header;
 use reqwest::Client;
 use reqwest::Proxy;
@@ -9,6 +9,7 @@ use std::fs::File;
 use std::io::Write;
 use std::time::Duration;
 use std::time::Instant;
+use tokio::time::sleep;
 
 fn get_default_proxy_url() -> Option<String> {
     let config = config::get_config();
@@ -111,34 +112,43 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     Ok(())
 }
 
-pub async fn ping_test(url: &str, count: usize, timeout: u64) -> Value {
+pub async fn ping_test(url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
     let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
 
     let mut latencies = Vec::new();
+    let mut error_count = 0;
 
-    for _ in 0..count {
+    for i in 0..count {
         let start = Instant::now();
-        let res = client.get(url).send().await;
+        let res = client.get(url).header(header::USER_AGENT, user_agent).send().await;
 
         match res {
-            Ok(_) => {
+            Ok(response) => {
+                if !response.status().is_success() {
+                    warn!("Ping attempt failed with HTTP status: {}", response.status());
+                    error_count += 1;
+                    continue;
+                }
+
                 let latency = start.elapsed().as_secs_f64() * 1000.0;
                 latencies.push(latency);
             }
             Err(e) => {
-                error!("Ping failed: {:?}", e);
-                return json!({
-                    "ok": false,
-                    "errMsg": e.to_string()
-                });
+                warn!("Ping attempt failed, i: {}, {:?}", i, e);
+                error_count += 1;
             }
+        }
+
+        if i + 1 < count {
+            sleep(Duration::from_millis(300)).await;
         }
     }
 
     if latencies.is_empty() {
         return json!({
             "ok": false,
-            "errMsg": "No successful ping responses"
+            "error_message": "No successful ping responses",
+            "error_count": error_count
         });
     }
 
@@ -147,7 +157,8 @@ pub async fn ping_test(url: &str, count: usize, timeout: u64) -> Value {
     json!({
         "ok": true,
         "avg_latency_ms": avg_latency,
-        "samples": latencies
+        "samples": latencies,
+        "error_count": error_count
     })
 }
 

@@ -207,6 +207,14 @@ export async function saveDnsTableList(content: DnsTableList) {
     return saveConf('dns_table_list.json', content)
 }
 
+export async function readSpeedTestConfig(): Promise<SpeedTestConfig | undefined> {
+    return readConf('speed_test_config.json')
+}
+
+export async function saveSpeedTestConfig(content: SpeedTestConfig) {
+    return saveConf('speed_test_config.json', content)
+}
+
 export async function getSysInfoJson() {
     return safeInvoke('get_sys_info_json')
 }
@@ -233,4 +241,8 @@ export async function getComponentsJson() {
 
 export async function killProcessByPid(pid: number) {
     return invokeBool('kill_process_by_pid', {pid})
+}
+
+export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+    return safeInvoke('ping_test', {url, userAgent, count, timeout})
 }

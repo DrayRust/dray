@@ -201,6 +201,17 @@ interface RuleDomain {
     reject: string; // 阻止访问的域名，每行一条
 }
 
+// ============= speed test ============
+interface SpeedTestConfig {
+    pingActive: number;
+    downloadActive: number;
+    uploadActive: number;
+
+    pingContent: string;
+    downloadContent: string;
+    uploadContent: string;
+}
+
 // https://xtls.github.io/config/routing.html#ruleobject
 // https://www.v2fly.org/config/routing.html#ruleobject
 /**
