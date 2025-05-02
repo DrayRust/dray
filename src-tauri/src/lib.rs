@@ -123,8 +123,8 @@ async fn ping_test(url: String, user_agent: String, count: usize, timeout: u64) 
 }
 
 #[tauri::command]
-async fn jitter_test(url: String, count: usize, timeout: u64) -> Value {
-    http::jitter_test(&url, count, timeout).await
+async fn jitter_test(url: String, user_agent: String, count: usize, timeout: u64) -> Value {
+    http::jitter_test(&url, &user_agent, count, timeout).await
 }
 
 #[tauri::command]

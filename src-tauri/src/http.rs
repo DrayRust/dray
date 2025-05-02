@@ -140,7 +140,7 @@ pub async fn ping_test(url: &str, user_agent: &str, count: usize, timeout: u64) 
         }
 
         if i + 1 < count {
-            sleep(Duration::from_millis(300)).await;
+            sleep(Duration::from_millis(200)).await;
         }
     }
 
@@ -162,47 +162,55 @@ pub async fn ping_test(url: &str, user_agent: &str, count: usize, timeout: u64) 
     })
 }
 
-pub async fn jitter_test(url: &str, count: usize, timeout: u64) -> Value {
+pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
     let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
 
     let mut latencies = Vec::new();
+    let mut error_count = 0;
 
-    for _ in 0..count {
+    for i in 0..count {
         let start = Instant::now();
-        let res = client.get(url).send().await;
+        let res = client.get(url).header(header::USER_AGENT, user_agent).send().await;
 
         match res {
-            Ok(_) => {
+            Ok(response) => {
+                if !response.status().is_success() {
+                    warn!("Jitter ping failed with HTTP status: {}", response.status());
+                    error_count += 1;
+                    continue;
+                }
+
                 let latency = start.elapsed().as_secs_f64() * 1000.0;
                 latencies.push(latency);
             }
             Err(e) => {
-                error!("Jitter ping failed: {:?}", e);
-                return json!({
-                    "ok": false,
-                    "errMsg": e.to_string()
-                });
+                warn!("Jitter ping failed at attempt {}: {:?}", i, e);
+                error_count += 1;
             }
+        }
+
+        if i + 1 < count {
+            sleep(Duration::from_millis(200)).await;
         }
     }
 
     if latencies.len() < 2 {
         return json!({
             "ok": false,
-            "errMsg": "Insufficient samples to calculate jitter"
+            "error_message": "Insufficient samples to calculate jitter",
+            "error_count": error_count
         });
     }
 
-    let mut diffs = Vec::new();
-    for i in 1..latencies.len() {
-        diffs.push((latencies[i] - latencies[i - 1]).abs());
-    }
+    // jitter = 相邻延迟差值的平均数
+    let diffs: Vec<f64> = latencies.windows(2).map(|pair| (pair[1] - pair[0]).abs()).collect();
     let jitter = diffs.iter().sum::<f64>() / diffs.len() as f64;
 
     json!({
         "ok": true,
         "jitter_ms": jitter,
-        "samples": latencies
+        "samples": latencies,
+        "error_count": error_count
     })
 }
 
