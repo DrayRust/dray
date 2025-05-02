@@ -1,4 +1,3 @@
-import React from 'react'
 import { Stack, Card, Typography } from '@mui/material'
 import { GaugeContainer, GaugeValueArc, GaugeReferenceArc, useGaugeState } from '@mui/x-charts/Gauge'
 
@@ -28,7 +27,7 @@ function GaugePointer() {
     )
 }
 
-export const SpeedGauge: React.FC<SpeedGaugeProps> = ({title, percent, value}) => {
+export const SpeedGauge = ({title, percent, value}: SpeedGaugeProps) => {
     return (
         <Stack component={Card} elevation={3} sx={{p: 2, flex: 1, alignItems: 'center'}}>
             <Typography variant="h6">{title}</Typography>
