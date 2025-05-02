@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ToggleButtonGroup, ToggleButton, Card, TextField, Button, Grid } from '@mui/material'
 
-import { useAppBar } from "../component/useAppBar.tsx"
+import PageHeader from "../component/PageHeader.tsx"
 import { hashJson } from "../util/crypto.ts"
 import { validateServerField, validateServerRow } from "../util/validate.ts"
 import { readServerList, saveServerList } from "../util/invoke.ts"
@@ -168,12 +168,11 @@ const ServerCreate: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const {SnackbarComponent, showSnackbar} = useSnackbar()
-    const {AppBarComponent} = useAppBar('/server', '添加')
     return <>
         <SnackbarComponent/>
-        <AppBarComponent/>
-        <Card sx={{p: 2, mt: 1}}>
-            <Grid container spacing={2} sx={{maxWidth: 800, m: 'auto'}}>
+        <Card>
+            <PageHeader title="添加" backLink="/server"/>
+            <Grid container spacing={2} sx={{p: 2, maxWidth: 800, m: 'auto'}}>
                 <Grid size={12}>
                     <ToggleButtonGroup
                         exclusive value={serverType} className="server-type"
