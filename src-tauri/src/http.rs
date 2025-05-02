@@ -234,7 +234,7 @@ pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> V
                         error!("Error while reading chunk: {:?}", e);
                         return json!({
                             "ok": false,
-                            "error_message": format!("Stream error: {}", e)
+                            "error_message": format!("Error reading download stream: {}", e)
                         });
                     }
                 }
@@ -245,7 +245,7 @@ pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> V
             if duration == 0.0 {
                 return json!({
                     "ok": false,
-                    "error_message": "Test duration too short"
+                    "error_message": "Download duration too short (0s)"
                 });
             }
 
@@ -259,7 +259,7 @@ pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> V
             })
         }
         Err(e) => {
-            let msg = format!("Failed to initiate upload request: {}", e);
+            let msg = format!("Failed to initiate download request: {}", e);
             error!("{}", msg);
             json!({
                 "ok": false,
