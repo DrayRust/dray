@@ -4,8 +4,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    --scrollbar-thumb: #888;
-    --scrollbar-thumb-hover: #555;
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
     --row-odd-bg: #ffffff;
 }
 
