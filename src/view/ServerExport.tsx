@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import {
-    Box, Typography, TextField, ToggleButtonGroup, ToggleButton,
+    Box, Card, Typography, TextField, ToggleButtonGroup, ToggleButton,
     Accordion, AccordionSummary, AccordionDetails, Stack, Button
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
@@ -11,7 +11,7 @@ import FileCopyIcon from '@mui/icons-material/FileCopy'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SaveAltIcon from '@mui/icons-material/SaveAlt'
 
-import { useAppBar } from "../component/useAppBar.tsx"
+import { PageHeader } from "../component/PageHeader.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { readServerList, saveTextFile } from "../util/invoke.ts"
@@ -180,47 +180,49 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
     }
 
     const [showKeys, setShowKeys] = useState<number[]>([0])
-    const height = 'calc(100vh - 85px)'
     const {SnackbarComponent, showSnackbar} = useSnackbar()
-    const {AppBarComponent} = useAppBar('/server', '导出')
     return <>
         <SnackbarComponent/>
-        <AppBarComponent/>
         {!serverList ? (
-            <LoadingCard height={height} mt={1}/>
+            <LoadingCard/>
         ) : errorMsg ? (
-            <ErrorCard errorMsg={errorMsg} height={height} mt={1}/>
+            <ErrorCard errorMsg={errorMsg}/>
         ) : (<>
-            <Stack direction="row" spacing={1} sx={{py: 1, alignItems: 'center', justifyContent: 'space-between'}}>
-                <ToggleButtonGroup exclusive value={isBase64} onChange={(_, v: boolean) => handleFormatChange(v)}>
-                    <ToggleButton value={false}>URL 格式</ToggleButton>
-                    <ToggleButton value={true}>Base64 URI 格式</ToggleButton>
-                </ToggleButtonGroup>
-                <Button variant="contained" onClick={handleExportTextFile} startIcon={<SaveAltIcon/>}>导出备份文件</Button>
-            </Stack>
-            {psList.map((ps, i) => (
-                <Accordion key={i} defaultExpanded={i === 0} onChange={() => handleAccordion(i)}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                        <Typography component="span">{ps}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails sx={{textAlign: 'center'}}>
-                        {showKeys.includes(i) && (<>
-                            <div className="qr-box">
-                                <QRCodeSVG className={`qrcode-${i}`} value={getUri(i)} size={256} marginSize={2} xmlns="http://www.w3.org/2000/svg"/>
-                            </div>
-                            <Box sx={{mt: 1}}>
-                                <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/>
-                            </Box>
-                            <Stack direction="row" spacing={1} sx={{mt: 1, alignItems: 'center', justifyContent: 'center'}}>
-                                <Button variant="contained" color="secondary" startIcon={<ContentCopyIcon/>}
-                                        onClick={() => handleCopyURI(i)}>{isBase64 ? '复制 Base64 URI' : '复制 URL'}</Button>
-                                <Button variant="contained" color="success" startIcon={<CollectionsIcon/>} onClick={() => handleCopyQrImage(i)}>复制二维码图片</Button>
-                                <Button variant="contained" color="warning" startIcon={<FileCopyIcon/>} onClick={() => handleCopyQRCodeSVG(i)}>复制二维码 SVG 代码</Button>
-                            </Stack>
-                        </>)}
-                    </AccordionDetails>
-                </Accordion>
-            ))}
+            <Card>
+                <PageHeader title="导出" backLink="/server"/>
+                <Box sx={{p: 2}}>
+                    <Stack direction="row" spacing={1} sx={{py: 1, alignItems: 'center', justifyContent: 'space-between'}}>
+                        <ToggleButtonGroup exclusive value={isBase64} onChange={(_, v: boolean) => handleFormatChange(v)}>
+                            <ToggleButton value={false}>URL 格式</ToggleButton>
+                            <ToggleButton value={true}>Base64 URI 格式</ToggleButton>
+                        </ToggleButtonGroup>
+                        <Button variant="contained" onClick={handleExportTextFile} startIcon={<SaveAltIcon/>}>导出备份文件</Button>
+                    </Stack>
+                    {psList.map((ps, i) => (
+                        <Accordion key={i} defaultExpanded={i === 0} onChange={() => handleAccordion(i)}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                                <Typography component="span">{ps}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{textAlign: 'center'}}>
+                                {showKeys.includes(i) && (<>
+                                    <div className="qr-box">
+                                        <QRCodeSVG className={`qrcode-${i}`} value={getUri(i)} size={256} marginSize={2} xmlns="http://www.w3.org/2000/svg"/>
+                                    </div>
+                                    <Box sx={{mt: 1}}>
+                                        <TextField value={getUri(i)} variant="outlined" size="small" fullWidth multiline disabled/>
+                                    </Box>
+                                    <Stack direction="row" spacing={1} sx={{mt: 1, alignItems: 'center', justifyContent: 'center'}}>
+                                        <Button variant="contained" color="secondary" startIcon={<ContentCopyIcon/>}
+                                                onClick={() => handleCopyURI(i)}>{isBase64 ? '复制 Base64 URI' : '复制 URL'}</Button>
+                                        <Button variant="contained" color="success" startIcon={<CollectionsIcon/>} onClick={() => handleCopyQrImage(i)}>复制二维码图片</Button>
+                                        <Button variant="contained" color="warning" startIcon={<FileCopyIcon/>} onClick={() => handleCopyQRCodeSVG(i)}>复制二维码 SVG 代码</Button>
+                                    </Stack>
+                                </>)}
+                            </AccordionDetails>
+                        </Accordion>
+                    ))}
+                </Box>
+            </Card>
         </>)}
     </>
 }
