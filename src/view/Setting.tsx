@@ -364,7 +364,14 @@ const Setting: React.FC<NavProps> = ({setNavState}) => {
                     </Card>
                 ) : activeTab === 1 ? (
                     <Card sx={wSx}>
-                        <Typography variant="h6" sx={{p: 2, pl: 3, pb: 1.5}}>自动设置</Typography>
+                        <Typography variant="h6" sx={{p: 2, pl: 3, pb: 1.5}}>
+                            <div className="flex-center-gap1">
+                                自动设置
+                                <Tooltip arrow placement="right" title="开启后，会自动修改操作系统代理设置">
+                                    <HelpIcon fontSize="small" sx={{color: 'text.secondary'}}/>
+                                </Tooltip>
+                            </div>
+                        </Typography>
                         <Divider/>
                         <ListItem disablePadding>
                             <ListItemButton sx={{cursor: 'default'}}>
