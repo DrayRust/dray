@@ -133,8 +133,8 @@ async fn download_speed_test(url: String, user_agent: String, timeout: u64) -> V
 }
 
 #[tauri::command]
-async fn upload_speed_test(url: String, size: usize, timeout: u64) -> Value {
-    http::upload_speed_test(&url, size, timeout).await
+async fn upload_speed_test(url: String, user_agent: String, size: usize, timeout: u64) -> Value {
+    http::upload_speed_test(&url, &user_agent, size, timeout).await
 }
 
 #[tauri::command]

@@ -258,33 +258,34 @@ pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> V
             })
         }
         Err(e) => {
-            error!("Failed to start download: {:?}", e);
+            let msg = format!("Failed to initiate upload request: {}", e);
+            error!("{}", msg);
             json!({
                 "ok": false,
-                "error_message": e.to_string()
+                "error_message": msg
             })
         }
     }
 }
 
-pub async fn upload_speed_test(url: &str, size: usize, timeout: u64) -> Value {
-    let size_bytes = size * 1024 * 1024; // Convert size from MB to bytes
+pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout: u64) -> serde_json::Value {
+    let size_bytes = size * 1024 * 1024; // MB -> bytes
     let buffer = vec![0u8; size_bytes];
 
-    let client = Client::builder().timeout(Duration::from_secs(timeout)).build();
+    let client = match Client::builder().timeout(Duration::from_secs(timeout)).build() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed to build HTTP client: {:?}", e);
+            return json!({
+                "ok": false,
+                "errMsg": e.to_string()
+            });
+        }
+    };
 
-    if let Err(e) = client {
-        error!("Failed to build HTTP client: {:?}", e);
-        return json!({
-            "ok": false,
-            "errMsg": e.to_string()
-        });
-    }
-
-    let client = client.unwrap();
     let start = Instant::now();
 
-    let response = client.post(url).body(buffer).send().await;
+    let response = client.post(url).header(header::USER_AGENT, user_agent).body(buffer).send().await;
 
     match response {
         Ok(_) => {
@@ -296,10 +297,11 @@ pub async fn upload_speed_test(url: &str, size: usize, timeout: u64) -> Value {
             })
         }
         Err(e) => {
-            error!("Failed to upload speed test: {:?}", e);
+            let msg = format!("Failed to perform upload speed test: {}", e);
+            error!("{}", msg);
             json!({
                 "ok": false,
-                "errMsg": e.to_string()
+                "error_message": msg
             })
         }
     }
