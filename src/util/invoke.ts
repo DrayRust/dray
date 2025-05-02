@@ -246,3 +246,7 @@ export async function killProcessByPid(pid: number) {
 export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 5) {
     return safeInvoke('ping_test', {url, userAgent, count, timeout})
 }
+
+export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+    return safeInvoke('jitter_test', {url, userAgent, count, timeout})
+}
