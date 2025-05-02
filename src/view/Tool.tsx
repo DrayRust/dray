@@ -242,21 +242,21 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
 
                             <Stack spacing={2} component={Card} elevation={4} sx={{p: 1, pt: 2}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="查看本机外网 IP" value={getMyIP()}/>
+                                    <TextField fullWidth multiline size="small" label="查看本机公网 IP" value={getMyIP()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'MyIP' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('MyIP')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="查看本机外网 IP & 归属地" value={getMyIpIp()}/>
+                                    <TextField fullWidth multiline size="small" label="查看本机公网 IP & 归属地" value={getMyIpIp()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'MyIpIp' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('MyIpIp')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
                                 </Stack>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <TextField fullWidth multiline size="small" label="查看本机外网 IP & 归属地 (JSON)" value={getMyIpJson()}/>
+                                    <TextField fullWidth multiline size="small" label="查看本机公网 IP & 归属地 (JSON)" value={getMyIpJson()}/>
                                     <Tooltip arrow placement="right" title={copiedType === 'MyIpJson' ? '已复制' : '点击复制'}>
                                         <IconButton onClick={() => handleCommandCopy('MyIpJson')}><ContentCopyIcon/></IconButton>
                                     </Tooltip>
