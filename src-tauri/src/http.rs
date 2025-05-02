@@ -214,38 +214,54 @@ pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64
     })
 }
 
-pub async fn download_speed_test(url: &str, timeout: u64) -> Value {
+pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> Value {
     let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
 
     let start = Instant::now();
 
-    let response = client.get(url).send().await;
+    match client.get(url).header(header::USER_AGENT, user_agent).send().await {
+        Ok(resp) => {
+            let mut total_bytes = 0usize;
+            let mut stream = resp.bytes_stream();
 
-    match response {
-        Ok(resp) => match resp.bytes().await {
-            Ok(bytes) => {
-                let size_bytes = bytes.len();
-                let duration = start.elapsed().as_secs_f64();
-                let speed_mbps = (size_bytes as f64 * 8.0) / (duration * 1_000_000.0);
-
-                json!({
-                    "ok": true,
-                    "speed": speed_mbps
-                })
+            while let Some(chunk_result) = stream.next().await {
+                match chunk_result {
+                    Ok(chunk) => {
+                        total_bytes += chunk.len();
+                    }
+                    Err(e) => {
+                        error!("Error while reading chunk: {:?}", e);
+                        return json!({
+                            "ok": false,
+                            "error_message": format!("Stream error: {}", e)
+                        });
+                    }
+                }
             }
-            Err(e) => {
-                error!("Failed to read download body: {:?}", e);
-                json!({
+
+            let duration = start.elapsed().as_secs_f64();
+
+            if duration == 0.0 {
+                return json!({
                     "ok": false,
-                    "errMsg": e.to_string()
-                })
+                    "error_message": "Test duration too short"
+                });
             }
-        },
+
+            let speed_mbps = (total_bytes as f64 * 8.0) / (duration * 1_000_000.0);
+
+            json!({
+                "ok": true,
+                "speed_mbps": speed_mbps,
+                "total_bytes": total_bytes,
+                "duration_secs": duration
+            })
+        }
         Err(e) => {
-            error!("Failed to perform download speed test: {:?}", e);
+            error!("Failed to start download: {:?}", e);
             json!({
                 "ok": false,
-                "errMsg": e.to_string()
+                "error_message": e.to_string()
             })
         }
     }
