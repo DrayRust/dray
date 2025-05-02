@@ -179,7 +179,7 @@ pub fn set_auto_setup_https(value: bool) -> bool {
     set_config(|config| config.auto_setup_https = value)
 }
 
-const ALLOWED_CONFIG_FILES: [&str; 9] = [
+const ALLOWED_CONFIG_FILES: [&str; 10] = [
     "ray_common_config.json",
     "server.json",
     "subscription.json",
@@ -189,6 +189,7 @@ const ALLOWED_CONFIG_FILES: [&str; 9] = [
     "dns_config.json",
     "dns_mode_list.json",
     "dns_table_list.json",
+    "speed_test_config.json",
 ];
 
 fn get_conf_path(filename: &str) -> Result<PathBuf, String> {
