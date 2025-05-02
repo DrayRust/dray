@@ -196,14 +196,14 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         setAppConfig('set_ray_enable', value)
     }
 
+    // const pSx = {p: 2, borderRadius: 2, width: '100%', height: `calc(100vh - 20px)`, overflow: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center'}
+    const pSx = {p: 2, borderRadius: 2, width: '100%', height: `calc(100vh - 20px)`, overflow: 'auto'}
+
     const {SnackbarComponent, showSnackbar} = useSnackbar()
     return (<>
         <SnackbarComponent/>
-        <Paper className="scr-none" elevation={5} sx={{
-            p: 2, borderRadius: 2, width: '100%', height: `calc(100vh - 20px)`, overflow: 'auto',
-            display: 'flex', justifyContent: 'center', alignItems: 'center'
-        }}>
-            <Stack spacing={2} sx={{minWidth: 620, m: 'auto'}}>
+        <Paper className="scr-none" elevation={5} sx={pSx}>
+            <Stack spacing={2} sx={{width: 620, m: 'auto'}}>
                 <Stack direction="row" elevation={2} component={Card} sx={{p: 1, justifyContent: 'space-between', alignItems: 'center'}}>
                     <Typography variant="body1" sx={{paddingLeft: 1}}>Xray 服务</Typography>
                     <Switch checked={rayEnable} onChange={handleRayEnable} sx={{transform: 'scale(1.3)'}}/>
