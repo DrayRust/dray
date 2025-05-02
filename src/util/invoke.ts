@@ -250,3 +250,11 @@ export async function pingTest(url: string, userAgent: string, count: number, ti
 export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 5) {
     return safeInvoke('jitter_test', {url, userAgent, count, timeout})
 }
+
+export async function downloadSpeedTest(url: string, userAgent: string, timeout: number = 60 * 20) {
+    return safeInvoke('download_speed_test', {url, userAgent, timeout})
+}
+
+export async function uploadSpeedTest(url: string, userAgent: string, size: number, timeout: number = 60 * 20) {
+    return safeInvoke('upload_speed_test', {url, userAgent, size, timeout})
+}
