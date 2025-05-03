@@ -259,6 +259,10 @@ export async function fetchResponseHeaders(url: string, proxyUrl: string, userAg
     return safeInvoke('fetch_response_headers', {url, proxyUrl, userAgent, timeout})
 }
 
+export async function fetchTextContent(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 10) {
+    return safeInvoke('fetch_text_content', {url, proxyUrl, userAgent, timeout})
+}
+
 /*
 [
   {

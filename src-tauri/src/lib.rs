@@ -108,11 +108,6 @@ async fn fetch_get(url: String, is_proxy: bool, user_agent: String, timeout: u64
 }
 
 #[tauri::command]
-async fn fetch_get_with_proxy(url: String, proxy_url: String) -> Value {
-    http::fetch_get_with_proxy(&url, &proxy_url).await
-}
-
-#[tauri::command]
 async fn download_large_file(url: String, filepath: String, timeout: u64) -> Value {
     http::download_large_file(&url, &filepath, timeout).await
 }
@@ -328,7 +323,6 @@ pub fn run() {
             save_proxy_pac,
             save_text_file,
             fetch_get,
-            fetch_get_with_proxy,
             download_large_file,
             ping_test,
             jitter_test,

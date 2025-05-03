@@ -9,17 +9,7 @@ use std::io::Write;
 use std::time::{Duration, Instant};
 use tokio::time::sleep;
 
-fn get_default_proxy_url() -> Option<String> {
-    let config = config::get_config();
-    Some(format!("socks5://{}:{}", config.ray_host, config.ray_socks_port))
-}
-
-pub async fn fetch_get(url: &str, is_proxy: bool, user_agent: &str, timeout: u64) -> Value {
-    let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
-    fetch_text_content(url, proxy_url.as_deref(), user_agent, timeout).await
-}
-
-pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
+/* pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
     match get_with_proxy(url, Some(proxy_url)).await {
         Ok(text) => json!({"ok": true, "text": text.to_string()}),
         Err(e) => {
@@ -65,7 +55,7 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
         }
         Err(e) => Err(format!("Failed to parse response body: {}", e)),
     }
-}
+} */
 
 pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
     match stream_download(&url, &filepath, timeout).await {
@@ -445,4 +435,14 @@ pub async fn fetch_text_content(url: &str, proxy_url: Option<&str>, user_agent: 
             })
         }
     }
+}
+
+pub async fn fetch_get(url: &str, is_proxy: bool, user_agent: &str, timeout: u64) -> Value {
+    let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
+    fetch_text_content(url, proxy_url.as_deref(), user_agent, timeout).await
+}
+
+fn get_default_proxy_url() -> Option<String> {
+    let config = config::get_config();
+    Some(format!("socks5://{}:{}", config.ray_host, config.ray_socks_port))
 }
