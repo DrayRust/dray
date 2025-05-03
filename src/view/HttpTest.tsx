@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import { Button, Stack, TextField } from '@mui/material'
+import { useState, useEffect } from 'react'
+import { Button, Box, Chip, Card, Stack, TextField, LinearProgress, Typography } from '@mui/material'
 
 import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
-import { fetchGet, fetchResponseHeaders } from "../util/invoke.ts"
+import { fetchResponseHeaders, fetchTextContent, readAppConfig } from "../util/invoke.ts"
+import { DEFAULT_APP_CONFIG } from "../util/config.ts"
+import { useDebounce } from "../hook/useDebounce.ts"
+import { sizeToUnit } from "../util/util.ts"
 
 const urlList = [
     'https://www.google.com',
@@ -56,45 +59,144 @@ const urlList = [
     'https://www.canva.com',
 ]
 
-const userAgent = navigator.userAgent
-
 export const HttpTest = () => {
+    const [appConfig, setAppConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
+
     const [urlValue, setUrlValue] = useState(urlList[0] || '')
-    const [headersValue, setHeadersValue] = useState('')
+    const [headersValue, setHeadersValue] = useState<any>()
     const [htmlValue, setHtmlValue] = useState('')
+
+    const [requestType, setRequestType] = useState('')
+    const [errorMsg, setErrorMsg] = useState('')
+
+    const [loading, setLoading] = useState(false)
+    const [isInit, setIsInit] = useState(false)
+    const loadConfig = useDebounce(async () => {
+        const newConfig = await readAppConfig()
+        if (newConfig) setAppConfig({...DEFAULT_APP_CONFIG, ...newConfig})
+        setIsInit(true)
+    }, 100)
+    useEffect(loadConfig, [])
+
+    const getProxyUrl = () => {
+        return `socks5://${appConfig.ray_host}:${appConfig.ray_socks_port}`
+    }
 
     const urlValueChange = (value: string) => {
         setUrlValue(value)
-        setHeadersValue('')
-        setHtmlValue('')
+        resetValue()
     }
 
-    const handleGetHtml = async () => {
-        const result = await fetchGet(urlValue, true)
-        if (result?.ok) {
-            setHtmlValue(result.body || '')
-        }
+    const resetValue = () => {
+        setHeadersValue('')
+        setHtmlValue('')
+        setRequestType('')
+        setErrorMsg('')
+        setStatusCode(0)
     }
 
     const handleGetHeaders = async () => {
-        const proxyUrl = "socks5://127.0.0.1:1086"
-        const result = await fetchResponseHeaders(urlValue, proxyUrl, userAgent)
+        resetValue()
+        setLoading(true)
+        setRequestType('headers')
+        const result = await fetchResponseHeaders(urlValue, getProxyUrl())
+        setStatusCode(result?.status || 0)
         if (result?.ok) {
-            setHeadersValue(JSON.stringify(result.headers, null, 2))
+            setHeadersValue(result.headers || {})
+        } else {
+            setErrorMsg(result?.error_message || '请求失败')
         }
+        setLoading(false)
+    }
+
+    const handleGetHtml = async () => {
+        resetValue()
+        setLoading(true)
+        setRequestType('html')
+        const result = await fetchTextContent(urlValue, getProxyUrl())
+        setStatusCode(result?.status || 0)
+        if (result?.ok) {
+            setHtmlValue(result.body || '')
+        } else {
+            setErrorMsg(result?.error_message || '请求失败')
+        }
+        setLoading(false)
+    }
+
+    const [statusCode, setStatusCode] = useState(0)
+    const getColor = () => {
+        if (statusCode >= 200 && statusCode < 300) return "success"
+        if (statusCode >= 300 && statusCode < 400) return "info"
+        if (statusCode >= 400 && statusCode < 500) return "warning"
+        return "error"
+    }
+
+    const getStatusMessage = () => {
+        if (statusCode >= 200 && statusCode < 300) return "请求成功"
+        if (statusCode >= 300 && statusCode < 400) return "重定向"
+        if (statusCode >= 400 && statusCode < 500) return "客户端错误"
+        if (statusCode >= 500) return "服务器错误"
+        return "未知状态码"
     }
 
     return (<>
-        <Stack spacing={1}>
+        <Stack spacing={2} sx={{pt: 1}}>
             <AutoCompleteField label="请求链接" id="test-url" value={urlValue} options={urlList} onChange={(value) => urlValueChange(value)}/>
 
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
-                <Button variant="contained" onClick={handleGetHeaders}>查看头信息</Button>
-                <Button variant="contained" onClick={handleGetHtml}>查看源代码</Button>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" alignItems="center" spacing={2}>
+                    <Button disabled={loading} variant="contained" onClick={handleGetHeaders}>查看头信息</Button>
+                    <Button disabled={loading} variant="contained" onClick={handleGetHtml}>查看源代码</Button>
+                </Stack>
+
+                {isInit && (appConfig.ray_enable ? <Chip label="代理已开启" color="success" variant="outlined"/> : <Chip label="代理未开启" color="error" variant="outlined"/>)}
             </Stack>
 
-            {headersValue && <TextField className="scr-w2" multiline minRows={2} maxRows={20} size="small" label="请求回应信息" value={headersValue}/>}
-            {htmlValue && <TextField className="scr-w2" multiline minRows={2} maxRows={20} size="small" label="HTML 源代码" value={htmlValue}/>}
+            {loading ? (
+                <Box sx={{py: 2}}><LinearProgress/></Box>
+            ) : errorMsg ? (<>
+                {statusCode > 0 && <Card elevation={4} sx={{p: 2}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">返回状态码</Typography>
+                        <Chip size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
+                    </Stack>
+                </Card>}
+
+                <Card elevation={4} sx={{p: 1, pt: 2}}>
+                    <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
+                </Card>
+            </>) : statusCode > 0 && (<>
+                <Card elevation={4} sx={{p: 2}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">返回状态码</Typography>
+                        <Chip size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
+                    </Stack>
+                </Card>
+
+                {requestType === 'headers' ? (<>
+                    <Card elevation={4} sx={{p: 2}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">参数数量</Typography>
+                            <Chip size="small" variant="outlined" label={`${Object.keys(headersValue).length} 个`} color="info"/>
+                        </Stack>
+                    </Card>
+
+                    <Card elevation={4} sx={{p: 2}}>
+                        <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="请求回应信息" value={JSON.stringify(headersValue, null, 2)}/>
+                    </Card>
+                </>) : requestType === 'html' && (<>
+                    <Card elevation={4} sx={{p: 2}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">内容长度</Typography>
+                            <Chip size="small" label={sizeToUnit(htmlValue.length)} color="info"/>
+                        </Stack>
+                    </Card>
+
+                    <Card elevation={4} sx={{p: 2}}>
+                        <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="HTML 源代码" value={htmlValue}/>
+                    </Card>
+                </>)}
+            </>)}
         </Stack>
     </>)
 }
