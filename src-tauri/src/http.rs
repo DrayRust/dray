@@ -59,23 +59,27 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
 
 pub async fn download_large_file(url: &str, proxy_url: &str, user_agent: &str, filepath: &str, timeout: u64) -> Value {
     match stream_download(url, proxy_url, user_agent, filepath, timeout).await {
-        Ok(()) => json!({ "ok": true }),
+        Ok(file_size) => json!({
+            "ok": true,
+            "file_size": file_size
+        }),
         Err(e) => {
             error!("{}", e);
-            json!({ "ok": false, "errMsg": e })
+            json!({
+                "ok": false,
+                "error_message": e
+            })
         }
     }
 }
 
-pub async fn stream_download(url: &str, proxy_url: &str, user_agent: &str, filepath: &str, timeout: u64) -> Result<(), String> {
+pub async fn stream_download(url: &str, proxy_url: &str, user_agent: &str, filepath: &str, timeout: u64) -> Result<u64, String> {
     let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
 
     let client_builder = if !proxy_url.is_empty() {
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
-            Err(e) => {
-                return Err(format!("Invalid proxy: {}", e));
-            }
+            Err(e) => return Err(format!("Invalid proxy: {}", e)),
         }
     } else {
         client_builder
@@ -97,16 +101,16 @@ pub async fn stream_download(url: &str, proxy_url: &str, user_agent: &str, filep
     let mut file = File::create(filepath).map_err(|e| format!("Failed to create local file: {}", e))?;
 
     let mut stream = response.bytes_stream();
-    let mut total_size = 0;
+    let mut total_size: u64 = 0;
     while let Some(chunk) = stream.next().await {
         let chunk = chunk.map_err(|e| format!("Failed to read chunk: {}", e))?;
         file.write_all(&chunk).map_err(|e| format!("Failed to write chunk to file: {}", e))?;
-        total_size += chunk.len();
+        total_size += chunk.len() as u64;
     }
 
     info!("Successfully downloaded file from: {}, size: {} bytes", url, total_size);
 
-    Ok(())
+    Ok(total_size)
 }
 
 pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
