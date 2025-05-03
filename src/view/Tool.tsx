@@ -16,7 +16,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
     const [action, setAction] = useState('system')
 
     return (
-        <Paper elevation={5} sx={{py: 1, borderRadius: 2, height: 'calc(100vh - 20px)'}}>
+        <Paper elevation={5} sx={{p: 1, borderRadius: 2, height: 'calc(100vh - 20px)'}}>
             <div className="flex-center p1">
                 <ToggleButtonGroup exclusive value={action} onChange={(_, v) => v && setAction(v)}>
                     <ToggleButton value="system"><WysiwygIcon sx={{mr: 1}}/>系统信息</ToggleButton>
