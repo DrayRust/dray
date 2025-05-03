@@ -128,8 +128,8 @@ async fn jitter_test(url: String, user_agent: String, count: usize, timeout: u64
 }
 
 #[tauri::command]
-async fn download_speed_test(url: String, user_agent: String, timeout: u64) -> Value {
-    http::download_speed_test(&url, &user_agent, timeout).await
+async fn download_speed_test(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
+    http::download_speed_test(&url, Some(&proxy_url), &user_agent, timeout).await
 }
 
 #[tauri::command]

@@ -7,8 +7,7 @@ use reqwest::Proxy;
 use serde_json::{json, Value};
 use std::fs::File;
 use std::io::Write;
-use std::time::Duration;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::time::sleep;
 
 fn get_default_proxy_url() -> Option<String> {
@@ -214,8 +213,32 @@ pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64
     })
 }
 
-pub async fn download_speed_test(url: &str, user_agent: &str, timeout: u64) -> Value {
-    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+pub async fn download_speed_test(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
+
+    let client_builder = if let Some(proxy_url) = proxy_url {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
+        Ok(c) => c,
+        Err(e) => {
+            return json!({
+                "ok": false,
+                "error_message": format!("Failed to build HTTP client: {}", e)
+            });
+        }
+    };
 
     let start = Instant::now();
 
