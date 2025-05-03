@@ -33,7 +33,7 @@ const urlList = [
     'https://www.naver.com',
     'https://www.live.com',
     'https://www.office.com',
-    'https://www.dzen.ru',
+    'https://dzen.ru',
     'https://www.bing.com',
     'https://www.pinterest.com',
     'https://www.temu.com',
