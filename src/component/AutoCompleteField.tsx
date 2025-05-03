@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Autocomplete, TextField } from '@mui/material'
 
 interface AutoCompleteFieldProps {
@@ -9,6 +10,12 @@ interface AutoCompleteFieldProps {
 }
 
 export const AutoCompleteField = ({label, value, options, onChange, id}: AutoCompleteFieldProps) => {
+    const [inputValue, setInputValue] = useState(value)
+
+    useEffect(() => {
+        setInputValue(value)
+    }, [value])
+
     return (
         <Autocomplete
             id={id}
@@ -16,11 +23,12 @@ export const AutoCompleteField = ({label, value, options, onChange, id}: AutoCom
             fullWidth
             freeSolo
             value={value}
+            inputValue={inputValue}
+            onInputChange={(_, v) => setInputValue(v)}
             onChange={(_, v) => onChange(v || '')}
+            onBlur={() => onChange(inputValue)}
             options={options}
-            renderInput={(params) => (
-                <TextField label={label} {...params} />
-            )}
+            renderInput={(params) => <TextField label={label} {...params} />}
         />
     )
 }
