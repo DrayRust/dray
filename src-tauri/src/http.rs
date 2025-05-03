@@ -94,8 +94,34 @@ pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<
     Ok(())
 }
 
-pub async fn ping_test(url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
-    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
+
+    let client_builder = if !proxy_url.is_empty() {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                error!("Invalid proxy: {}", e);
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed to build HTTP client: {}", e);
+            return json!({
+                "ok": false,
+                "error_message": e.to_string()
+            });
+        }
+    };
 
     let mut latencies = Vec::new();
     let mut error_count = 0;
@@ -144,8 +170,34 @@ pub async fn ping_test(url: &str, user_agent: &str, count: usize, timeout: u64) 
     })
 }
 
-pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
-    let client = Client::builder().timeout(Duration::from_secs(timeout)).build().unwrap();
+pub async fn jitter_test(url: &str, proxy_url: &str, user_agent: &str, count: usize, timeout: u64) -> Value {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
+
+    let client_builder = if !proxy_url.is_empty() {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                error!("Invalid proxy: {}", e);
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed to build HTTP client: {}", e);
+            return json!({
+                "ok": false,
+                "error_message": e.to_string()
+            });
+        }
+    };
 
     let mut latencies = Vec::new();
     let mut error_count = 0;
@@ -184,7 +236,6 @@ pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64
         });
     }
 
-    // jitter = 相邻延迟差值的平均数
     let diffs: Vec<f64> = latencies.windows(2).map(|pair| (pair[1] - pair[0]).abs()).collect();
     let jitter = diffs.iter().sum::<f64>() / diffs.len() as f64;
 
@@ -299,10 +350,11 @@ pub async fn upload_speed_test(url: &str, proxy_url: &str, user_agent: &str, siz
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build HTTP client: {:?}", e);
+            let msg = format!("Failed to build HTTP client: {:?}", e);
+            error!("{}", msg);
             return json!({
                 "ok": false,
-                "error_message": e.to_string()
+                "error_message": msg
             });
         }
     };
