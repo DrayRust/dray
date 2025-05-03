@@ -61,6 +61,7 @@ const urlList = [
     'https://www.ebay.com',
     'https://www.aliexpress.com',
     'https://www.canva.com',
+    'https://www.taobao.com',
 ]
 
 export const HttpTest = () => {
