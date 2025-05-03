@@ -387,3 +387,67 @@ pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_age
         }
     }
 }
+
+pub async fn fetch_text_content(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
+
+    let client_builder = if let Some(proxy_url) = proxy_url {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                error!("Invalid proxy: {}", e);
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed to build HTTP client: {}", e);
+            return json!({
+                "ok": false,
+                "error_message": format!("Failed to build HTTP client: {}", e)
+            });
+        }
+    };
+
+    let response_result = client.get(url).header(header::USER_AGENT, user_agent).send().await;
+
+    match response_result {
+        Ok(response) => {
+            let status = response.status().as_u16();
+            let body = match response.text().await {
+                Ok(text) => text,
+                Err(e) => {
+                    error!("Failed to read response text: {}", e);
+                    return json!({
+                        "ok": false,
+                        "status": status,
+                        "error_message": format!("Failed to read response text: {}", e)
+                    });
+                }
+            };
+
+            json!({
+                "ok": true,
+                "status": status,
+                "body": body
+            })
+        }
+        Err(err) => {
+            let status = err.status();
+            error!("Request failed: {}", err);
+            json!({
+                "ok": false,
+                "status": status.map(|s| s.as_u16()),
+                "error_message": err.to_string()
+            })
+        }
+    }
+}

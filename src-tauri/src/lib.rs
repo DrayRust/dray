@@ -143,6 +143,11 @@ async fn fetch_response_headers(url: String, proxy_url: String, user_agent: Stri
 }
 
 #[tauri::command]
+async fn fetch_text_content(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
+    http::fetch_text_content(&url, Some(&proxy_url), &user_agent, timeout).await
+}
+
+#[tauri::command]
 fn get_dirs_json() -> Value {
     dirs::get_dirs_json()
 }
@@ -330,6 +335,7 @@ pub fn run() {
             download_speed_test,
             upload_speed_test,
             fetch_response_headers,
+            fetch_text_content,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
