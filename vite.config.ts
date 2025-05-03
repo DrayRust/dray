@@ -1,12 +1,16 @@
-import {defineConfig} from "vite";
-import react from '@vitejs/plugin-react-swc';
+import { defineConfig } from "vite"
+import react from '@vitejs/plugin-react-swc'
 
 // @ts-expect-error process is a nodejs global
-const host = process.env.TAURI_DEV_HOST;
+const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
     plugins: [react()],
+
+    optimizeDeps: {
+        include: ['@uiw/react-codemirror'],
+    },
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
     //
@@ -32,4 +36,4 @@ export default defineConfig(async () => ({
     build: {
         emptyOutDir: true,
     },
-}));
+}))

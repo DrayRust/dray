@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Button, Box, Chip, Card, Stack, TextField, LinearProgress, Typography } from '@mui/material'
+import { Button, Box, Chip, Card, Paper, Stack, TextField, LinearProgress, Typography, useTheme } from '@mui/material'
+
+import CodeMirror from '@uiw/react-codemirror'
+import { html } from '@codemirror/lang-html'
 
 import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
 import { fetchResponseHeaders, fetchTextContent, readAppConfig } from "../util/invoke.ts"
@@ -139,6 +142,9 @@ export const HttpTest = () => {
         return "未知状态码"
     }
 
+    const theme = useTheme()
+    const isDark = theme.palette.mode === 'dark'
+
     return (<>
         <Stack spacing={2} sx={{pt: 1}}>
             <AutoCompleteField label="请求链接" id="test-url" value={urlValue} options={urlList} onChange={(value) => urlValueChange(value)}/>
@@ -166,10 +172,10 @@ export const HttpTest = () => {
                     <TextField className="scr-w2" fullWidth multiline error minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
                 </Card>
             </>) : statusCode > 0 && (<>
-                <Card elevation={4} sx={{p: 2}}>
+                <Card elevation={4} sx={{p: 1}}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="body1">返回状态码</Typography>
-                        <Chip size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
+                        <Chip variant="outlined" size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
                     </Stack>
                 </Card>
 
@@ -185,15 +191,22 @@ export const HttpTest = () => {
                         <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="请求回应信息" value={JSON.stringify(headersValue, null, 2)}/>
                     </Card>
                 </>) : requestType === 'html' && (<>
-                    <Card elevation={4} sx={{p: 2}}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Typography variant="body1">内容长度</Typography>
-                            <Chip size="small" label={sizeToUnit(htmlValue.length)} color="info"/>
-                        </Stack>
-                    </Card>
-
-                    <Card elevation={4} sx={{p: 2}}>
-                        <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="HTML 源代码" value={htmlValue}/>
+                    <Card elevation={4}>
+                        <Paper elevation={2} sx={{p: 1, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography variant="body1">HTML 源代码</Typography>
+                                <Chip variant="outlined" size="small" label={`长度: ${sizeToUnit(htmlValue.length)}`} color="info"/>
+                            </Stack>
+                        </Paper>
+                        <CodeMirror
+                            readOnly
+                            className="scr-w2"
+                            value={htmlValue}
+                            height="500px"
+                            extensions={[html()]}
+                            theme={isDark ? 'dark' : 'light'}
+                            style={{fontSize: '14px'}}
+                        />
                     </Card>
                 </>)}
             </>)}
