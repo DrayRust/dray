@@ -145,7 +145,8 @@ fn prepare_ray_resources(resource_dir: std::path::PathBuf) -> Result<(), Box<dyn
             let dest = target_dir.join(entry.file_name());
             fs::copy(&path, &dest)?;
 
-            #[cfg(unix)] // 适用于 macOS 和 Linux
+            // 适用于 macOS 和 Linux
+            #[cfg(unix)]
             {
                 let mut perms = fs::metadata(&dest)?.permissions();
                 if entry.file_name() == "xray" {
@@ -156,7 +157,8 @@ fn prepare_ray_resources(resource_dir: std::path::PathBuf) -> Result<(), Box<dyn
                 fs::set_permissions(&dest, perms)?;
             }
 
-            #[cfg(windows)] // 适用于 Windows
+            // 适用于 Windows
+            #[cfg(windows)]
             {
                 let mut perms = fs::metadata(&dest)?.permissions();
                 perms.set_readonly(false);
