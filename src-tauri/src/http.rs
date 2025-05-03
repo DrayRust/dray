@@ -14,15 +14,9 @@ fn get_default_proxy_url() -> Option<String> {
     Some(format!("socks5://{}:{}", config.ray_host, config.ray_socks_port))
 }
 
-pub async fn fetch_get(url: &str, is_proxy: bool) -> Value {
+pub async fn fetch_get(url: &str, is_proxy: bool, user_agent: &str, timeout: u64) -> Value {
     let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
-    match get_with_proxy(url, proxy_url.as_deref()).await {
-        Ok(text) => json!({"ok": true, "text": text.to_string()}),
-        Err(e) => {
-            error!("{}", e);
-            json!({"ok": false, "errMsg": e})
-        }
-    }
+    fetch_text_content(url, proxy_url.as_deref(), user_agent, timeout).await
 }
 
 pub async fn fetch_get_with_proxy(url: &str, proxy_url: &str) -> Value {
