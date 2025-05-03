@@ -9,7 +9,7 @@ import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
 import { fetchResponseHeaders, fetchTextContent, readAppConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG } from "../util/config.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { sizeToUnit } from "../util/util.ts"
+import { formatSecond, sizeToUnit } from "../util/util.ts"
 
 const urlList = [
     'https://www.google.com',
@@ -97,13 +97,20 @@ export const HttpTest = () => {
         setRequestType('')
         setErrorMsg('')
         setStatusCode(0)
+        setElapsed(0)
     }
 
+    const [elapsed, setElapsed] = useState(0)
     const handleGetHeaders = async () => {
         resetValue()
         setLoading(true)
         setRequestType('headers')
+
+        const startTime = performance.now()
         const result = await fetchResponseHeaders(urlValue, getProxyUrl())
+        const elapsed = Math.floor(performance.now() - startTime)
+        setElapsed(elapsed)
+
         setStatusCode(result?.status || 0)
         if (result?.ok) {
             setHeadersValue(result.headers || {})
@@ -117,7 +124,12 @@ export const HttpTest = () => {
         resetValue()
         setLoading(true)
         setRequestType('html')
+
+        const startTime = performance.now()
         const result = await fetchTextContent(urlValue, getProxyUrl())
+        const elapsed = Math.floor(performance.now() - startTime)
+        setElapsed(elapsed)
+
         setStatusCode(result?.status || 0)
         if (result?.ok) {
             setHtmlValue(result.body || '')
@@ -185,7 +197,10 @@ export const HttpTest = () => {
                         <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 <Typography variant="body1">请求回应头信息</Typography>
-                                <Chip variant="outlined" size="small" label={`参数: ${Object.keys(headersValue).length} 条`} color="info"/>
+                                <Stack direction="row" justifyContent="end" alignItems="center" spacing={1}>
+                                    <Chip variant="outlined" size="small" label={`参数: ${Object.keys(headersValue).length} 条`} color="info"/>
+                                    <Chip variant="outlined" size="small" label={`耗时: ${formatSecond(elapsed)}`} color="info"/>
+                                </Stack>
                             </Stack>
                         </Paper>
                         <CodeMirror
@@ -203,7 +218,10 @@ export const HttpTest = () => {
                         <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 <Typography variant="body1">HTML 源代码</Typography>
-                                <Chip variant="outlined" size="small" label={`长度: ${sizeToUnit(htmlValue.length)}`} color="info"/>
+                                <Stack direction="row" justifyContent="end" alignItems="center" spacing={1}>
+                                    <Chip variant="outlined" size="small" label={`大小: ${sizeToUnit(htmlValue.length)}`} color="info"/>
+                                    <Chip variant="outlined" size="small" label={`耗时: ${formatSecond(elapsed)}`} color="info"/>
+                                </Stack>
                             </Stack>
                         </Paper>
                         <CodeMirror
