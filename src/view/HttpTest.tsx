@@ -103,6 +103,7 @@ export const HttpTest = () => {
 
     const [elapsed, setElapsed] = useState(0)
     const handleGetHeaders = async () => {
+        if (!urlValue) return
         resetValue()
         setLoading(true)
         setRequestType('headers')
@@ -122,6 +123,7 @@ export const HttpTest = () => {
     }
 
     const handleGetHtml = async () => {
+        if (!urlValue) return
         resetValue()
         setLoading(true)
         setRequestType('html')
