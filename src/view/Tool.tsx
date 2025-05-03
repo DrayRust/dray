@@ -6,10 +6,12 @@ import {
 import TerminalIcon from '@mui/icons-material/Terminal'
 import WysiwygIcon from '@mui/icons-material/Wysiwyg'
 import SpeedIcon from '@mui/icons-material/Speed'
+import HttpIcon from '@mui/icons-material/Http'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 
 import SysInfo from "./SysInfo.tsx"
 import SpeedTest from "./SpeedTest.tsx"
+import HttpTest from "./HttpTest.tsx"
 import { readAppConfig, readRayCommonConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { clipboardWriteText } from "../util/tauri.ts"
@@ -147,6 +149,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
                     <ToggleButton value="term"><TerminalIcon sx={{mr: 1}}/>终端命令</ToggleButton>
                     <ToggleButton value="system"><WysiwygIcon sx={{mr: 1}}/>系统信息</ToggleButton>
                     <ToggleButton value="speed"><SpeedIcon sx={{mr: 1}}/>网速测试</ToggleButton>
+                    <ToggleButton value="http"><HttpIcon sx={{mr: 1}}/>请求测试</ToggleButton>
                 </ToggleButtonGroup>
             </div>
 
@@ -284,6 +287,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
                     </>)}
                     {action === 'system' && (<SysInfo/>)}
                     {action === 'speed' && (<SpeedTest/>)}
+                    {action === 'http' && (<HttpTest/>)}
                 </Card>
             </Box>
         </Paper>
