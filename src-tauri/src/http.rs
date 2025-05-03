@@ -1,8 +1,9 @@
 use crate::config;
 use futures_util::StreamExt;
 use logger::{error, info, trace, warn};
-use reqwest::{header, redirect::Policy, Client, Proxy};
+use reqwest::{header, header::HeaderMap, redirect::Policy, Client, Proxy};
 use serde_json::{json, Value};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::time::{Duration, Instant};
@@ -327,4 +328,39 @@ pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout
             })
         }
     }
+}
+
+pub async fn fetch_response_headers(url: &str, user_agent: &str, timeout: u64) -> Value {
+    let client = match Client::builder().timeout(Duration::from_secs(timeout)).build() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed to build HTTP client: {}", e);
+            return json!({
+                "ok": false,
+                "error_message": e.to_string()
+            });
+        }
+    };
+
+    let response = match client.get(url).header(header::USER_AGENT, user_agent).send().await {
+        Ok(resp) => resp,
+        Err(e) => {
+            error!("Request failed: {}", e);
+            return json!({
+                "ok": false,
+                "error_message": e.to_string()
+            });
+        }
+    };
+
+    let headers: &HeaderMap = response.headers();
+    let result: HashMap<String, String> = headers
+        .iter()
+        .filter_map(|(k, v)| v.to_str().ok().map(|val| (k.to_string(), val.to_string())))
+        .collect();
+
+    json!({
+        "ok": true,
+        "headers": result
+    })
 }

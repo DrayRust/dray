@@ -138,6 +138,11 @@ async fn upload_speed_test(url: String, user_agent: String, size: usize, timeout
 }
 
 #[tauri::command]
+async fn fetch_response_headers(url: String, user_agent: String, timeout: u64) -> Value {
+    http::fetch_response_headers(&url, &user_agent, timeout).await
+}
+
+#[tauri::command]
 fn get_dirs_json() -> Value {
     dirs::get_dirs_json()
 }
@@ -324,6 +329,7 @@ pub fn run() {
             jitter_test,
             download_speed_test,
             upload_speed_test,
+            fetch_response_headers,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
