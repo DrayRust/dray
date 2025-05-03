@@ -235,11 +235,11 @@ export async function downloadLargeFile(url: string, filepath: string, timeout: 
     return safeInvoke('download_large_file', {url, filepath, timeout})
 }
 
-export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 10) {
     return safeInvoke('ping_test', {url, userAgent, count, timeout})
 }
 
-export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 10) {
     return safeInvoke('jitter_test', {url, userAgent, count, timeout})
 }
 
@@ -251,11 +251,11 @@ export async function uploadSpeedTest(url: string, userAgent: string, size: numb
     return safeInvoke('upload_speed_test', {url, userAgent, size, timeout})
 }
 
-export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 5) {
+export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 10) {
     return safeInvoke('fetch_response_headers', {url, proxyUrl, userAgent, timeout})
 }
 
-export async function fetchTextContent(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 5) {
+export async function fetchTextContent(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 10) {
     return safeInvoke('fetch_text_content', {url, proxyUrl, userAgent, timeout})
 }
 
@@ -303,6 +303,6 @@ export async function fetchTextContent(url: string, proxyUrl: string, userAgent:
   }
 ]
 */
-export async function fetchGet(url: string, isProxy: boolean = false, userAgent: string = navigator.userAgent, timeout: number = 5) {
+export async function fetchGet(url: string, isProxy: boolean = false, userAgent: string = navigator.userAgent, timeout: number = 10) {
     return safeInvoke('fetch_get', {url, isProxy, userAgent, timeout})
 }
