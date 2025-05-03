@@ -251,7 +251,7 @@ export async function uploadSpeedTest(url: string, userAgent: string, size: numb
     return safeInvoke('upload_speed_test', {url, userAgent, size, timeout})
 }
 
-export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string, timeout: number = 10) {
+export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 10) {
     return safeInvoke('fetch_response_headers', {url, proxyUrl, userAgent, timeout})
 }
 
