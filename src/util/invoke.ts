@@ -231,10 +231,6 @@ export async function killProcessByPid(pid: number) {
     return invokeBool('kill_process_by_pid', {pid})
 }
 
-export async function fetchGet(url: string, isProxy: boolean = false) {
-    return safeInvoke('fetch_get', {url, isProxy})
-}
-
 export async function fetchProxyGet(url: string, proxyUrl: string) {
     return safeInvoke('fetch_get_with_proxy', {url, proxyUrl})
 }
@@ -243,11 +239,11 @@ export async function downloadLargeFile(url: string, filepath: string, timeout: 
     return safeInvoke('download_large_file', {url, filepath, timeout})
 }
 
-export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 10) {
     return safeInvoke('ping_test', {url, userAgent, count, timeout})
 }
 
-export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 5) {
+export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 10) {
     return safeInvoke('jitter_test', {url, userAgent, count, timeout})
 }
 
@@ -261,4 +257,52 @@ export async function uploadSpeedTest(url: string, userAgent: string, size: numb
 
 export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string, timeout: number = 10) {
     return safeInvoke('fetch_response_headers', {url, proxyUrl, userAgent, timeout})
+}
+
+/*
+[
+  {
+    "name": "Chrome (Windows)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+  },
+  {
+    "name": "Chrome (macOS)",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+  },
+  {
+    "name": "Firefox (Windows)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+  },
+  {
+    "name": "Safari (macOS)",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
+  },
+  {
+    "name": "Edge (Windows)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0"
+  },
+  {
+    "name": "Safari (iPhone)",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "name": "Chrome (Android)",
+    "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.60 Mobile Safari/537.36"
+  },
+  {
+    "name": "WeChat (iOS)",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.52(0x1800342b) NetType/WIFI Language/zh_CN"
+  },
+  {
+    "name": "QQ Browser (Android)",
+    "userAgent": "Mozilla/5.0 (Linux; U; Android 13; zh-cn; SM-G9730 Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 MQQBrowser/11.8 Mobile"
+  },
+  {
+    "name": "Baidu Spider",
+    "userAgent": "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)"
+  }
+]
+*/
+export async function fetchGet(url: string, isProxy: boolean = false, userAgent: string = navigator.userAgent, timeout: number = 10) {
+    return safeInvoke('fetch_get', {url, isProxy, userAgent, timeout})
 }
