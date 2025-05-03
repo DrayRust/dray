@@ -57,23 +57,38 @@ pub async fn get_with_proxy(url: &str, proxy_url: Option<&str>) -> Result<String
     }
 } */
 
-pub async fn download_large_file(url: &str, filepath: &str, timeout: u64) -> Value {
-    match stream_download(&url, &filepath, timeout).await {
-        Ok(()) => json!({"ok": true}),
+pub async fn download_large_file(url: &str, proxy_url: &str, user_agent: &str, filepath: &str, timeout: u64) -> Value {
+    match stream_download(url, proxy_url, user_agent, filepath, timeout).await {
+        Ok(()) => json!({ "ok": true }),
         Err(e) => {
             error!("{}", e);
-            json!({"ok": false, "errMsg": e})
+            json!({ "ok": false, "errMsg": e })
         }
     }
 }
 
-pub async fn stream_download(url: &str, filepath: &str, timeout: u64) -> Result<(), String> {
-    let client = Client::builder()
-        .timeout(Duration::from_secs(timeout))
-        .build()
-        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+pub async fn stream_download(url: &str, proxy_url: &str, user_agent: &str, filepath: &str, timeout: u64) -> Result<(), String> {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
 
-    let response = client.get(url).send().await.map_err(|e| format!("Failed to send HTTP request: {}", e))?;
+    let client_builder = if !proxy_url.is_empty() {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                return Err(format!("Invalid proxy: {}", e));
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = client_builder.build().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+
+    let response = client
+        .get(url)
+        .header(header::USER_AGENT, user_agent)
+        .send()
+        .await
+        .map_err(|e| format!("Failed to send HTTP request: {}", e))?;
 
     if !response.status().is_success() {
         return Err(format!("Failed to download file, status: {}", response.status()));

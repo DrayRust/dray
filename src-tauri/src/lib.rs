@@ -103,8 +103,8 @@ fn save_text_file(path: String, content: String) -> bool {
 }
 
 #[tauri::command]
-async fn download_large_file(url: String, filepath: String, timeout: u64) -> Value {
-    http::download_large_file(&url, &filepath, timeout).await
+async fn download_large_file(url: String, filepath: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
+    http::download_large_file(&url, &filepath, &proxy_url, &user_agent, timeout).await
 }
 
 #[tauri::command]
