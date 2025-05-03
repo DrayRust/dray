@@ -1,0 +1,263 @@
+import { useState, useEffect } from 'react'
+import {
+    Dialog, Button, BottomNavigation, BottomNavigationAction, Card, Stack,
+    IconButton, Typography, TextField, MenuItem,
+} from '@mui/material'
+
+import { downloadSpeedTest, fetchGet, jitterTest, pingTest, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
+import { SpeedGauge } from "../component/SpeedGauge.tsx"
+import { SpeedLineChart } from "../component/SpeedLineChart.tsx"
+import SettingsIcon from '@mui/icons-material/Settings'
+import { useDebounce } from "../hook/useDebounce.ts"
+import { processLines } from "../util/util.ts"
+
+const DEFAULT_SPEED_TEST_CONFIG: SpeedTestConfig = {
+    "pingActive": 0,
+    "downloadActive": 0,
+    "uploadActive": 0,
+    "pingContent": "http://www.gstatic.com/generate_204#谷歌网络检测\nhttp://www.google.com/generate_204#谷歌备用检测\nhttp://cp.cloudflare.com/generate_204#Cloudflare网络检测\nhttp://captive.apple.com/hotspot-detect.htm#苹果网络检测\nhttp://www.msftconnecttest.com/connecttest.txt#微软网络检测",
+    "downloadContent": "https://cachefly.cachefly.net/50mb.test#CacheFly（全球高速 CDN）\nhttp://ipv4.download.thinkbroadband.com/50MB.zip#ThinkBroadband（英国）\nhttps://nbg1-speed.hetzner.com/100MB.bin#Hetzner（德国数据中心）\nhttp://proof.ovh.net/files/100Mb.dat#OVH（法国）\nhttps://speedtest.tokyo2.linode.com/100MB-tokyo2.bin#Linode（日本东京）\nhttp://speedtest.tele2.net/100MB.zip#Tele2（瑞典）",
+    "uploadContent": "https://speedtest.serverius.net/upload.php#Serverius（荷兰）\nhttps://speedtest.wifirst.net/upload.php#Wifirst（法国）\nhttps://speedtest.netzwerge.de/upload.php#Netzwerge（德国）\nhttps://speedtest.lambdanet.co/upload.php#LambdaNet（美国）"
+}
+
+const userAgent = navigator.userAgent
+
+interface TestUrlRow {
+    name: string;
+    url: string;
+}
+
+export const SpeedTest = () => {
+    const [pingList, setPingList] = useState<TestUrlRow[]>([])
+    const [downloadList, setDownloadList] = useState<TestUrlRow[]>([])
+    const [uploadList, setUploadList] = useState<TestUrlRow[]>([])
+
+    const [pingUrl, setPingUrl] = useState<string>('')
+    const [downloadUrl, setDownloadUrl] = useState<string>('')
+    const [uploadUrl, setUploadUrl] = useState<string>('')
+
+    const [speedTestConfig, setSpeedTestConfig] = useState<SpeedTestConfig>(DEFAULT_SPEED_TEST_CONFIG)
+    const loadConfig = useDebounce(async () => {
+        let conf = await readSpeedTestConfig() as SpeedTestConfig
+        conf = conf ? {...DEFAULT_SPEED_TEST_CONFIG, ...conf} : DEFAULT_SPEED_TEST_CONFIG
+        setSpeedTestConfig(conf)
+        loadList(conf)
+    }, 100)
+    useEffect(loadConfig, [])
+
+    const loadList = (conf: SpeedTestConfig) => {
+        const pingList = extractNames(conf.pingContent)
+        const downloadList = extractNames(conf.downloadContent)
+        const uploadList = extractNames(conf.uploadContent)
+
+        setPingList(pingList)
+        setDownloadList(downloadList)
+        setUploadList(uploadList)
+
+        setPingUrl(pingList[conf.pingActive]?.url || '')
+        setDownloadUrl(downloadList[conf.downloadActive]?.url || '')
+        setUploadUrl(uploadList[conf.uploadActive]?.url || '')
+    }
+
+    const extractNames = (content: string): TestUrlRow[] => {
+        const result: TestUrlRow[] = []
+        const lines = processLines(content)
+        for (const line of lines) {
+            const arr = line.split('#')
+            const url = arr?.[0] || line
+            const name = arr?.[1] || line
+            result.push({name, url})
+        }
+        return result
+    }
+
+    const handleConfigChange = (name: keyof SpeedTestConfig) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSpeedTestConfig(prev => ({...prev, [name]: e.target.value}))
+    }
+
+    const handleSubmit = async () => {
+        let newConf = {...speedTestConfig}
+        newConf.pingContent = processLines(newConf.pingContent).join('\n')
+        newConf.downloadContent = processLines(newConf.downloadContent).join('\n')
+        newConf.uploadContent = processLines(newConf.uploadContent).join('\n')
+        const ok = await saveSpeedTestConfig(newConf)
+        if (!ok) {
+        }
+        loadList(newConf)
+        handleClose()
+    }
+
+    // const [pubIP, setPubIP] = useState('')
+    const handleGetIP = async () => {
+        const result = await fetchGet("https://httpbin.org/ip")
+        console.log('get IP result', result)
+        const result2 = await fetchGet("https://myip.ipip.net/")
+        console.log('get IP result', result2)
+    }
+
+    const [pingData, setPingData] = useState<any[]>([])
+    const [pingValue, setPingValue] = useState('')
+    const handleStartPing = async () => {
+        if (!pingUrl) return
+        console.log('start ping', pingUrl, userAgent)
+        const result = await pingTest(pingUrl, userAgent, 5)
+        if (result?.ok) {
+            setPingData([{label: 'Ping (ms)', data: [0, ...(result?.samples || [])]}])
+            setPingValue(Math.round(result?.avg_latency_ms || 0) + ' ms')
+        }
+        console.log('ping result', result)
+    }
+
+    const [jitterData, setJitterData] = useState<any[]>([])
+    const [jitterValue, setJitterValue] = useState('')
+    const handleStartJitter = async () => {
+        if (!pingUrl) return
+        console.log('start Jitter', pingUrl, userAgent)
+        const result = await jitterTest(pingUrl, userAgent, 20)
+        if (result?.ok) {
+            setJitterData([{label: 'Jitter (ms)', data: [0, ...(result?.samples || [])]}])
+            setJitterValue(Math.round(result?.jitter_ms || 0) + ' ms')
+        }
+        console.log('Jitter result', result)
+    }
+
+    const handleStartDownload = async () => {
+        if (!downloadUrl) return
+        console.log('start Download', downloadUrl, userAgent)
+        const proxyUrl = "socks5://127.0.0.1:1086"
+        const result = await downloadSpeedTest(downloadUrl, proxyUrl, userAgent)
+        if (result?.ok) {
+        }
+        console.log('Download result', result)
+    }
+
+    const handleStartUpload = async () => {
+        if (!uploadUrl) return
+        console.log('start Upload', uploadUrl, userAgent)
+        const result = await uploadSpeedTest(uploadUrl, userAgent, 5)
+        if (result?.ok) {
+        }
+        console.log('Upload result', result)
+    }
+
+    const handleStart = async () => {
+        await handleStartPing()
+        await handleStartJitter()
+        await handleStartDownload()
+        await handleStartUpload()
+    }
+
+    const [open, setOpen] = useState(false)
+    const [tab, setTab] = useState(0)
+    const handleOpen = () => {
+        setOpen(true)
+    }
+    const handleClose = () => {
+        setOpen(false)
+    }
+
+    return (<>
+        <Dialog open={open} onClose={handleClose}>
+            <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
+                <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
+                    <BottomNavigation
+                        showLabels
+                        component={Card}
+                        sx={{mb: 2, mt: 1}}
+                        value={tab}
+                        onChange={(_, v) => setTab(v)}>
+                        <BottomNavigationAction label="测速设置"/>
+                        <BottomNavigationAction label="测速服务"/>
+                    </BottomNavigation>
+
+                    {tab === 0 ? (<>
+                        <TextField
+                            select fullWidth size="small"
+                            label="Ping 测试服务"
+                            value={speedTestConfig.pingActive}
+                            onChange={handleConfigChange('pingActive')}>
+                            {pingList.map((item, key) => (
+                                <MenuItem key={key} value={key}>{item.name}</MenuItem>
+                            ))}
+                        </TextField>
+                        <TextField
+                            select fullWidth size="small"
+                            label="下载测速服务"
+                            value={speedTestConfig.downloadActive}
+                            onChange={handleConfigChange('downloadActive')}>
+                            {downloadList.map((item, key) => (
+                                <MenuItem key={key} value={key}>{item.name}</MenuItem>
+                            ))}
+                        </TextField>
+                        <TextField
+                            select fullWidth size="small"
+                            label="上传测速服务"
+                            value={speedTestConfig.uploadActive}
+                            onChange={handleConfigChange('uploadActive')}>
+                            {uploadList.map((item, key) => (
+                                <MenuItem key={key} value={key}>{item.name}</MenuItem>
+                            ))}
+                        </TextField>
+                    </>) : tab === 1 && (<>
+                        <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                            <TextField
+                                multiline minRows={2} maxRows={10}
+                                size="small"
+                                label="Ping 测试链接"
+                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
+                                value={speedTestConfig.pingContent}
+                                onChange={handleConfigChange('pingContent')}/>
+                            <TextField
+                                multiline minRows={2} maxRows={10}
+                                size="small"
+                                label="下载测速链接"
+                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
+                                value={speedTestConfig.downloadContent}
+                                onChange={handleConfigChange('downloadContent')}/>
+                            <TextField
+                                multiline minRows={2} maxRows={10}
+                                size="small"
+                                label="下载测速服务"
+                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
+                                value={speedTestConfig.uploadContent}
+                                onChange={handleConfigChange('uploadContent')}/>
+                        </Stack>
+                    </>)}
+                    <div className="flex-between">
+                        <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
+                        <Button variant="contained" onClick={handleClose}>取消</Button>
+                    </div>
+                </Stack>
+            </Stack>
+        </Dialog>
+
+        <Stack spacing={1}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
+                <Stack direction="row" justifyContent="center" spacing={1}>
+                    <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
+                    <Button variant="contained" onClick={handleStartPing}>Ping 测试</Button>
+                    <Button variant="contained" onClick={handleStartJitter}>抖动测试</Button>
+                    <Button variant="contained" onClick={handleStartDownload}>下载测试</Button>
+                    <Button variant="contained" onClick={handleStartUpload}>上传测试</Button>
+                    <Button variant="contained" onClick={handleStart}>全部测试</Button>
+                </Stack>
+                <IconButton color="default" onClick={handleOpen} sx={{position: 'absolute', right: 0, top: 2}}><SettingsIcon/></IconButton>
+            </Stack>
+
+            <Stack direction="row" justifyContent="space-between" alignItems="center" component={Card} elevation={3} sx={{p: 2}}>
+                <Typography variant="body1">公网 IP</Typography>
+                -
+            </Stack>
+
+            <SpeedLineChart title="Ping" value={pingValue} series={pingData}/>
+            <SpeedLineChart title="抖动" value={jitterValue} series={jitterData}/>
+
+            <Stack direction="row" justifyContent="center" spacing={1}>
+                <SpeedGauge title="下载" percent={0} value="0 kbit/s"/>
+                <SpeedGauge title="上传" percent={0} value="0 kbit/s"/>
+            </Stack>
+        </Stack>
+    </>)
+}
+
+export default SpeedTest
