@@ -79,7 +79,7 @@ export const HttpTest = () => {
     useEffect(loadConfig, [])
 
     const getProxyUrl = () => {
-        return `socks5://${appConfig.ray_host}:${appConfig.ray_socks_port}`
+        return appConfig.ray_enable ? `socks5://${appConfig.ray_host}:${appConfig.ray_socks_port}` : ''
     }
 
     const urlValueChange = (value: string) => {
@@ -163,7 +163,7 @@ export const HttpTest = () => {
                 </Card>}
 
                 <Card elevation={4} sx={{p: 1, pt: 2}}>
-                    <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
+                    <TextField className="scr-w2" fullWidth multiline error minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
                 </Card>
             </>) : statusCode > 0 && (<>
                 <Card elevation={4} sx={{p: 2}}>
