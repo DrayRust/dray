@@ -138,8 +138,8 @@ async fn upload_speed_test(url: String, user_agent: String, size: usize, timeout
 }
 
 #[tauri::command]
-async fn fetch_response_headers(url: String, user_agent: String, timeout: u64) -> Value {
-    http::fetch_response_headers(&url, &user_agent, timeout).await
+async fn fetch_response_headers(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
+    http::fetch_response_headers(&url, Some(&proxy_url), &user_agent, timeout).await
 }
 
 #[tauri::command]

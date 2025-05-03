@@ -330,8 +330,24 @@ pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout
     }
 }
 
-pub async fn fetch_response_headers(url: &str, user_agent: &str, timeout: u64) -> Value {
-    let client = match Client::builder().timeout(Duration::from_secs(timeout)).build() {
+pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
+
+    let client_builder = if let Some(proxy_url) = proxy_url {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
             error!("Failed to build HTTP client: {}", e);
