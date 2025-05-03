@@ -231,10 +231,6 @@ export async function killProcessByPid(pid: number) {
     return invokeBool('kill_process_by_pid', {pid})
 }
 
-export async function fetchProxyGet(url: string, proxyUrl: string) {
-    return safeInvoke('fetch_get_with_proxy', {url, proxyUrl})
-}
-
 export async function downloadLargeFile(url: string, filepath: string, timeout: number = 60 * 30) {
     return safeInvoke('download_large_file', {url, filepath, timeout})
 }
