@@ -119,7 +119,7 @@ async fn jitter_test(url: String, user_agent: String, count: usize, timeout: u64
 
 #[tauri::command]
 async fn download_speed_test(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
-    http::download_speed_test(&url, Some(&proxy_url), &user_agent, timeout).await
+    http::download_speed_test(&url, &proxy_url, &user_agent, timeout).await
 }
 
 #[tauri::command]
@@ -129,12 +129,12 @@ async fn upload_speed_test(url: String, user_agent: String, size: usize, timeout
 
 #[tauri::command]
 async fn fetch_response_headers(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
-    http::fetch_response_headers(&url, Some(&proxy_url), &user_agent, timeout).await
+    http::fetch_response_headers(&url, &proxy_url, &user_agent, timeout).await
 }
 
 #[tauri::command]
 async fn fetch_text_content(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
-    http::fetch_text_content(&url, Some(&proxy_url), &user_agent, timeout).await
+    http::fetch_text_content(&url, &proxy_url, &user_agent, timeout).await
 }
 
 #[tauri::command]

@@ -196,10 +196,10 @@ pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64
     })
 }
 
-pub async fn download_speed_test(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, timeout: u64) -> Value {
     let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
 
-    let client_builder = if let Some(proxy_url) = proxy_url {
+    let client_builder = if !proxy_url.is_empty() {
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
@@ -314,10 +314,10 @@ pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout
     }
 }
 
-pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+pub async fn fetch_response_headers(url: &str, proxy_url: &str, user_agent: &str, timeout: u64) -> Value {
     let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
 
-    let client_builder = if let Some(proxy_url) = proxy_url {
+    let client_builder = if !proxy_url.is_empty() {
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
@@ -372,10 +372,10 @@ pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_age
     }
 }
 
-pub async fn fetch_text_content(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
+pub async fn fetch_text_content(url: &str, proxy_url: &str, user_agent: &str, timeout: u64) -> Value {
     let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
 
-    let client_builder = if let Some(proxy_url) = proxy_url {
+    let client_builder = if !proxy_url.is_empty() {
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
@@ -438,8 +438,13 @@ pub async fn fetch_text_content(url: &str, proxy_url: Option<&str>, user_agent: 
 }
 
 pub async fn fetch_get(url: &str, is_proxy: bool, user_agent: &str, timeout: u64) -> Value {
-    let proxy_url = if is_proxy { get_default_proxy_url() } else { None };
-    fetch_text_content(url, proxy_url.as_deref(), user_agent, timeout).await
+    let proxy_url = if is_proxy {
+        get_default_proxy_url().unwrap_or_else(|| "".to_string())
+    } else {
+        "".to_string()
+    };
+
+    fetch_text_content(url, &proxy_url, user_agent, timeout).await
 }
 
 fn get_default_proxy_url() -> Option<String> {
