@@ -39,7 +39,7 @@ export const calculateNetworkSpeed = (
 export async function getStatsData(port: number) {
     const r = await fetchGet(`http://127.0.0.1:${port}/debug/vars`)
     if (!r || !r.ok) return false
-    const obj = safeJsonParse(r.text)
+    const obj = safeJsonParse(r.body)
     let result: any = {}
     if (obj.memstats) {
         result.memStats = extractMemStats(obj.memstats)

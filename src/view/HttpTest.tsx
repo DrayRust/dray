@@ -72,7 +72,7 @@ export const HttpTest = () => {
     const handleGetHtml = async () => {
         const result = await fetchGet(urlValue, true)
         if (result?.ok) {
-            setHtmlValue(result.text || '')
+            setHtmlValue(result.body || '')
         }
     }
 

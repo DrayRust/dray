@@ -7,10 +7,10 @@ export async function getSubscription(row: SubscriptionRow) {
     const r = await fetchGet(row.url, row.isProxy)
     if (r && r.ok) {
         if (row.isHtml) {
-            await parseHtml(r.text, row.name)
+            await parseHtml(r.body, row.name)
         } else {
             try {
-                const obj = JSON.parse(r.text)
+                const obj = JSON.parse(r.body)
                 await parseJson(obj, row.name)
             } catch (err) {
                 log.error(`${row.name}, failed to subscription parseJson:`, err)
