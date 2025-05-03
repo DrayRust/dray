@@ -16,6 +16,7 @@ const urlList = [
     'https://www.youtube.com',
     'https://www.facebook.com',
     'https://www.instagram.com',
+    'https://myip.ipip.net',
     'https://www.x.com',
     'https://www.chatgpt.com',
     'https://www.whatsapp.com',
