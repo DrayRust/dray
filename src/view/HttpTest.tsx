@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button, Box, Chip, Card, Paper, Stack, TextField, LinearProgress, Typography, useTheme } from '@mui/material'
 
 import CodeMirror from '@uiw/react-codemirror'
+import { json } from '@codemirror/lang-json'
 import { html } from '@codemirror/lang-html'
 
 import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
@@ -172,7 +173,7 @@ export const HttpTest = () => {
                     <TextField className="scr-w2" fullWidth multiline error minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
                 </Card>
             </>) : statusCode > 0 && (<>
-                <Card elevation={4} sx={{p: 1}}>
+                <Card elevation={4} sx={{p: 1, px: 1.5}}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="body1">返回状态码</Typography>
                         <Chip variant="outlined" size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
@@ -180,19 +181,26 @@ export const HttpTest = () => {
                 </Card>
 
                 {requestType === 'headers' ? (<>
-                    <Card elevation={4} sx={{p: 2}}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Typography variant="body1">参数数量</Typography>
-                            <Chip size="small" variant="outlined" label={`${Object.keys(headersValue).length} 个`} color="info"/>
-                        </Stack>
-                    </Card>
-
-                    <Card elevation={4} sx={{p: 2}}>
-                        <TextField className="scr-w2" fullWidth multiline minRows={2} maxRows={20} size="small" label="请求回应信息" value={JSON.stringify(headersValue, null, 2)}/>
+                    <Card elevation={4}>
+                        <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography variant="body1">请求回应头信息</Typography>
+                                <Chip variant="outlined" size="small" label={`参数: ${Object.keys(headersValue).length} 条`} color="info"/>
+                            </Stack>
+                        </Paper>
+                        <CodeMirror
+                            readOnly
+                            className="scr-w2"
+                            value={JSON.stringify(headersValue, null, 2)}
+                            height="500px"
+                            extensions={[json()]}
+                            theme={isDark ? 'dark' : 'light'}
+                            style={{fontSize: '14px'}}
+                        />
                     </Card>
                 </>) : requestType === 'html' && (<>
                     <Card elevation={4}>
-                        <Paper elevation={2} sx={{p: 1, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                        <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 <Typography variant="body1">HTML 源代码</Typography>
                                 <Chip variant="outlined" size="small" label={`长度: ${sizeToUnit(htmlValue.length)}`} color="info"/>
