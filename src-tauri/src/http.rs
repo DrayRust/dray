@@ -337,6 +337,7 @@ pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_age
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
+                error!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -353,30 +354,36 @@ pub async fn fetch_response_headers(url: &str, proxy_url: Option<&str>, user_age
             error!("Failed to build HTTP client: {}", e);
             return json!({
                 "ok": false,
-                "error_message": e.to_string()
+                "error_message": format!("Failed to build HTTP client: {}", e)
             });
         }
     };
 
-    let response = match client.get(url).header(header::USER_AGENT, user_agent).send().await {
-        Ok(resp) => resp,
-        Err(e) => {
-            error!("Request failed: {}", e);
-            return json!({
+    let response_result = client.get(url).header(header::USER_AGENT, user_agent).send().await;
+
+    match response_result {
+        Ok(response) => {
+            let status = response.status().as_u16();
+            let headers: &HeaderMap = response.headers();
+            let result: HashMap<String, String> = headers
+                .iter()
+                .filter_map(|(k, v)| v.to_str().ok().map(|val| (k.to_string(), val.to_string())))
+                .collect();
+
+            json!({
+                "ok": true,
+                "status": status,
+                "headers": result
+            })
+        }
+        Err(err) => {
+            let status = err.status();
+            error!("Request failed: {}", err);
+            json!({
                 "ok": false,
-                "error_message": e.to_string()
-            });
+                "status": status.map(|s| s.as_u16()),
+                "error_message": err.to_string()
+            })
         }
-    };
-
-    let headers: &HeaderMap = response.headers();
-    let result: HashMap<String, String> = headers
-        .iter()
-        .filter_map(|(k, v)| v.to_str().ok().map(|val| (k.to_string(), val.to_string())))
-        .collect();
-
-    json!({
-        "ok": true,
-        "headers": result
-    })
+    }
 }
