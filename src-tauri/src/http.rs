@@ -434,6 +434,7 @@ pub async fn fetch_text_content(url: &str, proxy_url: Option<&str>, user_agent: 
                 }
             };
 
+            trace!("Successfully fetched HTML content from: {}, status: {}", url, status);
             json!({
                 "ok": true,
                 "status": status,
