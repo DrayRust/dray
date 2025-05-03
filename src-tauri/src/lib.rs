@@ -103,11 +103,6 @@ fn save_text_file(path: String, content: String) -> bool {
 }
 
 #[tauri::command]
-async fn fetch_get(url: String, is_proxy: bool, user_agent: String, timeout: u64) -> Value {
-    http::fetch_get(&url, is_proxy, &user_agent, timeout).await
-}
-
-#[tauri::command]
 async fn download_large_file(url: String, filepath: String, timeout: u64) -> Value {
     http::download_large_file(&url, &filepath, timeout).await
 }
@@ -140,6 +135,11 @@ async fn fetch_response_headers(url: String, proxy_url: String, user_agent: Stri
 #[tauri::command]
 async fn fetch_text_content(url: String, proxy_url: String, user_agent: String, timeout: u64) -> Value {
     http::fetch_text_content(&url, Some(&proxy_url), &user_agent, timeout).await
+}
+
+#[tauri::command]
+async fn fetch_get(url: String, is_proxy: bool, user_agent: String, timeout: u64) -> Value {
+    http::fetch_get(&url, is_proxy, &user_agent, timeout).await
 }
 
 #[tauri::command]
@@ -322,7 +322,6 @@ pub fn run() {
             save_speed_test_conf,
             save_proxy_pac,
             save_text_file,
-            fetch_get,
             download_large_file,
             ping_test,
             jitter_test,
@@ -330,6 +329,7 @@ pub fn run() {
             upload_speed_test,
             fetch_response_headers,
             fetch_text_content,
+            fetch_get,
             get_dirs_json,
             get_dray_app_dir,
             get_sys_info_json,
