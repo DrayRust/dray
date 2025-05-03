@@ -1,9 +1,7 @@
 use crate::config;
 use futures_util::StreamExt;
 use logger::{error, info, trace, warn};
-use reqwest::header;
-use reqwest::Client;
-use reqwest::Proxy;
+use reqwest::{header, redirect::Policy, Client, Proxy};
 use serde_json::{json, Value};
 use std::fs::File;
 use std::io::Write;
@@ -214,7 +212,7 @@ pub async fn jitter_test(url: &str, user_agent: &str, count: usize, timeout: u64
 }
 
 pub async fn download_speed_test(url: &str, proxy_url: Option<&str>, user_agent: &str, timeout: u64) -> Value {
-    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout)).redirect(Policy::limited(10));
 
     let client_builder = if let Some(proxy_url) = proxy_url {
         match Proxy::all(proxy_url) {
