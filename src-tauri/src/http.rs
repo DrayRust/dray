@@ -275,17 +275,34 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
     }
 }
 
-pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout: u64) -> serde_json::Value {
+pub async fn upload_speed_test(url: &str, proxy_url: &str, user_agent: &str, size: usize, timeout: u64) -> Value {
     let size_bytes = size * 1024 * 1024; // MB -> bytes
     let buffer = vec![0u8; size_bytes];
 
-    let client = match Client::builder().timeout(Duration::from_secs(timeout)).build() {
+    let client_builder = Client::builder().timeout(Duration::from_secs(timeout));
+
+    let client_builder = if !proxy_url.is_empty() {
+        match Proxy::all(proxy_url) {
+            Ok(proxy) => client_builder.proxy(proxy),
+            Err(e) => {
+                error!("Invalid proxy: {}", e);
+                return json!({
+                    "ok": false,
+                    "error_message": format!("Invalid proxy: {}", e)
+                });
+            }
+        }
+    } else {
+        client_builder
+    };
+
+    let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
             error!("Failed to build HTTP client: {:?}", e);
             return json!({
                 "ok": false,
-                "errMsg": e.to_string()
+                "error_message": e.to_string()
             });
         }
     };
@@ -300,7 +317,7 @@ pub async fn upload_speed_test(url: &str, user_agent: &str, size: usize, timeout
             let speed_mbps = (size_bytes as f64 * 8.0) / (duration * 1_000_000.0);
             json!({
                 "ok": true,
-                "speed": speed_mbps
+                "speed_mbps": speed_mbps
             })
         }
         Err(e) => {
