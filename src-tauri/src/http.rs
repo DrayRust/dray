@@ -115,10 +115,11 @@ pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usiz
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build HTTP client: {}", e);
+            let msg = format!("Failed to build HTTP client: {}", e);
+            error!("{}", msg);
             return json!({
                 "ok": false,
-                "error_message": e.to_string()
+                "error_message": msg
             });
         }
     };
@@ -191,10 +192,11 @@ pub async fn jitter_test(url: &str, proxy_url: &str, user_agent: &str, count: us
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build HTTP client: {}", e);
+            let msg = format!("Failed to build HTTP client: {}", e);
+            error!("{}", msg);
             return json!({
                 "ok": false,
-                "error_message": e.to_string()
+                "error_message": msg
             });
         }
     };
