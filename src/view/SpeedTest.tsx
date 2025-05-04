@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
     Dialog, Button, Box, BottomNavigation, BottomNavigationAction, Card, Chip, Paper, Stack,
     IconButton, Typography, TextField, MenuItem, LinearProgress,
@@ -10,8 +10,10 @@ import { LineChart } from '@mui/x-charts/LineChart'
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, processLines } from "../util/util.ts"
-import { downloadSpeedTest, fetchGet, jitterTest, pingTest, readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
+import { downloadSpeedTest, fetchGet, getNetworksJson, jitterTest, pingTest, readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG } from "../util/config.ts"
+import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
+import { useVisibility } from "../hook/useVisibility.ts"
 
 const DEFAULT_SPEED_TEST_CONFIG: SpeedTestConfig = {
     "pingActive": 0,
@@ -160,11 +162,13 @@ export const SpeedTest = () => {
     const [downloadPercent, setDownloadPercent] = useState(0)
     const [downloadValue, setDownloadValue] = useState('')
     const [downloadElapsed, setDownloadElapsed] = useState(0)
-    const [downloadTesting, setDownloadTesting] = useState(false)
+    const [downloadTestState, setDownloadTestState] = useState(0)
     const handleStartDownload = async () => {
         if (!downloadUrl) return
+        firstNetwork.current = true
         setIsTesting(true)
-        setDownloadTesting(true)
+        setDownloadTestState(1)
+        setDownloadSpeed(0)
 
         const startTime = performance.now()
         const result = await downloadSpeedTest(downloadUrl, getProxyUrl(), userAgent)
@@ -173,17 +177,51 @@ export const SpeedTest = () => {
 
         console.log(result)
         if (result?.ok) {
-            let speed = result?.speed_mbps || 0
-            if (speed) {
-                setDownloadValue(result.speed_mbps.toFixed(1) + ` Mbps`)
-                setDownloadPercent(calcPercentage(speed))
-            }
+            let speed_mbps = result?.speed_mbps || 0
+            if (speed_mbps) setDownloadSpeed(speed_mbps)
         }
 
         setIsTesting(false)
-        setDownloadTesting(false)
+        setDownloadTestState(2)
     }
 
+    const setDownloadSpeed = (speed_mbps: number) => {
+        setDownloadValue(speed_mbps.toFixed(1) + ` Mbps`)
+        setDownloadPercent(calcPercentage(speed_mbps))
+    }
+
+    // ============== Upload Test ==============
+    const [uploadPercent, setUploadPercent] = useState(0)
+    const [uploadValue, setUploadValue] = useState('')
+    const [uploadElapsed, setUploadElapsed] = useState(0)
+    const [uploadTestState, setUploadTestState] = useState(0)
+    const handleStartUpload = async () => {
+        if (!uploadUrl) return
+        firstNetwork.current = true
+        setIsTesting(true)
+        setUploadTestState(1)
+        setUploadSpeed(0)
+
+        const startTime = performance.now()
+        const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 10)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setUploadElapsed(elapsed)
+
+        if (result?.ok) {
+            let speed_mbps = result?.speed_mbps || 0
+            if (speed_mbps) setUploadSpeed(speed_mbps)
+        }
+
+        setIsTesting(false)
+        setUploadTestState(2)
+    }
+
+    const setUploadSpeed = (speed_mbps: number) => {
+        setUploadValue(speed_mbps.toFixed(1) + ` Mbps`)
+        setUploadPercent(calcPercentage(speed_mbps))
+    }
+
+    // ============== common ==============
     const calcPercentage = (speed: number) => {
         speed = Number(speed) || 0
         speed = speed < 0 ? 0 : speed
@@ -192,31 +230,33 @@ export const SpeedTest = () => {
         return Number(Math.min(((speed / maxSpeed) * 100), 100).toFixed(1))
     }
 
-    // ============== Upload Test ==============
-    const [uploadPercent, setUploadPercent] = useState(0)
-    const [uploadValue, setUploadValue] = useState('')
-    const [uploadElapsed, setUploadElapsed] = useState(0)
-    const [uploadTesting, setUploadTesting] = useState(false)
-    const handleStartUpload = async () => {
-        if (!uploadUrl) return
-        setIsTesting(true)
-        setUploadTesting(true)
-
-        const startTime = performance.now()
-        const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 5)
-        const elapsed = Math.floor(performance.now() - startTime)
-        setUploadElapsed(elapsed)
-
-        if (result?.ok) {
-            let speed = result?.speed_mbps || 0
-            if (speed) {
-                setUploadValue(result.speed_mbps.toFixed(1) + ` Mbps`)
-                setUploadPercent(calcPercentage(speed))
-            }
+    // ==================================== interval ====================================
+    const intervalRef = useRef<number>(0)
+    const isVisibility = useVisibility()
+    useEffect(() => {
+        if (isVisibility && (uploadTestState === 1 || downloadTestState === 1)) {
+            intervalRef.current = setInterval(async () => {
+                await getNetworkData()
+            }, 500)
         }
+        return () => clearInterval(intervalRef.current)
+    }, [isVisibility, uploadTestState, downloadTestState])
 
-        setIsTesting(false)
-        setUploadTesting(false)
+    // ==================================== network ====================================
+    const firstNetwork = useRef(true)
+    const prevNetworkRef = useRef({up: 0, down: 0})
+    const getNetworkData = async () => {
+        let currentNetwork = await getNetworksJson()
+        if (currentNetwork) {
+            const net = sumNetworks(currentNetwork)
+            const speed = calculateNetworkSpeed(prevNetworkRef.current, net, 0.5)
+            if (!firstNetwork.current) {
+                if (downloadTestState === 1) setDownloadSpeed(speed.downSpeed * 8 / 1e6) // 转换为 Mbps
+                if (uploadTestState === 1) setUploadSpeed(speed.upSpeed * 8 / 1e6) // 转换为 Mbps
+            }
+            firstNetwork.current = false
+            prevNetworkRef.current = net
+        }
     }
 
     const handleStart = async () => {
@@ -375,15 +415,13 @@ export const SpeedTest = () => {
                     <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography variant="body1">下载</Typography>
-                            {downloadValue !== '' && (
+                            {downloadTestState === 2 && (
                                 <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(downloadElapsed)}`} color="info"/>
                             )}
                         </Stack>
                     </Paper>
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        {downloadTesting ? (
-                            <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
-                        ) : downloadValue === '' ? (
+                        {downloadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测试</Button>
                         ) : (
                             <SpeedGauge percent={downloadPercent} value={downloadValue}/>
@@ -395,15 +433,13 @@ export const SpeedTest = () => {
                     <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Typography variant="body1">上传</Typography>
-                            {uploadValue !== '' && (
+                            {uploadTestState === 2 && (
                                 <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(uploadElapsed)}`} color="info"/>
                             )}
                         </Stack>
                     </Paper>
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        {uploadTesting ? (
-                            <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
-                        ) : uploadValue === '' ? (
+                        {uploadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测试</Button>
                         ) : (
                             <SpeedGauge percent={uploadPercent} value={uploadValue}/>
