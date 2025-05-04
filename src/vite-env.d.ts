@@ -203,10 +203,12 @@ interface RuleDomain {
 
 // ============= speed test ============
 interface SpeedTestConfig {
+    ipTestActive: number;
     pingActive: number;
     downloadActive: number;
     uploadActive: number;
 
+    ipTestContent: string;
     pingContent: string;
     downloadContent: string;
     uploadContent: string;

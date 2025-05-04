@@ -10,19 +10,20 @@ import { LineChart } from '@mui/x-charts/LineChart'
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, processLines } from "../util/util.ts"
-import { downloadSpeedTest, fetchGet, getNetworksJson, jitterTest, pingTest, readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
-import { DEFAULT_APP_CONFIG } from "../util/config.ts"
+import {
+    downloadSpeedTest,
+    fetchTextContent,
+    getNetworksJson,
+    jitterTest,
+    pingTest,
+    readAppConfig,
+    readSpeedTestConfig,
+    saveSpeedTestConfig,
+    uploadSpeedTest
+} from "../util/invoke.ts"
+import { DEFAULT_APP_CONFIG, DEFAULT_SPEED_TEST_CONFIG } from "../util/config.ts"
 import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
-
-const DEFAULT_SPEED_TEST_CONFIG: SpeedTestConfig = {
-    "pingActive": 0,
-    "downloadActive": 0,
-    "uploadActive": 0,
-    "pingContent": "http://www.gstatic.com/generate_204#谷歌网络检测\nhttp://www.google.com/generate_204#谷歌备用检测\nhttp://cp.cloudflare.com/generate_204#Cloudflare网络检测\nhttp://captive.apple.com/hotspot-detect.htm#苹果网络检测\nhttp://www.msftconnecttest.com/connecttest.txt#微软网络检测",
-    "downloadContent": "https://cachefly.cachefly.net/50mb.test#CacheFly（全球高速 CDN）\nhttp://ipv4.download.thinkbroadband.com/50MB.zip#ThinkBroadband（英国）\nhttps://nbg1-speed.hetzner.com/100MB.bin#Hetzner（德国数据中心）\nhttp://proof.ovh.net/files/100Mb.dat#OVH（法国）\nhttps://speedtest.tokyo2.linode.com/100MB-tokyo2.bin#Linode（日本东京）\nhttp://speedtest.tele2.net/100MB.zip#Tele2（瑞典）",
-    "uploadContent": "https://speedtest.serverius.net/upload.php#Serverius（荷兰）\nhttps://speedtest.wifirst.net/upload.php#Wifirst（法国）\nhttps://speedtest.netzwerge.de/upload.php#Netzwerge（德国）\nhttps://speedtest.lambdanet.co/upload.php#LambdaNet（美国）"
-}
 
 const userAgent = navigator.userAgent
 
@@ -34,11 +35,13 @@ interface TestUrlRow {
 export const SpeedTest = () => {
     const [appConfig, setAppConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
 
+    const [ipTestList, setIpTestList] = useState<TestUrlRow[]>([])
     const [pingList, setPingList] = useState<TestUrlRow[]>([])
     const [downloadList, setDownloadList] = useState<TestUrlRow[]>([])
     const [uploadList, setUploadList] = useState<TestUrlRow[]>([])
 
     const [isTesting, setIsTesting] = useState(false)
+    const [ipTestUrl, setIpTestUrl] = useState<string>('')
     const [pingUrl, setPingUrl] = useState<string>('')
     const [downloadUrl, setDownloadUrl] = useState<string>('')
     const [uploadUrl, setUploadUrl] = useState<string>('')
@@ -57,14 +60,17 @@ export const SpeedTest = () => {
     useEffect(loadConfig, [])
 
     const loadList = (conf: SpeedTestConfig) => {
+        const ipTestList = extractNames(conf.ipTestContent)
         const pingList = extractNames(conf.pingContent)
         const downloadList = extractNames(conf.downloadContent)
         const uploadList = extractNames(conf.uploadContent)
 
+        setIpTestList(ipTestList)
         setPingList(pingList)
         setDownloadList(downloadList)
         setUploadList(uploadList)
 
+        setIpTestUrl(ipTestList[conf.ipTestActive]?.url || '')
         setPingUrl(pingList[conf.pingActive]?.url || '')
         setDownloadUrl(downloadList[conf.downloadActive]?.url || '')
         setUploadUrl(uploadList[conf.uploadActive]?.url || '')
@@ -92,6 +98,7 @@ export const SpeedTest = () => {
 
     const handleSubmit = async () => {
         let newConf = {...speedTestConfig}
+        newConf.ipTestContent = processLines(newConf.ipTestContent).join('\n')
         newConf.pingContent = processLines(newConf.pingContent).join('\n')
         newConf.downloadContent = processLines(newConf.downloadContent).join('\n')
         newConf.uploadContent = processLines(newConf.uploadContent).join('\n')
@@ -102,17 +109,10 @@ export const SpeedTest = () => {
         handleClose()
     }
 
-    // const [pubIP, setPubIP] = useState('')
-    const handleGetIP = async () => {
-        const result = await fetchGet("https://httpbin.org/ip")
-        console.log('get IP result', result)
-        const result2 = await fetchGet("https://myip.ipip.net/")
-        console.log('get IP result', result2)
-    }
-
     // ============== Test All ==============
     const handleTestAll = async () => {
         handleResetAll()
+        await handleGetIP()
         await handleStartPing()
         await handleStartJitter()
         await handleStartDownload()
@@ -120,12 +120,35 @@ export const SpeedTest = () => {
     }
 
     const handleResetAll = () => {
+        setPubIpData('')
         setPingData([])
         setPingValue('')
         setJitterData([])
         setJitterValue('')
         setDownloadTestState(0)
         setUploadTestState(0)
+    }
+
+    // ============== Public IP Test ==============
+    const [pubIpData, setPubIpData] = useState('')
+    const [pubIpElapsed, setPubIpElapsed] = useState(0)
+    const [pubIpTesting, setPubIpTesting] = useState(false)
+    const handleGetIP = async () => {
+        if (!ipTestUrl) return
+        setIsTesting(true)
+        setPubIpTesting(true)
+
+        const startTime = performance.now()
+        const result = await fetchTextContent(ipTestUrl, getProxyUrl(), userAgent)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setPubIpElapsed(elapsed)
+
+        if (result?.ok) {
+            setPubIpData(result.body)
+        }
+
+        setIsTesting(false)
+        setPubIpTesting(false)
     }
 
     // ============== Ping Test ==============
@@ -303,6 +326,15 @@ export const SpeedTest = () => {
                     {tab === 0 ? (<>
                         <TextField
                             select fullWidth size="small"
+                            label="IP 测试服务"
+                            value={speedTestConfig.ipTestActive}
+                            onChange={handleConfigChange('ipTestActive')}>
+                            {ipTestList.map((item, key) => (
+                                <MenuItem key={key} value={key}>{item.name}</MenuItem>
+                            ))}
+                        </TextField>
+                        <TextField
+                            select fullWidth size="small"
                             label="Ping 测试服务"
                             value={speedTestConfig.pingActive}
                             onChange={handleConfigChange('pingActive')}>
@@ -330,6 +362,13 @@ export const SpeedTest = () => {
                         </TextField>
                     </>) : tab === 1 && (<>
                         <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
+                            <TextField
+                                multiline minRows={2} maxRows={10}
+                                size="small"
+                                label="IP 测试链接"
+                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
+                                value={speedTestConfig.ipTestContent}
+                                onChange={handleConfigChange('ipTestContent')}/>
                             <TextField
                                 multiline minRows={2} maxRows={10}
                                 size="small"
@@ -364,17 +403,31 @@ export const SpeedTest = () => {
         <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
                 <Stack direction="row" justifyContent="center" spacing={1}>
-                    <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
-                    <Button variant="contained" disabled={isTesting} onClick={handleTestAll}>全部测试</Button>
+                    <Button variant="contained" disabled={isTesting} color="secondary" onClick={handleTestAll}>测试全部</Button>
                     <Button variant="contained" disabled={isTesting} color="warning" onClick={handleResetAll}>清除结果</Button>
                 </Stack>
                 <IconButton color="default" onClick={handleOpen} sx={{position: 'absolute', right: 0, top: 2}}><SettingsIcon/></IconButton>
             </Stack>
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center" component={Card} elevation={3} sx={{p: 2}}>
-                <Typography variant="body1">公网 IP</Typography>
-                -
-            </Stack>
+            <Card elevation={3}>
+                <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">公网 IP</Typography>
+                        {pubIpData.length > 0 && (
+                            <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(pubIpElapsed)}`} color="info"/>
+                        )}
+                    </Stack>
+                </Paper>
+                <Box sx={{p: 2, height: 180, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    {pubIpTesting ? (
+                        <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : pubIpData.length === 0 ? (
+                        <Button variant="contained" disabled={isTesting} onClick={handleGetIP}>开始测试</Button>
+                    ) : (
+                        <TextField fullWidth multiline rows={5} size="small" label="返回信息" value={pubIpData}/>
+                    )}
+                </Box>
+            </Card>
 
             <Card elevation={3}>
                 <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>

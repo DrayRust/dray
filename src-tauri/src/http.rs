@@ -306,7 +306,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
                 match chunk_result {
                     Ok(chunk) => {
                         total_bytes += chunk.len();
-                        trace!("Chunk len: {}, total bytes: {}", chunk.len(), total_bytes);
+                        // trace!("Chunk len: {}, total bytes: {}", chunk.len(), total_bytes);
                     }
                     Err(e) => {
                         error!("Error while reading chunk: {:?}", e);
