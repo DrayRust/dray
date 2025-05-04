@@ -108,6 +108,7 @@ export const SpeedTest = () => {
         console.log('get IP result', result2)
     }
 
+    // ============== Ping Test ==============
     const [pingData, setPingData] = useState<any[]>([])
     const [pingValue, setPingValue] = useState('')
     const [pingElapsed, setPingElapsed] = useState(0)
@@ -131,6 +132,7 @@ export const SpeedTest = () => {
         setPingTesting(false)
     }
 
+    // ============== Jitter Test ==============
     const [jitterData, setJitterData] = useState<any[]>([])
     const [jitterValue, setJitterValue] = useState('')
     const [jitterElapsed, setJitterElapsed] = useState(0)
@@ -154,23 +156,20 @@ export const SpeedTest = () => {
         setJitterTesting(false)
     }
 
+    // ============== Download Test ==============
     const handleStartDownload = async () => {
         if (!downloadUrl) return
-        console.log('start Download', downloadUrl, userAgent)
-        const proxyUrl = "socks5://127.0.0.1:1086"
-        const result = await downloadSpeedTest(downloadUrl, proxyUrl, userAgent)
+        const result = await downloadSpeedTest(downloadUrl, getProxyUrl(), userAgent)
         if (result?.ok) {
         }
-        console.log('Download result', result)
     }
 
+    // ============== Upload Test ==============
     const handleStartUpload = async () => {
         if (!uploadUrl) return
-        console.log('start Upload', uploadUrl, userAgent)
         const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 5)
         if (result?.ok) {
         }
-        console.log('Upload result', result)
     }
 
     const handleStart = async () => {
