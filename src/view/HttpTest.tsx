@@ -209,7 +209,7 @@ export const HttpTest = () => {
                         </Paper>
                         <CodeMirror
                             readOnly
-                            className="scr-w2"
+                            className="code-mirror scr-w2"
                             value={JSON.stringify(headersValue, null, 2)}
                             height="500px"
                             extensions={[json()]}
@@ -230,7 +230,7 @@ export const HttpTest = () => {
                         </Paper>
                         <CodeMirror
                             readOnly
-                            className="scr-w2"
+                            className="code-mirror scr-w2"
                             value={htmlValue}
                             height="500px"
                             extensions={[html()]}
