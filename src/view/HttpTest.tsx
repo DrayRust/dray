@@ -178,12 +178,14 @@ export const HttpTest = () => {
             {loading ? (
                 <Box sx={{py: 2}}><LinearProgress/></Box>
             ) : errorMsg ? (<>
-                {statusCode > 0 && <Card elevation={4} sx={{p: 2}}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="body1">返回状态码</Typography>
-                        <Chip size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
-                    </Stack>
-                </Card>}
+                {statusCode > 0 && (
+                    <Card elevation={4} sx={{p: 2}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">返回状态码</Typography>
+                            <Chip size="small" label={`HTTP ${statusCode} ｜ ${getStatusMessage()}`} color={getColor()}/>
+                        </Stack>
+                    </Card>
+                )}
 
                 <Card elevation={4} sx={{p: 1, pt: 2}}>
                     <TextField className="scr-w2" fullWidth multiline error minRows={2} maxRows={20} size="small" label="错误信息" value={errorMsg}/>
