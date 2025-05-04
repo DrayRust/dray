@@ -14,7 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import VpnLockIcon from '@mui/icons-material/VpnLock'
-import HttpIcon from '@mui/icons-material/Http'
+import HtmlIcon from '@mui/icons-material/Html'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
@@ -417,7 +417,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                                     <Tooltip arrow title="使用代理更新" placement="top"><IconButton color="warning"><VpnLockIcon/></IconButton></Tooltip>
                                                 )}
                                                 {row.isHtml && (
-                                                    <Tooltip arrow title="HTML 页面" placement="top"><IconButton color="primary"><HttpIcon/></IconButton></Tooltip>
+                                                    <Tooltip arrow title="HTML 页面" placement="top"><IconButton color="primary"><HtmlIcon/></IconButton></Tooltip>
                                                 )}
                                             </div>
                                         </Stack>
