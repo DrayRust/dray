@@ -290,23 +290,25 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                 <BottomNavigationAction label="模式管理" icon={<ModeIcon/>}/>
             </BottomNavigation>
             {tab === 0 ? (<>
-                <TextField
-                    select fullWidth size="small"
-                    label="未匹配上的域名"
-                    value={ruleConfig.unmatchedStrategy}
-                    onChange={handleRuleConfigChange('unmatchedStrategy')}>
-                    <MenuItem value="proxy">代理访问</MenuItem>
-                    <MenuItem value="direct">直接访问</MenuItem>
-                </TextField>
-                <TextField
-                    select fullWidth size="small"
-                    label="采用模式"
-                    value={ruleConfig.mode}
-                    onChange={handleRuleConfigChange('mode')}>
-                    {ruleModeList.map((item, index) => (
-                        <MenuItem key={index} value={index}>{item.name}</MenuItem>
-                    ))}
-                </TextField>
+                <Stack component={Card} spacing={3} sx={{p: 1, pt: 2}}>
+                    <TextField
+                        select fullWidth size="small"
+                        label="未匹配上的域名"
+                        value={ruleConfig.unmatchedStrategy}
+                        onChange={handleRuleConfigChange('unmatchedStrategy')}>
+                        <MenuItem value="proxy">代理访问</MenuItem>
+                        <MenuItem value="direct">直接访问</MenuItem>
+                    </TextField>
+                    <TextField
+                        select fullWidth size="small"
+                        label="采用模式"
+                        value={ruleConfig.mode}
+                        onChange={handleRuleConfigChange('mode')}>
+                        {ruleModeList.map((item, index) => (
+                            <MenuItem key={index} value={index}>{item.name}</MenuItem>
+                        ))}
+                    </TextField>
+                </Stack>
                 <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
                     <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
                     <ChipComponent/>
