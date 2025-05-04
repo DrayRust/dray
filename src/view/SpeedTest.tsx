@@ -8,7 +8,6 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import { LineChart } from '@mui/x-charts/LineChart'
 
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
-import { SpeedLineChart } from "../component/SpeedLineChart.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, processLines } from "../util/util.ts"
 import { downloadSpeedTest, fetchGet, jitterTest, pingTest, readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
@@ -134,15 +133,25 @@ export const SpeedTest = () => {
 
     const [jitterData, setJitterData] = useState<any[]>([])
     const [jitterValue, setJitterValue] = useState('')
+    const [jitterElapsed, setJitterElapsed] = useState(0)
+    const [jitterTesting, setJitterTesting] = useState(false)
     const handleStartJitter = async () => {
         if (!pingUrl) return
-        console.log('start Jitter', pingUrl, userAgent)
-        const result = await jitterTest(pingUrl, userAgent, 20)
+        setIsTesting(true)
+        setJitterTesting(true)
+
+        const startTime = performance.now()
+        const result = await jitterTest(pingUrl, getProxyUrl(), userAgent, 20)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setJitterElapsed(elapsed)
+
         if (result?.ok) {
             setJitterData([{label: 'Jitter (ms)', data: [0, ...(result?.samples || [])]}])
             setJitterValue(Math.round(result?.jitter_ms || 0) + ' ms')
         }
-        console.log('Jitter result', result)
+
+        setIsTesting(false)
+        setJitterTesting(false)
     }
 
     const handleStartDownload = async () => {
@@ -158,7 +167,7 @@ export const SpeedTest = () => {
     const handleStartUpload = async () => {
         if (!uploadUrl) return
         console.log('start Upload', uploadUrl, userAgent)
-        const result = await uploadSpeedTest(uploadUrl, userAgent, 5)
+        const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 5)
         if (result?.ok) {
         }
         console.log('Upload result', result)
@@ -259,7 +268,6 @@ export const SpeedTest = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
                 <Stack direction="row" justifyContent="center" spacing={1}>
                     <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
-                    <Button variant="contained" onClick={handleStartJitter}>抖动测试</Button>
                     <Button variant="contained" onClick={handleStartDownload}>下载测试</Button>
                     <Button variant="contained" onClick={handleStartUpload}>上传测试</Button>
                     <Button variant="contained" onClick={handleStart}>全部测试</Button>
@@ -295,7 +303,28 @@ export const SpeedTest = () => {
                 </Box>
             </Card>
 
-            <SpeedLineChart title="抖动" value={jitterValue} series={jitterData}/>
+            <Card elevation={3}>
+                <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">抖动</Typography>
+                        {jitterData.length > 0 && (
+                            <Stack direction="row" justifyContent="end" alignItems="center" spacing={1}>
+                                <Chip variant="outlined" size="small" label={`抖动: ${jitterValue}`} color="info"/>
+                                <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(jitterElapsed)}`} color="info"/>
+                            </Stack>
+                        )}
+                    </Stack>
+                </Paper>
+                <Box sx={{height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    {jitterTesting ? (
+                        <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : jitterData.length === 0 ? (
+                        <Button variant="contained" disabled={isTesting} onClick={handleStartJitter}>开始测试</Button>
+                    ) : (
+                        <LineChart series={jitterData} height={160}/>
+                    )}
+                </Box>
+            </Card>
 
             <Stack direction="row" justifyContent="center" spacing={1}>
                 <SpeedGauge title="下载" percent={0} value="0 kbit/s"/>
