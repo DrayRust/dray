@@ -231,24 +231,24 @@ export async function killProcessByPid(pid: number) {
     return invokeBool('kill_process_by_pid', {pid})
 }
 
-export async function downloadLargeFile(url: string, filepath: string, timeout: number = 60 * 30) {
-    return safeInvoke('download_large_file', {url, filepath, timeout})
+export async function downloadLargeFile(url: string, filepath: string, proxyUrl: string, userAgent: string, timeout: number = 60 * 30) {
+    return safeInvoke('download_large_file', {url, filepath, proxyUrl, userAgent, timeout})
 }
 
-export async function pingTest(url: string, userAgent: string, count: number, timeout: number = 10) {
-    return safeInvoke('ping_test', {url, userAgent, count, timeout})
+export async function pingTest(url: string, proxyUrl: string, userAgent: string, count: number, timeout: number = 10) {
+    return safeInvoke('ping_test', {url, proxyUrl, userAgent, count, timeout})
 }
 
-export async function jitterTest(url: string, userAgent: string, count: number, timeout: number = 10) {
-    return safeInvoke('jitter_test', {url, userAgent, count, timeout})
+export async function jitterTest(url: string, proxyUrl: string, userAgent: string, count: number, timeout: number = 10) {
+    return safeInvoke('jitter_test', {url, proxyUrl, userAgent, count, timeout})
 }
 
 export async function downloadSpeedTest(url: string, proxyUrl: string, userAgent: string, timeout: number = 60 * 20) {
     return safeInvoke('download_speed_test', {url, proxyUrl, userAgent, timeout})
 }
 
-export async function uploadSpeedTest(url: string, userAgent: string, size: number, timeout: number = 60 * 10) {
-    return safeInvoke('upload_speed_test', {url, userAgent, size, timeout})
+export async function uploadSpeedTest(url: string, proxyUrl: string, userAgent: string, size: number, timeout: number = 60 * 10) {
+    return safeInvoke('upload_speed_test', {url, proxyUrl, userAgent, size, timeout})
 }
 
 export async function fetchResponseHeaders(url: string, proxyUrl: string, userAgent: string = navigator.userAgent, timeout: number = 10) {

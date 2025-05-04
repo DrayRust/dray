@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import {
-    Dialog, Button, BottomNavigation, BottomNavigationAction, Card, Stack,
-    IconButton, Typography, TextField, MenuItem,
+    Dialog, Button, Box, BottomNavigation, BottomNavigationAction, Card, Chip, Paper, Stack,
+    IconButton, Typography, TextField, MenuItem, LinearProgress,
 } from '@mui/material'
+import SettingsIcon from '@mui/icons-material/Settings'
 
-import { downloadSpeedTest, fetchGet, jitterTest, pingTest, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
+import { LineChart } from '@mui/x-charts/LineChart'
+
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
 import { SpeedLineChart } from "../component/SpeedLineChart.tsx"
-import SettingsIcon from '@mui/icons-material/Settings'
 import { useDebounce } from "../hook/useDebounce.ts"
-import { processLines } from "../util/util.ts"
+import { formatSecond, processLines } from "../util/util.ts"
+import { downloadSpeedTest, fetchGet, jitterTest, pingTest, readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest } from "../util/invoke.ts"
+import { DEFAULT_APP_CONFIG } from "../util/config.ts"
 
 const DEFAULT_SPEED_TEST_CONFIG: SpeedTestConfig = {
     "pingActive": 0,
@@ -28,19 +31,26 @@ interface TestUrlRow {
 }
 
 export const SpeedTest = () => {
+    const [appConfig, setAppConfig] = useState<AppConfig>(DEFAULT_APP_CONFIG)
+
     const [pingList, setPingList] = useState<TestUrlRow[]>([])
     const [downloadList, setDownloadList] = useState<TestUrlRow[]>([])
     const [uploadList, setUploadList] = useState<TestUrlRow[]>([])
 
+    const [isTesting, setIsTesting] = useState(false)
     const [pingUrl, setPingUrl] = useState<string>('')
     const [downloadUrl, setDownloadUrl] = useState<string>('')
     const [uploadUrl, setUploadUrl] = useState<string>('')
 
     const [speedTestConfig, setSpeedTestConfig] = useState<SpeedTestConfig>(DEFAULT_SPEED_TEST_CONFIG)
     const loadConfig = useDebounce(async () => {
+        const newConfig = await readAppConfig()
+        if (newConfig) setAppConfig({...DEFAULT_APP_CONFIG, ...newConfig})
+
         let conf = await readSpeedTestConfig() as SpeedTestConfig
         conf = conf ? {...DEFAULT_SPEED_TEST_CONFIG, ...conf} : DEFAULT_SPEED_TEST_CONFIG
         setSpeedTestConfig(conf)
+
         loadList(conf)
     }, 100)
     useEffect(loadConfig, [])
@@ -57,6 +67,10 @@ export const SpeedTest = () => {
         setPingUrl(pingList[conf.pingActive]?.url || '')
         setDownloadUrl(downloadList[conf.downloadActive]?.url || '')
         setUploadUrl(uploadList[conf.uploadActive]?.url || '')
+    }
+
+    const getProxyUrl = () => {
+        return appConfig.ray_enable ? `socks5://${appConfig.ray_host}:${appConfig.ray_socks_port}` : ''
     }
 
     const extractNames = (content: string): TestUrlRow[] => {
@@ -97,15 +111,25 @@ export const SpeedTest = () => {
 
     const [pingData, setPingData] = useState<any[]>([])
     const [pingValue, setPingValue] = useState('')
+    const [pingElapsed, setPingElapsed] = useState(0)
+    const [pingTesting, setPingTesting] = useState(false)
     const handleStartPing = async () => {
         if (!pingUrl) return
-        console.log('start ping', pingUrl, userAgent)
-        const result = await pingTest(pingUrl, userAgent, 5)
+        setIsTesting(true)
+        setPingTesting(true)
+
+        const startTime = performance.now()
+        const result = await pingTest(pingUrl, getProxyUrl(), userAgent, 5)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setPingElapsed(elapsed)
+
         if (result?.ok) {
             setPingData([{label: 'Ping (ms)', data: [0, ...(result?.samples || [])]}])
             setPingValue(Math.round(result?.avg_latency_ms || 0) + ' ms')
         }
-        console.log('ping result', result)
+
+        setIsTesting(false)
+        setPingTesting(false)
     }
 
     const [jitterData, setJitterData] = useState<any[]>([])
@@ -235,7 +259,6 @@ export const SpeedTest = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
                 <Stack direction="row" justifyContent="center" spacing={1}>
                     <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
-                    <Button variant="contained" onClick={handleStartPing}>Ping 测试</Button>
                     <Button variant="contained" onClick={handleStartJitter}>抖动测试</Button>
                     <Button variant="contained" onClick={handleStartDownload}>下载测试</Button>
                     <Button variant="contained" onClick={handleStartUpload}>上传测试</Button>
@@ -249,7 +272,29 @@ export const SpeedTest = () => {
                 -
             </Stack>
 
-            <SpeedLineChart title="Ping" value={pingValue} series={pingData}/>
+            <Card elevation={3}>
+                <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body1">Ping</Typography>
+                        {pingData.length > 0 && (
+                            <Stack direction="row" justifyContent="end" alignItems="center" spacing={1}>
+                                <Chip variant="outlined" size="small" label={`平均: ${pingValue}`} color="info"/>
+                                <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(pingElapsed)}`} color="info"/>
+                            </Stack>
+                        )}
+                    </Stack>
+                </Paper>
+                <Box sx={{height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    {pingTesting ? (
+                        <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : pingData.length === 0 ? (
+                        <Button variant="contained" disabled={isTesting} onClick={handleStartPing}>开始测试</Button>
+                    ) : (
+                        <LineChart series={pingData} height={160}/>
+                    )}
+                </Box>
+            </Card>
+
             <SpeedLineChart title="抖动" value={jitterValue} series={jitterData}/>
 
             <Stack direction="row" justifyContent="center" spacing={1}>
