@@ -157,19 +157,66 @@ export const SpeedTest = () => {
     }
 
     // ============== Download Test ==============
+    const [downloadPercent, setDownloadPercent] = useState(0)
+    const [downloadValue, setDownloadValue] = useState('')
+    const [downloadElapsed, setDownloadElapsed] = useState(0)
+    const [downloadTesting, setDownloadTesting] = useState(false)
     const handleStartDownload = async () => {
         if (!downloadUrl) return
+        setIsTesting(true)
+        setDownloadTesting(true)
+
+        const startTime = performance.now()
         const result = await downloadSpeedTest(downloadUrl, getProxyUrl(), userAgent)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setDownloadElapsed(elapsed)
+
+        console.log(result)
         if (result?.ok) {
+            let speed = result?.speed_mbps || 0
+            if (speed) {
+                setDownloadValue(result.speed_mbps.toFixed(1) + ` Mbps`)
+                setDownloadPercent(calcPercentage(speed))
+            }
         }
+
+        setIsTesting(false)
+        setDownloadTesting(false)
+    }
+
+    const calcPercentage = (speed: number) => {
+        speed = Number(speed) || 0
+        speed = speed < 0 ? 0 : speed
+        const maxSpeed = 100
+        if (speed >= maxSpeed) return 100
+        return Number(Math.min(((speed / maxSpeed) * 100), 100).toFixed(1))
     }
 
     // ============== Upload Test ==============
+    const [uploadPercent, setUploadPercent] = useState(0)
+    const [uploadValue, setUploadValue] = useState('')
+    const [uploadElapsed, setUploadElapsed] = useState(0)
+    const [uploadTesting, setUploadTesting] = useState(false)
     const handleStartUpload = async () => {
         if (!uploadUrl) return
+        setIsTesting(true)
+        setUploadTesting(true)
+
+        const startTime = performance.now()
         const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 5)
+        const elapsed = Math.floor(performance.now() - startTime)
+        setUploadElapsed(elapsed)
+
         if (result?.ok) {
+            let speed = result?.speed_mbps || 0
+            if (speed) {
+                setUploadValue(result.speed_mbps.toFixed(1) + ` Mbps`)
+                setUploadPercent(calcPercentage(speed))
+            }
         }
+
+        setIsTesting(false)
+        setUploadTesting(false)
     }
 
     const handleStart = async () => {
@@ -267,8 +314,6 @@ export const SpeedTest = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
                 <Stack direction="row" justifyContent="center" spacing={1}>
                     <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
-                    <Button variant="contained" onClick={handleStartDownload}>下载测试</Button>
-                    <Button variant="contained" onClick={handleStartUpload}>上传测试</Button>
                     <Button variant="contained" onClick={handleStart}>全部测试</Button>
                 </Stack>
                 <IconButton color="default" onClick={handleOpen} sx={{position: 'absolute', right: 0, top: 2}}><SettingsIcon/></IconButton>
@@ -326,8 +371,45 @@ export const SpeedTest = () => {
             </Card>
 
             <Stack direction="row" justifyContent="center" spacing={1}>
-                <SpeedGauge title="下载" percent={0} value="0 kbit/s"/>
-                <SpeedGauge title="上传" percent={0} value="0 kbit/s"/>
+                <Card elevation={3} sx={{flex: 1, alignItems: 'center'}}>
+                    <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">下载</Typography>
+                            {downloadValue !== '' && (
+                                <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(downloadElapsed)}`} color="info"/>
+                            )}
+                        </Stack>
+                    </Paper>
+                    <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        {downloadTesting ? (
+                            <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                        ) : downloadValue === '' ? (
+                            <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测试</Button>
+                        ) : (
+                            <SpeedGauge percent={downloadPercent} value={downloadValue}/>
+                        )}
+                    </Box>
+                </Card>
+
+                <Card elevation={3} sx={{flex: 1, alignItems: 'center'}}>
+                    <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">上传</Typography>
+                            {uploadValue !== '' && (
+                                <Chip variant="outlined" size="small" label={`测试耗时: ${formatSecond(uploadElapsed)}`} color="info"/>
+                            )}
+                        </Stack>
+                    </Paper>
+                    <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        {uploadTesting ? (
+                            <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                        ) : uploadValue === '' ? (
+                            <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测试</Button>
+                        ) : (
+                            <SpeedGauge percent={uploadPercent} value={uploadValue}/>
+                        )}
+                    </Box>
+                </Card>
             </Stack>
         </Stack>
     </>)
