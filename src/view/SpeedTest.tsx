@@ -110,6 +110,24 @@ export const SpeedTest = () => {
         console.log('get IP result', result2)
     }
 
+    // ============== Test All ==============
+    const handleTestAll = async () => {
+        handleResetAll()
+        await handleStartPing()
+        await handleStartJitter()
+        await handleStartDownload()
+        await handleStartUpload()
+    }
+
+    const handleResetAll = () => {
+        setPingData([])
+        setPingValue('')
+        setJitterData([])
+        setJitterValue('')
+        setDownloadTestState(0)
+        setUploadTestState(0)
+    }
+
     // ============== Ping Test ==============
     const [pingData, setPingData] = useState<any[]>([])
     const [pingValue, setPingValue] = useState('')
@@ -186,7 +204,7 @@ export const SpeedTest = () => {
     }
 
     const setDownloadSpeed = (speed_mbps: number) => {
-        setDownloadValue(speed_mbps.toFixed(1) + ` Mbps`)
+        setDownloadValue(speed_mbps.toFixed(2) + ` Mbps`)
         setDownloadPercent(calcPercentage(speed_mbps))
     }
 
@@ -221,7 +239,7 @@ export const SpeedTest = () => {
         setUploadPercent(calcPercentage(speed_mbps))
     }
 
-    // ============== common ==============
+    // ============== Calc Percentage ==============
     const calcPercentage = (speed: number) => {
         speed = Number(speed) || 0
         speed = speed < 0 ? 0 : speed
@@ -257,13 +275,6 @@ export const SpeedTest = () => {
             firstNetwork.current = false
             prevNetworkRef.current = net
         }
-    }
-
-    const handleStart = async () => {
-        await handleStartPing()
-        await handleStartJitter()
-        await handleStartDownload()
-        await handleStartUpload()
     }
 
     const [open, setOpen] = useState(false)
@@ -354,7 +365,8 @@ export const SpeedTest = () => {
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
                 <Stack direction="row" justifyContent="center" spacing={1}>
                     <Button variant="contained" onClick={handleGetIP}>获取公网 IP 地址</Button>
-                    <Button variant="contained" onClick={handleStart}>全部测试</Button>
+                    <Button variant="contained" disabled={isTesting} onClick={handleTestAll}>全部测试</Button>
+                    <Button variant="contained" disabled={isTesting} color="warning" onClick={handleResetAll}>清除结果</Button>
                 </Stack>
                 <IconButton color="default" onClick={handleOpen} sx={{position: 'absolute', right: 0, top: 2}}><SettingsIcon/></IconButton>
             </Stack>
