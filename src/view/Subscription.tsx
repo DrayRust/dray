@@ -12,6 +12,9 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenWithIcon from '@mui/icons-material/OpenWith'
 import DeleteIcon from '@mui/icons-material/Delete'
 import HelpIcon from '@mui/icons-material/Help'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import VpnLockIcon from '@mui/icons-material/VpnLock'
+import HttpIcon from '@mui/icons-material/Http'
 
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
@@ -400,15 +403,27 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                         <Checkbox value={key} checked={subscriptionChecked.includes(key)} onChange={handleCheckedChange}/>
                                     </TableCell>
                                     <TableCell component="th" scope="row" sx={{p: 1}}>
-                                        <Typography variant="body1">{row.name}</Typography>
-                                        <Typography variant="body2" color="textSecondary">{row.note}</Typography>
-                                        <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
+                                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                            <div>
+                                                <Typography variant="body1">{row.name}</Typography>
+                                                <Typography variant="body2" color="textSecondary">{row.note}</Typography>
+                                                <Typography variant="body2" color="warning" className="text-ellipsis">{row.url}</Typography>
+                                            </div>
+                                            <div>
+                                                {row.autoUpdate && (
+                                                    <Tooltip arrow title="已开启自动更新" placement="top"><IconButton color="success"><AutorenewIcon/></IconButton></Tooltip>
+                                                )}
+                                                {row.isProxy && (
+                                                    <Tooltip arrow title="使用代理更新" placement="top"><IconButton color="warning"><VpnLockIcon/></IconButton></Tooltip>
+                                                )}
+                                                {row.isHtml && (
+                                                    <Tooltip arrow title="HTML 页面" placement="top"><IconButton color="primary"><HttpIcon/></IconButton></Tooltip>
+                                                )}
+                                            </div>
+                                        </Stack>
                                     </TableCell>
                                     <TableCell align="right" sx={{p: 1}}>
-                                        <div style={{minWidth: '100px'}}>
-                                            {!row.autoUpdate && <Chip size="small" label="已关闭更新" color="error" sx={{mr: 1}}/>}
-                                            {row.isProxy && <Chip size="small" label="代理更新" color="warning" sx={{mr: 1}}/>}
-                                            {row.isHtml && <Chip size="small" label="HTML" color="info" sx={{mr: 1}}/>}
+                                        <Stack direction="row" justifyContent="right" alignItems="center">
                                             <Tooltip arrow title="排序" placement="top">
                                                 <IconButton color="info" onClick={e => handleSubSortStart(e, key)}><OpenWithIcon/></IconButton>
                                             </Tooltip>
@@ -418,7 +433,7 @@ const Subscription: React.FC<NavProps> = ({setNavState}) => {
                                             <Tooltip arrow title="删除" placement="top">
                                                 <IconButton color="error" onClick={() => handleDelete(key, row.name)}><DeleteIcon/></IconButton>
                                             </Tooltip>
-                                        </div>
+                                        </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))}
