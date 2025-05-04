@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Dialog, Button, Box, BottomNavigation, BottomNavigationAction, Card, Chip, Paper, Stack,
+    Drawer, Button, Box, BottomNavigation, BottomNavigationAction, Card, Chip, Paper, Stack,
     IconButton, Typography, TextField, MenuItem, LinearProgress,
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 
 import { LineChart } from '@mui/x-charts/LineChart'
 
@@ -96,6 +97,7 @@ export const SpeedTest = () => {
         setSpeedTestConfig(prev => ({...prev, [name]: e.target.value}))
     }
 
+    // ============== Submit ==============
     const handleSubmit = async () => {
         let newConf = {...speedTestConfig}
         newConf.ipTestContent = processLines(newConf.ipTestContent).join('\n')
@@ -106,6 +108,7 @@ export const SpeedTest = () => {
         if (!ok) {
         }
         loadList(newConf)
+        setSpeedTestConfig(newConf)
         handleClose()
     }
 
@@ -310,19 +313,21 @@ export const SpeedTest = () => {
     }
 
     return (<>
-        <Dialog open={open} onClose={handleClose}>
-            <Stack spacing={2} sx={{p: 2, minWidth: 580}}>
-                <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                    <BottomNavigation
-                        showLabels
-                        component={Card}
-                        sx={{mb: 2, mt: 1}}
-                        value={tab}
-                        onChange={(_, v) => setTab(v)}>
-                        <BottomNavigationAction label="测速设置"/>
-                        <BottomNavigationAction label="测速服务"/>
-                    </BottomNavigation>
+        <Drawer anchor="right" open={open} onClose={handleClose}>
+            <Stack spacing={2} sx={{p: 2, minWidth: 700}}>
+                <DoubleArrowIcon onClick={handleClose}/>
 
+                <BottomNavigation
+                    showLabels
+                    component={Card}
+                    sx={{mb: 2, mt: 1}}
+                    value={tab}
+                    onChange={(_, v) => setTab(v)}>
+                    <BottomNavigationAction label="测速设置"/>
+                    <BottomNavigationAction label="测速服务"/>
+                </BottomNavigation>
+
+                <Stack component={Card} elevation={3} spacing={3} sx={{p: 1, pt: 2}}>
                     {tab === 0 ? (<>
                         <TextField
                             select fullWidth size="small"
@@ -361,44 +366,38 @@ export const SpeedTest = () => {
                             ))}
                         </TextField>
                     </>) : tab === 1 && (<>
-                        <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                            <TextField
-                                multiline minRows={2} maxRows={10}
-                                size="small"
-                                label="IP 测试链接"
-                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
-                                value={speedTestConfig.ipTestContent}
-                                onChange={handleConfigChange('ipTestContent')}/>
-                            <TextField
-                                multiline minRows={2} maxRows={10}
-                                size="small"
-                                label="Ping 测试链接"
-                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
-                                value={speedTestConfig.pingContent}
-                                onChange={handleConfigChange('pingContent')}/>
-                            <TextField
-                                multiline minRows={2} maxRows={10}
-                                size="small"
-                                label="下载测速链接"
-                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
-                                value={speedTestConfig.downloadContent}
-                                onChange={handleConfigChange('downloadContent')}/>
-                            <TextField
-                                multiline minRows={2} maxRows={10}
-                                size="small"
-                                label="下载测速服务"
-                                placeholder="每行一条，用等于符号 (=) 分割，前为名称，后为链接"
-                                value={speedTestConfig.uploadContent}
-                                onChange={handleConfigChange('uploadContent')}/>
-                        </Stack>
+                        <TextField
+                            multiline minRows={2} maxRows={6}
+                            size="small"
+                            label="IP 测试链接"
+                            value={speedTestConfig.ipTestContent}
+                            onChange={handleConfigChange('ipTestContent')}/>
+                        <TextField
+                            multiline minRows={2} maxRows={6}
+                            size="small"
+                            label="Ping 测试链接"
+                            value={speedTestConfig.pingContent}
+                            onChange={handleConfigChange('pingContent')}/>
+                        <TextField
+                            multiline minRows={2} maxRows={6}
+                            size="small"
+                            label="下载测速链接"
+                            value={speedTestConfig.downloadContent}
+                            onChange={handleConfigChange('downloadContent')}/>
+                        <TextField
+                            multiline minRows={2} maxRows={6}
+                            size="small"
+                            label="下载测速服务"
+                            value={speedTestConfig.uploadContent}
+                            onChange={handleConfigChange('uploadContent')}/>
                     </>)}
-                    <div className="flex-between">
-                        <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
-                        <Button variant="contained" onClick={handleClose}>取消</Button>
-                    </div>
                 </Stack>
+                <div className="flex-between">
+                    <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
+                    <Button variant="contained" onClick={handleClose}>取消</Button>
+                </div>
             </Stack>
-        </Dialog>
+        </Drawer>
 
         <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
