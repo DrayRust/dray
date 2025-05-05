@@ -120,7 +120,7 @@ pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usiz
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
-                error!("Invalid proxy: {}", e);
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -135,7 +135,7 @@ pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usiz
         Ok(c) => c,
         Err(e) => {
             let msg = format!("Failed to build HTTP client: {}", e);
-            error!("{}", msg);
+            warn!("{}", msg);
             return json!({
                 "ok": false,
                 "error_message": msg
@@ -173,6 +173,7 @@ pub async fn ping_test(url: &str, proxy_url: &str, user_agent: &str, count: usiz
     }
 
     if latencies.is_empty() {
+        warn!("No successful ping responses");
         return json!({
             "ok": false,
             "error_message": "No successful ping responses",
@@ -197,7 +198,7 @@ pub async fn jitter_test(url: &str, proxy_url: &str, user_agent: &str, count: us
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
-                error!("Invalid proxy: {}", e);
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -212,7 +213,7 @@ pub async fn jitter_test(url: &str, proxy_url: &str, user_agent: &str, count: us
         Ok(c) => c,
         Err(e) => {
             let msg = format!("Failed to build HTTP client: {}", e);
-            error!("{}", msg);
+            warn!("{}", msg);
             return json!({
                 "ok": false,
                 "error_message": msg
@@ -250,6 +251,7 @@ pub async fn jitter_test(url: &str, proxy_url: &str, user_agent: &str, count: us
     }
 
     if latencies.len() < 2 {
+        warn!("Insufficient samples to calculate jitter");
         return json!({
             "ok": false,
             "error_message": "Insufficient samples to calculate jitter",
@@ -275,6 +277,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -288,6 +291,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
+            warn!("Failed to build HTTP client: {}", e);
             return json!({
                 "ok": false,
                 "error_message": format!("Failed to build HTTP client: {}", e)
@@ -309,7 +313,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
                         // trace!("Chunk len: {}, total bytes: {}", chunk.len(), total_bytes);
                     }
                     Err(e) => {
-                        error!("Error while reading chunk: {:?}", e);
+                        warn!("Error while reading chunk: {:?}", e);
                         return json!({
                             "ok": false,
                             "error_message": format!("Error reading download stream: {}", e)
@@ -321,6 +325,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
             let duration = start.elapsed().as_secs_f64();
 
             if duration == 0.0 {
+                warn!("Download duration too short (0s)");
                 return json!({
                     "ok": false,
                     "error_message": "Download duration too short (0s)"
@@ -338,7 +343,7 @@ pub async fn download_speed_test(url: &str, proxy_url: &str, user_agent: &str, t
         }
         Err(e) => {
             let msg = format!("Failed to initiate download request: {}", e);
-            error!("{}", msg);
+            warn!("{}", msg);
             json!({
                 "ok": false,
                 "error_message": msg
@@ -357,7 +362,7 @@ pub async fn upload_speed_test(url: &str, proxy_url: &str, user_agent: &str, siz
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
-                error!("Invalid proxy: {}", e);
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -372,7 +377,7 @@ pub async fn upload_speed_test(url: &str, proxy_url: &str, user_agent: &str, siz
         Ok(c) => c,
         Err(e) => {
             let msg = format!("Failed to build HTTP client: {:?}", e);
-            error!("{}", msg);
+            warn!("{}", msg);
             return json!({
                 "ok": false,
                 "error_message": msg
@@ -395,7 +400,7 @@ pub async fn upload_speed_test(url: &str, proxy_url: &str, user_agent: &str, siz
         }
         Err(e) => {
             let msg = format!("Failed to perform upload speed test: {}", e);
-            error!("{}", msg);
+            warn!("{}", msg);
             json!({
                 "ok": false,
                 "error_message": msg
@@ -411,7 +416,7 @@ pub async fn fetch_response_headers(url: &str, proxy_url: &str, user_agent: &str
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
-                error!("Invalid proxy: {}", e);
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -425,7 +430,7 @@ pub async fn fetch_response_headers(url: &str, proxy_url: &str, user_agent: &str
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build HTTP client: {}", e);
+            warn!("Failed to build HTTP client: {}", e);
             return json!({
                 "ok": false,
                 "error_message": format!("Failed to build HTTP client: {}", e)
@@ -452,7 +457,7 @@ pub async fn fetch_response_headers(url: &str, proxy_url: &str, user_agent: &str
         }
         Err(err) => {
             let status = err.status();
-            error!("Request failed: {}", err);
+            warn!("Request failed: {}", err);
             json!({
                 "ok": false,
                 "status": status.map(|s| s.as_u16()),
@@ -469,7 +474,7 @@ pub async fn fetch_text_content(url: &str, proxy_url: &str, user_agent: &str, ti
         match Proxy::all(proxy_url) {
             Ok(proxy) => client_builder.proxy(proxy),
             Err(e) => {
-                error!("Invalid proxy: {}", e);
+                warn!("Invalid proxy: {}", e);
                 return json!({
                     "ok": false,
                     "error_message": format!("Invalid proxy: {}", e)
@@ -483,7 +488,7 @@ pub async fn fetch_text_content(url: &str, proxy_url: &str, user_agent: &str, ti
     let client = match client_builder.build() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed to build HTTP client: {}", e);
+            warn!("Failed to build HTTP client: {}", e);
             return json!({
                 "ok": false,
                 "error_message": format!("Failed to build HTTP client: {}", e)
@@ -499,7 +504,7 @@ pub async fn fetch_text_content(url: &str, proxy_url: &str, user_agent: &str, ti
             let body = match response.text().await {
                 Ok(text) => text,
                 Err(e) => {
-                    error!("Failed to read response text: {}", e);
+                    warn!("Failed to read response text: {}", e);
                     return json!({
                         "ok": false,
                         "status": status,
@@ -517,7 +522,7 @@ pub async fn fetch_text_content(url: &str, proxy_url: &str, user_agent: &str, ti
         }
         Err(err) => {
             let status = err.status();
-            error!("Request failed: {}", err);
+            warn!("Request failed: {}", err);
             json!({
                 "ok": false,
                 "status": status.map(|s| s.as_u16()),
