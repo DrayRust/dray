@@ -745,3 +745,46 @@ export const DEFAULT_SPEED_TEST_CONFIG: SpeedTestConfig = {
     "downloadContent": "https://cachefly.cachefly.net/10mb.test#CacheFly 10M（全球高速 CDN）\nhttps://cachefly.cachefly.net/50mb.test#CacheFly 50M（全球高速 CDN）\nhttp://ipv4.download.thinkbroadband.com/50MB.zip#ThinkBroadband（英国）\nhttp://proof.ovh.net/files/100Mb.dat#OVH（法国）\nhttps://speedtest.tokyo2.linode.com/100MB-tokyo2.bin#Linode（日本东京）\nhttp://speedtest.tele2.net/100MB.zip#Tele2（瑞典）\nhttp://down.360safe.com/setup.exe#360 安全卫士安装包（100+MB）",
     "uploadContent": "https://speed.cloudflare.com/__up#Cloudflare 上传测速（全球 CDN）\nhttps://test.ustc.edu.cn/results/result.php#Speedtest 上传测速（中国科学技术大学）\nhttps://fra.speedtest.clouvider.net/backend/empty.php#Speedtest 上传测速（法国）\nhttps://api-v3.speedtest.cn/speed/store#speedtest.cn 上传测速（中国测速网）"
 }
+
+export const DEFAULT_USER_AGENT_LIST = [
+    {
+        "name": "Chrome (Windows)",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    },
+    {
+        "name": "Chrome (macOS)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    },
+    {
+        "name": "Firefox (Windows)",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+    },
+    {
+        "name": "Safari (macOS)",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
+    },
+    {
+        "name": "Edge (Windows)",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0"
+    },
+    {
+        "name": "Safari (iPhone)",
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1"
+    },
+    {
+        "name": "Chrome (Android)",
+        "userAgent": "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.60 Mobile Safari/537.36"
+    },
+    {
+        "name": "WeChat (iOS)",
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.52(0x1800342b) NetType/WIFI Language/zh_CN"
+    },
+    {
+        "name": "QQ Browser (Android)",
+        "userAgent": "Mozilla/5.0 (Linux; U; Android 13; zh-cn; SM-G9730 Build/QP1A.190711.020) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36 MQQBrowser/11.8 Mobile"
+    },
+    {
+        "name": "Baidu Spider",
+        "userAgent": "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)"
+    }
+]
