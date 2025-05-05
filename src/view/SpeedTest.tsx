@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-    Drawer, Button, Box, BottomNavigation, BottomNavigationAction, Card, Chip, Paper, Stack,
-    IconButton, Typography, TextField, MenuItem, LinearProgress,
+    Drawer, Button, Box, BottomNavigation, BottomNavigationAction,
+    Card, Chip, Paper, Stack, Typography, TextField, MenuItem, LinearProgress,
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
@@ -43,6 +43,7 @@ export const SpeedTest = () => {
     const [downloadUrl, setDownloadUrl] = useState<string>('')
     const [uploadUrl, setUploadUrl] = useState<string>('')
 
+    const [isInit, setIsInit] = useState(false)
     const [speedTestConfig, setSpeedTestConfig] = useState<SpeedTestConfig>(DEFAULT_SPEED_TEST_CONFIG)
     const loadConfig = useDebounce(async () => {
         const newConfig = await readAppConfig()
@@ -53,6 +54,7 @@ export const SpeedTest = () => {
         setSpeedTestConfig(conf)
 
         loadList(conf)
+        setIsInit(true)
     }, 100)
     useEffect(loadConfig, [])
 
@@ -326,6 +328,7 @@ export const SpeedTest = () => {
         }
     }
 
+    // ==================================== Drawer ====================================
     const [open, setOpen] = useState(false)
     const [tab, setTab] = useState(0)
     const handleOpen = () => {
@@ -424,12 +427,14 @@ export const SpeedTest = () => {
         </Drawer>
 
         <Stack spacing={1}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{position: 'relative'}}>
-                <Stack direction="row" justifyContent="center" spacing={1}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" justifyContent="center" spacing={2}>
                     <Button variant="contained" disabled={isTesting} color="secondary" onClick={handleTestAll}>测试全部</Button>
                     <Button variant="contained" disabled={isTesting} color="warning" onClick={handleResetAll}>清除结果</Button>
+                    {isInit && (appConfig.ray_enable ? <Chip label="代理已开启" color="success" variant="outlined"/> : <Chip label="代理未开启" color="error" variant="outlined"/>)}
                 </Stack>
-                <IconButton color="default" onClick={handleOpen} sx={{position: 'absolute', right: 0, top: 2}}><SettingsIcon/></IconButton>
+
+                <Button variant="contained" startIcon={<SettingsIcon/>} onClick={handleOpen}>高级</Button>
             </Stack>
 
             <Card elevation={3}>
