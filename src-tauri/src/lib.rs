@@ -260,8 +260,23 @@ fn open_web_server_dir() -> bool {
 }
 
 #[tauri::command]
-fn scan_ports(host: String, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Value {
-    scan_ports::scan_ports(&host, start_port, end_port, max_threads, timeout_ms)
+async fn start_scan_ports(host: String, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Value {
+    scan_ports::start_scan_ports(&host, start_port, end_port, max_threads, timeout_ms)
+}
+
+#[tauri::command]
+async fn read_open_log() -> String {
+    scan_ports::read_open_log()
+}
+
+#[tauri::command]
+async fn read_timeout_log() -> String {
+    scan_ports::read_timeout_log()
+}
+
+#[tauri::command]
+async fn read_refused_log() -> String {
+    scan_ports::read_refused_log()
 }
 
 #[tauri::command]
@@ -360,7 +375,10 @@ pub fn run() {
             set_auto_setup_https,
             check_port_available,
             open_web_server_dir,
-            scan_ports,
+            start_scan_ports,
+            read_open_log,
+            read_timeout_log,
+            read_refused_log,
             get_ray_version,
             get_version,
             quit

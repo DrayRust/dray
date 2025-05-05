@@ -2,8 +2,10 @@ use crate::dirs;
 use logger::error;
 use serde_json::{json, Value};
 use std::fs::{File, OpenOptions};
+use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::io::{BufWriter, Write};
 use std::net::{TcpStream, ToSocketAddrs};
+use std::path::PathBuf;
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -45,7 +47,7 @@ impl ThreadLimiter {
     }
 }
 
-pub fn scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Value {
+pub fn start_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Value {
     match run_scan_ports(host, start_port, end_port, max_threads, timeout_ms) {
         Ok(result) => result,
         Err(e) => {
@@ -151,4 +153,107 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
         "timeout_count": timeout_count,
         "refused_count": refused_count,
     }))
+}
+
+pub fn read_open_log() -> String {
+    match get_log_path("scan_ports_open.log") {
+        Some(path) => read_full_file(path.to_str().unwrap_or_default()),
+        None => {
+            error!("Open log path not found");
+            String::new()
+        }
+    }
+}
+
+pub fn read_timeout_log() -> String {
+    match get_log_path("scan_ports_timeout.log") {
+        Some(path) => read_tail_file(path.to_str().unwrap_or_default(), 100 * 1024),
+        None => {
+            error!("Timeout log path not found");
+            String::new()
+        }
+    }
+}
+
+pub fn read_refused_log() -> String {
+    match get_log_path("scan_ports_refused.log") {
+        Some(path) => read_tail_file(path.to_str().unwrap_or_default(), 100 * 1024),
+        None => {
+            error!("Refused log path not found");
+            String::new()
+        }
+    }
+}
+
+fn get_log_path(filename: &str) -> Option<PathBuf> {
+    dirs::get_dray_logs_dir().map(|dir| dir.join(filename))
+}
+
+fn read_full_file(filepath: &str) -> String {
+    let file = match File::open(filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Failed to open file '{}': {}", filepath, e);
+            return String::new();
+        }
+    };
+
+    let mut buf_reader = BufReader::new(file);
+    let mut content = String::new();
+    if let Err(e) = buf_reader.read_to_string(&mut content) {
+        error!("Failed to read full content from '{}': {}", filepath, e);
+        return String::new();
+    }
+
+    content
+}
+
+fn read_tail_file(filepath: &str, max_bytes: u64) -> String {
+    let file = match File::open(filepath) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Failed to open file '{}': {}", filepath, e);
+            return String::new();
+        }
+    };
+
+    let metadata = match file.metadata() {
+        Ok(m) => m,
+        Err(e) => {
+            error!("Failed to get metadata for '{}': {}", filepath, e);
+            return String::new();
+        }
+    };
+
+    let file_size = metadata.len();
+    let mut buf_reader = BufReader::new(file);
+
+    // 文件较小：直接读取全部内容
+    if file_size <= max_bytes {
+        let mut content = String::new();
+        if buf_reader.read_to_string(&mut content).is_err() {
+            error!("Failed to read file '{}'", filepath);
+            return String::new();
+        }
+        return content;
+    }
+
+    // 文件较大：读取结尾 max_bytes 字节
+    let seek_pos = file_size.saturating_sub(max_bytes);
+    if buf_reader.seek(SeekFrom::Start(seek_pos)).is_err() {
+        error!("Failed to seek to position {} in file '{}'", seek_pos, filepath);
+        return String::new();
+    }
+
+    let mut buffer = String::new();
+    if buf_reader.read_to_string(&mut buffer).is_err() {
+        error!("Failed to read tail from file '{}'", filepath);
+        return String::new();
+    }
+
+    // 跳过第一行（可能不完整）
+    let mut lines = buffer.lines();
+    lines.next(); // Skip first partial line if any
+
+    lines.collect::<Vec<&str>>().join("\n")
 }
