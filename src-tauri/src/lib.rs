@@ -6,6 +6,7 @@ mod http;
 mod log;
 mod network;
 mod ray;
+mod scan_ports;
 mod setting;
 mod setup;
 mod sys_info;
@@ -259,6 +260,11 @@ fn open_web_server_dir() -> bool {
 }
 
 #[tauri::command]
+fn scan_ports(host: String, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Value {
+    scan_ports::scan_ports(&host, start_port, end_port, max_threads, timeout_ms)
+}
+
+#[tauri::command]
 fn get_ray_version() -> String {
     ray::get_ray_version()
 }
@@ -354,6 +360,7 @@ pub fn run() {
             set_auto_setup_https,
             check_port_available,
             open_web_server_dir,
+            scan_ports,
             get_ray_version,
             get_version,
             quit
