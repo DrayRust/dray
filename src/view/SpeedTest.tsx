@@ -135,12 +135,17 @@ export const SpeedTest = () => {
         setJitterValue('')
         setDownloadTestState(0)
         setUploadTestState(0)
+        setPingError(false)
+        setJitterError(false)
+        setDownloadError(false)
+        setUploadError(false)
     }
 
     // ============== Public IP Test ==============
     const [pubIpData, setPubIpData] = useState('')
     const [pubIpElapsed, setPubIpElapsed] = useState(0)
     const [pubIpTesting, setPubIpTesting] = useState(false)
+    const [pubIpError, setPubIpError] = useState(false)
     const handleGetIP = async () => {
         if (!ipTestUrl) return
         setIsTesting(true)
@@ -153,6 +158,8 @@ export const SpeedTest = () => {
 
         if (result?.ok) {
             setPubIpData(result.body)
+        } else {
+            setPubIpError(true)
         }
 
         setIsTesting(false)
@@ -164,6 +171,7 @@ export const SpeedTest = () => {
     const [pingValue, setPingValue] = useState('')
     const [pingElapsed, setPingElapsed] = useState(0)
     const [pingTesting, setPingTesting] = useState(false)
+    const [pingError, setPingError] = useState(false)
     const handleStartPing = async () => {
         if (!pingUrl) return
         setIsTesting(true)
@@ -177,6 +185,8 @@ export const SpeedTest = () => {
         if (result?.ok) {
             setPingData([{label: 'Ping (ms)', data: [0, ...(result?.samples || [])]}])
             setPingValue(Math.round(result?.avg_latency_ms || 0) + ' ms')
+        } else {
+            setPingError(true)
         }
 
         setIsTesting(false)
@@ -188,6 +198,7 @@ export const SpeedTest = () => {
     const [jitterValue, setJitterValue] = useState('')
     const [jitterElapsed, setJitterElapsed] = useState(0)
     const [jitterTesting, setJitterTesting] = useState(false)
+    const [jitterError, setJitterError] = useState(false)
     const handleStartJitter = async () => {
         if (!pingUrl) return
         setIsTesting(true)
@@ -201,6 +212,8 @@ export const SpeedTest = () => {
         if (result?.ok) {
             setJitterData([{label: 'Jitter (ms)', data: [0, ...(result?.samples || [])]}])
             setJitterValue(Math.round(result?.jitter_ms || 0) + ' ms')
+        } else {
+            setJitterError(true)
         }
 
         setIsTesting(false)
@@ -212,6 +225,7 @@ export const SpeedTest = () => {
     const [downloadValue, setDownloadValue] = useState('')
     const [downloadElapsed, setDownloadElapsed] = useState(0)
     const [downloadTestState, setDownloadTestState] = useState(0)
+    const [downloadError, setDownloadError] = useState(false)
     const handleStartDownload = async () => {
         if (!downloadUrl) return
         firstNetwork.current = true
@@ -227,6 +241,8 @@ export const SpeedTest = () => {
         if (result?.ok) {
             let speed_mbps = result?.speed_mbps || 0
             if (speed_mbps) setDownloadSpeed(speed_mbps)
+        } else {
+            setDownloadError(true)
         }
 
         setIsTesting(false)
@@ -243,6 +259,7 @@ export const SpeedTest = () => {
     const [uploadValue, setUploadValue] = useState('')
     const [uploadElapsed, setUploadElapsed] = useState(0)
     const [uploadTestState, setUploadTestState] = useState(0)
+    const [uploadError, setUploadError] = useState(false)
     const handleStartUpload = async () => {
         if (!uploadUrl) return
         firstNetwork.current = true
@@ -258,6 +275,8 @@ export const SpeedTest = () => {
         if (result?.ok) {
             let speed_mbps = result?.speed_mbps || 0
             if (speed_mbps) setUploadSpeed(speed_mbps)
+        } else {
+            setUploadError(true)
         }
 
         setIsTesting(false)
@@ -425,6 +444,8 @@ export const SpeedTest = () => {
                 <Box sx={{p: 2, height: 180, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     {pubIpTesting ? (
                         <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : pubIpError ? (
+                        <Chip label="测试错误" color="error"/>
                     ) : pubIpData.length === 0 ? (
                         <Button variant="contained" disabled={isTesting} onClick={handleGetIP}>开始测试</Button>
                     ) : (
@@ -448,6 +469,8 @@ export const SpeedTest = () => {
                 <Box sx={{height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     {pingTesting ? (
                         <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : pingError ? (
+                        <Chip label="测试错误" color="error"/>
                     ) : pingData.length === 0 ? (
                         <Button variant="contained" disabled={isTesting} onClick={handleStartPing}>开始测试</Button>
                     ) : (
@@ -471,6 +494,8 @@ export const SpeedTest = () => {
                 <Box sx={{height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     {jitterTesting ? (
                         <LinearProgress sx={{height: 10, width: '90%', borderRadius: 5}}/>
+                    ) : jitterError ? (
+                        <Chip label="测试错误" color="error"/>
                     ) : jitterData.length === 0 ? (
                         <Button variant="contained" disabled={isTesting} onClick={handleStartJitter}>开始测试</Button>
                     ) : (
@@ -492,6 +517,8 @@ export const SpeedTest = () => {
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {downloadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测速</Button>
+                        ) : downloadError ? (
+                            <Chip label="测速错误" color="error"/>
                         ) : (
                             <SpeedGauge percent={downloadPercent} value={downloadValue}/>
                         )}
@@ -510,6 +537,8 @@ export const SpeedTest = () => {
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {uploadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测速</Button>
+                        ) : uploadError ? (
+                            <Chip label="测速错误" color="error"/>
                         ) : (
                             <SpeedGauge percent={uploadPercent} value={uploadValue}/>
                         )}
