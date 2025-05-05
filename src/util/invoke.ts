@@ -262,3 +262,19 @@ export async function fetchTextContent(url: string, proxyUrl: string, userAgent:
 export async function fetchGet(url: string, isProxy: boolean = false, userAgent: string = navigator.userAgent, timeout: number = 10) {
     return safeInvoke('fetch_get', {url, isProxy, userAgent, timeout})
 }
+
+export async function startScanPorts(host: string, startPort: number, endPort: number, maxThreads: number, timeoutMs: number = 500) {
+    return safeInvoke('start_scan_ports', {host, startPort, endPort, maxThreads, timeoutMs})
+}
+
+export async function readOpenLog() {
+    return invokeString('read_open_log')
+}
+
+export async function readTimeoutLog() {
+    return invokeString('read_timeout_log')
+}
+
+export async function readRefusedLog() {
+    return invokeString('read_refused_log')
+}

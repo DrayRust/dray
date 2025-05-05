@@ -509,19 +509,21 @@ export const SpeedTest = () => {
                 <Button variant="contained" startIcon={<SettingsIcon/>} onClick={handleOpen}>高级</Button>
             </Stack>
 
-            <Card elevation={3} sx={{p: 1, pt: 2}}>
-                <TextField
-                    select fullWidth size="small"
-                    label="测试服务器"
-                    value={speedTestServer}
-                    onChange={handleServerChange}
-                >
-                    <MenuItem value={-1}>跟随软件设置</MenuItem>
-                    {serverList.map((item, key) => (
-                        <MenuItem key={key} value={key}>{`${item.ps} | ${item.host}`}</MenuItem>
-                    ))}
-                </TextField>
-            </Card>
+            {serverList.length > 0 && (
+                <Card elevation={3} sx={{p: 1, pt: 2}}>
+                    <TextField
+                        select fullWidth size="small"
+                        label="测试服务器"
+                        value={speedTestServer}
+                        onChange={handleServerChange}
+                    >
+                        <MenuItem value={-1}>跟随软件设置</MenuItem>
+                        {serverList.map((item, key) => (
+                            <MenuItem key={key} value={key}>{`${item.ps} | ${item.host}`}</MenuItem>
+                        ))}
+                    </TextField>
+                </Card>
+            )}
 
             <Card elevation={3}>
                 <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>

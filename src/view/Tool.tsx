@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import { Box, Card, Paper, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import WysiwygIcon from '@mui/icons-material/Wysiwyg'
-import SpeedIcon from '@mui/icons-material/Speed'
 import HttpIcon from '@mui/icons-material/Http'
+import SpeedIcon from '@mui/icons-material/Speed'
+import RadarIcon from '@mui/icons-material/Radar'
 
 import SysInfo from "./SysInfo.tsx"
 import TerminalCmd from "./TerminalCmd.tsx"
 import HttpTest from "./HttpTest.tsx"
 import SpeedTest from "./SpeedTest.tsx"
+import ScanPorts from "./ScanPorts.tsx"
 
 const Tool: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(5), [setNavState])
@@ -23,6 +25,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
                     <ToggleButton value="term"><TerminalIcon sx={{mr: 1}}/>终端命令</ToggleButton>
                     <ToggleButton value="http"><HttpIcon sx={{mr: 1}}/>请求测试</ToggleButton>
                     <ToggleButton value="speed"><SpeedIcon sx={{mr: 1}}/>网速测试</ToggleButton>
+                    <ToggleButton value="scan"><RadarIcon sx={{mr: 1}}/>端口扫描</ToggleButton>
                 </ToggleButtonGroup>
             </div>
 
@@ -32,6 +35,7 @@ const Tool: React.FC<NavProps> = ({setNavState}) => {
                     {action === 'term' && (<TerminalCmd/>)}
                     {action === 'http' && (<HttpTest/>)}
                     {action === 'speed' && (<SpeedTest/>)}
+                    {action === 'scan' && (<ScanPorts/>)}
                 </Card>
             </Box>
         </Paper>
