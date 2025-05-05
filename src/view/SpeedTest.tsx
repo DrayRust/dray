@@ -341,7 +341,7 @@ export const SpeedTest = () => {
         await startTestServer()
 
         const startTime = performance.now()
-        const result = await uploadSpeedTest(uploadUrl, proxyUrl.current, userAgent, 10)
+        const result = await uploadSpeedTest(uploadUrl, proxyUrl.current, userAgent, 5)
         const elapsed = Math.floor(performance.now() - startTime)
         setUploadElapsed(elapsed)
 
