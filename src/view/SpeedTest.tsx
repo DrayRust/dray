@@ -5,6 +5,8 @@ import {
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
+import TuneIcon from '@mui/icons-material/Tune'
+import StorageIcon from '@mui/icons-material/Storage'
 
 import { LineChart } from '@mui/x-charts/LineChart'
 
@@ -142,7 +144,7 @@ export const SpeedTest = () => {
         setPubIpTesting(true)
 
         const startTime = performance.now()
-        const result = await fetchTextContent(ipTestUrl, getProxyUrl(), userAgent)
+        const result = await fetchTextContent(ipTestUrl, getProxyUrl(), 'curl/8.7.1')
         const elapsed = Math.floor(performance.now() - startTime)
         setPubIpElapsed(elapsed)
 
@@ -323,15 +325,15 @@ export const SpeedTest = () => {
                     sx={{mb: 2, mt: 1}}
                     value={tab}
                     onChange={(_, v) => setTab(v)}>
-                    <BottomNavigationAction label="测速设置"/>
-                    <BottomNavigationAction label="测速服务"/>
+                    <BottomNavigationAction label="测速配置" icon={<TuneIcon/>}/>
+                    <BottomNavigationAction label="测速资源" icon={<StorageIcon/>}/>
                 </BottomNavigation>
 
                 <Stack component={Card} elevation={3} spacing={3} sx={{p: 1, pt: 2}}>
                     {tab === 0 ? (<>
                         <TextField
                             select fullWidth size="small"
-                            label="IP 测试服务"
+                            label="IP 测试"
                             value={speedTestConfig.ipTestActive}
                             onChange={handleConfigChange('ipTestActive')}>
                             {ipTestList.map((item, key) => (
@@ -340,7 +342,7 @@ export const SpeedTest = () => {
                         </TextField>
                         <TextField
                             select fullWidth size="small"
-                            label="Ping 测试服务"
+                            label="Ping 测试"
                             value={speedTestConfig.pingActive}
                             onChange={handleConfigChange('pingActive')}>
                             {pingList.map((item, key) => (
@@ -349,7 +351,7 @@ export const SpeedTest = () => {
                         </TextField>
                         <TextField
                             select fullWidth size="small"
-                            label="下载测速服务"
+                            label="下载测速"
                             value={speedTestConfig.downloadActive}
                             onChange={handleConfigChange('downloadActive')}>
                             {downloadList.map((item, key) => (
@@ -358,7 +360,7 @@ export const SpeedTest = () => {
                         </TextField>
                         <TextField
                             select fullWidth size="small"
-                            label="上传测速服务"
+                            label="上传测速"
                             value={speedTestConfig.uploadActive}
                             onChange={handleConfigChange('uploadActive')}>
                             {uploadList.map((item, key) => (
@@ -486,7 +488,7 @@ export const SpeedTest = () => {
                     </Paper>
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {downloadTestState === 0 ? (
-                            <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测试</Button>
+                            <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测速</Button>
                         ) : (
                             <SpeedGauge percent={downloadPercent} value={downloadValue}/>
                         )}
@@ -504,7 +506,7 @@ export const SpeedTest = () => {
                     </Paper>
                     <Box sx={{height: 240, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {uploadTestState === 0 ? (
-                            <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测试</Button>
+                            <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测速</Button>
                         ) : (
                             <SpeedGauge percent={uploadPercent} value={uploadValue}/>
                         )}
