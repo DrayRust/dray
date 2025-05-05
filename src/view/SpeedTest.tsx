@@ -100,6 +100,12 @@ export const SpeedTest = () => {
         newConf.pingContent = processLines(newConf.pingContent).join('\n')
         newConf.downloadContent = processLines(newConf.downloadContent).join('\n')
         newConf.uploadContent = processLines(newConf.uploadContent).join('\n')
+
+        if (!newConf.ipTestContent) newConf.ipTestContent = DEFAULT_SPEED_TEST_CONFIG.ipTestContent
+        if (!newConf.pingContent) newConf.pingContent = DEFAULT_SPEED_TEST_CONFIG.pingContent
+        if (!newConf.downloadContent) newConf.downloadContent = DEFAULT_SPEED_TEST_CONFIG.downloadContent
+        if (!newConf.uploadContent) newConf.uploadContent = DEFAULT_SPEED_TEST_CONFIG.uploadContent
+
         const ok = await saveSpeedTestConfig(newConf)
         if (!ok) {
             showChip('保存失败', 'error')
