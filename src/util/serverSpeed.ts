@@ -23,11 +23,36 @@ export async function generateServersPort(serverList: ServerList) {
     return servers
 }
 
-export async function serverSpeedTest(server: ServerRow, appDir: string, rayConfig: RayCommonConfig, port: number) {
+export async function generateServerPort() {
+    let port = getRandom(25000, 35000)
+    let errNum = 0
+    for (let i = 0; i < 100; i++) {
+        const ok = await checkPortAvailable(port)
+        if (ok) {
+            break
+        } else {
+            errNum++
+            port++
+        }
+    }
+    if (errNum > 0) {
+        log.warn(`${errNum} ports are not available`)
+        return 0
+    }
+    return port
+}
+
+export async function generateAndStartSpeedTestServer(server: ServerRow, appDir: string, rayConfig: RayCommonConfig, port: number) {
     const filename = server.host.replace(/[^\w.]/g, '_') + `-${server.id}.json`
     const conf = getSpeedTestConf(server, appDir, rayConfig, port)
-    await saveSpeedTestConf(filename, conf)
-    await startSpeedTestServer(port, filename)
+    let ok = await saveSpeedTestConf(filename, conf)
+    if (!ok) return false
+
+    return await startSpeedTestServer(port, filename)
+}
+
+export async function serverSpeedTest(server: ServerRow, appDir: string, rayConfig: RayCommonConfig, port: number) {
+    await generateAndStartSpeedTestServer(server, appDir, rayConfig, port)
     await sleep(500)
 
     // 目前测试 http 比 https 快 100-500ms

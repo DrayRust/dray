@@ -13,14 +13,16 @@ import { LineChart } from '@mui/x-charts/LineChart'
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
 import { useChip } from "../component/useChip.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
-import { formatSecond, processLines } from "../util/util.ts"
+import { formatSecond, processLines, sleep } from "../util/util.ts"
 import {
-    downloadSpeedTest, fetchTextContent, getNetworksJson, jitterTest, pingTest,
-    readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest
+    downloadSpeedTest, fetchTextContent, getDrayAppDir, getNetworksJson, jitterTest, pingTest,
+    readAppConfig, readRayCommonConfig, readServerList, readSpeedTestConfig,
+    saveSpeedTestConfig, stopSpeedTestServer, uploadSpeedTest
 } from "../util/invoke.ts"
-import { DEFAULT_APP_CONFIG, DEFAULT_SPEED_TEST_CONFIG } from "../util/config.ts"
+import { DEFAULT_APP_CONFIG, DEFAULT_RAY_COMMON_CONFIG, DEFAULT_SPEED_TEST_CONFIG } from "../util/config.ts"
 import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
+import { generateAndStartSpeedTestServer, generateServerPort } from "../util/serverSpeed.ts"
 
 const userAgent = navigator.userAgent
 
@@ -37,7 +39,12 @@ export const SpeedTest = () => {
     const [downloadList, setDownloadList] = useState<TestUrlRow[]>([])
     const [uploadList, setUploadList] = useState<TestUrlRow[]>([])
 
+    const [serverList, setServerList] = useState<ServerList>([])
+    const [speedTestServer, setSpeedTestServer] = useState(-1)
+
     const [isTesting, setIsTesting] = useState(false)
+    const proxyUrl = useRef('')
+
     const [ipTestUrl, setIpTestUrl] = useState<string>('')
     const [pingUrl, setPingUrl] = useState<string>('')
     const [downloadUrl, setDownloadUrl] = useState<string>('')
@@ -52,8 +59,13 @@ export const SpeedTest = () => {
         let conf = await readSpeedTestConfig() as SpeedTestConfig
         conf = conf ? {...DEFAULT_SPEED_TEST_CONFIG, ...conf} : DEFAULT_SPEED_TEST_CONFIG
         setSpeedTestConfig(conf)
-
         loadList(conf)
+
+        const serverList = await readServerList() as ServerList
+        if (serverList) setServerList(serverList)
+
+        proxyUrl.current = getProxyUrl()
+
         setIsInit(true)
     }, 100)
     useEffect(loadConfig, [])
@@ -89,6 +101,15 @@ export const SpeedTest = () => {
             result.push({name, url})
         }
         return result
+    }
+
+    const handleServerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const key = Number(e.target.value)
+        setSpeedTestServer(key)
+        if (key === -1) {
+            proxyUrl.current = getProxyUrl()
+        }
+        handleResetAll()
     }
 
     const handleConfigChange = (name: keyof SpeedTestConfig) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +164,47 @@ export const SpeedTest = () => {
         setUploadError(false)
     }
 
+    // ============== Test Server ==============
+    let testPort = useRef(0)
+    let isTestStarting = useRef(false)
+    let appDir = useRef<string>('')
+    let rayCommonConfig = useRef<RayCommonConfig | null>(null)
+    const startTestServer = async () => {
+        if (speedTestServer === -1) return
+
+        // cansel stop server
+        if (isTestStarting.current) {
+            clearTimeout(timeoutStop.current)
+            return
+        }
+
+        if (!appDir.current) appDir.current = await getDrayAppDir()
+        if (!rayCommonConfig.current) rayCommonConfig.current = await readRayCommonConfig() || DEFAULT_RAY_COMMON_CONFIG
+
+        const port = await generateServerPort()
+        if (!port) return
+
+        const server = serverList[speedTestServer]
+        if (!server) return
+
+        const ok = await generateAndStartSpeedTestServer(server, appDir.current, rayCommonConfig.current, port)
+        if (!ok) return
+
+        testPort.current = port
+        proxyUrl.current = `socks5://127.0.0.1:${port}`
+        isTestStarting.current = true
+        await sleep(500)
+    }
+
+    let timeoutStop = useRef<number>(0)
+    const stopTestServer = () => {
+        if (!isTestStarting.current) return
+        timeoutStop.current = setTimeout(async () => {
+            await stopSpeedTestServer(testPort.current)
+            isTestStarting.current = false
+        }, 1000)
+    }
+
     // ============== Public IP Test ==============
     const [pubIpData, setPubIpData] = useState('')
     const [pubIpElapsed, setPubIpElapsed] = useState(0)
@@ -152,9 +214,10 @@ export const SpeedTest = () => {
         if (!ipTestUrl) return
         setIsTesting(true)
         setPubIpTesting(true)
+        await startTestServer()
 
         const startTime = performance.now()
-        const result = await fetchTextContent(ipTestUrl, getProxyUrl(), 'curl/8.7.1')
+        const result = await fetchTextContent(ipTestUrl, proxyUrl.current, 'curl/8.7.1')
         const elapsed = Math.floor(performance.now() - startTime)
         setPubIpElapsed(elapsed)
 
@@ -166,6 +229,7 @@ export const SpeedTest = () => {
 
         setIsTesting(false)
         setPubIpTesting(false)
+        stopTestServer()
     }
 
     // ============== Ping Test ==============
@@ -178,9 +242,10 @@ export const SpeedTest = () => {
         if (!pingUrl) return
         setIsTesting(true)
         setPingTesting(true)
+        await startTestServer()
 
         const startTime = performance.now()
-        const result = await pingTest(pingUrl, getProxyUrl(), userAgent, 5)
+        const result = await pingTest(pingUrl, proxyUrl.current, userAgent, 5)
         const elapsed = Math.floor(performance.now() - startTime)
         setPingElapsed(elapsed)
 
@@ -193,6 +258,7 @@ export const SpeedTest = () => {
 
         setIsTesting(false)
         setPingTesting(false)
+        stopTestServer()
     }
 
     // ============== Jitter Test ==============
@@ -205,9 +271,10 @@ export const SpeedTest = () => {
         if (!pingUrl) return
         setIsTesting(true)
         setJitterTesting(true)
+        await startTestServer()
 
         const startTime = performance.now()
-        const result = await jitterTest(pingUrl, getProxyUrl(), userAgent, 20)
+        const result = await jitterTest(pingUrl, proxyUrl.current, userAgent, 20)
         const elapsed = Math.floor(performance.now() - startTime)
         setJitterElapsed(elapsed)
 
@@ -220,6 +287,7 @@ export const SpeedTest = () => {
 
         setIsTesting(false)
         setJitterTesting(false)
+        stopTestServer()
     }
 
     // ============== Download Test ==============
@@ -234,9 +302,10 @@ export const SpeedTest = () => {
         setIsTesting(true)
         setDownloadTestState(1)
         setDownloadSpeed(0)
+        await startTestServer()
 
         const startTime = performance.now()
-        const result = await downloadSpeedTest(downloadUrl, getProxyUrl(), userAgent)
+        const result = await downloadSpeedTest(downloadUrl, proxyUrl.current, userAgent)
         const elapsed = Math.floor(performance.now() - startTime)
         setDownloadElapsed(elapsed)
 
@@ -249,6 +318,7 @@ export const SpeedTest = () => {
 
         setIsTesting(false)
         setDownloadTestState(2)
+        stopTestServer()
     }
 
     const setDownloadSpeed = (speed_mbps: number) => {
@@ -268,9 +338,10 @@ export const SpeedTest = () => {
         setIsTesting(true)
         setUploadTestState(1)
         setUploadSpeed(0)
+        await startTestServer()
 
         const startTime = performance.now()
-        const result = await uploadSpeedTest(uploadUrl, getProxyUrl(), userAgent, 10)
+        const result = await uploadSpeedTest(uploadUrl, proxyUrl.current, userAgent, 10)
         const elapsed = Math.floor(performance.now() - startTime)
         setUploadElapsed(elapsed)
 
@@ -283,6 +354,7 @@ export const SpeedTest = () => {
 
         setIsTesting(false)
         setUploadTestState(2)
+        stopTestServer()
     }
 
     const setUploadSpeed = (speed_mbps: number) => {
@@ -436,6 +508,20 @@ export const SpeedTest = () => {
 
                 <Button variant="contained" startIcon={<SettingsIcon/>} onClick={handleOpen}>高级</Button>
             </Stack>
+
+            <Card elevation={3} sx={{p: 1, pt: 2}}>
+                <TextField
+                    select fullWidth size="small"
+                    label="测试服务器"
+                    value={speedTestServer}
+                    onChange={handleServerChange}
+                >
+                    <MenuItem value={-1}>跟随软件设置</MenuItem>
+                    {serverList.map((item, key) => (
+                        <MenuItem key={key} value={key}>{`${item.ps} | ${item.host}`}</MenuItem>
+                    ))}
+                </TextField>
+            </Card>
 
             <Card elevation={3}>
                 <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
