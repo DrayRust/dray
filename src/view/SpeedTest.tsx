@@ -611,7 +611,7 @@ export const SpeedTest = () => {
                         {downloadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartDownload}>开始测速</Button>
                         ) : downloadError ? (
-                            <Chip label="测速错误" color="error"/>
+                            <Chip label="测速资源下载失败" color="error"/>
                         ) : (
                             <SpeedGauge percent={downloadPercent} value={downloadValue}/>
                         )}
@@ -631,7 +631,7 @@ export const SpeedTest = () => {
                         {uploadTestState === 0 ? (
                             <Button variant="contained" disabled={isTesting} onClick={handleStartUpload}>开始测速</Button>
                         ) : uploadError ? (
-                            <Chip label="测速错误" color="error"/>
+                            <Chip label="上传测速服务器响应异常" color="error"/>
                         ) : (
                             <SpeedGauge percent={uploadPercent} value={uploadValue}/>
                         )}

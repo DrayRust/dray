@@ -13,6 +13,7 @@ mod sys_info;
 mod web;
 use logger::{debug, info};
 use serde_json::{json, Value};
+use tauri::AppHandle;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -22,10 +23,10 @@ fn dray(name: &str) -> String {
 }
 
 #[tauri::command]
-fn quit() -> String {
+fn quit(app: AppHandle) {
     cleanup::exit_cleanly();
     info!("Dray quit");
-    std::process::exit(0);
+    app.exit(0);
 }
 
 #[tauri::command]
