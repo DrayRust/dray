@@ -309,7 +309,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                         ))}
                     </TextField>
                 </Stack>
-                <Stack direction="row" spacing={2} sx={{justifyContent: "flex-start", alignItems: "center"}}>
+                <Stack direction="row" spacing={2} alignItems="center">
                     <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
                     <ChipComponent/>
                 </Stack>
