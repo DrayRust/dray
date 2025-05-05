@@ -9,6 +9,7 @@ import OutputIcon from '@mui/icons-material/Output'
 import HelpIcon from '@mui/icons-material/Help'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
 
 import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, readRayConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
@@ -240,6 +241,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
                 <Stack direction="row" justifyContent="center" spacing={2}>
                     <Button startIcon={<OpenInNewIcon/>} variant="contained" target="_blank" href="https://d2ray.github.io">官方网站</Button>
                     <Button startIcon={<GitHubIcon/>} variant="contained" target="_blank" href="https://github.com/d2ray/dray">查看源码</Button>
+                    <Button startIcon={<CloudDownloadIcon/>} variant="contained" target="_blank" href="https://github.com/d2ray/dray/releases">最新版本</Button>
                 </Stack>
 
                 <TableContainer elevation={2} component={Card}>
