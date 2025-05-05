@@ -11,18 +11,12 @@ import StorageIcon from '@mui/icons-material/Storage'
 import { LineChart } from '@mui/x-charts/LineChart'
 
 import { SpeedGauge } from "../component/SpeedGauge.tsx"
+import { useChip } from "../component/useChip.tsx"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, processLines } from "../util/util.ts"
 import {
-    downloadSpeedTest,
-    fetchTextContent,
-    getNetworksJson,
-    jitterTest,
-    pingTest,
-    readAppConfig,
-    readSpeedTestConfig,
-    saveSpeedTestConfig,
-    uploadSpeedTest
+    downloadSpeedTest, fetchTextContent, getNetworksJson, jitterTest, pingTest,
+    readAppConfig, readSpeedTestConfig, saveSpeedTestConfig, uploadSpeedTest
 } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG, DEFAULT_SPEED_TEST_CONFIG } from "../util/config.ts"
 import { calculateNetworkSpeed, sumNetworks } from "../util/network.ts"
@@ -108,10 +102,13 @@ export const SpeedTest = () => {
         newConf.uploadContent = processLines(newConf.uploadContent).join('\n')
         const ok = await saveSpeedTestConfig(newConf)
         if (!ok) {
+            showChip('保存失败', 'error')
+            return
         }
+        showChip('保存成功', 'success')
+
         loadList(newConf)
         setSpeedTestConfig(newConf)
-        handleClose()
     }
 
     // ============== Test All ==============
@@ -314,6 +311,7 @@ export const SpeedTest = () => {
         setOpen(false)
     }
 
+    const {ChipComponent, showChip} = useChip()
     return (<>
         <Drawer anchor="right" open={open} onClose={handleClose}>
             <Stack spacing={2} sx={{p: 2, minWidth: 700}}>
@@ -394,10 +392,10 @@ export const SpeedTest = () => {
                             onChange={handleConfigChange('uploadContent')}/>
                     </>)}
                 </Stack>
-                <div className="flex-between">
+                <Stack direction="row" alignItems="center" spacing={2}>
                     <Button variant="contained" color="info" onClick={handleSubmit}>确定</Button>
-                    <Button variant="contained" onClick={handleClose}>取消</Button>
-                </div>
+                    <ChipComponent/>
+                </Stack>
             </Stack>
         </Drawer>
 
