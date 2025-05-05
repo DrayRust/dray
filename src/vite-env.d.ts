@@ -241,11 +241,11 @@ interface RuleRow {
     outboundTag: string; // 访问方式，对应出站连接配置的标识 如: proxy / direct / reject
     ruleType: string; // 规则类型 如: domain / ip / multi (多维规则)
     domain: string; // 域名
-    ip: string; // IP
+    ip: string; // 目标 IP
     port: string; // 目标端口
+    // source: string; // 来源 IP （需求少，不实现）
     sourcePort: string; // 来源端口
     network: string; // 传输协议
-    // source: string; // 来源 IP （雷同参数，不实现）
     // user: string; // 用户邮箱地址（无聊的设计，砍掉）
     // inboundTag: string; // 入站连接标识（需求少，不实现）
     protocol: string; // 请求协议
