@@ -162,7 +162,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             }, 1000)
         }
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, bootTime, errorMsg])
+    }, [isVisibility, errorMsg, bootTime, rayEnable, rayCommonConfig])
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])

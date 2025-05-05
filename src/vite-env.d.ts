@@ -39,7 +39,7 @@ interface NavProps {
     setNavState?: any;
 }
 
-// ============= Log ============
+// ============= Log =============
 interface LogRow {
     filename: string;
     last_modified: string;
@@ -62,7 +62,7 @@ interface PrevLogContent {
     len: number;
 }
 
-// ============= server ============
+// ============= server =============
 interface ServerRow {
     id: string;
     ps: string; // 附言 postscript / 服务器备注 remark
@@ -173,7 +173,7 @@ interface TrojanRow {
     path: string; // (ws) 伪装路径 path / (grpc) 伪装主机名 SNI = Server Name Indication 如：example.com
 }
 
-// ============= subscription ============
+// ============= subscription =============
 interface SubscriptionRow {
     name: string; // 订阅名称
     note: string; // 订阅描述
@@ -188,7 +188,7 @@ interface SubscriptionRow {
 
 type SubscriptionList = SubscriptionRow[];
 
-// ============= rule ============
+// ============= rule =============
 interface RuleConfig {
     globalProxy: boolean; // 是否全局代理
     unmatchedStrategy: string; // 未匹配到的域名访问方式 如：proxy / direct
@@ -201,7 +201,7 @@ interface RuleDomain {
     reject: string; // 阻止访问的域名，每行一条
 }
 
-// ============= speed test ============
+// ============= speed test =============
 interface SpeedTestConfig {
     ipTestActive: number;
     pingActive: number;

@@ -224,7 +224,6 @@ export const SpeedTest = () => {
         const elapsed = Math.floor(performance.now() - startTime)
         setDownloadElapsed(elapsed)
 
-        console.log(result)
         if (result?.ok) {
             let speed_mbps = result?.speed_mbps || 0
             if (speed_mbps) setDownloadSpeed(speed_mbps)

@@ -11,18 +11,14 @@ interface SelectFieldProps {
 export const SelectField = ({label, value, options, onChange, id}: SelectFieldProps) => {
     return (
         <TextField
-            select
-            fullWidth
-            size="small"
+            select fullWidth size="small"
             label={label}
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
         >
             {options.map((v) => (
-                <MenuItem key={v} value={v}>
-                    {v}
-                </MenuItem>
+                <MenuItem key={v} value={v}>{v}</MenuItem>
             ))}
         </TextField>
     )
