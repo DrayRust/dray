@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery, useTheme,
+    Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Menu, MenuItem, IconButton, Divider, Drawer, Tooltip,
 } from '@mui/material'
@@ -409,9 +409,6 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setTimeout(() => setIsCopied(false), 1000)
     }
 
-    const theme = useTheme()
-    const isDark = theme.palette.mode === 'dark'
-
     const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {DialogComponent, dialogConfirm} = useDialog()
     const height = 'calc(100vh - 70px)'
@@ -509,7 +506,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <MenuItem onClick={handleDelete}><DeleteIcon sx={{mr: 1}} fontSize="small"/>删除</MenuItem>
         </Menu>
         <Drawer open={openDrawer} anchor="right" onClose={handleCloseDrawer}>
-            <Stack sx={{p: 1, width: 660}} spacing={1}>
+            <Stack sx={{p: 1, width: 700}} spacing={1}>
                 <div className="flex-between">
                     <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
                     <Tooltip arrow title={isCopied ? '已复制' : '点击复制'}>
@@ -517,7 +514,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                     </Tooltip>
                 </div>
 
-                <JsonCodeViewer value={rayConfigJson} height={`calc(100vh - 70px)`} isDark={isDark}/>
+                <JsonCodeViewer value={rayConfigJson} height={`calc(100vh - 70px)`}/>
             </Stack>
         </Drawer>
     </>)

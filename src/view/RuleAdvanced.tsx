@@ -16,6 +16,7 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { JsonCodeViewer } from "../component/CodeViewer.tsx"
 import { ErrorCard } from "../component/useCard.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
@@ -366,9 +367,7 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                         )}
                     </div>
                     {ruleModeConf ? (
-                        <Stack spacing={2} component={Card} sx={{p: 1, pt: 2}}>
-                            <TextField size="small" multiline disabled minRows={10} maxRows={20} label="规则配置" value={ruleModeConf}/>
-                        </Stack>
+                        <JsonCodeViewer value={ruleModeConf} height={`calc(100vh - 195px)`}/>
                     ) : (
                         <ErrorCard errorMsg="没有规则" height="160px"/>
                     )}

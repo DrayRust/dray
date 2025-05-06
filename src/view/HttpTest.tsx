@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Button, Box, Chip, Card, Paper, Stack, TextField, LinearProgress, Typography, useTheme } from '@mui/material'
+import { Button, Box, Chip, Card, Paper, Stack, TextField, LinearProgress, Typography } from '@mui/material'
 
 import { HtmlCodeViewer, JsonCodeViewer } from "../component/CodeViewer.tsx"
 import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
@@ -156,9 +156,6 @@ export const HttpTest = () => {
         return "未知状态码"
     }
 
-    const theme = useTheme()
-    const isDark = theme.palette.mode === 'dark'
-
     return (<>
         <Stack spacing={2} sx={{pt: 1}}>
             <AutoCompleteField label="请求链接" id="test-url" value={urlValue} options={urlList} onChange={(value) => urlValueChange(value)}/>
@@ -206,7 +203,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <JsonCodeViewer value={headersValue} isDark={isDark}/>
+                        <JsonCodeViewer value={headersValue}/>
                     </Card>
                 </>) : requestType === 'html' && (<>
                     <Card elevation={4}>
@@ -219,7 +216,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <HtmlCodeViewer value={htmlValue} isDark={isDark}/>
+                        <HtmlCodeViewer value={htmlValue}/>
                     </Card>
                 </>)}
             </>)}
