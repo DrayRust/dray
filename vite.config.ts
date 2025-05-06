@@ -35,5 +35,13 @@ export default defineConfig(async () => ({
     },
     build: {
         emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // vendor: ['react', 'react-dom'],
+                    codemirror: ['@uiw/react-codemirror', '@codemirror/lang-html', '@codemirror/lang-json'],
+                }
+            }
+        }
     },
 }))
