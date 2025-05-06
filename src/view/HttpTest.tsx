@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Box, Chip, Card, Paper, Stack, TextField, LinearProgress, Typography, useTheme } from '@mui/material'
 
-import CodeMirror from '@uiw/react-codemirror'
-import { json } from '@codemirror/lang-json'
-import { html } from '@codemirror/lang-html'
-
+import { HtmlCodeViewer, JsonCodeViewer } from "../component/CodeViewer.tsx"
 import { AutoCompleteField } from "../component/AutoCompleteField.tsx"
 import { fetchResponseHeaders, fetchTextContent, readAppConfig } from "../util/invoke.ts"
 import { DEFAULT_APP_CONFIG } from "../util/config.ts"
@@ -209,15 +206,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <CodeMirror
-                            readOnly
-                            className="code-mirror scr-w2"
-                            value={JSON.stringify(headersValue, null, 2)}
-                            height="500px"
-                            extensions={[json()]}
-                            theme={isDark ? 'dark' : 'light'}
-                            style={{fontSize: '14px'}}
-                        />
+                        <JsonCodeViewer value={headersValue} isDark={isDark}/>
                     </Card>
                 </>) : requestType === 'html' && (<>
                     <Card elevation={4}>
@@ -230,15 +219,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <CodeMirror
-                            readOnly
-                            className="code-mirror scr-w2"
-                            value={htmlValue}
-                            height="500px"
-                            extensions={[html()]}
-                            theme={isDark ? 'dark' : 'light'}
-                            style={{fontSize: '14px'}}
-                        />
+                        <HtmlCodeViewer value={htmlValue} isDark={isDark}/>
                     </Card>
                 </>)}
             </>)}
