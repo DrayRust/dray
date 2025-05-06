@@ -4,7 +4,7 @@ use serde_json::{json, Value};
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write};
 use std::net::{TcpStream, ToSocketAddrs};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -70,7 +70,7 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
     File::create(&timeout_log_path)?;
     File::create(&refused_log_path)?;
 
-    let create_log_writer = |path: &std::path::Path| -> Result<Arc<Mutex<BufWriter<File>>>, std::io::Error> {
+    let create_log_writer = |path: &Path| -> Result<Arc<Mutex<BufWriter<File>>>, std::io::Error> {
         Ok(Arc::new(Mutex::new(BufWriter::new(OpenOptions::new().append(true).open(path)?))))
     };
 
@@ -107,6 +107,9 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
                                 if let Err(e) = log.write_all(line.as_bytes()) {
                                     error!("Failed to write open log: {}", e);
                                 }
+                                if let Err(e) = log.flush() {
+                                    error!("Failed to flush open log: {}", e);
+                                }
                             }
                             counter.lock().unwrap().0 += 1;
                         }
@@ -118,6 +121,9 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
                                     if let Err(e) = log.write_all(line.as_bytes()) {
                                         error!("Failed to write timeout log: {}", e);
                                     }
+                                    if let Err(e) = log.flush() {
+                                        error!("Failed to flush timeout log: {}", e);
+                                    }
                                 }
                                 counter.lock().unwrap().1 += 1;
                             } else {
@@ -126,6 +132,9 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
                                 if let Ok(mut log) = refused_log.lock() {
                                     if let Err(e) = log.write_all(line.as_bytes()) {
                                         error!("Failed to write refused log: {}", e);
+                                    }
+                                    if let Err(e) = log.flush() {
+                                        error!("Failed to flush refused log: {}", e);
                                     }
                                 }
                                 counter.lock().unwrap().2 += 1;
