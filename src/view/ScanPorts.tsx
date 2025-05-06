@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, CSSProperties } from 'react'
 import {
-    Button, Box, Card, Dialog, DialogActions, Slider, Paper, Stack,
+    Button, Box, Card, Dialog, DialogActions, Slider, Paper, Stack, InputAdornment,
     Alert, TextField, Typography, IconButton, useTheme, Chip, CircularProgress,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import SettingsIcon from '@mui/icons-material/Settings'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
@@ -44,6 +45,10 @@ export const ScanPorts = () => {
         let val = Number(e.target.value) || 0
         val = Math.min(65535, Math.max(val, startPort))
         setEndPort(val)
+    }
+
+    const handleClear = () => {
+        setHost('')
     }
 
     // ==================================== Scan ====================================
@@ -158,6 +163,13 @@ export const ScanPorts = () => {
                 label="目标 IP / 域名"
                 value={host}
                 onChange={e => setHost(e.target.value)}
+                slotProps={{
+                    input: {
+                        endAdornment: host && (
+                            <InputAdornment position="end"><IconButton onClick={handleClear} size="small"><CloseIcon/></IconButton></InputAdornment>
+                        ),
+                    },
+                }}
             />
 
             <Stack direction="row" justifyContent="space-between" alignItems="center">
