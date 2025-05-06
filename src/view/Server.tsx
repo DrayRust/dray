@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-    Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery,
+    Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery, useTheme,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Menu, MenuItem, IconButton, Divider, Drawer, TextField, Tooltip,
+    Menu, MenuItem, IconButton, Divider, Drawer, Tooltip,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -18,6 +18,7 @@ import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenWithIcon from '@mui/icons-material/OpenWith'
 
+import { JsonCodeViewer } from "../component/CodeViewer.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
@@ -408,6 +409,9 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
         setTimeout(() => setIsCopied(false), 1000)
     }
 
+    const theme = useTheme()
+    const isDark = theme.palette.mode === 'dark'
+
     const {SnackbarComponent, showSnackbar} = useSnackbar()
     const {DialogComponent, dialogConfirm} = useDialog()
     const height = 'calc(100vh - 70px)'
@@ -505,14 +509,15 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <MenuItem onClick={handleDelete}><DeleteIcon sx={{mr: 1}} fontSize="small"/>删除</MenuItem>
         </Menu>
         <Drawer open={openDrawer} anchor="right" onClose={handleCloseDrawer}>
-            <Stack sx={{p: 1, width: 660}} spacing={2}>
+            <Stack sx={{p: 1, width: 660}} spacing={1}>
                 <div className="flex-between">
                     <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
                     <Tooltip arrow title={isCopied ? '已复制' : '点击复制'}>
                         <IconButton onClick={handleCopyJson}><ContentCopyIcon/></IconButton>
                     </Tooltip>
                 </div>
-                <TextField variant="outlined" label="配置详情" value={rayConfigJson} fullWidth multiline disabled/>
+
+                <JsonCodeViewer value={rayConfigJson} height={`calc(100vh - 70px)`} isDark={isDark}/>
             </Stack>
         </Drawer>
     </>)
