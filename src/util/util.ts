@@ -97,7 +97,7 @@ export const formatFloat = (num: number, decimal: number = 2): string => {
     return num.toFixed(decimal)
 }
 
-export function formatDuration(seconds: number, digits: number = 2): string {
+export function formatDuration(seconds: number, digits: number = 1): string {
     if (seconds < 60) {
         return `${seconds.toFixed(digits)} s`
     } else if (seconds < 3600) {

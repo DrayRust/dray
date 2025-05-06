@@ -104,7 +104,7 @@ export const ScanPorts = () => {
 
         return () => {
             clearInterval(intervalRef.current)
-            readLogs().catch()
+            setTimeout(readLogs, 200)
         }
     }, [scanning, scanEnd])
 
@@ -138,7 +138,7 @@ export const ScanPorts = () => {
                 <Box>
                     <Typography variant="body2">最大线程: {maxThreads}</Typography>
                     <Slider
-                        min={5} max={5000} step={5}
+                        min={1} max={5000} step={1}
                         value={maxThreads}
                         onChange={(_, val) => setMaxThreads(Number(val))}
                         valueLabelDisplay="auto"
