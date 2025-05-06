@@ -2,7 +2,7 @@ use crate::dirs;
 use logger::error;
 use serde_json::{json, Value};
 use std::{
-    io::{Error, ErrorKind},
+    io::{Error, ErrorKind, SeekFrom},
     path::{Path, PathBuf},
     sync::Arc,
     time::{Duration, Instant},
@@ -191,7 +191,7 @@ async fn read_tail_file(filepath: &str, max_bytes: u64) -> String {
             Ok(meta) => {
                 let file_size = meta.len();
                 let seek_pos = file_size.saturating_sub(max_bytes);
-                if file.seek(std::io::SeekFrom::Start(seek_pos)).await.is_err() {
+                if file.seek(SeekFrom::Start(seek_pos)).await.is_err() {
                     error!("Failed to seek file '{}'", filepath);
                     return String::new();
                 }
