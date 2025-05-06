@@ -14,7 +14,7 @@ export const ScanPorts = () => {
     const [startPort, setStartPort] = useState(1)
     const [endPort, setEndPort] = useState(2048)
     const [maxThreads, setMaxThreads] = useState(50)
-    const [timeoutMs, setTimeoutMs] = useState(200)
+    const [timeoutMs, setTimeoutMs] = useState(300)
 
     const [scanning, setScanning] = useState(false)
     const [scanEnd, setScanEnd] = useState(false)
@@ -26,7 +26,7 @@ export const ScanPorts = () => {
         setStartPort(1)
         setEndPort(2048)
         setMaxThreads(50)
-        setTimeoutMs(200)
+        setTimeoutMs(300)
         setScanning(false)
         setScanEnd(false)
         setError('')
