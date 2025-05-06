@@ -20,6 +20,19 @@ export const ScanPorts = () => {
     const [error, setError] = useState('')
     const [result, setResult] = useState<any>({})
 
+    // ==================================== Change ====================================
+    const handleStartPortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = Number(e.target.value) || 0
+        val = Math.max(1, Math.min(val, endPort))
+        setStartPort(val)
+    }
+
+    const handleEndPortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = Number(e.target.value) || 0
+        val = Math.min(65535, Math.max(val, startPort))
+        setEndPort(val)
+    }
+
     // ==================================== Scan ====================================
     const handleScan = async () => {
         setScanning(true)
@@ -140,14 +153,14 @@ export const ScanPorts = () => {
                         size="small"
                         label="起始端口"
                         value={startPort}
-                        onChange={e => setStartPort(Number(e.target.value))}
+                        onChange={handleStartPortChange}
                         sx={{width: 150}}
                     />
                     <TextField
                         size="small"
                         label="结束端口"
                         value={endPort}
-                        onChange={e => setEndPort(Number(e.target.value))}
+                        onChange={handleEndPortChange}
                         sx={{width: 150}}
                     />
                     <IconButton aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
