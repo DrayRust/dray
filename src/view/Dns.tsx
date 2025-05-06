@@ -15,6 +15,7 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import { JsonCodeViewer } from "../component/CodeViewer.tsx"
 import { useAlertDialog } from "../component/useAlertDialog.tsx"
 import { useDialog } from "../component/useDialog.tsx"
 import { ErrorCard, LoadingCard } from "../component/useCard.tsx"
@@ -379,9 +380,13 @@ export const Dns = () => {
                     </Stack>
                 ) : action === 'viewConf' && (
                     <Stack spacing={2} sx={widthSx}>
-                        <Stack spacing={2} component={Card} elevation={5} sx={{p: 1, pt: 2}}>
-                            <TextField size="small" multiline disabled minRows={10} maxRows={16} label="DNS 配置" value={dnsModeViewJson}/>
-                        </Stack>
+                        <Card elevation={4}>
+                            <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                                <Typography variant="body1">DNS 配置</Typography>
+                            </Paper>
+                            <JsonCodeViewer value={dnsModeViewJson} height={`calc(100vh - 350px)`}/>
+                        </Card>
+
                         <div className="flex-between">
                             <div>
                                 <Button variant="contained" color="info" startIcon={<ContentCopyIcon/>} onClick={() => handleDnsModeCopy(dnsModeViewJson)}>复制</Button>
