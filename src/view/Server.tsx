@@ -512,7 +512,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                 <Card elevation={4}>
                     <Paper elevation={2} sx={{py: 0.5, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Typography variant="body1">规则配置</Typography>
+                            <Typography variant="body1">Xray 配置</Typography>
                             <Tooltip arrow placement="left" title={isCopied ? '已复制' : '点击复制'}>
                                 <IconButton size="small" onClick={handleCopyJson}><ContentCopyIcon fontSize="small"/></IconButton>
                             </Tooltip>
