@@ -1,18 +1,17 @@
 use crate::config;
 use crate::dirs;
 use actix_files::Files;
-use actix_web::{dev, rt, web, App, HttpServer};
-use logger::{debug, error, info};
-use once_cell::sync::Lazy;
-use std::fs;
-use std::sync::Mutex;
-
 use actix_web::middleware::Logger;
+use actix_web::{dev, rt, web, App, HttpServer};
 use chrono;
 use env_logger::Builder;
 use log::LevelFilter;
+use logger::{debug, error, info};
+use once_cell::sync::Lazy;
+use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
+use std::sync::Mutex;
 
 static SERVER_HANDLE: Lazy<Mutex<Option<dev::ServerHandle>>> = Lazy::new(|| Mutex::new(None));
 static LOGGER_ONCE: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));

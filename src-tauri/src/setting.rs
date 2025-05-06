@@ -1,7 +1,6 @@
+use crate::{config, log, network, ray, web};
 use logger::{info, warn};
 use std::net::TcpListener;
-
-use crate::{config, log, network, ray, web};
 
 pub fn set_app_log_level(value: &str) -> bool {
     info!("set_app_log_level: {}", value);
