@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
     Card, Chip, Stack, Checkbox, Button, Typography, useMediaQuery,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Menu, MenuItem, IconButton, Divider, Drawer, Tooltip,
+    Menu, MenuItem, IconButton, Divider, Drawer, Tooltip, Paper,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -435,8 +435,7 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
                     <TableHead>
                         <TableRow>
                             <TableCell padding="checkbox">
-                                <Checkbox checked={selectedAll}
-                                          onChange={(e) => handleSelectAll(e.target.checked)}/>
+                                <Checkbox checked={selectedAll} onChange={(e) => handleSelectAll(e.target.checked)}/>
                             </TableCell>
                             <TableCell sx={{py: 1}}>服务器名称</TableCell>
                             {!isMediumScreen && (<>
@@ -509,12 +508,18 @@ const Server: React.FC<NavProps> = ({setNavState}) => {
             <Stack sx={{p: 1, width: 700}} spacing={1}>
                 <div className="flex-between">
                     <IconButton onClick={handleCloseDrawer}><DoubleArrowIcon/></IconButton>
-                    <Tooltip arrow title={isCopied ? '已复制' : '点击复制'}>
-                        <IconButton onClick={handleCopyJson}><ContentCopyIcon/></IconButton>
-                    </Tooltip>
                 </div>
-
-                <JsonCodeViewer value={rayConfigJson} height={`calc(100vh - 70px)`}/>
+                <Card elevation={4}>
+                    <Paper elevation={2} sx={{py: 0.5, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Typography variant="body1">规则配置</Typography>
+                            <Tooltip arrow placement="left" title={isCopied ? '已复制' : '点击复制'}>
+                                <IconButton size="small" onClick={handleCopyJson}><ContentCopyIcon fontSize="small"/></IconButton>
+                            </Tooltip>
+                        </Stack>
+                    </Paper>
+                    <JsonCodeViewer value={rayConfigJson} height={`calc(100vh - 110px)`}/>
+                </Card>
             </Stack>
         </Drawer>
     </>)

@@ -363,15 +363,15 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                     </div>
                     {ruleModeConf ? (
                         <Card elevation={4}>
-                            <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                            <Paper elevation={2} sx={{py: 0.5, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                                     <Typography variant="body1">规则配置</Typography>
                                     <Tooltip arrow placement="left" title={isCopied ? '已复制' : '复制规则配置'}>
-                                        <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                                        <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon fontSize="small"/></IconButton>
                                     </Tooltip>
                                 </Stack>
                             </Paper>
-                            <JsonCodeViewer value={ruleModeConf} height={`calc(100vh - 250px)`}/>
+                            <JsonCodeViewer value={ruleModeConf} height={`calc(100vh - 240px)`}/>
                         </Card>
                     ) : (
                         <ErrorCard errorMsg="没有规则" height="160px"/>

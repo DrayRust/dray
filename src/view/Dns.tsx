@@ -381,7 +381,7 @@ export const Dns = () => {
                 ) : action === 'viewConf' && (
                     <Stack spacing={2} sx={widthSx}>
                         <Card elevation={4}>
-                            <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                            <Paper elevation={2} sx={{py: 0.5, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
                                 <Typography variant="body1">DNS 配置</Typography>
                             </Paper>
                             <JsonCodeViewer value={dnsModeViewJson} height={`calc(100vh - 350px)`}/>
