@@ -55,6 +55,9 @@ export const ScanPorts = () => {
     const handleScan = async () => {
         setScanning(true)
         setScanEnd(false)
+        setOpenLog('')
+        setTimeoutLog('')
+        setRefusedLog('')
         setError('')
         setResult({})
         const res = await startScanPorts(host, startPort, endPort, maxThreads, timeoutMs)
