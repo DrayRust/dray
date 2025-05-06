@@ -9,7 +9,7 @@ use std::{
 };
 use tokio::{
     fs::{self, File, OpenOptions},
-    io::{AsyncBufReadExt, AsyncReadExt, AsyncSeekExt, AsyncWriteExt, BufReader, BufWriter},
+    io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt, BufReader, BufWriter},
     net::{lookup_host, TcpStream},
     sync::{Mutex, Semaphore},
     task,
@@ -186,56 +186,47 @@ async fn read_full_file(filepath: &str) -> String {
 }
 
 async fn read_tail_file(filepath: &str, max_bytes: u64) -> String {
-    let file = match File::open(filepath).await {
-        Ok(f) => f,
+    match File::open(filepath).await {
+        Ok(mut file) => {
+            match file.metadata().await {
+                Ok(meta) => {
+                    let file_size = meta.len();
+                    let read_start = if file_size > max_bytes { file_size.saturating_sub(max_bytes) } else { 0 };
+
+                    // 将文件指针移动到读取开始的位置
+                    if let Err(e) = file.seek(SeekFrom::Start(read_start)).await {
+                        error!("Failed to seek file '{}': {}", filepath, e);
+                        return String::new();
+                    }
+
+                    // 读取文件内容
+                    let mut raw_content = String::new();
+                    if let Err(e) = file.read_to_string(&mut raw_content).await {
+                        error!("Failed to read file '{}': {}", filepath, e);
+                        return String::new();
+                    }
+
+                    // 如果文件内容小于 max_bytes，则直接返回
+                    if file_size <= max_bytes {
+                        return raw_content;
+                    }
+
+                    // 跳过可能不完整的第一行
+                    if let Some(first_newline) = raw_content.find('\n') {
+                        raw_content[first_newline + 1..].to_string()
+                    } else {
+                        raw_content
+                    }
+                }
+                Err(e) => {
+                    error!("Failed to get metadata for '{}': {}", filepath, e);
+                    String::new()
+                }
+            }
+        }
         Err(e) => {
             error!("Failed to open file '{}': {}", filepath, e);
-            return String::new();
+            String::new()
         }
-    };
-
-    let metadata = match file.metadata().await {
-        Ok(m) => m,
-        Err(e) => {
-            error!("Failed to get metadata for '{}': {}", filepath, e);
-            return String::new();
-        }
-    };
-
-    let file_size = metadata.len();
-
-    if file_size <= max_bytes {
-        // 小文件：直接读全内容
-        let mut reader = BufReader::new(file);
-        let mut content = String::new();
-        if reader.read_to_string(&mut content).await.is_err() {
-            error!("Failed to read full content of '{}'", filepath);
-            return String::new();
-        }
-        return content;
     }
-
-    // 大文件：只读结尾 max_bytes 部分，跳过第一行
-    let mut file = file;
-    let seek_pos = file_size.saturating_sub(max_bytes);
-    if file.seek(SeekFrom::Start(seek_pos)).await.is_err() {
-        error!("Failed to seek file '{}'", filepath);
-        return String::new();
-    }
-
-    let reader = BufReader::new(file);
-    let mut lines = reader.lines();
-
-    // 跳过可能不完整的第一行
-    if lines.next_line().await.is_err() {
-        error!("Failed to skip partial line in '{}'", filepath);
-        return String::new();
-    }
-
-    let mut result = Vec::new();
-    while let Ok(Some(line)) = lines.next_line().await {
-        result.push(line);
-    }
-
-    result.join("\n")
 }
