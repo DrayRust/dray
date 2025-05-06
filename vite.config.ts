@@ -39,7 +39,12 @@ export default defineConfig(async () => ({
             output: {
                 manualChunks: {
                     // vendor: ['react', 'react-dom'],
-                    codemirror: ['@uiw/react-codemirror', '@codemirror/lang-html', '@codemirror/lang-json'],
+                    h5qr: ['html5-qrcode'],
+                    mui: ['@mui/material'],
+                    icons: ['@mui/icons-material'],
+                    charts: ['@mui/x-charts'],
+                    codemirror: ['@uiw/react-codemirror'],
+                    'code-lang': ['@codemirror/lang-html', '@codemirror/lang-json'],
                 }
             }
         }
