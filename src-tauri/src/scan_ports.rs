@@ -121,7 +121,8 @@ pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: u
                                 }
                                 counter.lock().unwrap().1 += 1;
                             } else {
-                                let line = format!("Port {} refused ({})\n", port, kind);
+                                // let line = format!("Port {} refused ({})\n", port, kind);
+                                let line = format!("{}\n", port);
                                 if let Ok(mut log) = refused_log.lock() {
                                     if let Err(e) = log.write_all(line.as_bytes()) {
                                         error!("Failed to write refused log: {}", e);
