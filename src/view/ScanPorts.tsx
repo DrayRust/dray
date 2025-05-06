@@ -56,8 +56,8 @@ export const ScanPorts = () => {
         setScanning(true)
         setScanEnd(false)
         setOpenLog('')
-        setTimeoutLog('')
         setRefusedLog('')
+        setTimeoutLog('')
         setError('')
         setResult({})
         const res = await startScanPorts(host, startPort, endPort, maxThreads, timeoutMs)
@@ -72,12 +72,12 @@ export const ScanPorts = () => {
 
     // ==================================== interval ====================================
     const openLogRef = useRef<HTMLTextAreaElement>(null)
-    const timeoutLogRef = useRef<HTMLTextAreaElement>(null)
     const refusedLogRef = useRef<HTMLTextAreaElement>(null)
+    const timeoutLogRef = useRef<HTMLTextAreaElement>(null)
 
     const [openLog, setOpenLog] = useState('')
-    const [timeoutLog, setTimeoutLog] = useState('')
     const [refusedLog, setRefusedLog] = useState('')
+    const [timeoutLog, setTimeoutLog] = useState('')
 
     const intervalRef = useRef<number>(0)
     useEffect(() => {
@@ -87,14 +87,14 @@ export const ScanPorts = () => {
                 if (openLogRef.current) openLogRef.current.scrollTop = openLogRef.current.scrollHeight
             }, 100)
 
-            setTimeoutLog(await readTimeoutLog())
-            setTimeout(() => {
-                if (timeoutLogRef.current) timeoutLogRef.current.scrollTop = timeoutLogRef.current.scrollHeight
-            }, 100)
-
             setRefusedLog(await readRefusedLog())
             setTimeout(() => {
                 if (refusedLogRef.current) refusedLogRef.current.scrollTop = refusedLogRef.current.scrollHeight
+            }, 100)
+
+            setTimeoutLog(await readTimeoutLog())
+            setTimeout(() => {
+                if (timeoutLogRef.current) timeoutLogRef.current.scrollTop = timeoutLogRef.current.scrollHeight
             }, 100)
         }
 
@@ -217,20 +217,20 @@ export const ScanPorts = () => {
                     <Card elevation={3} sx={{flex: 1}}>
                         <Paper elevation={2} sx={pSx}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                超时端口
-                                {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.timeout_count || 0}`}/>}
-                            </Stack>
-                        </Paper>
-                        <textarea readOnly className="scr-w2" style={textareaStyle} ref={timeoutLogRef} value={timeoutLog.trim()}/>
-                    </Card>
-                    <Card elevation={3} sx={{flex: 1}}>
-                        <Paper elevation={2} sx={pSx}>
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 拒连端口
                                 {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.refused_count || 0}`}/>}
                             </Stack>
                         </Paper>
                         <textarea readOnly className="scr-w2" style={textareaStyle} ref={refusedLogRef} value={refusedLog.trim()}/>
+                    </Card>
+                    <Card elevation={3} sx={{flex: 1}}>
+                        <Paper elevation={2} sx={pSx}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                超时端口
+                                {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.timeout_count || 0}`}/>}
+                            </Stack>
+                        </Paper>
+                        <textarea readOnly className="scr-w2" style={textareaStyle} ref={timeoutLogRef} value={timeoutLog.trim()}/>
                     </Card>
                 </Stack>
             )}
