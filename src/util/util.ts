@@ -97,6 +97,18 @@ export const formatFloat = (num: number, decimal: number = 2): string => {
     return num.toFixed(decimal)
 }
 
+export function formatDuration(seconds: number, digits: number = 2): string {
+    if (seconds < 60) {
+        return `${seconds.toFixed(digits)} s`
+    } else if (seconds < 3600) {
+        const minutes = seconds / 60
+        return `${minutes.toFixed(digits)} m`
+    } else {
+        const hours = seconds / 3600
+        return `${hours.toFixed(digits)} h`
+    }
+}
+
 export function formatSecond(duration: number): string {
     duration = Number(duration) || 0
     return duration >= 1000 ? `${(duration / 1000).toFixed(2)} s` : `${duration} ms`

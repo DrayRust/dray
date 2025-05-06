@@ -8,7 +8,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import { readOpenLog, readRefusedLog, readTimeoutLog, startScanPorts } from "../util/invoke.ts"
-import { formatFloat, formatSecond } from "../util/util.ts"
+import { formatDuration, formatSecond } from "../util/util.ts"
 
 export const ScanPorts = () => {
     const [host, setHost] = useState('127.0.0.1')
@@ -196,7 +196,7 @@ export const ScanPorts = () => {
                 </Stack>
 
                 <Stack direction="row" spacing={2} alignItems="center">
-                    {scanEnd && <Chip size="small" variant="outlined" color="info" label={`扫描耗时: ${formatFloat(result?.elapsed_secs || 0)} s`}/>}
+                    {scanEnd && <Chip size="small" variant="outlined" color="info" label={`扫描耗时: ${formatDuration(result?.elapsed_secs || 0)}`}/>}
                     <Button variant="contained" disabled={scanning || !host} onClick={handleScan}>{scanning ? <CircularProgress size={20}/> : '开始扫描'}</Button>
                 </Stack>
             </Stack>
