@@ -1,100 +1,199 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, CSSProperties } from 'react'
 import {
-    Button, Stack, TextField, Typography, CircularProgress
+    Button, Box, Card, Dialog, DialogActions, Slider, Paper, Stack,
+    Alert, TextField, Typography, IconButton, useTheme, Chip, CircularProgress,
 } from '@mui/material'
-import CodeMirror from '@uiw/react-codemirror'
-import { json } from '@codemirror/lang-json'
-import { startScanPorts } from "../util/invoke.ts"
+import SettingsIcon from '@mui/icons-material/Settings'
+
+import { readOpenLog, readRefusedLog, readTimeoutLog, startScanPorts } from "../util/invoke.ts"
+import { formatFloat, formatSecond } from "../util/util.ts"
 
 export const ScanPorts = () => {
     const [host, setHost] = useState('127.0.0.1')
     const [startPort, setStartPort] = useState(1)
-    const [endPort, setEndPort] = useState(2000)
+    const [endPort, setEndPort] = useState(2048)
     const [maxThreads, setMaxThreads] = useState(50)
-    const [timeout, setTimeout] = useState(500)
+    const [timeoutMs, setTimeoutMs] = useState(200)
 
-    const [result, setResult] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [scanning, setScanning] = useState(false)
+    const [scanEnd, setScanEnd] = useState(false)
     const [error, setError] = useState('')
+    const [result, setResult] = useState<any>({})
 
+    // ==================================== Scan ====================================
     const handleScan = async () => {
-        setLoading(true)
+        setScanning(true)
+        setScanEnd(false)
         setError('')
-        setResult('')
-        const res = await startScanPorts(host, startPort, endPort, maxThreads, timeout)
-        if (res.ok) {
-            setResult(JSON.stringify(res, null, 2))
+        setResult({})
+        const res = await startScanPorts(host, startPort, endPort, maxThreads, timeoutMs)
+        if (res?.ok) {
+            setResult(res)
         } else {
-            setError('扫描失败')
+            setError(res?.error_message || '扫描失败')
         }
-        setLoading(false)
+        setScanning(false)
+        setScanEnd(true)
     }
 
-    return (
-        <Stack spacing={2} sx={{pt: 2}}>
-            <Stack direction="row" spacing={2} alignItems="center">
-                <TextField
-                    size="small"
-                    label="目标 IP / 域名"
-                    value={host}
-                    onChange={e => setHost(e.target.value)}
-                    fullWidth
-                />
-                <TextField
-                    size="small"
-                    label="起始端口"
-                    type="number"
-                    value={startPort}
-                    onChange={e => setStartPort(Number(e.target.value))}
-                    sx={{width: 140}}
-                />
-                <TextField
-                    size="small"
-                    label="结束端口"
-                    type="number"
-                    value={endPort}
-                    onChange={e => setEndPort(Number(e.target.value))}
-                    sx={{width: 140}}
-                />
-                <Button
-                    variant="contained"
-                    disabled={loading}
-                    onClick={handleScan}
-                    sx={{width: 130}}
-                >
-                    {loading ? <CircularProgress size={20}/> : '开始扫描'}
-                </Button>
+    // ==================================== interval ====================================
+    const openLogRef = useRef<HTMLTextAreaElement>(null)
+    const timeoutLogRef = useRef<HTMLTextAreaElement>(null)
+    const refusedLogRef = useRef<HTMLTextAreaElement>(null)
+
+    const [openLog, setOpenLog] = useState('')
+    const [timeoutLog, setTimeoutLog] = useState('')
+    const [refusedLog, setRefusedLog] = useState('')
+
+    const intervalRef = useRef<number>(0)
+    useEffect(() => {
+        const readLogs = async () => {
+            setOpenLog(await readOpenLog())
+            setTimeout(() => {
+                if (openLogRef.current) openLogRef.current.scrollTop = openLogRef.current.scrollHeight
+            }, 100)
+
+            setTimeoutLog(await readTimeoutLog())
+            setTimeout(() => {
+                if (timeoutLogRef.current) timeoutLogRef.current.scrollTop = timeoutLogRef.current.scrollHeight
+            }, 100)
+
+            setRefusedLog(await readRefusedLog())
+            setTimeout(() => {
+                if (refusedLogRef.current) refusedLogRef.current.scrollTop = refusedLogRef.current.scrollHeight
+            }, 100)
+        }
+
+        if (scanning && !scanEnd) {
+            intervalRef.current = setInterval(readLogs, 1000)
+        }
+
+        return () => {
+            clearInterval(intervalRef.current)
+            readLogs().catch()
+        }
+    }, [scanning, scanEnd])
+
+    // ==================================== textarea ====================================
+    const theme = useTheme()
+    const textareaStyle: CSSProperties = {
+        width: '100%',
+        height: '500px',
+        padding: '8px',
+        resize: 'none',
+        display: 'block',
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: '0 0 4px 4px',
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.secondary,
+        fontFamily: 'inherit',
+        fontSize: '1rem',
+    }
+
+    // ==================================== Dialog ====================================
+    const [open, setOpen] = useState(false)
+    const handleClose = () => {
+        setOpen(false)
+    }
+
+    const pSx = {p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}
+    return (<>
+        <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+            <Stack spacing={3} sx={{px: 4, pt: 2}}>
+                <Typography variant="h6" gutterBottom>高级设置</Typography>
+                <Box>
+                    <Typography variant="body2">最大线程: {maxThreads}</Typography>
+                    <Slider
+                        min={5} max={5000} step={5}
+                        value={maxThreads}
+                        onChange={(_, val) => setMaxThreads(Number(val))}
+                        valueLabelDisplay="auto"
+                    />
+                </Box>
+                <Box>
+                    <Typography variant="body2">超时时间: {formatSecond(timeoutMs)}</Typography>
+                    <Slider
+                        min={100} max={10000} step={100}
+                        value={timeoutMs}
+                        onChange={(_, val) => setTimeoutMs(Number(val))}
+                        valueLabelDisplay="auto"
+                    />
+                </Box>
+            </Stack>
+            <DialogActions sx={{p: 3, pt: 2}}>
+                <Button variant="contained" onClick={handleClose}>确定</Button>
+            </DialogActions>
+        </Dialog>
+
+        <Stack spacing={3} sx={{pt: 1}}>
+            <TextField
+                fullWidth
+                size="small"
+                label="目标 IP / 域名"
+                value={host}
+                onChange={e => setHost(e.target.value)}
+            />
+
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <TextField
+                        size="small"
+                        label="起始端口"
+                        value={startPort}
+                        onChange={e => setStartPort(Number(e.target.value))}
+                        sx={{width: 150}}
+                    />
+                    <TextField
+                        size="small"
+                        label="结束端口"
+                        value={endPort}
+                        onChange={e => setEndPort(Number(e.target.value))}
+                        sx={{width: 150}}
+                    />
+                    <IconButton aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                    {scanEnd && <Chip size="small" variant="outlined" color="info" label={`扫描耗时: ${formatFloat(result?.elapsed_secs || 0)} s`}/>}
+                    <Button variant="contained" disabled={scanning} onClick={handleScan}>{scanning ? <CircularProgress size={20}/> : '开始扫描'}</Button>
+                </Stack>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
-                <TextField
-                    size="small"
-                    label="最大线程数"
-                    type="number"
-                    value={maxThreads}
-                    onChange={e => setMaxThreads(Number(e.target.value))}
-                />
-                <TextField
-                    size="small"
-                    label="超时时间 (ms)"
-                    type="number"
-                    value={timeout}
-                    onChange={e => setTimeout(Number(e.target.value))}
-                />
-            </Stack>
-
-            {error && <Typography color="error">错误：{error}</Typography>}
-
-            {result && (
-                <CodeMirror
-                    value={result}
-                    extensions={[json()]}
-                    theme="dark"
-                    basicSetup={{lineNumbers: true}}
-                />
+            {error ? (
+                <Alert severity="error" variant="outlined">{error}</Alert>
+            ) : (scanning || scanEnd) && (
+                <Stack direction="row" spacing={1}>
+                    <Card elevation={3} sx={{flex: 1}}>
+                        <Paper elevation={2} sx={pSx}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                开放端口
+                                {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.open_count || 0}`}/>}
+                            </Stack>
+                        </Paper>
+                        <textarea readOnly className="scr-w2" style={textareaStyle} ref={openLogRef} value={openLog.trim()}/>
+                    </Card>
+                    <Card elevation={3} sx={{flex: 1}}>
+                        <Paper elevation={2} sx={pSx}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                超时连接
+                                {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.timeout_count || 0}`}/>}
+                            </Stack>
+                        </Paper>
+                        <textarea readOnly className="scr-w2" style={textareaStyle} ref={timeoutLogRef} value={timeoutLog.trim()}/>
+                    </Card>
+                    <Card elevation={3} sx={{flex: 1}}>
+                        <Paper elevation={2} sx={pSx}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                拒绝请求
+                                {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.refused_count || 0}`}/>}
+                            </Stack>
+                        </Paper>
+                        <textarea readOnly className="scr-w2" style={textareaStyle} ref={refusedLogRef} value={refusedLog.trim()}/>
+                    </Card>
+                </Stack>
             )}
         </Stack>
-    )
+    </>)
 }
 
 export default ScanPorts
