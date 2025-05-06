@@ -194,7 +194,7 @@ export const ScanPorts = () => {
 
                 <Stack direction="row" spacing={2} alignItems="center">
                     {scanEnd && <Chip size="small" variant="outlined" color="info" label={`扫描耗时: ${formatFloat(result?.elapsed_secs || 0)} s`}/>}
-                    <Button variant="contained" disabled={scanning} onClick={handleScan}>{scanning ? <CircularProgress size={20}/> : '开始扫描'}</Button>
+                    <Button variant="contained" disabled={scanning || !host} onClick={handleScan}>{scanning ? <CircularProgress size={20}/> : '开始扫描'}</Button>
                 </Stack>
             </Stack>
 
@@ -223,7 +223,7 @@ export const ScanPorts = () => {
                     <Card elevation={3} sx={{flex: 1}}>
                         <Paper elevation={2} sx={pSx}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                拒绝端口
+                                拒连端口
                                 {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.refused_count || 0}`}/>}
                             </Stack>
                         </Paper>
