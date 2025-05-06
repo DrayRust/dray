@@ -3,7 +3,7 @@ use std::net::TcpListener;
 
 use crate::{config, log, network, ray, web};
 
-pub fn set_app_log_level(value: String) -> bool {
+pub fn set_app_log_level(value: &str) -> bool {
     info!("set_app_log_level: {}", value);
     config::set_app_log_level(value) && {
         log::init();
@@ -23,7 +23,7 @@ pub fn set_web_server_enable(value: bool) -> bool {
     success
 }
 
-pub fn set_web_server_host(value: String) -> bool {
+pub fn set_web_server_host(value: &str) -> bool {
     let success = config::set_web_server_host(value);
     if success {
         let config = config::get_config();
@@ -49,15 +49,18 @@ pub fn set_web_server_port(value: u32) -> bool {
 
 pub fn set_ray_enable(value: bool) -> bool {
     info!("set_ray_enable: {}", value);
-    config::set_ray_enable(value)
-        && if value {
+    if config::set_ray_enable(value) {
+        if value {
             ray::start() && network::setup_proxies()
         } else {
             ray::force_kill() && network::disable_proxies()
         }
+    } else {
+        false
+    }
 }
 
-pub fn set_ray_host(value: String) -> bool {
+pub fn set_ray_host(value: &str) -> bool {
     config::set_ray_host(value) && network::setup_proxies()
 }
 
@@ -125,7 +128,7 @@ pub fn check_port_available(port: u32) -> bool {
             true
         }
         Err(e) => {
-            warn!("[Oops!] Port {} is unavailable: {}", port, e);
+            warn!("Port {} is unavailable: {}", port, e);
             false
         }
     }

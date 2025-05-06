@@ -15,7 +15,6 @@ use logger::{debug, info};
 use serde_json::{json, Value};
 use tauri::AppHandle;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn dray(name: &str) -> String {
     debug!("dray triggered");
@@ -35,8 +34,8 @@ fn read_log_list() -> Value {
 }
 
 #[tauri::command]
-fn read_log_file(filename: String, reverse: bool, start: i64) -> Value {
-    log::read_log_file(&filename, reverse, start)
+fn read_log_file(filename: &str, reverse: bool, start: i64) -> Value {
+    log::read_log_file(filename, reverse, start)
 }
 
 #[tauri::command]
@@ -50,13 +49,13 @@ fn get_dray_app_dir() -> String {
 }
 
 #[tauri::command]
-fn send_log(content: String) -> bool {
-    log::write_web_interface_log(&content)
+fn send_log(content: &str) -> bool {
+    log::write_web_interface_log(content)
 }
 
 #[tauri::command]
-fn start_speed_test_server(port: u16, filename: String) -> bool {
-    ray::start_speed_test_server(port, &filename)
+fn start_speed_test_server(port: u16, filename: &str) -> bool {
+    ray::start_speed_test_server(port, filename)
 }
 
 #[tauri::command]
@@ -75,33 +74,33 @@ fn read_ray_config() -> Value {
 }
 
 #[tauri::command]
-fn save_ray_config(content: String) -> bool {
-    ray::save_ray_config(&content)
+fn save_ray_config(content: &str) -> bool {
+    ray::save_ray_config(content)
 }
 
 #[tauri::command]
-fn read_conf(filename: String) -> Value {
-    config::read_conf(&filename)
+fn read_conf(filename: &str) -> Value {
+    config::read_conf(filename)
 }
 
 #[tauri::command]
-fn save_conf(filename: String, content: String) -> bool {
-    config::save_conf(&filename, &content)
+fn save_conf(filename: &str, content: &str) -> bool {
+    config::save_conf(filename, content)
 }
 
 #[tauri::command]
-fn save_speed_test_conf(filename: String, content: String) -> bool {
-    config::save_speed_test_conf(&filename, &content)
+fn save_speed_test_conf(filename: &str, content: &str) -> bool {
+    config::save_speed_test_conf(filename, content)
 }
 
 #[tauri::command]
-fn save_proxy_pac(content: String) -> bool {
-    web::save_proxy_pac(&content)
+fn save_proxy_pac(content: &str) -> bool {
+    web::save_proxy_pac(content)
 }
 
 #[tauri::command]
-fn save_text_file(path: String, content: String) -> bool {
-    fs::save_text_file(&path, &content)
+fn save_text_file(path: &str, content: &str) -> bool {
+    fs::save_text_file(path, content)
 }
 
 #[tauri::command]
@@ -160,8 +159,8 @@ fn get_load_average_json() -> Value {
 }
 
 #[tauri::command]
-fn get_processes_json(keyword: String) -> Value {
-    sys_info::get_processes_json(&keyword)
+fn get_processes_json(keyword: &str) -> Value {
+    sys_info::get_processes_json(keyword)
 }
 
 #[tauri::command]
@@ -191,7 +190,7 @@ fn get_config_json() -> Value {
 }
 
 #[tauri::command]
-fn set_app_log_level(value: String) -> bool {
+fn set_app_log_level(value: &str) -> bool {
     setting::set_app_log_level(value)
 }
 
@@ -201,7 +200,7 @@ fn set_web_server_enable(value: bool) -> bool {
 }
 
 #[tauri::command]
-fn set_web_server_host(value: String) -> bool {
+fn set_web_server_host(value: &str) -> bool {
     setting::set_web_server_host(value)
 }
 
@@ -216,7 +215,7 @@ fn set_ray_enable(value: bool) -> bool {
 }
 
 #[tauri::command]
-fn set_ray_host(value: String) -> bool {
+fn set_ray_host(value: &str) -> bool {
     setting::set_ray_host(value)
 }
 

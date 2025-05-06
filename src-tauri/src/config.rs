@@ -6,8 +6,7 @@ use serde_json::{json, Value};
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
-use std::sync::LazyLock;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -131,16 +130,16 @@ where
         .is_ok()
 }
 
-pub fn set_app_log_level(value: String) -> bool {
-    set_config(|config| config.app_log_level = value)
+pub fn set_app_log_level(value: &str) -> bool {
+    set_config(|config| config.app_log_level = value.to_string())
 }
 
 pub fn set_web_server_enable(value: bool) -> bool {
     set_config(|config| config.web_server_enable = value)
 }
 
-pub fn set_web_server_host(value: String) -> bool {
-    set_config(|config| config.web_server_host = value)
+pub fn set_web_server_host(value: &str) -> bool {
+    set_config(|config| config.web_server_host = value.to_string())
 }
 
 pub fn set_web_server_port(value: u32) -> bool {
@@ -151,8 +150,8 @@ pub fn set_ray_enable(value: bool) -> bool {
     set_config(|config| config.ray_enable = value)
 }
 
-pub fn set_ray_host(value: String) -> bool {
-    set_config(|config| config.ray_host = value)
+pub fn set_ray_host(value: &str) -> bool {
+    set_config(|config| config.ray_host = value.to_string())
 }
 
 pub fn set_ray_socks_port(value: u32) -> bool {
@@ -221,9 +220,7 @@ pub fn read_conf(filename: &str) -> Value {
                 }
             }
         }
-        Err(_) => {
-            json!(null)
-        }
+        Err(_) => json!(null),
     }
 }
 
