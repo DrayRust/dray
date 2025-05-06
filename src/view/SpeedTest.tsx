@@ -96,8 +96,10 @@ export const SpeedTest = () => {
         const lines = processLines(content)
         for (const line of lines) {
             const arr = line.split('#')
-            const url = arr?.[0] || line
-            const name = arr?.[1] || line
+            let url = arr?.[0] || line
+            let name = arr?.[1] || line
+            url = url.trim()
+            name = name.trim()
             result.push({name, url})
         }
         return result
