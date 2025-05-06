@@ -60,6 +60,15 @@ pub fn start_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads:
 }
 
 pub fn run_scan_ports(host: &str, start_port: u16, end_port: u16, max_threads: usize, timeout_ms: u64) -> Result<Value, std::io::Error> {
+    // Validate if the host can be resolved before proceeding
+    let test_addr = format!("{}:0", host); // Use port 0 just for resolution testing
+    if test_addr.to_socket_addrs()?.next().is_none() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("Failed to resolve hostname: {}", host),
+        ));
+    }
+
     let logs_dir = dirs::get_dray_logs_dir().ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "log dir not found"))?;
 
     let open_log_path = logs_dir.join("scan_ports_open.log");
