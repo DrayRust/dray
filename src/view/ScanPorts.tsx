@@ -4,6 +4,7 @@ import {
     Alert, TextField, Typography, IconButton, useTheme, Chip, CircularProgress,
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 
 import { readOpenLog, readRefusedLog, readTimeoutLog, startScanPorts } from "../util/invoke.ts"
 import { formatFloat, formatSecond } from "../util/util.ts"
@@ -19,6 +20,18 @@ export const ScanPorts = () => {
     const [scanEnd, setScanEnd] = useState(false)
     const [error, setError] = useState('')
     const [result, setResult] = useState<any>({})
+
+    const handleReset = () => {
+        setHost('127.0.0.1')
+        setStartPort(1)
+        setEndPort(2048)
+        setMaxThreads(50)
+        setTimeoutMs(200)
+        setScanning(false)
+        setScanEnd(false)
+        setError('')
+        setResult({})
+    }
 
     // ==================================== Change ====================================
     const handleStartPortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +177,7 @@ export const ScanPorts = () => {
                         sx={{width: 150}}
                     />
                     <IconButton aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
+                    <IconButton aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
                 </Stack>
 
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -188,7 +202,7 @@ export const ScanPorts = () => {
                     <Card elevation={3} sx={{flex: 1}}>
                         <Paper elevation={2} sx={pSx}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                超时连接
+                                超时端口
                                 {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.timeout_count || 0}`}/>}
                             </Stack>
                         </Paper>
@@ -197,7 +211,7 @@ export const ScanPorts = () => {
                     <Card elevation={3} sx={{flex: 1}}>
                         <Paper elevation={2} sx={pSx}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                拒绝请求
+                                拒绝端口
                                 {scanEnd && <Chip size="small" variant="outlined" color="info" label={`端口数: ${result?.refused_count || 0}`}/>}
                             </Stack>
                         </Paper>
