@@ -488,7 +488,7 @@ export const SpeedTest = () => {
                         <TextField
                             multiline minRows={2} maxRows={6}
                             size="small"
-                            label="下载测速服务"
+                            label="上传测速服务"
                             value={speedTestConfig.uploadContent}
                             onChange={handleConfigChange('uploadContent')}/>
                     </>)}
