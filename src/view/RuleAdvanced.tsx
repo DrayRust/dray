@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Card, Checkbox, Stack, TextField, MenuItem, Button, Typography,
+    Card, Checkbox, Stack, TextField, MenuItem, Button, Typography, Paper,
     TableContainer, Table, TableBody, TableRow, TableCell, IconButton, Tooltip,
     BottomNavigation, BottomNavigationAction
 } from '@mui/material'
@@ -360,14 +360,19 @@ export const RuleAdvanced = ({handleClose, ruleConfig, setRuleConfig, ruleDomain
                 </>) : action === 'viewConf' ? (<>
                     <div className="flex-between">
                         <Button variant="contained" startIcon={<ChevronLeftIcon/>} onClick={handleRuleModeCancel}>返回</Button>
-                        {ruleModeConf && (
-                            <Tooltip arrow placement="left" title={isCopied ? '已复制' : '复制规则配置'}>
-                                <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
-                            </Tooltip>
-                        )}
                     </div>
                     {ruleModeConf ? (
-                        <JsonCodeViewer value={ruleModeConf} height={`calc(100vh - 195px)`}/>
+                        <Card elevation={4}>
+                            <Paper elevation={2} sx={{p: 1, px: 1.5, mb: '1px', borderRadius: '8px 8px 0 0'}}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                    <Typography variant="body1">规则配置</Typography>
+                                    <Tooltip arrow placement="left" title={isCopied ? '已复制' : '复制规则配置'}>
+                                        <IconButton size="small" onClick={() => handleRuleModeCopy(ruleModeConf)}><ContentCopyIcon/></IconButton>
+                                    </Tooltip>
+                                </Stack>
+                            </Paper>
+                            <JsonCodeViewer value={ruleModeConf} height={`calc(100vh - 250px)`}/>
+                        </Card>
                     ) : (
                         <ErrorCard errorMsg="没有规则" height="160px"/>
                     )}
