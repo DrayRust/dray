@@ -87,8 +87,7 @@ const App: React.FC = () => {
     const isWindowFocused = useWindowFocused()
     useEffect(() => {
         if (isVisibility) setTimeout(subscribeUpdate, 0)
-        // if (!isVisibility || !isWindowFocused) setTimeout(hideWindow, 0)
-        if (!isVisibility) setTimeout(hideWindow, 0)
+        if (!isVisibility && !isWindowFocused) setTimeout(hideWindow, 0)
     }, [isVisibility, isWindowFocused])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
