@@ -11,14 +11,24 @@ mod setting;
 mod setup;
 mod sys_info;
 mod web;
-use logger::{debug, info};
+use logger::{debug, info, trace};
 use serde_json::{json, Value};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 fn dray(name: &str) -> String {
-    debug!("dray triggered");
+    trace!("dray triggered");
     format!("Hello, {}! Do you know Dray is great?", name)
+}
+
+#[tauri::command]
+fn set_focus(app: AppHandle) {
+    trace!("set_focus triggered");
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.hide();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
 }
 
 #[tauri::command]
@@ -185,7 +195,7 @@ fn kill_process_by_pid(pid: u32) -> bool {
 
 #[tauri::command]
 fn get_config_json() -> Value {
-    debug!("get_config_json triggered");
+    trace!("get_config_json triggered");
     config::get_config_json()
 }
 
@@ -381,6 +391,7 @@ pub fn run() {
             read_refused_log,
             get_ray_version,
             get_version,
+            set_focus,
             quit
         ])
         .run(tauri::generate_context!())
