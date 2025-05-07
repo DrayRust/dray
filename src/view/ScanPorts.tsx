@@ -182,17 +182,19 @@ export const ScanPorts = () => {
                         label="起始端口"
                         value={startPort}
                         onChange={handleStartPortChange}
-                        sx={{width: 150}}
+                        sx={{width: 100}}
                     />
                     <TextField
                         size="small"
                         label="结束端口"
                         value={endPort}
                         onChange={handleEndPortChange}
-                        sx={{width: 150}}
+                        sx={{width: 100}}
                     />
-                    <IconButton aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
-                    <IconButton aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
+                    <div>
+                        <IconButton size="small" aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
+                        <IconButton size="small" aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
+                    </div>
                 </Stack>
 
                 <Stack direction="row" spacing={2} alignItems="center">
