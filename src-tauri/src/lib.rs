@@ -27,13 +27,13 @@ fn dray(name: &str) -> String {
 }
 
 #[tauri::command]
-fn show(app: AppHandle) {
+fn startup_show(app: AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
     }
 
     let elapsed = START_TIME.elapsed();
-    info!("App runtime: {:?}", elapsed);
+    info!("Dray startup time: {:?}", elapsed);
 }
 
 #[tauri::command]
