@@ -42,11 +42,14 @@ import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
 import { useWindowFocused } from "./hook/useWindowFocused.ts"
+import { useNoBackspaceNav } from "./hook/useNoBackspaceNav.ts"
 import { hideWindow, showWindow } from "./util/tauri.ts"
 
 let subscribeLastUpdate = 0
 
 const App: React.FC = () => {
+    useNoBackspaceNav()
+
     const navItems = [
         {path: '/', text: '首页', icon: <HomeIcon/>},
         {path: '/server', text: '服务器', icon: <StorageIcon/>},
@@ -61,14 +64,6 @@ const App: React.FC = () => {
     const handleNavClick = (index: number) => {
         setNavState(index)
     }
-
-    useEffect(() => {
-        const handleBackspace = (e: KeyboardEvent) => {
-            if (e.key === 'Backspace') e.preventDefault() // 阻止后退
-        }
-        window.addEventListener('keydown', handleBackspace)
-        return () => window.removeEventListener('keydown', handleBackspace)
-    }, [])
 
     useEffect(() => {
         setTimeout(async () => {
