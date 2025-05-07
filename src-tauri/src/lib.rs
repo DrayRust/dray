@@ -32,8 +32,8 @@ fn startup_show(app: AppHandle) {
         let _ = window.show();
     }
 
-    let elapsed = START_TIME.elapsed();
-    info!("Dray startup time: {:?}", elapsed);
+    let elapsed = START_TIME.elapsed().as_secs_f64();
+    info!("Dray startup time: {:.2}", elapsed);
 }
 
 #[tauri::command]

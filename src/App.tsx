@@ -37,7 +37,7 @@ import Setting from "./view/Setting.tsx"
 // const Tool = lazy(() => import("./view/Tool.tsx"))
 
 import './App.css'
-import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
+import { isQuietMode, readSubscriptionList, safeInvoke, startupShow } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
@@ -64,6 +64,13 @@ const App: React.FC = () => {
     const handleNavClick = (index: number) => {
         setNavState(index)
     }
+
+    useEffect(() => {
+        setTimeout(async () => {
+            let isQuiet = await isQuietMode()
+            if (!isQuiet) await startupShow()
+        }, 0)
+    }, [])
 
     const isVisibility = useVisibility()
     const isWindowFocused = useWindowFocused()

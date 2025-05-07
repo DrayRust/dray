@@ -10,9 +10,10 @@ export async function hideWindow() {
     if (!IS_TAURI) return false
     try {
         await getCurrentWindow().hide()
+        return true
     } catch (e) {
         log.error(`Tauri hide Window error: ${e}`)
-        return ''
+        return false
     }
 }
 
@@ -20,9 +21,10 @@ export async function showWindow() {
     if (!IS_TAURI) return false
     try {
         await getCurrentWindow().show()
+        return true
     } catch (e) {
         log.error(`Tauri show Window error: ${e}`)
-        return ''
+        return false
     }
 }
 
@@ -32,9 +34,30 @@ export async function showAndFocusWindow() {
         const window = getCurrentWindow()
         await window.show()
         await window.setFocus()
+        return true
     } catch (e) {
         log.error(`Tauri show Window error: ${e}`)
-        return ''
+        return false
+    }
+}
+
+export async function isVisibleWindow() {
+    if (!IS_TAURI) return false
+    try {
+        return await getCurrentWindow().isVisible()
+    } catch (e) {
+        log.error(`Tauri isVisibleWindow error: ${e}`)
+        return false
+    }
+}
+
+export async function isFocusedWindow() {
+    if (!IS_TAURI) return false
+    try {
+        return await getCurrentWindow().isFocused()
+    } catch (e) {
+        log.error(`Tauri isFocusedWindow error: ${e}`)
+        return false
     }
 }
 

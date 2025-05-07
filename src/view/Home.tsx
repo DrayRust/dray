@@ -13,15 +13,16 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
 
 import { useSnackbar } from "../component/useSnackbar.tsx"
 import {
-    getNetworksJson, getSysInfoJson, invokeString, isQuietMode,
+    getNetworksJson, getSysInfoJson, invokeString,
     readAppConfig, readRayCommonConfig, readRayConfig,
-    safeInvoke, setAppConfig, startupShow
+    safeInvoke, setAppConfig
 } from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
 import { DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
 import { useVisibility } from "../hook/useVisibility.ts"
+import { isVisibleWindow } from "../util/tauri.ts"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -53,19 +54,8 @@ interface XrayVersionInfo {
     go: string;
 }
 
-let IS_QUIET_MODE: boolean | null = null
-
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
-
-    // ==================================== show window ====================================
-    useEffect(() => {
-        setTimeout(async () => {
-            if (IS_QUIET_MODE !== null) return
-            IS_QUIET_MODE = await isQuietMode()
-            if (!IS_QUIET_MODE) await startupShow()
-        }, 0)
-    }, [])
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
@@ -159,12 +149,21 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
+    // ==================================== isVisible ====================================
+    const [isVisible, setIsVisible] = useState(false)
+    useEffect(() => {
+        setTimeout(async () => {
+            const isVisible = await isVisibleWindow()
+            setIsVisible(isVisible)
+        }, 0)
+    }, [])
+
     // ==================================== interval ====================================
     const [errorMsg, setErrorMsg] = useState(false)
     const intervalRef = useRef<number>(0)
     const isVisibility = useVisibility()
     useEffect(() => {
-        if (isVisibility && !errorMsg) {
+        if (isVisibility && isVisible && !errorMsg) {
             intervalRef.current = setInterval(async () => {
                 const runTime = Math.floor(Date.now() / 1000) - bootTime
                 setRunTime(Math.max(0, runTime))
@@ -177,7 +176,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             }, 1000)
         }
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, errorMsg, bootTime, rayEnable, rayCommonConfig])
+    }, [isVisibility, isVisible, errorMsg, bootTime, rayEnable, rayCommonConfig])
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])
@@ -203,7 +202,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
             if (!c || !c.inbounds || !c.outbounds) {
                 setErrorMsg(true)
                 setTimeout(() => setErrorMsg(false), 2500)
-                showSnackbar('无服务器可以启用', 'error', 2000)
+                showSnackbar('无服务器可启用', 'error', 2000)
                 return
             }
         }
