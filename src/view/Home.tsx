@@ -149,34 +149,32 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         }
     }
 
-    // ==================================== isVisible ====================================
-    const [isVisible, setIsVisible] = useState(false)
-    useEffect(() => {
-        setTimeout(async () => {
-            const isVisible = await isVisibleWindow()
-            setIsVisible(isVisible)
-        }, 0)
-    }, [])
-
     // ==================================== interval ====================================
-    const [errorMsg, setErrorMsg] = useState(false)
+    const [errorConf, setErrorConf] = useState(false)
     const intervalRef = useRef<number>(0)
     const isVisibility = useVisibility()
     useEffect(() => {
-        if (isVisibility && isVisible && !errorMsg) {
-            intervalRef.current = setInterval(async () => {
-                const runTime = Math.floor(Date.now() / 1000) - bootTime
-                setRunTime(Math.max(0, runTime))
-
-                await getNetworkData()
-
-                if (rayEnable && rayCommonConfig.stats_enable) {
-                    await loadStats(rayCommonConfig.stats_port)
-                }
-            }, 1000)
-        }
+        runGetData(isVisibility, errorConf, bootTime, rayEnable, rayCommonConfig).catch()
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, isVisible, errorMsg, bootTime, rayEnable, rayCommonConfig])
+    }, [isVisibility, errorConf, bootTime, rayEnable, rayCommonConfig])
+
+    const runGetData = async (isVisibility: boolean, errorConf: boolean, bootTime: number, rayEnable: boolean, rayConf: RayCommonConfig) => {
+        if (!isVisibility || errorConf) return
+
+        const isVisible = await isVisibleWindow()
+        if (!isVisible) return
+
+        intervalRef.current = setInterval(async () => {
+            const runTime = Math.floor(Date.now() / 1000) - bootTime
+            setRunTime(Math.max(0, runTime))
+
+            await getNetworkData()
+
+            if (rayEnable && rayConf.stats_enable) {
+                await loadStats(rayConf.stats_port)
+            }
+        }, 1000)
+    }
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])
@@ -200,8 +198,8 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         if (value) {
             let c = await readRayConfig()
             if (!c || !c.inbounds || !c.outbounds) {
-                setErrorMsg(true)
-                setTimeout(() => setErrorMsg(false), 2500)
+                setErrorConf(true)
+                setTimeout(() => setErrorConf(false), 2500)
                 showSnackbar('无服务器可启用', 'error', 2000)
                 return
             }

@@ -33,7 +33,7 @@ fn startup_show(app: AppHandle) {
     }
 
     let elapsed = START_TIME.elapsed().as_secs_f64();
-    info!("Dray startup time: {:.2}", elapsed);
+    info!("Dray startup time: {:.2} s", elapsed);
 }
 
 #[tauri::command]
