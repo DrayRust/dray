@@ -18,7 +18,7 @@ pub fn init() {
 }
 
 pub fn write_web_interface_log(log_msg: &str) -> bool {
-    let log_file = dirs::get_dray_logs_dir().unwrap().join("web_interface.log");
+    let log_file = dirs::get_dray_logs_dir().unwrap().join("dray_web_interface.log");
     match OpenOptions::new().create(true).append(true).open(&log_file) {
         Ok(file) => {
             let mut writer = BufWriter::new(file);
@@ -206,7 +206,7 @@ pub fn clear_log_all() -> bool {
 
     let preserve_files = [
         "dray.log",
-        "web_interface.log",
+        "dray_web_interface.log",
         "web_server.log",
         "xray_access.log",
         "xray_error.log",
