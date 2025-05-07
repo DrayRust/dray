@@ -71,9 +71,9 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         if (rayConf) {
             setRayCommonConfig(rayConf)
         } else {
-            rayConf = rayCommonConfig
+            // rayConf = rayCommonConfig
         }
-        if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port)
+        // if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port) // 服务还没启动完成，读取数据会失败
 
         await getSysInfo()
         await getNetworkData()
@@ -170,7 +170,7 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
             await getNetworkData()
 
-            if (rayEnable && rayConf.stats_enable) {
+            if (rayEnable && rayConf?.stats_enable && rayConf?.stats_port) {
                 await loadStats(rayConf.stats_port)
             }
         }, 1000)
