@@ -58,6 +58,7 @@ pub fn create_main_window(app: &App) -> Result<(), Box<dyn std::error::Error>> {
         .inner_size(800.0, 600.0)
         .visible(false)
         .build()?;
+    info!("Main window created");
 
     #[cfg(any(target_os = "windows", target_os = "linux"))]
     let _ = main_window.set_skip_taskbar(true);
