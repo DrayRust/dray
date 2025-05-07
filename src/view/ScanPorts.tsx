@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, CSSProperties } from 'react'
 import {
     Button, Box, Card, Dialog, DialogActions, Slider, Paper, Stack, InputAdornment,
-    Alert, TextField, Typography, IconButton, useTheme, Chip, CircularProgress,
+    Alert, TextField, Typography, IconButton, useTheme, Chip, CircularProgress, Tooltip,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -192,8 +192,12 @@ export const ScanPorts = () => {
                         sx={{width: 100}}
                     />
                     <div>
-                        <IconButton size="small" aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
-                        <IconButton size="small" aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
+                        <Tooltip arrow placement="top" title="高级设置">
+                            <IconButton size="small" aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
+                        </Tooltip>
+                        <Tooltip arrow placement="top" title="重置设置">
+                            <IconButton size="small" aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
+                        </Tooltip>
                     </div>
                 </Stack>
 
