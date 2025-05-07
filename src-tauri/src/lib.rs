@@ -365,7 +365,7 @@ pub fn run() {
         .setup(setup::init)
         .invoke_handler(tauri::generate_handler![
             dray,
-            show,
+            startup_show,
             set_focus,
             read_log_list,
             read_log_file,
