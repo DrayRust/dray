@@ -18,7 +18,7 @@ use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 fn dray(name: &str) -> String {
-    trace!("dray triggered");
+    // trace!("dray triggered");
     format!("Hello, {}! Do you know Dray is great?", name)
 }
 
@@ -26,7 +26,7 @@ fn dray(name: &str) -> String {
 fn set_focus(app: AppHandle) {
     trace!("set_focus triggered");
     if let Some(window) = app.get_webview_window("main") {
-        let _ = window.hide();
+        // let _ = window.hide();
         let _ = window.show();
         let _ = window.set_focus();
     }
