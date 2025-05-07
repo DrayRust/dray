@@ -13,13 +13,27 @@ mod setup;
 mod sys_info;
 mod web;
 use logger::{info, trace, warn};
+use once_cell::sync::Lazy;
 use serde_json::{json, Value};
+use std::time::Instant;
 use tauri::{AppHandle, Manager};
+
+static START_TIME: Lazy<Instant> = Lazy::new(Instant::now);
 
 #[tauri::command]
 fn dray(name: &str) -> String {
     // trace!("dray triggered");
     format!("Hello, {}! Do you know Dray is great?", name)
+}
+
+#[tauri::command]
+fn show(app: AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+    }
+
+    let elapsed = START_TIME.elapsed();
+    info!("App runtime: {:?}", elapsed);
 }
 
 #[tauri::command]
@@ -351,6 +365,8 @@ pub fn run() {
         .setup(setup::init)
         .invoke_handler(tauri::generate_handler![
             dray,
+            show,
+            set_focus,
             read_log_list,
             read_log_file,
             clear_log_all,
@@ -404,7 +420,6 @@ pub fn run() {
             get_ray_version,
             get_version,
             is_quiet_mode,
-            set_focus,
             quit
         ])
         .run(tauri::generate_context!())
