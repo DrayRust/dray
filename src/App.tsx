@@ -19,7 +19,6 @@ import {
 } from '@mui/icons-material'
 
 import { ThemeProvider } from './context/ThemeProvider.tsx'
-import { useWindowFocused } from './hook/useWindowFocused.ts'
 
 import Home from "./view/Home.tsx"
 import Server from "./view/Server.tsx"
@@ -42,6 +41,7 @@ import './App.css'
 import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
+import { useVisibility } from "./hook/useVisibility.ts"
 
 let subscribeLastUpdate = 0
 
@@ -75,23 +75,25 @@ const App: React.FC = () => {
         subscribeLastUpdate = Date.now()
     }, 2000)
 
-    const isWindowFocused = useWindowFocused()
+    const isVisibility = useVisibility()
     useEffect(() => {
-        setTimeout(async () => {
+        const updateFocus = async () => {
             try {
-                if (isWindowFocused) {
-                    // await getCurrentWindow().show()
-                    await getCurrentWindow().setFocus()
+                const window = getCurrentWindow()
+                if (isVisibility) {
+                    await window.show()
+                    await window.setFocus()
                 } else {
-                    // await getCurrentWindow().hide()
+                    await window.hide()
                 }
             } catch (e) {
                 // console.log(e)
             }
-        }, 0)
+        }
 
+        setTimeout(updateFocus, 0)
         setTimeout(subscribeUpdate, 0)
-    }, [isWindowFocused])
+    }, [isVisibility])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
