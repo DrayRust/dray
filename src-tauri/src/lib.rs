@@ -340,6 +340,7 @@ fn log_startup_info() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    Lazy::force(&START_TIME); // Ensure START_TIME is initialized
     args::parse_args();
     config::init();
     log::init();
