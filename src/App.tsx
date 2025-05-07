@@ -37,13 +37,13 @@ import Setting from "./view/Setting.tsx"
 // const Tool = lazy(() => import("./view/Tool.tsx"))
 
 import './App.css'
-import { isQuietMode, readSubscriptionList, safeInvoke } from "./util/invoke.ts"
+import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
 import { useWindowFocused } from "./hook/useWindowFocused.ts"
 import { useNoBackspaceNav } from "./hook/useNoBackspaceNav.ts"
-import { hideWindow, showWindow } from "./util/tauri.ts"
+import { hideWindow } from "./util/tauri.ts"
 
 let subscribeLastUpdate = 0
 
@@ -64,13 +64,6 @@ const App: React.FC = () => {
     const handleNavClick = (index: number) => {
         setNavState(index)
     }
-
-    useEffect(() => {
-        setTimeout(async () => {
-            const isQuiet = await isQuietMode()
-            !isQuiet && await showWindow()
-        }, 0)
-    }, [])
 
     const isVisibility = useVisibility()
     const isWindowFocused = useWindowFocused()

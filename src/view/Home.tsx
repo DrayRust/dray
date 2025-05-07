@@ -11,13 +11,17 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
 
-import { getNetworksJson, getSysInfoJson, invokeString, readAppConfig, readRayCommonConfig, readRayConfig, safeInvoke, setAppConfig } from "../util/invoke.ts"
+import { useSnackbar } from "../component/useSnackbar.tsx"
+import {
+    getNetworksJson, getSysInfoJson, invokeString, isQuietMode,
+    readAppConfig, readRayCommonConfig, readRayConfig,
+    safeInvoke, setAppConfig, startupShow
+} from "../util/invoke.ts"
 import { useDebounce } from "../hook/useDebounce.ts"
 import { formatSecond, formatTime, formatTimestamp, sizeToUnit } from "../util/util.ts"
 import { calculateNetworkSpeed, getStatsData, sumNetworks } from "../util/network.ts"
-import { useVisibility } from "../hook/useVisibility.ts"
 import { DEFAULT_RAY_COMMON_CONFIG } from "../util/config.ts"
-import { useSnackbar } from "../component/useSnackbar.tsx"
+import { useVisibility } from "../hook/useVisibility.ts"
 
 interface Inbound {
     totalUp: number; // 总上传
@@ -49,8 +53,19 @@ interface XrayVersionInfo {
     go: string;
 }
 
+let IS_QUIET_MODE: boolean | null = null
+
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
+
+    // ==================================== show window ====================================
+    useEffect(() => {
+        setTimeout(async () => {
+            if (IS_QUIET_MODE !== null) return
+            IS_QUIET_MODE = await isQuietMode()
+            if (!IS_QUIET_MODE) await startupShow()
+        }, 0)
+    }, [])
 
     // 从配置文件中读取配置信息
     const [rayEnable, setRayEnable] = useState(false)
