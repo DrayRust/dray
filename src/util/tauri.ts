@@ -3,7 +3,40 @@ import { enable, isEnabled, disable } from '@tauri-apps/plugin-autostart'
 import { revealItemInDir, openUrl as openUrlTauri } from '@tauri-apps/plugin-opener'
 import { Image } from '@tauri-apps/api/image'
 import { save, SaveDialogOptions } from '@tauri-apps/plugin-dialog'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { IS_TAURI, log } from "./invoke.ts"
+
+export async function hideWindow() {
+    if (!IS_TAURI) return false
+    try {
+        await getCurrentWindow().hide()
+    } catch (e) {
+        log.error(`Tauri hide Window error: ${e}`)
+        return ''
+    }
+}
+
+export async function showWindow() {
+    if (!IS_TAURI) return false
+    try {
+        await getCurrentWindow().show()
+    } catch (e) {
+        log.error(`Tauri show Window error: ${e}`)
+        return ''
+    }
+}
+
+export async function showAndFocusWindow() {
+    if (!IS_TAURI) return false
+    try {
+        const window = getCurrentWindow()
+        await window.show()
+        await window.setFocus()
+    } catch (e) {
+        log.error(`Tauri show Window error: ${e}`)
+        return ''
+    }
+}
 
 export async function showSaveDialog(options?: SaveDialogOptions) {
     if (!IS_TAURI) return false

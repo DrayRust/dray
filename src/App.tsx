@@ -36,12 +36,13 @@ import Setting from "./view/Setting.tsx"
 // const ServerImport = lazy(() => import("./view/ServerImport.tsx"))
 // const Tool = lazy(() => import("./view/Tool.tsx"))
 
-import { getCurrentWindow } from '@tauri-apps/api/window'
 import './App.css'
 import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
+import { useWindowFocused } from "./hook/useWindowFocused.ts"
+import { hideWindow, showWindow } from "./util/tauri.ts"
 
 let subscribeLastUpdate = 0
 
@@ -75,25 +76,17 @@ const App: React.FC = () => {
         subscribeLastUpdate = Date.now()
     }, 2000)
 
-    const isVisibility = useVisibility()
     useEffect(() => {
-        const updateFocus = async () => {
-            try {
-                const window = getCurrentWindow()
-                if (isVisibility) {
-                    await window.show()
-                    await window.setFocus()
-                } else {
-                    await window.hide()
-                }
-            } catch (e) {
-                // console.log(e)
-            }
-        }
+        setTimeout(showWindow, 0)
+    }, [])
 
-        setTimeout(updateFocus, 0)
-        setTimeout(subscribeUpdate, 0)
-    }, [isVisibility])
+    const isVisibility = useVisibility()
+    const isWindowFocused = useWindowFocused()
+    useEffect(() => {
+        if (isVisibility) setTimeout(subscribeUpdate, 0)
+        // if (!isVisibility || !isWindowFocused) setTimeout(hideWindow, 0)
+        if (!isVisibility) setTimeout(hideWindow, 0)
+    }, [isVisibility, isWindowFocused])
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
