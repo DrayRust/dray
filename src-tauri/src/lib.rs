@@ -333,7 +333,8 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            warn!("Duplicate startup detected: {:?}, {:?}", args, cwd);
+            warn!("Duplicate startup detected: {:?}, current working directory: {:?}", args, cwd);
+
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.show();
                 let _ = window.set_focus();

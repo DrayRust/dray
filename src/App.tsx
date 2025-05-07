@@ -77,6 +77,16 @@ const App: React.FC = () => {
     }, 2000)
 
     useEffect(() => {
+        const handleBackspace = (e: KeyboardEvent) => {
+            if (e.key === 'Backspace') e.preventDefault() // 阻止后退
+        }
+        window.addEventListener('keydown', handleBackspace)
+        return () => {
+            window.removeEventListener('keydown', handleBackspace)
+        }
+    }, [])
+
+    useEffect(() => {
         setTimeout(async () => {
             const isQuiet = await isQuietMode()
             !isQuiet && await showWindow()
