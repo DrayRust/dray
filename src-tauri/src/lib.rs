@@ -1,3 +1,4 @@
+mod args;
 mod cleanup;
 mod config;
 mod dirs;
@@ -36,6 +37,11 @@ fn quit(app: AppHandle) {
     cleanup::exit_cleanly();
     info!("Dray quit");
     app.exit(0);
+}
+
+#[tauri::command]
+fn is_quiet_mode() -> bool {
+    args::is_quiet_mode()
 }
 
 #[tauri::command]
@@ -320,6 +326,7 @@ fn log_startup_info() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    args::parse_args();
     config::init();
     log::init();
     log_startup_info();
@@ -388,6 +395,7 @@ pub fn run() {
             read_refused_log,
             get_ray_version,
             get_version,
+            is_quiet_mode,
             set_focus,
             quit
         ])
