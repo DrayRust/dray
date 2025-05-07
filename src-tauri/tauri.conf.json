@@ -10,23 +10,6 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "withGlobalTauri": false,
-    "windows": [
-      {
-        "title": "Dray",
-        "fullscreen": false,
-        "resizable": true,
-        "devtools": true,
-        "create": true,
-        "focus": true,
-        "alwaysOnTop": false,
-        "backgroundColor": "#121212",
-        "minWidth": 800,
-        "minHeight": 600,
-        "width": 800,
-        "height": 600
-      }
-    ],
     "security": {
       "csp": null
     }

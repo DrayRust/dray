@@ -12,8 +12,8 @@ use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}
 use tauri::{App, Manager, Runtime};
 
 pub fn init(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
-    if let Err(e) = set_main_window(app) {
-        error!("Failed to set main window: {}", e);
+    if let Err(e) = create_main_window(app) {
+        error!("Failed to create main window: {}", e);
     }
 
     if let Err(e) = set_tray(app) {
@@ -47,24 +47,25 @@ fn start_services() {
     }
 }
 
-fn set_main_window<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
-    let app = app.handle();
-    let main_window = app.get_webview_window("main").unwrap();
+pub fn create_main_window(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    #[cfg(target_os = "macos")]
+    app.handle().set_activation_policy(tauri::ActivationPolicy::Accessory)?;
 
-    // #[cfg(target_os = "windows")]
+    // more see: https://github.com/tauri-apps/tauri/blob/dev/crates/tauri/src/webview/webview_window.rs
+    let main_window = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()))
+        .title("Dray")
+        .min_inner_size(800.0, 600.0)
+        .inner_size(800.0, 600.0)
+        .build()?;
+
+    #[cfg(any(target_os = "windows", target_os = "linux"))]
     main_window.set_skip_taskbar(true)?;
 
-    #[cfg(target_os = "macos")]
-    app.set_activation_policy(tauri::ActivationPolicy::Accessory)?;
-
-    let app = app.clone();
+    // 取消关闭窗口事件，仅隐藏
     main_window.clone().on_window_event(move |event| {
         if let tauri::WindowEvent::CloseRequested { api, .. } = event {
             api.prevent_close();
             main_window.hide().unwrap();
-
-            #[cfg(target_os = "macos")]
-            let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
         }
     });
 
