@@ -112,7 +112,7 @@ export const ScanPorts = () => {
     const theme = useTheme()
     const textareaStyle: CSSProperties = {
         width: '100%',
-        height: '500px',
+        height: 'calc(100vh - 305px)',
         padding: '8px',
         resize: 'none',
         display: 'block',
