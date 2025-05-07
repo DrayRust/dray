@@ -47,21 +47,22 @@ fn start_services() {
     }
 }
 
-pub fn create_main_window(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+pub fn create_main_window(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(target_os = "macos")]
-    app.handle().set_activation_policy(tauri::ActivationPolicy::Accessory)?;
+    let _ = app.handle().set_activation_policy(tauri::ActivationPolicy::Accessory);
 
     // more see: https://github.com/tauri-apps/tauri/blob/dev/crates/tauri/src/webview/webview_window.rs
     let main_window = tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()))
         .title("Dray")
         .min_inner_size(800.0, 600.0)
         .inner_size(800.0, 600.0)
+        .visible(false)
         .build()?;
 
     #[cfg(any(target_os = "windows", target_os = "linux"))]
-    main_window.set_skip_taskbar(true)?;
+    let _ = main_window.set_skip_taskbar(true);
 
-    // 取消关闭窗口事件，仅隐藏
+    // 注册关闭事件：拦截并隐藏窗口
     main_window.clone().on_window_event(move |event| {
         if let tauri::WindowEvent::CloseRequested { api, .. } = event {
             api.prevent_close();
