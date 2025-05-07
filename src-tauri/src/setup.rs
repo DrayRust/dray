@@ -11,7 +11,7 @@ use tauri::path::BaseDirectory;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{App, Manager, Runtime};
 
-pub fn init<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
+pub fn init(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     if let Err(e) = set_main_window(app) {
         error!("Failed to set main window: {}", e);
     }
@@ -34,6 +34,17 @@ pub fn init<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
     });
 
     Ok(())
+}
+
+fn start_services() {
+    let config = config::get_config();
+    if config.ray_enable {
+        ray::start();
+        network::setup_proxies();
+    }
+    if config.web_server_enable {
+        web::start();
+    }
 }
 
 fn set_main_window<R: Runtime>(app: &App<R>) -> tauri::Result<()> {
@@ -170,15 +181,4 @@ fn prepare_ray_resources(resource_dir: std::path::PathBuf) -> Result<(), Box<dyn
     fs::remove_dir_all(&resource_dir)?;
 
     Ok(())
-}
-
-fn start_services() {
-    let config = config::get_config();
-    if config.ray_enable {
-        ray::start();
-        network::setup_proxies();
-    }
-    if config.web_server_enable {
-        web::start();
-    }
 }

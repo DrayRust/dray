@@ -11,7 +11,7 @@ mod setting;
 mod setup;
 mod sys_info;
 mod web;
-use logger::{debug, info, trace};
+use logger::{info, trace};
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager};
 
@@ -333,10 +333,7 @@ pub fn run() {
         ))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .setup(|app| {
-            setup::init(app)?;
-            Ok(())
-        })
+        .setup(setup::init)
         .invoke_handler(tauri::generate_handler![
             dray,
             read_log_list,
