@@ -12,7 +12,7 @@ mod setting;
 mod setup;
 mod sys_info;
 mod web;
-use logger::{info, trace};
+use logger::{info, trace, warn};
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager};
 
@@ -332,6 +332,13 @@ pub fn run() {
     log_startup_info();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+            warn!("Duplicate startup detected: {:?}, {:?}", args, cwd);
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(cleanup::init())
         .plugin(tauri_plugin_autostart::init(
