@@ -37,7 +37,7 @@ import Setting from "./view/Setting.tsx"
 // const Tool = lazy(() => import("./view/Tool.tsx"))
 
 import './App.css'
-import { readSubscriptionList, safeInvoke } from "./util/invoke.ts"
+import { isQuietMode, readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
@@ -77,7 +77,10 @@ const App: React.FC = () => {
     }, 2000)
 
     useEffect(() => {
-        setTimeout(showWindow, 0)
+        setTimeout(async () => {
+            const isQuiet = await isQuietMode()
+            !isQuiet && await showWindow()
+        }, 0)
     }, [])
 
     const isVisibility = useVisibility()

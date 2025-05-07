@@ -83,6 +83,10 @@ export async function readRayConfig(): Promise<any> {
     return safeInvoke('read_ray_config')
 }
 
+export async function isQuietMode() {
+    return invokeBool('is_quiet_mode')
+}
+
 export async function saveRayConfig(content: any) {
     return invokeBool('save_ray_config', {content: jsonStringify(content)})
 }
