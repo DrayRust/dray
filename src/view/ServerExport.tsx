@@ -199,7 +199,7 @@ const ServerExport: React.FC<NavProps> = ({setNavState}) => {
                         <Button variant="contained" onClick={handleExportTextFile} startIcon={<SaveAltIcon/>}>导出备份文件</Button>
                     </Stack>
                     {psList.map((ps, i) => (
-                        <Accordion key={i} defaultExpanded={i === 0} onChange={() => handleAccordion(i)}>
+                        <Accordion elevation={3} key={i} defaultExpanded={i === 0} onChange={() => handleAccordion(i)}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography component="span">{ps}</Typography>
                             </AccordionSummary>

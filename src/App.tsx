@@ -62,28 +62,12 @@ const App: React.FC = () => {
         setNavState(index)
     }
 
-    const subscribeUpdate = useDebounce(async () => {
-        if (Date.now() - subscribeLastUpdate < 1000 * 60 * 10) return // 更新频率，不要超过 10 分钟
-
-        const subList = await readSubscriptionList() as SubscriptionList
-        if (subList) {
-            for (const row of subList) {
-                if (row.autoUpdate) {
-                    await getSubscription(row)
-                }
-            }
-        }
-        subscribeLastUpdate = Date.now()
-    }, 2000)
-
     useEffect(() => {
         const handleBackspace = (e: KeyboardEvent) => {
             if (e.key === 'Backspace') e.preventDefault() // 阻止后退
         }
         window.addEventListener('keydown', handleBackspace)
-        return () => {
-            window.removeEventListener('keydown', handleBackspace)
-        }
+        return () => window.removeEventListener('keydown', handleBackspace)
     }, [])
 
     useEffect(() => {
@@ -99,6 +83,20 @@ const App: React.FC = () => {
         if (isVisibility) setTimeout(subscribeUpdate, 0)
         if (!isVisibility && !isWindowFocused) setTimeout(hideWindow, 0)
     }, [isVisibility, isWindowFocused])
+
+    const subscribeUpdate = useDebounce(async () => {
+        if (Date.now() - subscribeLastUpdate < 1000 * 60 * 10) return // 更新频率，不要超过 10 分钟
+
+        const subList = await readSubscriptionList() as SubscriptionList
+        if (subList) {
+            for (const row of subList) {
+                if (row.autoUpdate) {
+                    await getSubscription(row)
+                }
+            }
+        }
+        subscribeLastUpdate = Date.now()
+    }, 2000)
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
