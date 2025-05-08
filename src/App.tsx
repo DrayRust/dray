@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import {
@@ -60,10 +60,15 @@ const App: React.FC = () => {
         {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
+    const isElapsed = useRef(false)
     useEffect(() => {
         setTimeout(async () => {
+            if (isElapsed.current) return
+            isElapsed.current = true
+
             let isQuiet = await isQuietMode()
             if (!isQuiet) await showWindow()
+
             await appElapsed()
         }, 0)
     }, [])
