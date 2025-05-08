@@ -54,6 +54,8 @@ interface XrayVersionInfo {
     go: string;
 }
 
+let isVisited = false
+
 const Home: React.FC<NavProps> = ({setNavState}) => {
     useEffect(() => setNavState(0), [setNavState])
 
@@ -71,12 +73,16 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         if (rayConf) {
             setRayCommonConfig(rayConf)
         } else {
-            // rayConf = rayCommonConfig
+            rayConf = rayCommonConfig
         }
-        // if (rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port) // 服务还没启动完成，读取数据会失败
 
         await getSysInfo()
         await getNetworkData()
+
+        // 如果 xray 服务还没启动完成，读取 API 会失败，设计一个变量，控制首次访问不读取
+        if (isVisited && rayEnable && rayConf.stats_enable) await loadStats(rayConf.stats_port)
+
+        isVisited = true
     }, 100)
     useEffect(loadConfig, [])
 
@@ -135,46 +141,46 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
 
     // ==================================== system info ====================================
     const [sysInfo, setSysInfo] = useState<any>({})
-    const [bootTime, setBootTime] = useState(0)
-    const [runTime, setRunTime] = useState(0)
+    const [bootTime, setBootTime] = useState(0) // 开机时间
+    const [runTime, setRunTime] = useState(0) // 运行时间
     const getSysInfo = async () => {
         let info = await getSysInfoJson()
         if (info) {
             setSysInfo(info)
             if (info.uptime && info.uptime > 0) {
-                const booTime = Math.floor(Date.now() / 1000) - info.uptime
-                setBootTime(Math.max(0, booTime))
+                const bootTime = Math.floor(Date.now() / 1000) - info.uptime
+                setBootTime(Math.max(0, bootTime))
                 setRunTime(info.uptime)
             }
         }
     }
 
     // ==================================== interval ====================================
-    const [errorConf, setErrorConf] = useState(false)
+    const [errorEnabled, setErrorEnabled] = useState(false)
     const intervalRef = useRef<number>(0)
+    const [isVisible, setIsVisible] = useState(false)
     const isVisibility = useVisibility()
     useEffect(() => {
-        runGetData(isVisibility, errorConf, bootTime, rayEnable, rayCommonConfig).catch()
+        setTimeout(async () => {
+            const isVisible = await isVisibleWindow()
+            setIsVisible(isVisible)
+        }, 0)
+
+        if (isVisibility && isVisible && !errorEnabled && bootTime) {
+            intervalRef.current = setInterval(async () => {
+                const runTime = Math.floor(Date.now() / 1000) - bootTime
+                setRunTime(Math.max(0, runTime))
+
+                await getNetworkData()
+
+                if (rayEnable && rayCommonConfig?.stats_enable && rayCommonConfig?.stats_port) {
+                    await loadStats(rayCommonConfig.stats_port)
+                }
+            }, 1000)
+        }
+
         return () => clearInterval(intervalRef.current)
-    }, [isVisibility, errorConf, bootTime, rayEnable, rayCommonConfig])
-
-    const runGetData = async (isVisibility: boolean, errorConf: boolean, bootTime: number, rayEnable: boolean, rayConf: RayCommonConfig) => {
-        if (!isVisibility || errorConf) return
-
-        const isVisible = await isVisibleWindow()
-        if (!isVisible) return
-
-        intervalRef.current = setInterval(async () => {
-            const runTime = Math.floor(Date.now() / 1000) - bootTime
-            setRunTime(Math.max(0, runTime))
-
-            await getNetworkData()
-
-            if (rayEnable && rayConf?.stats_enable && rayConf?.stats_port) {
-                await loadStats(rayConf.stats_port)
-            }
-        }, 1000)
-    }
+    }, [isVisibility, isVisible, errorEnabled, bootTime, rayEnable, rayCommonConfig])
 
     // ==================================== network ====================================
     const [network, setNetwork] = useState<any>([])
@@ -198,8 +204,8 @@ const Home: React.FC<NavProps> = ({setNavState}) => {
         if (value) {
             let c = await readRayConfig()
             if (!c || !c.inbounds || !c.outbounds) {
-                setErrorConf(true)
-                setTimeout(() => setErrorConf(false), 2500)
+                setErrorEnabled(true)
+                setTimeout(() => setErrorEnabled(false), 2500)
                 showSnackbar('无服务器可启用', 'error', 2000)
                 return
             }

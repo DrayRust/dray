@@ -60,11 +60,6 @@ const App: React.FC = () => {
         {path: '/setting', text: '设置', icon: <SettingsIcon/>}
     ]
 
-    const [navState, setNavState] = useState(-1)
-    const handleNavClick = (index: number) => {
-        setNavState(index)
-    }
-
     useEffect(() => {
         setTimeout(async () => {
             let isQuiet = await isQuietMode()
@@ -92,6 +87,12 @@ const App: React.FC = () => {
         }
         subscribeLastUpdate = Date.now()
     }, 2000)
+
+    // ====================== nav ======================
+    const [navState, setNavState] = useState(-1)
+    const handleNavClick = (index: number) => {
+        setNavState(index)
+    }
 
     const CustomListItemIcon = styled(ListItemIcon)(() => ({minWidth: 36}))
 
