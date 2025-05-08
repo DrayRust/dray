@@ -203,7 +203,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <JsonCodeViewer value={headersValue}/>
+                        <JsonCodeViewer value={headersValue} height="calc(100vh - 340px)"/>
                     </Card>
                 </>) : requestType === 'html' && (<>
                     <Card elevation={4}>
@@ -216,7 +216,7 @@ export const HttpTest = () => {
                                 </Stack>
                             </Stack>
                         </Paper>
-                        <HtmlCodeViewer value={htmlValue}/>
+                        <HtmlCodeViewer value={htmlValue} height="calc(100vh - 340px)"/>
                     </Card>
                 </>)}
             </>)}
