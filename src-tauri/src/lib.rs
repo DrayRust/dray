@@ -28,10 +28,10 @@ fn dray(name: &str) -> String {
 
 #[tauri::command]
 fn app_elapsed() {
-    let elapsed = START_TIME.elapsed();
+    let elapsed = START_TIME.elapsed().as_secs_f64();
     // 大于 10 s 不记录日志，通常是开发调试，刷新造成
-    if elapsed.as_secs_f64() < 10.0 {
-        info!("Dray startup time: {:?}", elapsed);
+    if elapsed < 10.0 {
+        info!("Dray startup time: {:.2} s", elapsed);
     }
 }
 
