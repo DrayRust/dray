@@ -192,10 +192,10 @@ export const ScanPorts = () => {
                         sx={{width: 100}}
                     />
                     <div>
-                        <Tooltip arrow placement="top" title="高级设置">
+                        <Tooltip arrow placement="top" title="高级">
                             <IconButton size="small" aria-label="settings" onClick={() => setOpen(true)}><SettingsIcon/></IconButton>
                         </Tooltip>
-                        <Tooltip arrow placement="top" title="重置设置">
+                        <Tooltip arrow placement="top" title="重置">
                             <IconButton size="small" aria-label="reset" onClick={handleReset}><RestartAltIcon/></IconButton>
                         </Tooltip>
                     </div>

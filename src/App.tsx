@@ -37,13 +37,13 @@ import Setting from "./view/Setting.tsx"
 // const Tool = lazy(() => import("./view/Tool.tsx"))
 
 import './App.css'
-import { isQuietMode, readSubscriptionList, safeInvoke, startupShow } from "./util/invoke.ts"
+import { appElapsed, isQuietMode, readSubscriptionList, safeInvoke } from "./util/invoke.ts"
 import { getSubscription } from "./util/subscription.ts"
 import { useDebounce } from "./hook/useDebounce.ts"
 import { useVisibility } from "./hook/useVisibility.ts"
 import { useWindowFocused } from "./hook/useWindowFocused.ts"
 import { useNoBackspaceNav } from "./hook/useNoBackspaceNav.ts"
-import { hideWindow } from "./util/tauri.ts"
+import { hideWindow, showWindow } from "./util/tauri.ts"
 
 let subscribeLastUpdate = 0
 
@@ -63,7 +63,8 @@ const App: React.FC = () => {
     useEffect(() => {
         setTimeout(async () => {
             let isQuiet = await isQuietMode()
-            if (!isQuiet) await startupShow()
+            if (!isQuiet) await showWindow()
+            await appElapsed()
         }, 0)
     }, [])
 

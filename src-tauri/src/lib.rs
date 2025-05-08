@@ -27,13 +27,19 @@ fn dray(name: &str) -> String {
 }
 
 #[tauri::command]
-fn startup_show(app: AppHandle) {
+fn app_elapsed() {
+    let elapsed = START_TIME.elapsed();
+    // 大于 10 s 不记录日志，通常是开发调试，刷新造成
+    if elapsed.as_secs_f64() < 10.0 {
+        info!("Dray startup time: {:?}", elapsed);
+    }
+}
+
+#[tauri::command]
+fn show(app: AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
     }
-
-    let elapsed = START_TIME.elapsed().as_secs_f64();
-    info!("Dray startup time: {:.2} s", elapsed);
 }
 
 #[tauri::command]
@@ -366,7 +372,8 @@ pub fn run() {
         .setup(setup::init)
         .invoke_handler(tauri::generate_handler![
             dray,
-            startup_show,
+            app_elapsed,
+            show,
             set_focus,
             read_log_list,
             read_log_file,

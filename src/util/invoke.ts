@@ -83,8 +83,8 @@ export async function readRayConfig(): Promise<any> {
     return safeInvoke('read_ray_config')
 }
 
-export async function startupShow() {
-    return invokeBool('startup_show')
+export async function appElapsed() {
+    return safeInvoke('app_elapsed')
 }
 
 export async function isQuietMode() {
