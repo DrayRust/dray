@@ -33,4 +33,4 @@ jobs:
                     tagName: v__VERSION__
                     releaseName: "Dray v__VERSION__"
                     releaseBody: "Dray 1.0.0 发布"
-                    tauriScript: pnpm tauri build
+                    tauriScript: pnpm
